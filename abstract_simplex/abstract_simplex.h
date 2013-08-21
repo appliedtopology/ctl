@@ -5,6 +5,7 @@
 #include <initializer_list>  // std::initializer_list
 #include <iostream> //cout (debug only)
 #include <algorithm> //sort, unique
+#include "simplex_boundary.h"
 namespace ct {
 
 //T must be a type with `<` a strict-weak-ordering
@@ -15,6 +16,7 @@ class Abstract_simplex {
 	typedef Abstract_simplex< T> Self;
 	typedef std::initializer_list< T> Init_list;
 	public:
+	typedef std::size_t size_t;
 	typedef typename Vector::value_type value_type;
 	typedef typename Vector::value_type vertex_type;
 	typedef typename Vector::const_iterator const_iterator;
@@ -28,8 +30,9 @@ class Abstract_simplex {
 				vertices.end() );
 
 	}
-	Abstract_simplex( const const_iterator begin, 
-			  const const_iterator end): vertices( begin,end){};
+	template< typename Iterator>
+	Abstract_simplex( const Iterator begin, 
+			  const Iterator end): vertices( begin,end){};
 	Abstract_simplex( const Self & from): vertices( from.vertices){};
 
 	iterator       begin()	        { return vertices.begin(); 	}
@@ -57,6 +60,15 @@ class Abstract_simplex {
 				vertices.end() );
 	
 	}
+	template< typename Iterator>
+	void insert( Iterator first, Iterator last){
+	        std::size_t offset = vertices.size();
+		vertices.insert( vertices.end(), first, last);
+		std::inplace_merge( vertices.begin(), 
+				    vertices.begin()+offset, vertices.end());
+		vertices.erase( unique( vertices.begin(), vertices.end() ), 
+				vertices.end() );
+	}
 	iterator remove( const vertex_type v){
 		iterator pos = std::lower_bound( begin(), end(), v);
 		//element not in list
@@ -74,6 +86,9 @@ class Abstract_simplex {
 	}
 	private:
 	Vector vertices;
+
+	template< typename Self, typename Coefficient> 
+	friend class ct::Simplex_boundary< Self, Coefficient>::const_iterator; 
 }; //Abstract_simplex
 
 } // namespace ct
@@ -81,7 +96,7 @@ class Abstract_simplex {
 template< typename Stream, typename T>
 Stream& operator<<( Stream & out, const ct::Abstract_simplex< T> simplex){
 	typedef typename ct::Abstract_simplex< T>::const_iterator iterator;
-	out << "[";
+out << "[";
 	for(iterator i = simplex.begin(); i != simplex.end(); ++i){
 		out << *i;
 		if ( i+1 != simplex.end()) { out << ", "; } else { out << "]";}

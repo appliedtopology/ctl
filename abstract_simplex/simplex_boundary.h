@@ -1,7 +1,6 @@
 #ifndef SIMPLEX_BOUNDARY_H
 #define SIMPLEX_BOUNDARY_H
 #include "term.h"
-
 //non-exported functionality
 namespace {
 
@@ -19,38 +18,38 @@ class const_boundary_iterator :
 	  typedef typename Cell::value_type Vertex;
 	public:
 	  //default constructor
-	  const_boundary_iterator(): cellptr( 0), pos( 0){}
-	  const_boundary_iterator( const Cell & s): pos( 0){
-	  	if( s.dimension()){
+	 const_boundary_iterator(): cellptr( 0), pos( 0){}
+	 const_boundary_iterator( const Cell & s): pos( 0){ 
+		if( s.dimension()){
 		    //begin by removing first vertex
 		    cellptr = &s;
 		    removed = s.vertices[ 0];
+		    face.coefficient( 1);
 		    face.cell().vertices.resize( s.dimension());
-		    face.set_coefficient( 1);
-		    std::copy( s.begin()+1, s.end(), face.cell().begin());
+		    std::copy( s.begin()+1, s.end(), 
+			       face.cell().vertices.begin()); 
 		}else{ cellptr = 0; } //\partial(vertex) = 0
-	  }
-	  //copy constructor
-	  const_boundary_iterator( const Self & from): cellptr( from.cellptr), 
-	  face(from.face), pos( from.pos), removed( from.removed){}
-	  const_boundary_iterator& operator=( const_boundary_iterator & from){
-	  	cellptr = from.cellptr;
-		pos = from.pos;
-		face = from.face;
-		removed = from.removed;
-		return &(*this);
 	 }
-	 const Term& operator*() const {
-	 	if( cellptr){ return face; }
-		std::cerr << "Error! Attempting to Dereference the end" 
-			  << std::flush << std::endl;
-		std::exit( EXIT_FAILURE);
-	 }
-	 const Term* operator->() const { return &face; }
-	 bool operator==( const_boundary_iterator & b) const { 
+	 //copy constructor
+	 const_boundary_iterator( const Self & from): cellptr( from.cellptr), 
+	 face(from.face), pos( from.pos), removed( from.removed){}
+	 const_boundary_iterator& operator==( const Self & b) const { 
 		return (b.cellptr == cellptr) && (b.pos == pos); 
-	 }
-	 bool operator!=( const_boundary_iterator & b) const { 
+	 } 
+	const_boundary_iterator& operator= (const Self & b){
+		cellptr = b.cellptr;
+		remove = b.removed;
+		face = b.face;
+		pos = b.pos;
+		return *this;
+	}
+	Term& operator*() { 
+		if( cellptr != 0) { return face; } 
+		std::cerr << "Cannot Dereference End" << std::endl; 
+		std::exit( -1); 
+	}
+	const Term* operator->() const { return &face; }
+	bool operator!=( const const_boundary_iterator & b) const { 
 		return (b.cellptr != cellptr) || (b.pos != pos); 
 	 }
 
@@ -58,10 +57,11 @@ class const_boundary_iterator :
 		if( pos == face.cell().size()){
 			cellptr = 0;
 			pos = 0;
+			return *this;
 		}
 		//return removed vertex, get rid of another one
 		std::swap( face.cell().vertices[ pos++], removed);
-		face.set_coefficient( -face.get_coefficient());
+		face.coefficient( -face.coefficient());
 		return *this;	
 	 }
 
@@ -73,27 +73,30 @@ class const_boundary_iterator :
 
 	 private:
 		const Cell* cellptr;
-		typename Cell::size_type pos;
+		typename Cell::size_t pos;
 		Term face;
 		Vertex removed;
-			
 	}; // END const_boundary_iterator
 } //END private namespace
 
 namespace ct { 
-template< typename Simplex_, typename Coefficient, 
-	  template<typename, typename> class Term_ >
+template< typename Simplex_, typename Coefficient_>
 class Simplex_boundary {
 public:
 	typedef Simplex_ Simplex;
-	typedef Term_< Simplex, Coefficient> Term;
+	typedef Coefficient_ Coefficient;
+	typedef ct::Term< Simplex, Coefficient> Term;
 	typedef const_boundary_iterator< Term> const_iterator;
 	//default constructor
 	Simplex_boundary(){};	
 
+	Simplex_boundary& operator=( const Simplex_boundary& from){ return *this;}
 	//It only makes sense for const iterators
 	const_iterator begin( const Simplex & s){ return const_iterator( s); }
-	const_iterator end( const Simplex & s){};
+	const_iterator end( const Simplex & s){ return const_iterator();};
+	std::size_t length( const Simplex & s) const { 
+		return (s.size()>1)? s.size():0;
+	}
 }; //Simplex_boundary
 
 } // end namespace ct

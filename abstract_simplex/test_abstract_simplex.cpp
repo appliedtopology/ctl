@@ -2,10 +2,12 @@
 #include "abstract_simplex.h"
 #include <iostream>
 #include "simplex_boundary.h"
+#include "term.h"
 
 //#include "simplex_boundary.h"
 
-typedef ct::Abstract_simplex< std::size_t> Simplex;
+typedef ct::Abstract_simplex< int> Simplex;
+typedef ct::Simplex_boundary< Simplex, int> Boundary;
 int main( int argc, char** argv){
 	Simplex s;
 	s.insert( 2);
@@ -26,6 +28,13 @@ int main( int argc, char** argv){
 	std::cout << "t = " << t << std::flush << std::endl;
 	t.remove( t.begin()+2, t.begin()+4);
 	std::cout << "t = " << t << std::flush << std::endl;
+	Boundary b;
+	b.begin( t);
+	auto i=b.end( t);
+	i++;
+	for (auto i = b.begin( t); i != b.end( t); ++i){
+		std::cout << (*i).cell() << std::endl;
+	}
 	return 0;
 }
 

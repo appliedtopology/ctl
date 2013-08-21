@@ -14,5 +14,5 @@ if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" VERSION_GREATER 2.6)
   endif()
 endif()
 
-add_subdirectory( abstract_simplex)
 add_subdirectory( term)
+add_subdirectory( abstract_simplex)
