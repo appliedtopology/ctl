@@ -84,19 +84,19 @@ class Abstract_simplex {
 	bool operator==( const Self & b) const { 
 		return std::equal( begin(), end(), b.begin()); 
 	}
+	
 	private:
 	Vector vertices;
 
 	template< typename Self, typename Coefficient> 
 	friend class ct::Simplex_boundary< Self, Coefficient>::const_iterator; 
 }; //Abstract_simplex
-
 } // namespace ct
 
 template< typename Stream, typename T>
-Stream& operator<<( Stream & out, const ct::Abstract_simplex< T> simplex){
+Stream& operator<<(Stream& out, const ct::Abstract_simplex< T> simplex){
 	typedef typename ct::Abstract_simplex< T>::const_iterator iterator;
-out << "[";
+	out << "[";
 	for(iterator i = simplex.begin(); i != simplex.end(); ++i){
 		out << *i;
 		if ( i+1 != simplex.end()) { out << ", "; } else { out << "]";}

@@ -14,6 +14,6 @@ int main( int argc, char** argv){
 	Complex c;
 	Cell s( {1,2,3,4});
 	c.insert_closed_cell( s);
-	//std::cout << c << std::endl;
+	std::cout << c << std::endl;
 	return 0;
 }

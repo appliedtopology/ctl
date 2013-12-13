@@ -2,7 +2,10 @@
 #define CELL_MAP_H
 #include <unordered_map>
 #include <sstream>
+
 #include "hash/hash.h"
+#include "io/io.h"
+#include "abstract_simplex/abstract_simplex.h"
 
 //forward declaration
 namespace ct{
@@ -17,10 +20,16 @@ class Data_with_id : public Data_ {
 	private:
 	typedef Data_with_id< Data_> Self;
 	public:
-	Data_with_id(): id( 0) {};
-	Data_with_id( const Data_with_id & from) {}
+	//default
+	Data_with_id(): id_( 0) {};
+	//copy
+	Data_with_id( const Data_with_id & from) : id_( from.id_) {} 
+	//move
+	Data_with_id( const Data_with_id && from): id_( std::move( id_)) {} 
+	
+	std::size_t id() const { return id_; }
 	private:
-	std::size_t id;
+	std::size_t id_;
 	//(to be read in Millhouse Van Houten's voice)
 	//This lets the cell_map touch my privates ;)
 	template< typename C, typename B, typename D, typename H>
@@ -53,11 +62,15 @@ public:
 	typedef typename Map::value_type value_type;
 public:
 	//Constructors
-	Cell_map() {}; //Default
-	Cell_map( const Cell_map & b): cells( b.cells), bd( b.bd) {}; //Copy
+	//Default
+	Cell_map() {}; 
+	//Copy
+	Cell_map( const Cell_map & b): cells( b.cells), bd( b.bd),
+					 max_id( b.max_id) {}; 
 	//Move
 	Cell_map( Cell_map && b): cells( std::move( b.cells)), 
-				  bd( std::move( b.bd)), max_id(b.max_id) {} 
+				  bd( std::move( b.bd)), 
+				  max_id( std::move(b.max_id)) {} 
 
 	// assignment operator
 	Cell_map& operator=( const Cell_map& b){
@@ -92,11 +105,12 @@ public:
 	std::pair< iterator, bool> insert_open_cell( const Cell & s, 
 						     const Data& data=Data()){
 	  std::pair< iterator, bool> c =  cells.emplace( s, data);
-	  if( c.second) { //this outer if is probably unnecessary 
-	    if( c.first->second.id == 0){ 
-	     c.first->second.id = ++max_id;
+	  if( c.second) { //this outer if is probably unnecessary
+	    max_dim = std::max( max_dim, s.dimension());
+	    if( c.first->second.id_ == 0){ 
+	     c.first->second.id_ = ++max_id;
 	    } else{ 
-	     max_id=std::max( max_id, c.first->second.id);
+	     max_id=std::max( max_id, c.first->second.id_);
 	    }
 	  }
 	  return c;	
@@ -116,7 +130,7 @@ public:
 		
 		//first you add the boundary
 		Data face_data( data);
-		face_data.id = 0;
+		face_data.id_ = 0;
 		for( auto face = bd.begin( s); face != bd.end( s); ++face){
 		 const Pair & p = insert_closed_cell( face->cell(), 
 						      closed, face_data);
@@ -127,39 +141,42 @@ public:
 		const std::pair< iterator, bool> p(insert_open_cell( s, data));
 		return std::make_pair( p.first, p.second+num_faces_inserted);
 	}
-	const std::size_t dimension(){ return max_dim; }
+	const std::size_t dimension() const { return max_dim; }
+	Boundary& boundary() { return bd; }
+	
 private:
 	Map cells;
 	Boundary bd;
 	std::size_t max_id;
 	std::size_t max_dim;
 }; //cell_map
+} //namespace ct
 
-template< typename Cell, typename Boundary, typename Data, typename Hash>
+template< typename Stream, typename Cell, 
+	  typename Boundary, typename Data, typename Hash>
 Stream& operator>>( Stream& in, ct::Cell_map< Cell, Boundary, Data, Hash> & c){ 
-	char line[ ];
 	std::size_t line_num = 0;
+	std::string line;
+	std::size_t id=0;
 	while( ct::get_line(in, line, line_num)){
 		std::istringstream ss( line);
-		Cell c;
+		Cell cell;
 		ss >> id;
-		ss >> c;
+		ss >> cell;
 		c.insert_open_cell( cell, Data( id));
 	}
 	return in;
 }
 
-template< typename Cell, typename Boundary, typename Data, typename Hash>
+template< typename Stream, typename Cell, typename Boundary, 
+	   typename Data, typename Hash>
 Stream& operator<<( Stream& out, 
 		    const ct::Cell_map< Cell, Boundary, Data, Hash> & c){ 
-	for(auto i = c.begin(); 
-		 i != c.end(); ++i){
-		std::cout << i->second.id() << " " 
-			  << i->first << " " 
-			  << i->second << std::endl;
+	for(auto i = c.begin(); i != c.end(); ++i){
+		std::cout << i->second.id() <<": " << i->first << " --> {" 
+			  << i->second << "}" << std::endl;
 	}
 	return out;
 }
 
-} //namespace ct
 #endif //CELL_MAP_H
