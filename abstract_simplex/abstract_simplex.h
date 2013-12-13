@@ -78,10 +78,10 @@ class Abstract_simplex {
 	iterator remove( iterator first, iterator last){
 		return vertices.erase( first, last);
 	}
-	bool operator<( const Self & b) {
+	bool operator<( const Self & b) const {
 		return std::lexicographical_compare( begin(), end(), b.begin());
 	} 
-	bool operator==( const Self & b) { 
+	bool operator==( const Self & b) const { 
 		return std::equal( begin(), end(), b.begin()); 
 	}
 	private:

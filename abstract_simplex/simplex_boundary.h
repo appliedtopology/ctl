@@ -1,6 +1,6 @@
 #ifndef SIMPLEX_BOUNDARY_H
 #define SIMPLEX_BOUNDARY_H
-#include "term.h"
+#include "term/term.h"
 //non-exported functionality
 namespace {
 
@@ -18,8 +18,8 @@ class const_boundary_iterator :
 	  typedef typename Cell::value_type Vertex;
 	public:
 	  //default constructor
-	 const_boundary_iterator(): cellptr( 0), pos( 0){}
-	 const_boundary_iterator( const Cell & s): pos( 0){ 
+	const_boundary_iterator(): cellptr( 0), pos( 0){}
+	const_boundary_iterator( const Cell & s): pos( 0){ 
 		if( s.dimension()){
 		    //begin by removing first vertex
 		    cellptr = &s;
@@ -29,13 +29,13 @@ class const_boundary_iterator :
 		    std::copy( s.begin()+1, s.end(), 
 			       face.cell().vertices.begin()); 
 		}else{ cellptr = 0; } //\partial(vertex) = 0
-	 }
-	 //copy constructor
-	 const_boundary_iterator( const Self & from): cellptr( from.cellptr), 
-	 face(from.face), pos( from.pos), removed( from.removed){}
-	 const_boundary_iterator& operator==( const Self & b) const { 
+	}
+	//copy constructor
+	const_boundary_iterator( const Self & from): cellptr( from.cellptr), 
+	face(from.face), pos( from.pos), removed( from.removed){}
+	const_boundary_iterator& operator==( const Self & b) const { 
 		return (b.cellptr == cellptr) && (b.pos == pos); 
-	 } 
+	} 
 	const_boundary_iterator& operator= (const Self & b){
 		cellptr = b.cellptr;
 		remove = b.removed;
@@ -51,9 +51,9 @@ class const_boundary_iterator :
 	const Term* operator->() const { return &face; }
 	bool operator!=( const const_boundary_iterator & b) const { 
 		return (b.cellptr != cellptr) || (b.pos != pos); 
-	 }
+	}
 
-	 const_boundary_iterator& operator++(){
+	const_boundary_iterator& operator++(){
 		if( pos == face.cell().size()){
 			cellptr = 0;
 			pos = 0;
@@ -63,7 +63,7 @@ class const_boundary_iterator :
 		std::swap( face.cell().vertices[ pos++], removed);
 		face.coefficient( -face.coefficient());
 		return *this;	
-	 }
+	}
 
 	 const_boundary_iterator operator++( int){
 	 	const_boundary_iterator tmp( *this); 

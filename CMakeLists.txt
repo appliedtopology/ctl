@@ -16,3 +16,4 @@ endif()
 
 add_subdirectory( term)
 add_subdirectory( abstract_simplex)
+add_subdirectory( cell_map)

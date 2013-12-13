@@ -1,0 +1,62 @@
+Scanning dependencies of target tc
+[100%] Building CXX object cell_map/CMakeFiles/tc.dir/test_cell_map.cpp.o
+In file included from /Users/rhl/code/ctlib/cell_map/test_cell_map.cpp:2:
+In file included from /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1/iostream:38:
+In file included from /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1/ios:216:
+In file included from /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1/__locale:18:
+In file included from /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1/mutex:177:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1/functional:521:21: error: invalid operands to binary expression ('const ct::Abstract_simplex<int>' and 'const ct::Abstract_simplex<int>')
+        {return __x == __y;}
+                ~~~ ^  ~~~
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1/unordered_map:417:17: note: in instantiation of member function 'std::__1::equal_to<ct::Abstract_simplex<int> >::operator()' requested here
+        {return static_cast<const _Pred&>(*this)(__x.first, __y);}
+                ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1/__hash_table:1600:21: note: in instantiation of member function 'std::__1::__unordered_map_equal<ct::Abstract_simplex<int>, <anonymous>::Data_with_id<<anonymous>::Default_data>, std::__1::equal_to<ct::Abstract_simplex<int> >, true>::operator()' requested here
+                if (key_eq()(__nd->__value_, __k))
+                    ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1/unordered_map:850:69: note: in instantiation of function template specialization 'std::__1::__hash_table<std::__1::pair<ct::Abstract_simplex<int>, <anonymous>::Data_with_id<<anonymous>::Default_data> >, std::__1::__unordered_map_hasher<ct::Abstract_simplex<int>, <anonymous>::Data_with_id<<anonymous>::Default_data>, ct::Hash<ct::Abstract_simplex<int> >, true>, std::__1::__unordered_map_equal<ct::Abstract_simplex<int>, <anonymous>::Data_with_id<<anonymous>::Default_data>, std::__1::equal_to<ct::Abstract_simplex<int> >, true>, std::__1::allocator<std::__1::pair<ct::Abstract_simplex<int>, <anonymous>::Data_with_id<<anonymous>::Default_data> > > >::find<ct::Abstract_simplex<int> >' requested here
+    iterator       find(const key_type& __k)       {return __table_.find(__k);}
+                                                                    ^
+/Users/rhl/code/ctlib/cell_map/cell_map.h:105:25: note: in instantiation of member function 'std::__1::unordered_map<ct::Abstract_simplex<int>, <anonymous>::Data_with_id<<anonymous>::Default_data>, ct::Hash<ct::Abstract_simplex<int> >, std::__1::equal_to<ct::Abstract_simplex<int> >, std::__1::allocator<std::__1::pair<const ct::Abstract_simplex<int>, <anonymous>::Data_with_id<<anonymous>::Default_data> > > >::find' requested here
+                iterator iter = cells.find( s); 
+                                      ^
+/Users/rhl/code/ctlib/cell_map/test_cell_map.cpp:16:4: note: in instantiation of member function 'ct::Cell_map<ct::Abstract_simplex<int>, ct::Simplex_boundary<ct::Abstract_simplex<int>, int>, <anonymous>::Default_data, ct::Hash<ct::Abstract_simplex<int> > >::insert_closed_cell' requested here
+        c.insert_closed_cell( s);
+          ^
+In file included from /Users/rhl/code/ctlib/cell_map/test_cell_map.cpp:7:
+In file included from /Users/rhl/code/ctlib/cell_map/cell_map.h:3:
+In file included from /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1/unordered_map:318:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1/__hash_table:1569:32: error: call to object of type 'key_equal' (aka 'std::__1::__unordered_map_equal<ct::Abstract_simplex<int>, <anonymous>::Data_with_id<<anonymous>::Default_data>, std::__1::equal_to<ct::Abstract_simplex<int> >, true>') is ambiguous
+                               key_eq()(__cp->__value_, __np->__next_->__value_);
+                               ^~~~~~~~
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1/__hash_table:1518:9: note: in instantiation of member function 'std::__1::__hash_table<std::__1::pair<ct::Abstract_simplex<int>, <anonymous>::Data_with_id<<anonymous>::Default_data> >, std::__1::__unordered_map_hasher<ct::Abstract_simplex<int>, <anonymous>::Data_with_id<<anonymous>::Default_data>, ct::Hash<ct::Abstract_simplex<int> >, true>, std::__1::__unordered_map_equal<ct::Abstract_simplex<int>, <anonymous>::Data_with_id<<anonymous>::Default_data>, std::__1::equal_to<ct::Abstract_simplex<int> >, true>, std::__1::allocator<std::__1::pair<ct::Abstract_simplex<int>, <anonymous>::Data_with_id<<anonymous>::Default_data> > > >::__rehash' requested here
+        __rehash(__n);
+        ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1/__hash_table:1229:13: note: in instantiation of member function 'std::__1::__hash_table<std::__1::pair<ct::Abstract_simplex<int>, <anonymous>::Data_with_id<<anonymous>::Default_data> >, std::__1::__unordered_map_hasher<ct::Abstract_simplex<int>, <anonymous>::Data_with_id<<anonymous>::Default_data>, ct::Hash<ct::Abstract_simplex<int> >, true>, std::__1::__unordered_map_equal<ct::Abstract_simplex<int>, <anonymous>::Data_with_id<<anonymous>::Default_data>, std::__1::equal_to<ct::Abstract_simplex<int> >, true>, std::__1::allocator<std::__1::pair<ct::Abstract_simplex<int>, <anonymous>::Data_with_id<<anonymous>::Default_data> > > >::rehash' requested here
+            rehash(_VSTD::max<size_type>(2 * __bc + !__is_power2(__bc),
+            ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1/unordered_map:1167:41: note: in instantiation of member function 'std::__1::__hash_table<std::__1::pair<ct::Abstract_simplex<int>, <anonymous>::Data_with_id<<anonymous>::Default_data> >, std::__1::__unordered_map_hasher<ct::Abstract_simplex<int>, <anonymous>::Data_with_id<<anonymous>::Default_data>, ct::Hash<ct::Abstract_simplex<int> >, true>, std::__1::__unordered_map_equal<ct::Abstract_simplex<int>, <anonymous>::Data_with_id<<anonymous>::Default_data>, std::__1::equal_to<ct::Abstract_simplex<int> >, true>, std::__1::allocator<std::__1::pair<ct::Abstract_simplex<int>, <anonymous>::Data_with_id<<anonymous>::Default_data> > > >::__node_insert_unique' requested here
+    pair<iterator, bool> __r = __table_.__node_insert_unique(__h.get());
+                                        ^
+/Users/rhl/code/ctlib/cell_map/cell_map.h:90:42: note: in instantiation of function template specialization 'std::__1::unordered_map<ct::Abstract_simplex<int>, <anonymous>::Data_with_id<<anonymous>::Default_data>, ct::Hash<ct::Abstract_simplex<int> >, std::__1::equal_to<ct::Abstract_simplex<int> >, std::__1::allocator<std::__1::pair<const ct::Abstract_simplex<int>, <anonymous>::Data_with_id<<anonymous>::Default_data> > > >::emplace<const ct::Abstract_simplex<int> &, const <anonymous>::Data_with_id<<anonymous>::Default_data> &>' requested here
+          std::pair< iterator, bool> c =  cells.emplace( s, data);
+                                                ^
+/Users/rhl/code/ctlib/cell_map/cell_map.h:123:38: note: in instantiation of member function 'ct::Cell_map<ct::Abstract_simplex<int>, ct::Simplex_boundary<ct::Abstract_simplex<int>, int>, <anonymous>::Default_data, ct::Hash<ct::Abstract_simplex<int> > >::insert_open_cell' requested here
+                const std::pair< iterator, bool> p(insert_open_cell( s, data));
+                                                   ^
+/Users/rhl/code/ctlib/cell_map/test_cell_map.cpp:16:4: note: in instantiation of member function 'ct::Cell_map<ct::Abstract_simplex<int>, ct::Simplex_boundary<ct::Abstract_simplex<int>, int>, <anonymous>::Default_data, ct::Hash<ct::Abstract_simplex<int> > >::insert_closed_cell' requested here
+        c.insert_closed_cell( s);
+          ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1/unordered_map:413:10: note: candidate function
+    bool operator()(const _Pp& __x, const _Cp& __y) const
+         ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1/unordered_map:419:10: note: candidate function
+    bool operator()(const _Cp& __x, const _Pp& __y) const
+         ^
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1/unordered_map:422:10: note: candidate function
+    bool operator()(const _Cp& __x, const _Cp& __y) const
+         ^
+2 errors generated.
+make[2]: *** [cell_map/CMakeFiles/tc.dir/test_cell_map.cpp.o] Error 1
+make[1]: *** [cell_map/CMakeFiles/tc.dir/all] Error 2
+make: *** [all] Error 2
