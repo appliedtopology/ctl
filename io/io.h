@@ -21,9 +21,6 @@ bool get_line( Stream & in, std::string & line, std::size_t line_num){
 			case '#':
 			case '%':
 			case '\0':
-			case '{':
-			case '}':
-			case '\\':
 			break;
 			default:		
 			return true;
