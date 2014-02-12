@@ -4,7 +4,7 @@
 //non-exported functionality 
 namespace {} //anon. namespace
 
-namespace ct {
+namespace ctl {
 	template< typename T>
 	struct Hash{
 		//TODO: make this smarter..
@@ -17,5 +17,5 @@ namespace ct {
 			return hash;
 		}
 	}; //class Hash
-} //namespace ct
+} //namespace ctl
 #endif //CTLIB_HASH_H

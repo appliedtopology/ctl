@@ -1,6 +1,8 @@
 #ifndef SIMPLEX_BOUNDARY_H
 #define SIMPLEX_BOUNDARY_H
 #include "term/term.h"
+#include "finite_field/finite_field.h"
+
 //non-exported functionality
 namespace {
 
@@ -61,7 +63,7 @@ class const_boundary_iterator :
 		}
 		//return removed vertex, get rid of another one
 		std::swap( face.cell().vertices[ pos++], removed);
-		face.coefficient( -face.coefficient());
+		face.coefficient( -1*face.coefficient());
 		return *this;	
 	}
 
@@ -79,26 +81,28 @@ class const_boundary_iterator :
 	}; // END const_boundary_iterator
 } //END private namespace
 
-namespace ct { 
+namespace ctl { 
 template< typename Simplex_, typename Coefficient_>
 class Simplex_boundary {
 public:
 	typedef Simplex_ Simplex;
 	typedef Coefficient_ Coefficient;
-	typedef ct::Term< Simplex, Coefficient> Term;
+	typedef ctl::Term< Simplex, Coefficient> Term;
 	typedef const_boundary_iterator< Term> const_iterator;
 	//default constructor
 	Simplex_boundary(){};	
 
-	Simplex_boundary& operator=( const Simplex_boundary& from){ return *this;}
+	Simplex_boundary& operator=( const Simplex_boundary& from){ 
+		return *this;
+	}
 	//It only makes sense for const iterators
-	const_iterator begin( const Simplex & s){ return const_iterator( s); }
-	const_iterator end( const Simplex & s){ return const_iterator();};
+	const_iterator begin( const Simplex & s) { return const_iterator( s); }
+	const_iterator end( const Simplex & s)   { return const_iterator(); }
 	std::size_t length( const Simplex & s) const { 
 		return (s.size()>1)? s.size():0;
 	}
 }; //Simplex_boundary
 
-} // end namespace ct
+} // namespace ctl
 
 #endif //SIMPLEX_BOUNDARY_H

@@ -6,8 +6,8 @@
 
 #include "simplex_boundary.h"
 
-typedef ct::Abstract_simplex< int> Simplex;
-typedef ct::Simplex_boundary< Simplex, int> Boundary;
+typedef ctl::Abstract_simplex< int> Simplex;
+typedef ctl::Simplex_boundary< Simplex, int> Boundary;
 int main( int argc, char** argv){
 	Simplex s;
 	std::cout << "build a simplex, vertex by vertex." << std::endl;

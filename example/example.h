@@ -2,7 +2,7 @@
 #define EXAMPLE_H
 
 //exported functionality
-namespace ct{
+namespace ctl{
 
 } //namespace ct
 

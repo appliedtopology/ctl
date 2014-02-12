@@ -2,7 +2,7 @@
 #define CTLIB_IO_H
 #include <string>
 
-namespace ct{
+namespace ctl{
 
 template< typename Stream>
 bool open_file( Stream & in, const char* file_name){
@@ -29,6 +29,6 @@ bool get_line( Stream & in, std::string & line, std::size_t line_num){
 	return false;
 }
 
-} //namespace ct
+} //namespace ctl
 
 #endif //CTLIB_IO_H

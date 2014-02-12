@@ -6,7 +6,7 @@
 #include <iostream> //cout (debug only)
 #include <algorithm> //sort, unique
 #include "simplex_boundary.h"
-namespace ct {
+namespace ctl {
 
 //T must be a type with `<` a strict-weak-ordering
 template< typename T>
@@ -79,7 +79,8 @@ class Abstract_simplex {
 		return vertices.erase( first, last);
 	}
 	bool operator<( const Self & b) const {
-		return std::lexicographical_compare( begin(), end(), b.begin());
+		return std::lexicographical_compare( begin(), end(), 
+						     b.begin(), b.end());
 	} 
 	bool operator==( const Self & b) const { 
 		return std::equal( begin(), end(), b.begin()); 
@@ -89,13 +90,13 @@ class Abstract_simplex {
 	Vector vertices;
 
 	template< typename Self, typename Coefficient> 
-	friend class ct::Simplex_boundary< Self, Coefficient>::const_iterator; 
+	friend class ctl::Simplex_boundary< Self, Coefficient>::const_iterator; 
 }; //Abstract_simplex
-} // namespace ct
+} // namespace ctl
 
 template< typename Stream, typename T>
-Stream& operator<<(Stream& out, const ct::Abstract_simplex< T> simplex){
-	typedef typename ct::Abstract_simplex< T>::const_iterator iterator;
+Stream& operator<<(Stream& out, const ctl::Abstract_simplex< T> simplex){
+	typedef typename ctl::Abstract_simplex< T>::const_iterator iterator;
 	out << "[";
 	for(iterator i = simplex.begin(); i != simplex.end(); ++i){
 		out << *i;
