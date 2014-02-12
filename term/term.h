@@ -5,6 +5,9 @@
 //exported functionality
 namespace ctl{
 
+struct term_z2_tag{};
+struct term_non_z2_tag{};
+
 template< typename _Cell, typename _Coefficient>
 class Term {
 	private:
@@ -12,7 +15,8 @@ class Term {
 	public:
 		typedef _Cell Cell;
 		typedef _Coefficient Coefficient;
-		
+		typedef term_non_z2_tag coeff_tag;
+	public:	
 		Term() {}
 		Term( Cell & cell_): _cell( cell_), _coeff( 1) {};
 		Term( Cell & cell_, Coefficient & coeff_, std::size_t pos_=0): 
@@ -56,6 +60,7 @@ class Term< _Cell, ctl::Finite_field< 2> > {
 		typedef ctl::Finite_field< 2> Coefficient;
 	private:
 		typedef Term< _Cell, Coefficient > Self;
+		typedef term_z2_tag coeff_tag;
 	public:
 		
 		Term() {}

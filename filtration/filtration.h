@@ -1,17 +1,40 @@
 #ifndef CTLIB_FILTRATION_H
 #define CTLIB_FILTRATION_H
 #include "filtration/less.h"
-//exported functionality
-
 //non-exported functionality 
-namespace { 
-   //forward declaration
-   template< typename Iterator> class _transform_iterator;
-  
-   //wrapper
-   template< typename Iterator>
-   inline _transform_iterator< Iterator> _create_transform_iterator( Iterator);
+namespace {
+//needed in filtration constructor
+template< typename Iterator>
+class _transform_iterator : 
+		public std::iterator< std::input_iterator_tag, Iterator> {
+	private:
+		typedef _transform_iterator< Iterator> Self;
+	public:
+	//default
+	_transform_iterator() {}
+	//copy
+	_transform_iterator( Self & f): _i( f._i) {};
+	//move
+	_transform_iterator( Self && f): _i( std::move(f._i)) {};
+	//special
+	_transform_iterator( Iterator & i_): _i( i_) {};
+	_transform_iterator& operator++(){ _i++; return *this; }
+ 	Iterator* operator->() { return &(_i); }
+ 	bool operator!=(const Self& r) const { return (_i != r._i); }
+ 	bool operator==(const Self& r) const { return !operator!=(r); }
+	Self& operator=(const Self& r) { _i = r._i; return *this; } 
+	//the details
+	Iterator operator*(){ return _i; }
+	private:
+	Iterator _i;
+}; //class _transform_iterator
+template< typename Iterator>
+inline _transform_iterator< Iterator> _create_transform_iterator ( Iterator i){
+ 	return _transform_iterator< Iterator>( i);
+ }
+
 } //anonymous namespace
+
 
 namespace ctl{
 template< typename Complex_, 
@@ -60,40 +83,4 @@ class Filtration {
 }; //class Filtration
 
 } //namespace ct
-
-//non-exported functionality 
-namespace {
-//needed in filtration constructor
-template< typename Iterator>
-class _transform_iterator : 
-		public std::iterator< std::input_iterator_tag, Iterator> {
-	private:
-		typedef _transform_iterator< Iterator> Self;
-	public:
-	//default
-	_transform_iterator() {}
-	//copy
-	_transform_iterator( Self & f): _i( f._i) {};
-	//move
-	_transform_iterator( Self && f): _i( std::move(f._i)) {};
-	//special
-	_transform_iterator( Iterator & i_): _i( i_) {};
-	_transform_iterator& operator++(){ _i++; return *this; }
- 	Iterator* operator->() { return &(_i); }
- 	bool operator!=(const Self& r) const { return (_i != r._i); }
- 	bool operator==(const Self& r) const { return !operator!=(r); }
-	Self& operator=(const Self& r) { _i = r._i; return *this; } 
-	//the details
-	Iterator operator*(){ return _i; }
-	private:
-		Iterator _i;
-}; //class _transform_iterator
-  template< typename Iterator>
- inline _transform_iterator< Iterator> _create_transform_iterator ( Iterator i){
- 	return _transform_iterator< Iterator>( i);
- }
-
-} //anonymous namespace
-
-
 #endif //CTLIB_FILTRATION_H
