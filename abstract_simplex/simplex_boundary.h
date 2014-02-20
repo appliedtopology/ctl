@@ -8,7 +8,7 @@ namespace {
 
 template< typename Term_>
 class const_boundary_iterator : 
-	public std::iterator< std::input_iterator_tag,
+	public std::iterator< std::bidirectional_iterator_tag,
 			      Term_,
 			      std::ptrdiff_t,
 			      const Term_*,
@@ -38,7 +38,7 @@ class const_boundary_iterator :
 	const_boundary_iterator& operator==( const Self & b) const { 
 		return (b.cellptr == cellptr) && (b.pos == pos); 
 	} 
-	const_boundary_iterator& operator= (const Self & b){
+	const_boundary_iterator& operator=(const Self & b){
 		cellptr = b.cellptr;
 		remove = b.removed;
 		face = b.face;
@@ -67,18 +67,34 @@ class const_boundary_iterator :
 		return *this;	
 	}
 
-	 const_boundary_iterator operator++( int){
+	const_boundary_iterator& operator--(){
+		if(pos == 0){
+			cellptr = 0;
+			pos = 0;
+			return *this;
+		}
+		//return removed vertex, get rid of another one
+		std::swap( face.cell().vertices[ --pos], removed);
+		face.coefficient( -1*face.coefficient());
+		return *this;	
+	}
+
+	const_boundary_iterator operator++( int){
 	 	const_boundary_iterator tmp( *this); 
 		++(*this); //now call previous operator
 		return tmp;
-	 }
-
+	}
+	const_boundary_iterator operator--( int){
+	 	const_boundary_iterator tmp( *this); 
+		--(*this); //now call previous operator
+		return tmp;
+	}
 	 private:
 		const Cell* cellptr;
 		typename Cell::size_t pos;
 		Term face;
 		Vertex removed;
-	}; // END const_boundary_iterator
+}; // END const_boundary_iterator
 } //END private namespace
 
 namespace ctl { 

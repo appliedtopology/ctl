@@ -35,7 +35,7 @@ class Data_wrapper : public Data_ {
 	private:
 	std::size_t id_;
 	//(to be read in Millhouse Van Houten's voice)
-	//This lets the cell_map touch my privates ;)
+	//This lets the chain_complex touch my privates ;)
 	template< typename C, typename B, typename D, typename H>
 	friend class ctl::Chain_complex;
 }; // class Data_wrapper
@@ -63,6 +63,7 @@ private:
 	typedef std::unordered_map< Cell, Data, Hash> Map;
 	typedef typename Boundary::Coefficient _Coefficient;
 public: 
+	typedef typename Map::size_type size_type;
 	typedef typename Map::iterator iterator;
 	typedef typename Map::const_iterator const_iterator;
 	typedef typename Map::value_type value_type;
@@ -72,7 +73,7 @@ public:
 public:
 	//Constructors
 	//Default
-	Chain_complex() {}; 
+	Chain_complex(): max_id( 0) {}; 
 	//Copy
 	Chain_complex( const Chain_complex & b): cells( b.cells), bd( b.bd),
 					 max_id( b.max_id) {}; 
@@ -101,10 +102,14 @@ public:
 		return Term( cells.find( s), 1);
 	}
 
- 	iterator find_cell( const Cell & s) const { 
+ 	iterator find_cell( const Cell & s) { 
 		return cells.find( s); 
 	}
 	
+ 	const_iterator find_cell( const Cell & s) const { 
+		return cells.find( s); 
+	}
+
 	iterator       begin()       { return cells.begin(); }
 	iterator         end()       { return cells.end();   }
 	
@@ -132,7 +137,7 @@ public:
 		iterator iter = cells.find( s);	
 		std::size_t num_faces_inserted=0;
 		//if cell exists, and we assume 
-		//we have are closed then we are done.
+		//we are closed then we are done.
 		if( closed && iter != cells.end()){ 
 		 return std::make_pair( iter, num_faces_inserted); 
 		}
@@ -185,7 +190,7 @@ Stream& operator<<( Stream& out,
 		    const ctl::Chain_complex< Cell, Boundary, Data, Hash> & c){ 
 	for(auto i = c.begin(); i != c.end(); ++i){
 		std::cout << i->second.id() <<": " << i->first << " --> {" 
-			  << i->second << "}" << std::endl;
+		  	  << i->second << "}" << std::endl;
 	}
 	return out;
 }

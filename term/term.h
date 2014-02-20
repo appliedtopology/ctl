@@ -1,12 +1,13 @@
-#ifndef TERM_H
-#define TERM_H
+#ifndef CTLIB_TERM_H
+#define CTLIB_TERM_H
+
+
 #include "finite_field/finite_field.h"
+#include "term/term_tags.h"
 
 //exported functionality
 namespace ctl{
 
-struct term_z2_tag{};
-struct term_non_z2_tag{};
 
 template< typename _Cell, typename _Coefficient>
 class Term {
@@ -15,36 +16,43 @@ class Term {
 	public:
 		typedef _Cell Cell;
 		typedef _Coefficient Coefficient;
-		typedef term_non_z2_tag coeff_tag;
+		typedef _ctl::term_non_z2_tag coeff_tag;
 	public:	
 		Term() {}
-		Term( Cell & cell_): _cell( cell_), _coeff( 1) {};
-		Term( Cell & cell_, Coefficient & coeff_, std::size_t pos_=0): 
-			_cell( cell_), _coeff( coeff_), _pos(pos_)  {}
+		Term( Cell & cell_): _cell( cell_), _coeff( 1) {}
+		Term( Cell & cell_, Coefficient & coeff_):
+			_cell( cell_), _coeff( coeff_) {}
 		Term( const Term & from): _cell( from._cell),
-					  _coeff( from._coeff), 
-					  _pos( from._pos) {};	
+					  _coeff( from._coeff) {}
 		Coefficient coefficient() const { return _coeff; }
-		void coefficient( Coefficient n) { _coeff = n; }
-		
+		void coefficient( const Coefficient n) { _coeff = n; }
+		void coefficient( const Coefficient n, 
+				         const bool f) { _coeff *= n; }
 		Cell&            cell()       { return _cell; }
 		const Cell&      cell() const { return _cell; }
-		const std::size_t pos() const { return _pos; }
-
+			
 		Self& operator=( const Self & from) { 
 			_cell=from._cell;
 			_coeff = from._coeff;
-			_pos = from._pos;
 			return *this; 
-		} 
-		bool operator==( const Self & from){ 
+		}
+ 
+		bool operator==( const Self & from) const { 
 			return _cell == from._cell && _coeff == from._coeff;
+		}
+
+		bool operator!=( const Self & from) const { 
+			return _cell != from._cell || _coeff != from._coeff;
+		}
+
+		Term& operator+( const Coefficient & a){
+			_coeff+=a;
+			return *this;	
 		}
 		
 	private:
 		Cell _cell;
 		Coefficient _coeff;
-		std::size_t _pos;
 	public:
 	template <typename _Ce, typename _Co > 
 	struct rebind {
@@ -60,7 +68,7 @@ class Term< _Cell, ctl::Finite_field< 2> > {
 		typedef ctl::Finite_field< 2> Coefficient;
 	private:
 		typedef Term< _Cell, Coefficient > Self;
-		typedef term_z2_tag coeff_tag;
+		typedef _ctl::term_z2_tag coeff_tag;
 	public:
 		
 		Term() {}
@@ -81,6 +89,9 @@ class Term< _Cell, ctl::Finite_field< 2> > {
 		bool operator==( const Self & from) const { 
 			return (_cell == from._cell); 
 		}
+		bool operator!=( const Self & from) const { 
+			return (_cell != from._cell); 
+		}
 		bool operator<( const Self & from) const { 
 			return (_cell < from.cell); 
 		}
@@ -93,9 +104,9 @@ class Term< _Cell, ctl::Finite_field< 2> > {
 	struct rebind { typedef Term<_Ce, _Co> Term; };
 
 }; //Class Term specialization for Z2
-} //namespace ct
+} //namespace ctl
 
 //non-exported functionality
 namespace {} //anonymous namespace
 
-#endif //TERM_H
+#endif //CTLIB_TERM_H

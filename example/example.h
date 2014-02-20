@@ -1,14 +1,47 @@
-#ifndef EXAMPLE_H
-#define EXAMPLE_H
+#ifndef CTLIB_EXAMPLE_H
+#define CTLIB_EXAMPLE_H
+/*******************************************************************************
+* -Academic Honesty-
+* Plagarism: The unauthorized use or close imitation of the language and 
+* thoughts of another author and the representation of them as one's own 
+* original work, as by not crediting the author. 
+* (Encyclopedia Britannica, 2008.)
+*
+* You are free to use the code according to the below liscence, but please
+* do not commit acts of academic dishonesty. We encourage and request that 
+* for any academic use of this source code one should cite the following 
+* papers:
+* 
+* \cite{$bibtex_names_here}
+* 
+* See ct.bib for the corresponding bibtex entries. 
+* !!! DO NOT CITE THE USER MANUAL !!!
+*******************************************************************************
+* Copyright (C) $NAMES_OF_AUTHORS $YEARS_FIRST_CREATED <$emails>
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public License
+* as published by the Free Software Foundation; either version 2
+* of the License, or (at your option) any later version.
+* 
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+* 
+* You should have received a copy of the GNU General Public License
+* along with this program in a file entitled COPYING; if not, write to the 
+* Free Software Foundation, Inc., 
+* 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+*******************************************************************************
+*******************************************************************************/
 
 //exported functionality
 namespace ctl{
-
-} //namespace ct
+} //namespace ctl
 
 //non-exported functionality
 namespace {
-
 } //anonymous namespace
 
-#endif //EXAMPLE_H
+#endif //CTLIB_EXAMPLE_H

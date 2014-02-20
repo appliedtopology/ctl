@@ -5,6 +5,7 @@
 
 //non-exported functionality 
 namespace { 
+
 //needed in filtration constructor
 template< typename Iterator>
 class _transform_iterator : 
@@ -42,7 +43,6 @@ inline _transform_iterator< Iterator> _create_transform_iterator ( Iterator i){
 //exported functionality
 namespace ct{
 
-
 template< typename _Term, typename _Less>
 class Chain {
  public:
@@ -79,14 +79,10 @@ public:
 	Chain& operator+( const Chain & b) { 
 		return chain_add( _chain, b, coeff_tag);
 	}
-
-	Chain& operator+( const Term & b)  { 
-		return chain_add( a, b, coeff_tag);
+	Chain& operator+( const Term & b){
+		return chain_add( _chain, b, coeff_tag);
 	}
 
-	Chain& operator*( const Term::Coefficient & scalar){ 
-	  for( auto i = begin(); i != end(); ++i){ (*i)*=scalar; }
-	}
  private:
 	Vector _chain;
 }; //class Chain
