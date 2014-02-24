@@ -22,20 +22,24 @@ class Data_wrapper : public Data_ {
 	typedef Data_wrapper< Data_> Self;
 	public:
 	//default
-	Data_wrapper(): id_( 0), pos( 0) {};
+	Data_wrapper(): id_( 0), pos__( 0) {};
 	//copy
 	Data_wrapper( const Data_wrapper & from) : 
-	  id_( from.id_), pos( from.pos) {} 
+	  id_( from.id_), pos__( from.pos__) {} 
 	//move
 	Data_wrapper( const Data_wrapper && from): 
-		id_( std::move( from.id_)), pos( std::move( from.pos)) {} 
+		id_( std::move( from.id_)), pos__( std::move( from.pos__)) {} 
 	
 	std::size_t id() const { return id_; }
-	std::size_t pos;
+
+	//a bit akward.. probably should change this later.
+	std::size_t& pos_() { return pos__; }
+	void pos_( const std::size_t p) { pos__ = p; }
 	private:
 	std::size_t id_;
+	std::size_t pos__;
 	//(to be read in Millhouse Van Houten's voice)
-	//This lets the chain_complex touch my privates ;)
+	//This lets the chain_complex & boundary touch my privates ;)
 	template< typename C, typename B, typename D, typename H>
 	friend class ctl::Chain_complex;
 }; // class Data_wrapper

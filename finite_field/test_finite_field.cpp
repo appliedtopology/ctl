@@ -11,6 +11,8 @@ int main( int argc, char** argv){
 	Z3  b( 1);	
 	std::cout << "b = " << b << " b + b = " << b+b  
 		  << " 3*b: " << b+b+b << std::endl;	
+	Z3 bneg( -1); 
+	std::cout << "bneg = " << bneg << std::endl;
 	Z11 c( 1);
 	std::cout << "c = " << c << " 11*c  = " << 11*c << std::endl;
 	for( int i = 1; i < c.prime(); ++i){

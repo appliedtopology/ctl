@@ -3,6 +3,7 @@
 #include <string>
 
 namespace ctl{
+constexpr char delta[] = "\u2202";
 
 template< typename Stream>
 bool open_file( Stream & in, const char* file_name){

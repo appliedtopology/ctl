@@ -66,12 +66,12 @@ public:
 	term( i.term) {}
 	
 	//move
-	_const_boundary_iterator( const Self && i):
+	_const_boundary_iterator( Self && i):
 	complex ( std::move( i.complex)),
 	next_term ( std::move( i.next_term)),
 	end_term ( std::move( i.end_term)),
 	term( std::move( i.term)) { i.complex = NULL; }
-	
+
 	//begin constructor
 	_const_boundary_iterator( Complex& _complex, 
 				  Cell_boundary & _bd,
@@ -80,7 +80,7 @@ public:
 	  next_term ( _bd.begin( cell)), end_term( _bd.end( cell)){ 
 		_next_term();
 	}
-	 
+ 
         //end constructor
 	_const_boundary_iterator( Complex & _complex): complex( &_complex){ 
 	  	_end_term(); 
@@ -90,11 +90,15 @@ public:
 		next_term = from.next_term;
 		end_term = from.end_term;
 		term = from.term;
+		return *this;
 	}
 	bool operator==( const Self & i) const { return term == i.term;}		
 	bool operator!=( const Self & i) const { return term != i.term;}		
-	Self& operator++(){ _next_term(); return *this;}
-	Self operator++(int){ 
+	Self& operator++(){ 
+		_next_term(); 
+		return *this;
+	}
+	Self operator++(int){
 		Self tmp = *this;
 		_next_term(); 
 		return tmp;
@@ -106,11 +110,17 @@ protected:
 	if( next_term != end_term){
 		term.cell() = complex->find_cell( next_term->cell());
 		term.coefficient( next_term->coefficient());
+		//mirror the internal filtration position
+		//TODO: see if it improves performace,
+		//complex_iterators can store this position
+		//to avoid the extra dereference
+		term.pos_( term.cell()->second.pos_());
 		++next_term;
 		return;
 	}
 	_end_term();
   }
+
   void _end_term(){ term.cell() = complex->end(); }
   //we use a pointer since references are not default constructible
   Complex* complex;
@@ -118,7 +128,7 @@ protected:
   //typename Cell_boundary::const_iterator begin_term; 
   typename Cell_boundary::const_iterator next_term;
   typename Cell_boundary::const_iterator end_term;
-  Term	term;	
+  Term term;	
 }; //class _const_boundary_iterator
 } //anonymous namespace
 
@@ -152,10 +162,16 @@ class Complex_boundary{
 	const_iterator begin( const typename Term::Cell & c) {
 		return const_iterator( _complex, _complex.boundary(), c->first);
 	}
-	
+	const_iterator begin( const typename Term::Cell & c, 
+			              const std::size_t & pos) {
+		c->second.pos_( pos);
+		return const_iterator( _complex, _complex.boundary(), c->first);
+	}
 	const_iterator end( const typename Term::Cell & c) {
 		return const_iterator( _complex);
 	}
+	inline const_iterator end( const typename Term::Cell & c, 
+				   const std::size_t & pos) { return end( c); }
 	size_type length( const typename Term::Cell & c){
 		return _complex.boundary().length( c->first);
 	}

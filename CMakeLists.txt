@@ -19,6 +19,7 @@ endif()
 
 add_subdirectory( term)
 add_subdirectory( abstract_simplex)
+add_subdirectory( chain)
 add_subdirectory( chain_complex)
 add_subdirectory( finite_field)
 add_subdirectory( filtration)

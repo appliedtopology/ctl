@@ -7,16 +7,17 @@
 
 //forward declarations
 namespace ctl {
-template< int N> class Finite_field; 
+template< std::size_t N> class Finite_field; 
 }
 
 //non-exported functionality
 namespace {
+
 //Extended Euclidean Algorithm 
-int _inverse(const int a, const int prime){
-    if (a == 0){ std::cerr << std::endl << "!!! divide by 0. !!!" << std::endl; }
-    int b = prime-2;
-    int x = 1, y = a;
+std::size_t _inverse(const std::size_t a, const std::size_t prime){
+    if (a == 0){ std::cerr << std::endl << "!!! divide by 0. !!!" << std::endl;}
+    std::size_t b = prime-2;
+    std::size_t x = 1, y = a;
     while(b > 0) {
         if(b%2 == 1) {
             x=(x*y);
@@ -28,51 +29,74 @@ int _inverse(const int a, const int prime){
     }
     return x;
 }
-template< int N>
-int _inverse( const ctl::Finite_field< N> & x, const int prime ){ 
+
+template< std::size_t N>
+std::size_t _inverse( const ctl::Finite_field< N> & x, const std::size_t prime){ 
 	return _inverse( x.value(), prime); 
 }
-template< typename T>
-int get_number_data(const T & rhs){ return rhs;}
-template< int N>
-int get_number_data( const ctl::Finite_field< N> & rhs){ return rhs.value(); }
 
 } //anon. namespace
 
 //exported functionality
 namespace ctl{
-template< int _prime>
+template< std::size_t _prime>
 class Finite_field{
 	private:
 	typedef Finite_field< _prime> Self;
 	public:
 	Finite_field(){}
-	Finite_field( const unsigned int n): x( n % _prime){};
+
+	template< typename T>
+	Finite_field( const T n): x( mod( n) ){};
+
+	//mod avoid branch when possible.
+	template <typename T>
+	typename std::enable_if< std::is_unsigned<T>::value, 
+				 std::size_t>::type mod(T n) const {
+		return n%_prime;
+	}
+	
+	template <typename T>
+	typename std::enable_if< !std::is_unsigned<T>::value, 
+				 std::size_t>::type mod(T n) const {
+		return (n>=0)? n % _prime: _prime-(std::abs(n)%_prime); 
+	}
+
+	//given an arbitrary number get a number between [0, prime)
+	template< typename T>
+	std::size_t get_number_data(const T & rhs) const { return mod( rhs); }
+	
+	template< std::size_t N>
+	std::size_t get_number_data( const ctl::Finite_field< N> & rhs) const {
+		return mod( rhs.value());
+	}
 
 	template< typename T>
 	Self& operator=( const T& from){ 
 		x = get_number_data( from);
 		return *this;
 	}
+
 	template< typename T>
 	Self operator+( const T& rhs) const { 
 		return Self( x+get_number_data(rhs)); 
 	}
+
 	template< typename T>
 	Self& operator+=( const T& rhs){ 
-		x+=get_number_data(rhs); 
-		x=x%_prime; 
+		x+=get_number_data( rhs); 
+		x=mod( x); 
 		return *this; 
 	}
 
 	template< typename T>	
 	Self operator-( const T& rhs) const { 
-		return Self( x-get_number_data(rhs)); 
+		const std::size_t lhs = x  + (_prime - get_number_data(rhs));
+		return Self( lhs); 
 	}
 	template< typename T>
 	Self& operator-=( const T& rhs){ 
-		x-=get_number_data(rhs); 
-		x=x%_prime; 
+		x = mod(x  + (_prime - get_number_data(rhs)));
 		return *this; 
 	}
 
@@ -82,10 +106,22 @@ class Finite_field{
 	}
 	template< typename T>
 	Self& operator*=( const T& rhs){ 
-		x*=get_number_data(rhs, _prime); 
-		x%_prime; 
+		x*=get_number_data(rhs); 
+		x = mod(x); 
 		return *this; 
 	}
+	
+	template< typename T>
+	bool operator==( const T& rhs) const {
+		return (x == get_number_data( rhs));
+	}
+
+	template< typename T>
+	bool operator!=( const T& rhs) const {
+		return (x != get_number_data( rhs));
+	}
+
+
 
 	template< typename T>
 	Self operator/(const T& rhs) const{ 
@@ -100,32 +136,36 @@ class Finite_field{
 	
 	Self inverse() const{ return Self( _inverse( x, _prime)); }
 
-	const unsigned int prime() const { return _prime; }
-	const unsigned int value() const { return x; } 
+	const std::size_t prime() const { return _prime; }
+	const std::size_t value() const { return x; } 
 	private:
-	unsigned int x;	
+	std::size_t x;	
 }; //class Finite_field
 
 } //namespace ctl
 
-template< typename Stream, int N>
-Stream& operator<<( Stream & out, const ctl::Finite_field< N> & x ){ 
-	out << x.value();
+template< typename Stream, std::size_t N>
+Stream& operator<<( Stream & out, const ctl::Finite_field< N> & x ){
+	int value = x.value();
+	if( x.prime()>2 && value >= x.prime()/2.0){ 
+		value = -1*(x.prime() -value);  
+	}
+	out << std::showpos << value << std::noshowpos;
 	return out;
 }
 
-template<typename T, int N> 
+template<typename T, std::size_t N> 
 ctl::Finite_field< N> operator* (T k, const ctl::Finite_field< N> &m) { 
 	return m * k; 
 }
 
-template<typename T, int N> 
+template<typename T, std::size_t N> 
 ctl::Finite_field< N> operator/ (T k, const ctl::Finite_field< N> &m) { 
 	return m / k; 
 }
 
 
-template<typename T, int N> 
+template<typename T, std::size_t N> 
 ctl::Finite_field< N> operator+ (T k, const ctl::Finite_field< N> &m) { 
 	return m + k; 
 }
