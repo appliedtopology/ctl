@@ -91,7 +91,7 @@ class Term< _Cell, ctl::Finite_field< 2> > {
 		      const std::size_t pos_ ): _cell( cell_), _pos( pos_) {}	
 		Cell& cell() { return _cell; }
 		const Cell& cell() const { return _cell; }
-		constexpr Coefficient coefficient() const { return 1; }
+		const Coefficient coefficient() const { return 1; }
 		//for internal use to couple filtration order to our otherwise 
 		//unordered objects.
 		const std::size_t pos_() const { return _pos; }

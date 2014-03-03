@@ -4,6 +4,7 @@
 
 //TODO: Ensure things here are efficient.
 //TODO: possibly provide a generic multiplication table 
+//TODO: Specialize for N=2
 
 //forward declarations
 namespace ctl {
