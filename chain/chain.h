@@ -50,12 +50,12 @@ class Chain {
  public:
  	typedef _Term Term;
 	typedef _Less Less;
-	typedef Term::Coefficient Coefficient; 
+	typedef typename Term::Coefficient Coefficient; 
  private:
 	typedef std::vector< Term> Vector;
 	typedef Chain< Term, Less> Self;
  public:
-	typedef Vector::value_type value_type;
+	typedef typename Vector::value_type value_type;
 	typedef typename Vector::iterator iterator;
 	typedef typename Vector::const_iterator const_iterator;
 	typedef typename Term::coeff_tag coeff_tag; 
@@ -87,8 +87,7 @@ public:
 	Chain& operator=( Chain&& from){ _chain = std::move( from.chain); }
 
 	Coefficient& normalize() { return normalize( coeff_tag()); }
-	Coefficient& normalize( bool) const { return normalize( coeff_tag(), 
-								      bool); }
+	Coefficient& normalize( bool) const { return normalize( coeff_tag(), bool()); }
 	template< typename Scalar>
 	Chain& scaled_add( const Scalar & l, const Chain& rhs){
 		//TODO: finish this

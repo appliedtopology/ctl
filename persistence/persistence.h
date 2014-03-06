@@ -46,18 +46,17 @@ class partner {};
 class partner_and_cascade {};
 
 template< typename Persistence_data>
-void eliminate_boundaries( Persistence_data & persistence_data){
-   while( !data.cascade_boundary.size()){
-	auto tau = cascade_boundary.youngest();
-	auto bd_cascade_tau = data.cascade_boundary_map[ tau];
+void eliminate_boundaries( Persistence_data & data){
+   while( !data.cascade_boundary.empty()){
+	const auto tau = data.cascade_boundary.youngest();
+	const auto bd_cascade_tau = data.cascade_boundary_map[ tau];
 	//tau is the partner
 	if( bd_cascade_tau.empty()){ return; }
 	//otherwise tau has a partner
-	auto tau_partner_term = tau_boundary.youngest();
-	auto tau_partner = tau_parter_term.cell();
+	const auto tau_partner_term = bd_cascade_tau.youngest();
+	const auto tau_partner = tau_partner_term.cell();
 	auto bd_cascade_tau_partner = data.cascade_boundary_map[ tau_partner];
-	auto scalar = tau_partner_term.coefficient().inverse();
-	//TODO: Make sure terms here are correct
+	const auto scalar = tau_partner_term.coefficient().inverse();
   	data.cascade_boundary.scaled_add( scalar, bd_cascade_tau_partner);
   }
 }
@@ -68,7 +67,7 @@ bool is_creator( const Cell & cell, Chain_map & cascade_boundary_map){
 	typedef typename Chain::Less Term_less;
 	const Chain& bd = cascade_boundary_map[ cell];
 	Term_less term_less;
-	return  bd.empty() || term_less( cell, boundary.youngest());
+	return  bd.empty() || term_less( cell, bd.youngest());
 }
 
 template< typename Cell, typename Persistence_data>
@@ -90,8 +89,9 @@ void initialize_cascade_data( const Cell & sigma, const std::size_t pos,
 template< typename Cell, typename Persistence_data>
 void initialize_cascade_data( const Cell & cell, const std::size_t pos, 
 			      Persistence_data & data, partner_and_cascade){
+	typedef typename Persistence_data::Chain::Term Term;
 	data.cascade += Term( cell, 1); 
-	initialize_cascade_data( cell, data, partner);
+	initialize_cascade_data( cell, data, partner());
 }
 
 //nothing to store when we don't store cascades.
@@ -111,7 +111,7 @@ void store_cascade( Persistence_data & data, const Cell & cell,
 
 template< typename Persistence_data, typename Cell>
 void store_scaled_cascade( Persistence_data & data, const Cell & cell, 
-		    partner_and_cascade){
+		           partner_and_cascade){
 	auto scalar = data.cascade_boundary.normalize();
 	data.cascade_map[ cell] = scalar*data.cascade;
 }
@@ -120,19 +120,20 @@ template< typename Filtration_iterator,
 	  typename Boundary_operator,
 	  typename Chain_map,
 	  typename Output_policy>
-void pair_cells( Filtration_iterator & begin,
-		 Filtration_iterator & end,
-		 Boundary_operator & bd,
-		 Chain_map & cascade_boundary_map,
-		 Chain_map & cascade_map,
-		 Output_policy policy){
+void pair_cells( Filtration_iterator & begin, Filtration_iterator & end,
+		 Boundary_operator & bd, 
+		 Chain_map & cascade_boundary_map, Chain_map & cascade_map,
+		 Output_policy output_policy){
 	
-	typedef Persistence_data< Term_less, 
-				  Boundary_operator, 
-				  Chain_map, 
-				  Output_policy> Data;
+	typedef _ctl::Persistence_data< Term_less, Boundary_operator, 
+				  	Chain_map, Output_policy> 
+					            Persistence_data;
 	typedef typename Filtration_iterator::value_type Cell_iterator; 
-	Data persistence_data( term_less, bd, 
+	typedef typename Persistence_data::Chain Chain;
+	typedef typename Chain::Term Term;
+
+	Term_less term_less;
+	Persistence_data data( term_less, bd, 
 			       cascade_boundary_map, cascade_map); 
 	//TODO: pos should not start at zero, 
 	//Filtration_iterator should know its position
@@ -150,9 +151,7 @@ void pair_cells( Filtration_iterator & begin,
 			Chain tau_boundary_chain( sigma_term);  
 			cascade_boundary_map[ tau] = 
 					std::move( tau_boundary_chain); 
-		} else{
-			store_cascade( data, sigma, output_policy);  
-		}	
+		} else{ store_cascade( data, sigma, output_policy); }	
 	}
 }
 
@@ -165,7 +164,7 @@ void persistence( Filtration_iterator begin,
 		  Chain_map & cascade_boundary_map,
 		  Chain_map & cascade_map){
 	ctl::pair_cells( begin, end, bd, cascade_boundary_map, 
-			 cascade, partner_and_cascade());
+			 cascade_map, partner_and_cascade());
 }
 template< typename Filtration_iterator, 
 	  typename Boundary_operator,

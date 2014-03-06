@@ -44,10 +44,11 @@ template< typename Term_less_,
 //hold onto persistence data
 struct Persistence_data {
 
-	typedef typename Term_less_ Term_less; 
-	typedef typename Boundary_operator_ Boundary_operator;
-	typedef typename Cascade_map_ Cascade_map;
-	typedef typename Output_policy_ Output_policy;
+	typedef Term_less_ Term_less; 
+	typedef Boundary_operator_ Boundary_operator;
+	typedef Cascade_map_ Cascade_map;
+	typedef Output_policy_ Output_policy;
+	typedef typename Cascade_map::value_type Chain;
 
 	Persistence_data( Term_less  t, 
 			  Boundary_operator & bd_,
