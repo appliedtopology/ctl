@@ -80,7 +80,7 @@ void initialize_cascade_data( const Cell & sigma, const std::size_t pos,
 	for( auto i = data.boundary_operator.begin( sigma, pos);
 		  i != data.boundary_operator.end( sigma);
 		  ++i){
-		//the += here maintains the chain is sorted
+	    //the += here maintains that the chain is sorted
 	    if( is_creator( i->cell(), data.cascade_boundary_map)){
 		cascade_boundary+=(*i);    
 	    }
@@ -181,7 +181,6 @@ void persistence( Filtration_iterator begin,
 } //namespace ctl
 
 //non-exported functionality
-namespace {
-} //anonymous namespace
+namespace {} //anonymous namespace
 
 #endif //CTLIB_PERSISTENCE_H

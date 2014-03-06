@@ -39,6 +39,7 @@
 
 #include "chain/chain_add.h"
 #include "term/term_less.h"
+#include "term/term_tags.h"
 
 //exported functionality
 namespace ctl{
@@ -49,10 +50,12 @@ class Chain {
  public:
  	typedef _Term Term;
 	typedef _Less Less;
+	typedef Term::Coefficient Coefficient; 
  private:
 	typedef std::vector< Term> Vector;
 	typedef Chain< Term, Less> Self;
  public:
+	typedef Vector::value_type value_type;
 	typedef typename Vector::iterator iterator;
 	typedef typename Vector::const_iterator const_iterator;
 	typedef typename Term::coeff_tag coeff_tag; 
@@ -68,6 +71,9 @@ public:
 	template< typename Iterator>
 	Chain( Iterator begin, Iterator end, const bool sorted): 
 	_chain(  begin, end) {}
+	
+	Term&	       youngest() 	   { return _chain.back();  }
+	const Term&    youngest() const	   { return _chain.back();  }
 	iterator       begin() 	     	   { return _chain.begin(); }
 	const_iterator begin() const 	   { return _chain.begin(); }
 		
@@ -79,6 +85,16 @@ public:
 	
 	Chain& operator=( const Chain& from){ _chain = from.chain; }
 	Chain& operator=( Chain&& from){ _chain = std::move( from.chain); }
+
+	Coefficient& normalize() { return normalize( coeff_tag()); }
+	Coefficient& normalize( bool) const { return normalize( coeff_tag(), 
+								      bool); }
+	template< typename Scalar>
+	Chain& scaled_add( const Scalar & l, const Chain& rhs){
+		//TODO: finish this
+		//return _ctl::chain_add( );  
+		return *this;
+	}
 
 	Chain& operator+=( const Term & b){
 		return _ctl::chain_add( *this, b, coeff_tag());
@@ -99,8 +115,22 @@ public:
 	   result._chain.erase( leftover, result.end());
 	   return result;
 	}
-
  private:
+   Coefficient& normalize( _ctl::term_z2_tag) const { return Coefficient( 1); }
+   Coefficient& normalize( _ctl::term_z2_tag, bool) const { 
+		return Coefficient( 1); 
+   }
+   Coefficient& normalize( _ctl::term_non_z2_tag, bool) const  {
+    	if (_chain.empty()) { return Coefficient( 0); }
+    	return this->youngest.coefficient().inverse();
+    }
+   Coefficient& normalize( _ctl::term_non_z2_tag)  {
+    	if (_chain.empty()) { return Coefficient( 0); }
+    	auto inverse = this->youngest.coefficient().inverse();
+    	if ( inverse != 2){ (*this)*=inverse; }
+    	return inverse;
+    }
+private:
 	Vector _chain;
 }; //class Chain
 
