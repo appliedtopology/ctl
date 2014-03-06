@@ -64,25 +64,25 @@ public:
 	Chain( const Term & t): _chain( 1, t) {}
 	template< typename Iterator, typename Compare = Less>
 	Chain( Iterator begin, Iterator end, Compare c = Compare()): 
-	_chain(  begin, end) { 
-		std::cout << "bout to sort." << std::flush << std::endl;
-		std::sort( _chain.begin(), _chain.end(), c); 
-	};
+	_chain(  begin, end) { std::sort( _chain.begin(), _chain.end(), c); }
 	template< typename Iterator>
 	Chain( Iterator begin, Iterator end, const bool sorted): 
-	_chain(  begin, end) { std::cout << "schwat?" << std::endl; };
-	
-
-	iterator       begin() 	     { return _chain.begin(); }
-	const_iterator begin() const { return _chain.begin(); }
+	_chain(  begin, end) {}
+	iterator       begin() 	     	   { return _chain.begin(); }
+	const_iterator begin() const 	   { return _chain.begin(); }
 		
-	iterator       end() 	     { return _chain.end(); }
-	const_iterator end() const   { return _chain.end(); }
+	iterator       end() 	     	   { return _chain.end(); }
+	const_iterator end() const   	   { return _chain.end(); }
 
-	std::size_t   size() const   { return _chain.size(); }	
+	std::size_t   size() const   	   { return _chain.size(); }	
+	void reserve( const std::size_t n) { _chain.reserve( n); } 
 	
 	Chain& operator=( const Chain& from){ _chain = from.chain; }
 	Chain& operator=( Chain&& from){ _chain = std::move( from.chain); }
+
+	Chain& operator+=( const Term & b){
+		return _ctl::chain_add( *this, b, coeff_tag());
+	}
 
 	Chain operator+( const Term & b){
 		Chain result( *this);
