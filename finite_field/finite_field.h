@@ -50,6 +50,22 @@ class Finite_field{
 	template< typename T>
 	Finite_field( const T n): x( mod( n) ){};
 
+	template< typename T>
+	constexpr Finite_field( const T n): x( cmod( n) ){};
+
+	//mod avoid branch when possible.
+	template <typename T>
+	typename std::enable_if< std::is_unsigned<T>::value, 
+				 constexpr std::size_t>::type cmod(T n) const {
+		return n%_prime;
+	}
+	
+	template <typename T>
+	typename std::enable_if< !std::is_unsigned<T>::value, 
+				 constexpr std::size_t>::type cmod(T n) const {
+		return (n>=0)? (n % _prime) : (_prime-((-1*n)%_prime)); 
+	}
+
 	//mod avoid branch when possible.
 	template <typename T>
 	typename std::enable_if< std::is_unsigned<T>::value, 
@@ -60,7 +76,7 @@ class Finite_field{
 	template <typename T>
 	typename std::enable_if< !std::is_unsigned<T>::value, 
 				 std::size_t>::type mod(T n) const {
-		return (n>=0)? n % _prime: _prime-(std::abs(n)%_prime); 
+		return (n>=0)? (n % _prime) : (_prime-((-1*n)%_prime)); 
 	}
 
 	//given an arbitrary number get a number between [0, prime)
