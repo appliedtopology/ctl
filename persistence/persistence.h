@@ -61,36 +61,38 @@ void eliminate_boundaries( Persistence_data & data){
   }
 }
 
-template< typename Cell, typename Chain_map>
-bool is_creator( const Cell & cell, Chain_map & cascade_boundary_map){
+template< typename Term, typename Chain_map>
+bool is_creator( const Term & term, Chain_map & cascade_boundary_map){
 	typedef typename Chain_map::value_type Chain;
 	typedef typename Chain::Less Term_less;
-	const Chain& bd = cascade_boundary_map[ cell];
+	const Chain& bd = cascade_boundary_map[ term.cell()];
 	Term_less term_less;
-	return  bd.empty() || term_less( cell, bd.youngest());
+	return  bd.empty() || term_less( term, bd.youngest());
 }
 
 template< typename Cell, typename Persistence_data>
 void initialize_cascade_data( const Cell & sigma, const std::size_t pos, 
 			      Persistence_data & data, partner){
-	typedef typename Persistence_data::Chain Chain;
-	Chain& cascade_boundary = data.cascade_boundary;
-	cascade_boundary.reserve( data.bd.max_length( sigma));
-	for( auto i = data.boundary_operator.begin( sigma, pos);
-		  i != data.boundary_operator.end( sigma);
-		  ++i){
-	    //the += here maintains that the chain is sorted
-	    if( is_creator( i->cell(), data.cascade_boundary_map)){
-		cascade_boundary+=(*i);    
-	    }
-	}
+     typedef typename Persistence_data::Chain Chain;
+     Chain& cascade_boundary = data.cascade_boundary;
+     cascade_boundary.reserve( data.bd.length( sigma));
+     //using pos here stores the pos in the data section of the complex
+     //we wish to maintain that all terms know there position in the 
+     //filtration.. this avoids a lot of dereferencing 
+     //and expensive comparisons.
+     for( auto i = data.bd.begin( sigma, pos); i != data.bd.end( sigma); ++i){
+         //the += here maintains that the chain is sorted
+         if( is_creator( *i, data.cascade_boundary_map)){
+     		cascade_boundary+=(*i);    
+         }
+     }
 }
 
 template< typename Cell, typename Persistence_data>
 void initialize_cascade_data( const Cell & cell, const std::size_t pos, 
 			      Persistence_data & data, partner_and_cascade){
 	typedef typename Persistence_data::Chain::Term Term;
-	data.cascade += Term( cell, 1); 
+	data.cascade += Term( cell, 1, pos); 
 	initialize_cascade_data( cell, data, partner());
 }
 
@@ -120,11 +122,13 @@ template< typename Filtration_iterator,
 	  typename Boundary_operator,
 	  typename Chain_map,
 	  typename Output_policy>
-void pair_cells( Filtration_iterator & begin, Filtration_iterator & end,
+void pair_cells( Filtration_iterator begin, Filtration_iterator end,
 		 Boundary_operator & bd, 
 		 Chain_map & cascade_boundary_map, Chain_map & cascade_map,
 		 Output_policy output_policy){
-	
+
+	//we will use the faster Term_pos_less always.	
+	typedef ctl::Term_pos_less Term_less;
 	typedef _ctl::Persistence_data< Term_less, Boundary_operator, 
 				  	Chain_map, Output_policy> 
 					            Persistence_data;
@@ -134,24 +138,24 @@ void pair_cells( Filtration_iterator & begin, Filtration_iterator & end,
 
 	Term_less term_less;
 	Persistence_data data( term_less, bd, 
-			       cascade_boundary_map, cascade_map); 
-	//TODO: pos should not start at zero, 
-	//Filtration_iterator should know its position
-	for(std::size_t pos = 0; begin != end; ++begin, ++pos){	
+			       cascade_boundary_map, cascade_map, output_policy); 
+	for( ; begin != end; ++begin){
+		//Filtration_iterators are specialized to know there position.
+		const std::size_t pos = begin.pos(); 	
 		Cell_iterator sigma = *begin;
 		initialize_cascade_data( sigma, pos, data, output_policy);
 		eliminate_boundaries( data);
 		if( !data.cascade_boundary.empty() ){
-			auto tau = youngest( data.cascade_boundary).cell();
+			auto tau = data.cascade_boundary.youngest().cell();
 		 	//make tau sigma's partner
 			cascade_boundary_map[ sigma] = data.cascade_boundary;
 			store_scaled_cascade( data, sigma, output_policy);  
 		        //make sigma tau's partner
-			Term sigma_term( sigma, 1);	
+			Term sigma_term( sigma, 1, pos); //keep filt. pos 	
 			Chain tau_boundary_chain( sigma_term);  
 			cascade_boundary_map[ tau] = 
 					std::move( tau_boundary_chain); 
-		} else{ store_cascade( data, sigma, output_policy); }	
+		} else{ store_cascade( data, sigma, output_policy); }
 	}
 }
 

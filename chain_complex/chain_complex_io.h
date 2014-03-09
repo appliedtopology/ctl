@@ -1,5 +1,5 @@
-#ifndef CTLIB_IO_H
-#define CTLIB_IO_H
+#ifndef CTLIB_CHAIN_COMPLEX_IO_H
+#define CTLIB_CHAIN_COMPLEX_IO_H
 /*******************************************************************************
 * -Academic Honesty-
 * Plagarism: The unauthorized use or close imitation of the language and 
@@ -35,37 +35,54 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 *******************************************************************************/
-#include <string>
 #include <fstream>
+#include "chain_complex/chain_complex.h"
+
+
+template< typename Stream, typename Cell, typename Boundary, 
+	   typename Data, typename Hash>
+Stream& operator<<( Stream& out, 
+		    const ctl::Chain_complex< Cell, Boundary, Data, Hash> & c){ 
+	for(auto i = c.begin(); i != c.end(); ++i){
+		std::cout << i->second.id() <<": " << i->first << " --> {" 
+		  	  << i->second << "}" << std::endl;
+	}
+	return out;
+}
+
+
+
+template< typename Stream, typename Cell, 
+	  typename Boundary, typename Data_, typename Hash>
+Stream& operator>>( Stream& in, 
+		    ctl::Chain_complex< Cell, Boundary, Data_, Hash> & c){ 
+	typedef typename ctl::Chain_complex< Cell, Boundary, 
+					     Data_, Hash> Chain_complex;  
+	typedef typename Chain_complex::Data Data;
+	std::size_t line_num = 0;
+	std::string line;
+	std::size_t id=0;
+	while( ctl::get_line(in, line, line_num)){
+		std::istringstream ss( line);
+		Cell cell;
+		ss >> id;
+		ss >> cell;
+		Data d( id);
+		c.insert_open_cell( cell, d);
+	}
+	return in;
+}
 
 namespace ctl{
-constexpr char delta[] = "\u2202";
-
-template< typename Stream>
-bool open_file( Stream & in, const char* file_name){
-	in.open( file_name);
-	return in.is_open();
+template<typename String, typename Complex>
+void read_complex(String & complex_name, Complex & complex){
+	std::ifstream in;
+	std::cout << "File IO ..." << std::flush;
+	ctl::open_file( in, complex_name.c_str());
+	in >> complex;
+	ctl::close_file( in);
+	std::cout << "completed!" << std::endl;
 }
-template< typename Stream>
-void close_file( Stream & in){ in.close(); }
-
-template< typename Stream>
-bool get_line( Stream & in, std::string & line, std::size_t line_num){
-	while(in.good()){
-		std::getline( in, line);
-		++line_num;
-		switch( line[0]){
-			case '#':
-			case '%':
-			case '\0':
-			break;
-			default:		
-			return true;
-		}
-	}
-	return false;
-}
-
 } //namespace ctl
 
-#endif //CTLIB_IO_H
+#endif //CTLIB_CHAIN_COMPLEX_IO_H

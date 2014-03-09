@@ -1,5 +1,40 @@
-#ifndef CELL_MAP_H
-#define CELL_MAP_H
+#ifndef CTLIB_CELL_MAP_H
+#define CTLIB_CELL_MAP_H
+/*******************************************************************************
+* -Academic Honesty-
+* Plagarism: The unauthorized use or close imitation of the language and 
+* thoughts of another author and the representation of them as one's own 
+* original work, as by not crediting the author. 
+* (Encyclopedia Britannica, 2008.)
+*
+* You are free to use the code according to the below liscence, but please
+* do not commit acts of academic dishonesty. We encourage and request that 
+* for any academic use of this source code one should cite the following 
+* papers:
+* 
+* \cite{$bibtex_names_here}
+* 
+* See ct.bib for the corresponding bibtex entries. 
+* !!! DO NOT CITE THE USER MANUAL !!!
+*******************************************************************************
+* Copyright (C) $NAMES_OF_AUTHORS $YEARS_FIRST_CREATED <$emails>
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public License
+* as published by the Free Software Foundation; either version 2
+* of the License, or (at your option) any later version.
+* 
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+* 
+* You should have received a copy of the GNU General Public License
+* along with this program in a file entitled COPYING; if not, write to the 
+* Free Software Foundation, Inc., 
+* 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+*******************************************************************************
+*******************************************************************************/
 #include <unordered_map>
 #include <sstream>
 
@@ -22,16 +57,23 @@ class Data_wrapper : public Data_ {
 	typedef Data_wrapper< Data_> Self;
 	public:
 	//default
-	Data_wrapper(): id_( 0), pos__( 0) {};
+	Data_wrapper(): id_( 0), pos__( 0) {}
 	//copy
+	Data_wrapper( const std::size_t & tid): Data_(), id_( tid), pos__( 0) {}
+ 
 	Data_wrapper( const Data_wrapper & from) : 
 	  id_( from.id_), pos__( from.pos__) {} 
 	//move
 	Data_wrapper( const Data_wrapper && from): 
 		id_( std::move( from.id_)), pos__( std::move( from.pos__)) {} 
 	
+	Self& operator=( const Self & from){
+		Data_::operator=( from);
+		id_ = from.id_;
+		pos__ = from.pos__;
+		return *this;
+	}
 	std::size_t id() const { return id_; }
-
 	//a bit akward.. probably should change this later.
 	std::size_t& pos_() { return pos__; }
 	void pos_( const std::size_t p) { pos__ = p; }
@@ -44,11 +86,11 @@ class Data_wrapper : public Data_ {
 	friend class ctl::Chain_complex;
 }; // class Data_wrapper
 
+struct Default_data {}; //class Default_data for complex.
+} //anonymous namespace
 
-class Default_data {}; //class Default_data for complex.
 template< typename Stream>
 Stream& operator<<( Stream & out, const Default_data & d){ return out; }
-} //anonymous namespace
 
 //exported functionality
 namespace ctl{
@@ -159,6 +201,7 @@ public:
 		const std::pair< iterator, bool> p(insert_open_cell( s, data));
 		return std::make_pair( p.first, p.second+num_faces_inserted);
 	}
+	void reserve( const std::size_t n) { cells.reserve( n); }
 	const std::size_t dimension() const { return max_dim; }
 	const std::size_t size() const { return cells.size(); } 
 	Boundary& boundary() { return bd; }
@@ -171,32 +214,4 @@ private:
 }; //cell_map
 } //namespace ct;
 
-template< typename Stream, typename Cell, 
-	  typename Boundary, typename Data, typename Hash>
-Stream& operator>>( Stream& in, 
-		    ctl::Chain_complex< Cell, Boundary, Data, Hash> & c){ 
-	std::size_t line_num = 0;
-	std::string line;
-	std::size_t id=0;
-	while( ctl::get_line(in, line, line_num)){
-		std::istringstream ss( line);
-		Cell cell;
-		ss >> id;
-		ss >> cell;
-		c.insert_open_cell( cell, Data( id));
-	}
-	return in;
-}
-
-template< typename Stream, typename Cell, typename Boundary, 
-	   typename Data, typename Hash>
-Stream& operator<<( Stream& out, 
-		    const ctl::Chain_complex< Cell, Boundary, Data, Hash> & c){ 
-	for(auto i = c.begin(); i != c.end(); ++i){
-		std::cout << i->second.id() <<": " << i->first << " --> {" 
-		  	  << i->second << "}" << std::endl;
-	}
-	return out;
-}
-
-#endif //CELL_MAP_H
+#endif //CTL_CHAIN_COMPLEX_MAP_H

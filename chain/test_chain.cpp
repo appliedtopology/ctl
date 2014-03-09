@@ -9,6 +9,7 @@
 
 //chain_complex
 #include "chain_complex/chain_complex.h"
+#include "chain_complex/chain_complex_io.h"
 #include "chain_complex/complex_boundary.h"
 
 //chain
@@ -17,7 +18,12 @@
 //delta
 #include "io/io.h"
 
+//filtration
 #include "filtration/filtration.h"
+#include "filtration/less.h"
+
+//Term
+#include "term/term_less.h"
 
 //We build a simplicial chain complex with Z2 coefficients
 typedef ctl::Abstract_simplex< int> Simplex;
@@ -27,8 +33,8 @@ typedef ctl::Chain_complex< Simplex, Boundary> Complex;
 typedef Complex::Cell Cell;
 typedef ctl::Complex_boundary< Complex> Complex_boundary;
 typedef Complex_boundary::Term Term;
-typedef ctl::Chain< Term> Chain;
 typedef ctl::Filtration< Complex, ctl::Id_less> Filtration;
+typedef ctl::Chain< Term, ctl::Term_cell_less< ctl::Id_less> > Chain;
  
 std::string print_chain( const Chain & a){
 	std::stringstream out;
@@ -64,7 +70,8 @@ int main( int argc, char** argv){
 	std::cout << "b = " << complex_cell->first << std::endl; 
 	Chain bdp = bda+bdb;
 	std::cout << ctl::delta << "(a+b) = " << print_chain( bdp) << std::endl;
-
+	std::cout << "Youngest["<<ctl::delta<<"(a+b)] = "
+		  << bdp.youngest().coefficient() << "*" 
+		  << bdp.youngest().cell()->first << std::endl;
 	return 0;
-
 }

@@ -39,10 +39,13 @@
 //exported functionality
 namespace ctl{
 
-struct Term_less{
+template< typename Cell_less>
+struct Term_cell_less{
    template< typename Term>
    bool operator()( const Term & l, const Term & r) const { 
-   	return l.cell()->first < r.cell()->first; 
+	const Cell_less c; 
+  	return c( l.cell(), r.cell()); 
+
    } 
 }; //struct Term_less
 

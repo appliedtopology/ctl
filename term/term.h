@@ -99,6 +99,9 @@ class Term< _Cell, ctl::Finite_field< 2> > {
 		
 		template< typename C>
 		void coefficient( const C & n) const {}
+
+		template< typename T>
+		bool operator< ( const T & t) const { return _cell < t.cell(); } 
 	
 		Self& operator=( const Self & from) { 
 			_cell=from._cell;

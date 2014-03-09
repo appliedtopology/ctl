@@ -50,7 +50,7 @@ struct Persistence_data {
 	typedef Output_policy_ Output_policy;
 	typedef typename Cascade_map::value_type Chain;
 
-	Persistence_data( Term_less  t, 
+	Persistence_data( Term_less t, 
 			  Boundary_operator & bd_,
 			  Cascade_map & bd_map_,	
 			  Cascade_map & map_,

@@ -20,7 +20,9 @@ class Abstract_simplex {
 	typedef typename Vector::value_type value_type;
 	typedef typename Vector::value_type vertex_type;
 	typedef typename Vector::const_iterator const_iterator;
+	typedef typename Vector::const_reverse_iterator const_reverse_iterator;
 	typedef typename Vector::iterator iterator;
+	typedef typename Vector::reverse_iterator reverse_iterator;
 	public:
 	Abstract_simplex(): vertices(){};
 	Abstract_simplex( std::size_t d) { vertices.reserve( d); }
@@ -35,10 +37,17 @@ class Abstract_simplex {
 			  const Iterator end): vertices( begin,end){};
 	Abstract_simplex( const Self & from): vertices( from.vertices){};
 
-	iterator       begin()	        { return vertices.begin(); 	}
-	const_iterator begin()  const	{ return vertices.begin(); 	}
-	iterator         end()	  	{ return vertices.end();	}
-	const_iterator   end()  const	{ return vertices.end();	}
+	iterator       begin()	        { return vertices.begin(); }
+	const_iterator begin()  const	{ return vertices.begin(); }
+	
+	iterator         end()	  	{ return vertices.end();   }
+	const_iterator   end()  const	{ return vertices.end();   }
+	
+	reverse_iterator        rbegin()	{ return vertices.rbegin(); }
+	const_reverse_iterator  rbegin()  const	{ return vertices.rbegin(); }
+	
+	reverse_iterator         rend()	        { return vertices.rend(); }
+	const_reverse_iterator   rend()  const	{ return vertices.rend(); }
 
 	std::size_t       size() const	{ return vertices.size(); 	}
 	std::size_t  dimension() const	{ return size()-1; 	  	}
@@ -85,7 +94,6 @@ class Abstract_simplex {
 	bool operator==( const Self & b) const { 
 		return std::equal( begin(), end(), b.begin()); 
 	}
-	
 	private:
 	Vector vertices;
 
@@ -95,7 +103,17 @@ class Abstract_simplex {
 } // namespace ctl
 
 template< typename Stream, typename T>
-Stream& operator<<(Stream& out, const ctl::Abstract_simplex< T> simplex){
+Stream& operator>>( Stream & in, ctl::Abstract_simplex< T> & simplex){
+	T vertex;
+	while( in.good()){
+		in >> vertex;
+		simplex.insert( vertex);	
+	}
+	return in;
+}
+	
+template< typename Stream, typename T>
+Stream& operator<<(Stream& out, const ctl::Abstract_simplex< T> & simplex){
 	typedef typename ctl::Abstract_simplex< T>::const_iterator iterator;
 	out << "[";
 	for(iterator i = simplex.begin(); i != simplex.end(); ++i){

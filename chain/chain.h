@@ -40,12 +40,13 @@
 #include "chain/chain_add.h"
 #include "term/term_less.h"
 #include "term/term_tags.h"
+#include <algorithm>
 
 //exported functionality
 namespace ctl{
 
 template< typename _Term, 
-	  typename _Less = class ctl::Term_less>
+	  typename _Less = std::less< _Term> >
 class Chain {
  public:
  	typedef _Term Term;
@@ -62,16 +63,17 @@ class Chain {
 public:
 	Chain(){}
 	Chain( const std::size_t n): _chain( n) {}
-	Chain( const Chain & c): _chain( c) {}
+	Chain( const Chain & c): _chain( c._chain) {}
 	Chain( const Chain && c): _chain( std::move( c._chain)) {}
 	Chain( const Term & t): _chain( 1, t) {}
 	template< typename Iterator, typename Compare = Less>
 	Chain( Iterator begin, Iterator end, Compare c = Compare()): 
-	_chain(  begin, end) { std::sort( _chain.begin(), _chain.end(), c); }
+	_chain( begin, end){ std::sort( _chain.begin(), _chain.end(), c); }
 	template< typename Iterator>
 	Chain( Iterator begin, Iterator end, const bool sorted): 
 	_chain(  begin, end) {}
 	
+	bool 		  empty()    const { return _chain.empty(); }
 	Term&	       youngest() 	   { return _chain.back();  }
 	const Term&    youngest() const	   { return _chain.back();  }
 	iterator       begin() 	     	   { return _chain.begin(); }
@@ -82,19 +84,19 @@ public:
 
 	std::size_t   size() const   	   { return _chain.size(); }	
 	void reserve( const std::size_t n) { _chain.reserve( n); } 
-	
 	Chain& operator=( const Chain& from){ _chain = from.chain; }
 	Chain& operator=( Chain&& from){ _chain = std::move( from.chain); }
-
+	
 	Coefficient& normalize() { return normalize( coeff_tag()); }
-	Coefficient& normalize( bool) const { return normalize( coeff_tag(), bool()); }
+	Coefficient& normalize( bool) const { 
+		return normalize( coeff_tag(), 1); 
+	}
 	template< typename Scalar>
 	Chain& scaled_add( const Scalar & l, const Chain& rhs){
 		//TODO: finish this
 		//return _ctl::chain_add( );  
 		return *this;
 	}
-
 	Chain& operator+=( const Term & b){
 		return _ctl::chain_add( *this, b, coeff_tag());
 	}
@@ -122,7 +124,7 @@ public:
    Coefficient& normalize( _ctl::term_non_z2_tag, bool) const  {
     	if (_chain.empty()) { return Coefficient( 0); }
     	return this->youngest.coefficient().inverse();
-    }
+   }
    Coefficient& normalize( _ctl::term_non_z2_tag)  {
     	if (_chain.empty()) { return Coefficient( 0); }
     	auto inverse = this->youngest.coefficient().inverse();

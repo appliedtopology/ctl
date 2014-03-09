@@ -80,7 +80,6 @@ public:
 	  next_term ( _bd.begin( cell)), end_term( _bd.end( cell)){ 
 		_next_term();
 	}
- 
         //end constructor
 	_const_boundary_iterator( Complex & _complex): complex( &_complex){ 
 	  	_end_term(); 
@@ -128,7 +127,7 @@ protected:
   //typename Cell_boundary::const_iterator begin_term; 
   typename Cell_boundary::const_iterator next_term;
   typename Cell_boundary::const_iterator end_term;
-  Term term;	
+  Term term;
 }; //class _const_boundary_iterator
 } //anonymous namespace
 
@@ -165,14 +164,22 @@ class Complex_boundary{
 	const_iterator begin( const typename Term::Cell & c, 
 			              const std::size_t & pos) {
 		c->second.pos_( pos);
-		return const_iterator( _complex, _complex.boundary(), c->first);
+		//the complex_boundary_iterator ++ always keeps track of the pos
+		//it may just be a zero value, but, it also may mirror a 
+		//filtration on the complex
+		//the use case is that in persistence if we get quickly get
+		//these positions we can use them for faster 
+		//set_symmetric_difference
+		return const_iterator( _complex, _complex.boundary(), 
+				       c->first);
 	}
 	const_iterator end( const typename Term::Cell & c) {
 		return const_iterator( _complex);
 	}
 	inline const_iterator end( const typename Term::Cell & c, 
 				   const std::size_t & pos) { return end( c); }
-	size_type length( const typename Term::Cell & c){
+
+	size_type length( const typename Term::Cell & c) const {
 		return _complex.boundary().length( c->first);
 	}
 		

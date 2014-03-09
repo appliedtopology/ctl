@@ -46,14 +46,17 @@ int main( int argc, char** argv){
 	std::cout << "construction: " << t.elapsed() << std::endl;
 	std::cout << "size: " << c.size() << std::endl;
 	t.start();
-	Filtration_cell_less f1( c.begin(), c.end());
+	Filtration_cell_less f1( c);
 	t.stop();
 	std::cout << "f1 is sorted " << is_sorted( f1) 
 		  << " " << t.elapsed() << std::endl; 
 	t.start();
-	Filtration_id_less f2( c.begin(), c.end());
+	Filtration_id_less f2( c);
 	t.stop();
 	std::cout << "f2 is sorted " << is_sorted( f2) 
 		  << " " << t.elapsed() << std::endl; 
+	for( auto i = f2.begin(); i != f2.end(); ++i){
+		std::cout << i.pos() << ": " << (*i)->first << std::endl;
+	}
 	return 0;
 }

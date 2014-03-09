@@ -4,7 +4,8 @@
 //exported functionality
 namespace ctl{
 
-struct Id_less{ 
+struct Id_less{
+      constexpr Id_less(){}
       template< typename Cell_iterator>
       bool operator()( const Cell_iterator & a, const Cell_iterator & b) const {
        return a->second.id() < b->second.id();
@@ -12,6 +13,7 @@ struct Id_less{
 }; //struct Id_less
 
 struct Cell_less{
+      constexpr Cell_less(){}
       template< typename Cell_iterator>
       bool operator()( const Cell_iterator & a, const Cell_iterator & b) const {
 	return a->first < b->first;
