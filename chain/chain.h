@@ -82,44 +82,75 @@ public:
 	iterator       end() 	     	   { return _chain.end(); }
 	const_iterator end() const   	   { return _chain.end(); }
 
+	//needed for scaled_add below..	
+	const_iterator cbegin() const 	   { return _chain.begin(); }
+	const_iterator cend() const   	   { return _chain.end(); }
+	
+
 	std::size_t   size() const   	   { return _chain.size(); }	
 	void reserve( const std::size_t n) { _chain.reserve( n); } 
-	Chain& operator=( const Chain& from){ _chain = from.chain; }
-	Chain& operator=( Chain&& from){ _chain = std::move( from.chain); }
+	Chain& operator=( const Chain& from){ 
+		_chain = from._chain; 
+		return *this;
+	}
+	Chain& operator=( Chain&& from){ 
+		_chain = std::move( from._chain); 
+		return *this;
+	}
 	
 	Coefficient& normalize() { return normalize( coeff_tag()); }
 	Coefficient& normalize( bool) const { 
 		return normalize( coeff_tag(), 1); 
 	}
-	template< typename Scalar>
-	Chain& scaled_add( const Scalar & l, const Chain& rhs){
-		//TODO: finish this
-		//return _ctl::chain_add( );  
+
+	template< typename Chain, typename Compare = Less>
+	Chain& scaled_add( const Coefficient & a, const Chain& rhs, 
+					      Compare c = Compare()){
+		Chain result( size() + rhs.size());	 
+		const_iterator 
+		_end = _ctl::chain_add( _chain.cbegin(), _chain.cend(),
+				 	a, rhs.begin(), rhs.end(), 
+				 	result.begin(), c, 
+				 	coeff_tag());
+		//hopefully should cause no deallocation
+		//investigate this
+		result._chain.erase( _end, result.end());
+		//currently investigating if this is faster than swap.
+		_chain = std::move( result._chain);  
 		return *this;
 	}
+
+	template< typename Term, typename Compare = Less>
+	Chain& add( const Term& rhs, Compare c = Compare() ){
+		_ctl::chain_term_add( _chain, rhs, c, coeff_tag());
+		return *this;
+	}
+	
 	Chain& operator+=( const Term & b){
-		return _ctl::chain_add( *this, b, coeff_tag());
+		_ctl::chain_term_add( _chain, b, Less(), coeff_tag());
+		return *this;
 	}
 
 	Chain operator+( const Term & b){
 		Chain result( *this);
-		return _ctl::chain_add( result, b, coeff_tag());
+		_ctl::chain_term_add( result._chain, b, Less(), coeff_tag());
+		return result;
 	}
 
 	Chain operator+( const Chain & b) const {
 	   Chain result( size()+b.size());
 	   auto leftover = _ctl::chain_add( begin(), end(), 
-	   			         b.begin(), b.end(),
-	   			         result.begin(),
-	   			         Less(),
-	   			         Chain::coeff_tag());
+	   			            b.begin(), b.end(),
+	   			            result.begin(),
+	   			            Less(),
+	   			            Chain::coeff_tag());
 	   result._chain.erase( leftover, result.end());
 	   return result;
 	}
  private:
    Coefficient& normalize( _ctl::term_z2_tag) const { return Coefficient( 1); }
    Coefficient& normalize( _ctl::term_z2_tag, bool) const { 
-		return Coefficient( 1); 
+	return Coefficient( 1); 
    }
    Coefficient& normalize( _ctl::term_non_z2_tag, bool) const  {
     	if (_chain.empty()) { return Coefficient( 0); }
@@ -128,7 +159,7 @@ public:
    Coefficient& normalize( _ctl::term_non_z2_tag)  {
     	if (_chain.empty()) { return Coefficient( 0); }
     	auto inverse = this->youngest.coefficient().inverse();
-    	if ( inverse != 2){ (*this)*=inverse; }
+    	if ( inverse != 1){ (*this)*=inverse; }
     	return inverse;
     }
 private:

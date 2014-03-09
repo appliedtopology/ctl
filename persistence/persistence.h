@@ -48,7 +48,7 @@ class partner_and_cascade {};
 template< typename Persistence_data>
 void eliminate_boundaries( Persistence_data & data){
    while( !data.cascade_boundary.empty()){
-	const auto tau = data.cascade_boundary.youngest();
+	const auto tau = data.cascade_boundary.youngest().cell();
 	const auto bd_cascade_tau = data.cascade_boundary_map[ tau];
 	//tau is the partner
 	if( bd_cascade_tau.empty()){ return; }
@@ -57,6 +57,7 @@ void eliminate_boundaries( Persistence_data & data){
 	const auto tau_partner = tau_partner_term.cell();
 	auto bd_cascade_tau_partner = data.cascade_boundary_map[ tau_partner];
 	const auto scalar = tau_partner_term.coefficient().inverse();
+	const auto & less = data.term_less;
   	data.cascade_boundary.scaled_add( scalar, bd_cascade_tau_partner);
   }
 }
@@ -138,7 +139,8 @@ void pair_cells( Filtration_iterator begin, Filtration_iterator end,
 
 	Term_less term_less;
 	Persistence_data data( term_less, bd, 
-			       cascade_boundary_map, cascade_map, output_policy); 
+			       cascade_boundary_map, cascade_map, 
+			       output_policy); 
 	for( ; begin != end; ++begin){
 		//Filtration_iterators are specialized to know there position.
 		const std::size_t pos = begin.pos(); 	

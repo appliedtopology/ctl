@@ -1,4 +1,7 @@
 include_directories( ${CMAKE_SOURCE_DIR})
 add_executable( persistence persistence.cpp)
+target_link_libraries( persistence boost_program_options)
 add_executable( duplicate build_blobs.cpp)
 add_executable( build_clique clique_tool.cpp)
+add_executable( euler euler_tool.cpp)
+target_link_libraries( euler boost_program_options)

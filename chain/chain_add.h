@@ -33,7 +33,23 @@ Chain_iterator chain_add( Chain_iterator x_begin, Chain_iterator x_end,
 	return result;
 }
 
+template< typename Chain_iterator, typename Coefficient, 
+	  typename OutputIterator, typename Term_less>
+Chain_iterator chain_add( Chain_iterator x_begin, Chain_iterator x_end, 
+			  const Coefficient& not_used, 
+		 	  Chain_iterator y_begin, Chain_iterator y_end,
+			  OutputIterator result, const Term_less less,   
+			  const _ctl::term_z2_tag t){
+	return chain_add( x_begin, x_end, y_begin, y_end, result, less, t);
+}	
+
 //and this is an 1xpy call for nonz2 terms
+//TODO: should take a coefficient, and a flag
+//QUESTION: Currently persistence will not hit this function.
+//Is it faster in general to always check if coefficient == 1 then call this
+//or is it faster to have the branches in the inner loop?
+//any c++11 or better compiler will remove the outer branch when we have a Z2
+//term, so this will truly only matter for non_z2 terms.  
 template< typename Chain_iterator, typename OutputIterator, typename Term_less>
 Chain_iterator chain_add( Chain_iterator x_begin, Chain_iterator x_end, 
 		  	  Chain_iterator y_begin, Chain_iterator y_end,
@@ -43,9 +59,6 @@ Chain_iterator chain_add( Chain_iterator x_begin, Chain_iterator x_end,
 	typedef typename Chain_iterator::value_type Term;
 	typedef typename Term::Coefficient Coefficient;
 	
-	//TODO: optimize set_symmetric_difference
-	//TODO: Can we avoid separate return result 
-	//and use x itself as the output? 
 	while( true){ 
 	     if(x_begin == x_end){ return std::copy( y_begin, y_end, result); }
 	     if(y_begin == y_end){ return std::copy( x_begin, x_end, result); }
@@ -82,14 +95,11 @@ Chain_iterator chain_add( Chain_iterator x_begin, Chain_iterator x_end,
 	typedef typename Chain_iterator::value_type Term;
 	typedef typename Term::Coefficient Coefficient;
 	
-	//TODO: optimize set_symmetric_difference
-	//TODO: Can we avoid separate return result 
-	//and use x itself as the output? 
 	while( true){ 
 	     if(x_begin == x_end){ return std::copy( y_begin, y_end, result); }
 	     if(y_begin == y_end){ return std::copy( x_begin, x_end, result); }
 	     if( less(*x_begin, *y_begin)) { 
-		*result = *x_begin; //optimize chain= operator. 
+		*result = *x_begin; 
 		 ++x_begin; 
 	     }
 	     //expect that Term_less compares position in filtration 
@@ -97,12 +107,11 @@ Chain_iterator chain_add( Chain_iterator x_begin, Chain_iterator x_end,
 	     else if( less(*y_begin,*x_begin)) { 
 		const Coefficient c = a*y_begin->coefficient(); 
 		if( c == 0 ) { continue; } 
-		*result = *y_begin; //optimize chain= operator.
+		*result = *y_begin; 
 		result->coefficient( c);
 	 	++y_begin;
 	     } else {
-		const Coefficient c = x_begin->coefficient() + 
-				    a*y_begin->coefficient();
+		const Coefficient c = (1+a)*y_begin->coefficient(); 
 		if( c == 0 ) { continue; } 
 		*result = *x_begin; 
 		result->coefficient( c);
@@ -114,11 +123,10 @@ Chain_iterator chain_add( Chain_iterator x_begin, Chain_iterator x_end,
 }
 
 //over Z2 the only coeff is 1
-template< typename Chain, typename Term>
-Chain& chain_add( Chain & x, Term & y, const _ctl::term_z2_tag t ){
-	typedef typename Chain::Less Less;
-	Less less;
-	auto pos = std::lower_bound( x.begin(), x.end(), y);
+template< typename Vector, typename Less>
+Vector& chain_term_add( Vector & x, const typename Vector::value_type & y, 
+			Less less, const _ctl::term_z2_tag t){
+	auto pos = std::lower_bound( x.begin(), x.end(), y, less);
 	//new element, so add it at the end
 	if (pos == x.end()) { x.push_back( y); }
 	//new element in the middle, add it.
@@ -137,13 +145,13 @@ struct is_zero{
 }; //struct is_zero
 
 //Since x=x+a*y is well defined for y a term we ignore the coefficient
-template< typename Chain, typename Term>
-Chain& chain_add( Chain & x, const Term & y, const _ctl::term_non_z2_tag t){
-	typedef typename Chain::Less Less;
-	Less less;
+template< typename Vector, typename Less>
+Vector& chain_term_add( Vector & x, const typename Vector::value_type & y, 
+		        Less less, const _ctl::term_non_z2_tag t){
+	typedef typename Vector::value_type Term;
 	typedef typename Term::Coefficient Coefficient;
 	typedef _ctl::is_zero< Term> Is_zero;
-	auto pos = std::lower_bound( x.begin(), x.end(), y);
+	auto pos = std::lower_bound( x.begin(), x.end(), y, less);
 	//new element, so add it at the end
 	if (pos == x.end()) { x.push_back( y); }
 	//new element in the middle, add it.
