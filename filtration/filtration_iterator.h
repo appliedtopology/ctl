@@ -61,6 +61,7 @@ class _filtration_iterator :
 	//arithmetic
  	Self operator+(const diff_type n) const { return Self(i+n, p+n); }
 	Self operator-(const diff_type n) const { return Self(i-n, p-n); }
+	diff_type operator-(const Self& a) const { return i-a.i; }
 	Self& operator=(const Self& r) { i = r.i; p = r.p; return *this; } 
  	Self& operator+=(const difference_type n) { i+=n; p+=n; return *this;}
  	Self& operator-=(const difference_type n) { i-=n; p-=n; return *this;}

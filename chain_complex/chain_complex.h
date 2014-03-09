@@ -57,29 +57,38 @@ class Data_wrapper : public Data_ {
 	typedef Data_wrapper< Data_> Self;
 	public:
 	//default
-	Data_wrapper(): id_( 0), pos__( 0) {}
+	Data_wrapper(): id_( 0), pos_( 0) {}
 	//copy
-	Data_wrapper( const std::size_t & tid): Data_(), id_( tid), pos__( 0) {}
+	Data_wrapper( const std::size_t & tid, const std::size_t p=0): 
+	Data_(), id_( tid), pos_( p) {}
  
 	Data_wrapper( const Data_wrapper & from) : 
-	  id_( from.id_), pos__( from.pos__) {} 
+	  id_( from.id_), pos_( from.pos_) {} 
 	//move
 	Data_wrapper( const Data_wrapper && from): 
-		id_( std::move( from.id_)), pos__( std::move( from.pos__)) {} 
+		id_( std::move( from.id_)), pos_( std::move( from.pos_)) {} 
 	
 	Self& operator=( const Self & from){
 		Data_::operator=( from);
 		id_ = from.id_;
-		pos__ = from.pos__;
+		pos_ = from.pos_;
 		return *this;
 	}
+	Self& operator=( const Self && from){
+		Data_::operator=( from);
+		id_ = std::move( from.id_);
+		pos_ = std::move( from.pos_);
+		return *this;
+	}
+
+
 	std::size_t id() const { return id_; }
 	//a bit akward.. probably should change this later.
-	std::size_t& pos_() { return pos__; }
-	void pos_( const std::size_t p) { pos__ = p; }
+	std::size_t pos() const { return pos_; }
+	void pos( const std::size_t p) { pos_= p; }
 	private:
 	std::size_t id_;
-	std::size_t pos__;
+	std::size_t pos_;
 	//(to be read in Millhouse Van Houten's voice)
 	//This lets the chain_complex & boundary touch my privates ;)
 	template< typename C, typename B, typename D, typename H>
@@ -200,6 +209,14 @@ public:
 		//ugly, but then you add yourself.	
 		const std::pair< iterator, bool> p(insert_open_cell( s, data));
 		return std::make_pair( p.first, p.second+num_faces_inserted);
+	}
+	template< typename Stream>
+	void write( Stream& out) const {
+		for( auto cell: cells){
+		  out << cell.second.id() << " ";
+		  cell.first.write( out);
+		  out << std::endl; 
+		}
 	}
 	void reserve( const std::size_t n) { cells.reserve( n); }
 	const std::size_t dimension() const { return max_dim; }

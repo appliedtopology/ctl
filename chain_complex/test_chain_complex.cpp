@@ -68,11 +68,13 @@ int main( int argc, char** argv){
 		  << complex.begin()->first << std::endl;
 	auto wtf = complex.begin();
 	std::cout << "boundary length: " << b.length( wtf) << std::endl;
-	for( boundary_iterator i = b.begin( wtf); i != b.end( wtf); ++i){
+	for( boundary_iterator i = b.begin( wtf, 0); i != b.end( wtf); ++i){
 		std::cout << i->cell()->first 
 			  << " --> {" 
 			  << i->cell()->second  
 			  << "}"<< std::endl;
 	}
+	std::ofstream out( "test.asc");
+	complex.write( out); 
 	return 0;
 }

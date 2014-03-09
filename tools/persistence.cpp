@@ -101,23 +101,23 @@ int main(int argc, char *argv[]){
   std::string complex_name(full_complex_name);
   size_t found = complex_name.rfind('/');
   if (found != std::string::npos){ complex_name.replace(0, found+1, ""); }
-
+  std::cout << "full_complex_name: " << full_complex_name << std::endl;
   //create some data structures 
   Complex complex;
   Complex_boundary complex_boundary( complex);
   Timer timer;
                                        
   // Read the cell_set in  
-  ctl::read_complex(full_complex_name, complex); 
+  ctl::read_complex( full_complex_name, complex); 
+  std::cout << "complex size: " << complex.size() << std::endl; 
+  std::cout << "complex dimension: " << complex.dimension() << std::endl;
 
   //produce a filtration
   timer.start();
-  Filtration complex_filtration(complex);
+  Filtration complex_filtration( complex);
   timer.stop();
   double complex_filtration_time = timer.elapsed();
-
   //display some info
-  std::cout << "complex size: " << complex.size() << std::endl;
   std::cout << "time for complex filtration (secs): " 
 	    << complex_filtration_time << std::endl;
   

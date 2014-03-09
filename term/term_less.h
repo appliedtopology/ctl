@@ -50,7 +50,7 @@ struct Term_cell_less{
 }; //struct Term_less
 
 
-//we mirror pos() from l.cell()->second.pos() in the term
+//we mirror pos_() from l.cell()->second.pos() in the term
 //so that we avoid a dereference.
 struct Term_pos_less{
    template< typename Term>

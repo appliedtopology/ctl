@@ -35,6 +35,14 @@ class const_boundary_iterator :
 	//copy constructor
 	const_boundary_iterator( const Self & from): cellptr( from.cellptr), 
 	face(from.face), pos( from.pos), removed( from.removed){}
+	//move constructor
+	const_boundary_iterator( const Self && from): 
+	cellptr( std::move(from.cellptr)), 
+	face( std::move(from.face)), 
+	pos( std::move(from.pos)), 
+	removed( std::move(from.removed)){}
+	
+	//equality
 	const_boundary_iterator& operator==( const Self & b) const { 
 		return (b.cellptr == cellptr) && (b.pos == pos); 
 	} 
@@ -45,6 +53,14 @@ class const_boundary_iterator :
 		pos = b.pos;
 		return *this;
 	}
+	const_boundary_iterator& operator=(const Self && b){
+		cellptr = std::move(b.cellptr);
+		remove  = std::move(b.removed);
+		face    = std::move(b.face);
+		pos     = std::move(b.pos);
+		return *this;
+	}
+	
 	Term& operator*() { 
 		if( cellptr != 0) { return face; } 
 		std::cerr << "Cannot Dereference End" << std::endl; 

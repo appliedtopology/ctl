@@ -36,6 +36,7 @@ class Abstract_simplex {
 	Abstract_simplex( const Iterator begin, 
 			  const Iterator end): vertices( begin,end){};
 	Abstract_simplex( const Self & from): vertices( from.vertices){};
+	Abstract_simplex( const Self && from): vertices( std::move(from.vertices)){};
 
 	iterator       begin()	        { return vertices.begin(); }
 	const_iterator begin()  const	{ return vertices.begin(); }
@@ -87,12 +88,32 @@ class Abstract_simplex {
 	iterator remove( iterator first, iterator last){
 		return vertices.erase( first, last);
 	}
+	Self& operator=( const Self & b) { 
+		vertices = b.vertices; 
+		return *this;
+	}
+	Self& operator=( const Self && b) {
+		vertices = std::move( b.vertices); 
+		return *this;
+	}
 	bool operator<( const Self & b) const {
-		return std::lexicographical_compare( begin(), end(), 
-						     b.begin(), b.end());
-	} 
+		
+		return (size() < b.size()) || 
+		 ((size() == b.size()) && 
+		std::lexicographical_compare( begin(), end(), 
+					      b.begin(), b.end()));
+	}
 	bool operator==( const Self & b) const { 
-		return std::equal( begin(), end(), b.begin()); 
+		const bool equal_size = (b.size() == size());
+		return equal_size && std::equal( begin(), end(), b.begin()); 	    
+	}
+	bool operator!=( const Self & b) const{ 
+		const bool equal_size = (b.size() == size());
+		return !equal_size || !std::equal( begin(), end(), b.begin());
+	}
+	template< typename Stream>
+	void write( Stream & out) const {
+		for( auto i : vertices){ out << i << " "; }
 	}
 	private:
 	Vector vertices;

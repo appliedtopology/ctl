@@ -40,6 +40,8 @@
 
 namespace ctl{
 constexpr char delta[] = "\u2202";
+constexpr char sigma[] = "\u03C3";
+constexpr char tau[] = "\u1D6D5";
 
 template< typename Stream>
 bool open_file( Stream & in, const char* file_name){
@@ -51,7 +53,7 @@ void close_file( Stream & in){ in.close(); }
 
 template< typename Stream>
 bool get_line( Stream & in, std::string & line, std::size_t line_num){
-	while(in.good()){
+	while( in.good()){
 		std::getline( in, line);
 		++line_num;
 		switch( line[0]){

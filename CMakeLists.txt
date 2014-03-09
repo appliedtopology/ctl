@@ -8,6 +8,7 @@ set( CMAKE_VERBOSE_MAKEFILE  false)
 #for installing read:
 #http://www.cmake.org/cmake/help/cmake_tutorial.html
 add_definitions("-std=c++11")
+set(CMAKE_BUILD_TYPE Release) 
 cmake_minimum_required(VERSION 2.6.2)
 if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" VERSION_GREATER 2.6)
   if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION}" VERSION_GREATER 2.8.3)

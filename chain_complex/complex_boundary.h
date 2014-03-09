@@ -113,7 +113,7 @@ protected:
 		//TODO: see if it improves performace,
 		//complex_iterators can store this position
 		//to avoid the extra dereference
-		term.pos_( term.cell()->second.pos_());
+		term.pos( term.cell()->second.pos());
 		++next_term;
 		return;
 	}
@@ -163,7 +163,7 @@ class Complex_boundary{
 	}
 	const_iterator begin( const typename Term::Cell & c, 
 			              const std::size_t & pos) {
-		c->second.pos_( pos);
+		c->second.pos( pos);
 		//the complex_boundary_iterator ++ always keeps track of the pos
 		//it may just be a zero value, but, it also may mirror a 
 		//filtration on the complex
