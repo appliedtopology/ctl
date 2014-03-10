@@ -7,17 +7,17 @@
 * original work, as by not crediting the author. 
 * (Encyclopedia Britannica, 2008.)
 *
-* You are free to use the code according to the below liscence, but please
-* do not commit acts of academic dishonesty. We encourage and request that 
-* for any academic use of this source code one should cite the following 
-* papers:
+* You are free to use the code according to the license below, but, please
+* do not commit acts of academic dishonesty. We strongly encourage and request 
+* that for any [academic] use of this source code one should cite one the 
+* following works:
 * 
-* \cite{$bibtex_names_here}
+* \cite{hatcher, z-ct-10}
 * 
 * See ct.bib for the corresponding bibtex entries. 
 * !!! DO NOT CITE THE USER MANUAL !!!
 *******************************************************************************
-* Copyright (C) $NAMES_OF_AUTHORS $YEARS_FIRST_CREATED <$emails>
+* Copyright (C) Ryan H. Lewis 2014 <me@ryanlewis.net>
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -34,9 +34,10 @@
 * Free Software Foundation, Inc., 
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
+*******************************************************************************
 * NOTES
-* For now this is an input_iterator, abstract_simplex is bidirectional so we 
-* could easily store this
+* For now this is an input_iterator, cell boundary operations could be 
+* bidirectional so we could easily make this a bidirectional iterator
 *******************************************************************************
 *******************************************************************************/
 
