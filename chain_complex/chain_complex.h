@@ -128,19 +128,21 @@ public:
 public:
 	//Constructors
 	//Default
-	Chain_complex(): max_id( 0) {}; 
+	Chain_complex(): max_id( 0), max_dim( 0) {}; 
 	//Copy
 	Chain_complex( const Chain_complex & b): cells( b.cells), bd( b.bd),
-					 max_id( b.max_id) {}; 
+					 max_id( b.max_id), max_dim( b.max_dim) {}; 
 	//Move
 	Chain_complex( Chain_complex && b): cells( std::move( b.cells)), 
 				  bd( std::move( b.bd)), 
-				  max_id( std::move(b.max_id)) {} 
+				  max_id( std::move(b.max_id)), 
+				  max_dim( std::move( b.max_dim)) {} 
 
 	// assignment operator
 	Chain_complex& operator=( const Chain_complex& b){
 		bd = b.bd;
 		max_id = b.max_id;
+		max_dim = b.max_dim;
 		cells = b.cells;
 		return *this;
 	}
@@ -149,12 +151,9 @@ public:
 	Chain_complex& operator=( const Chain_complex&& b){
 		bd = std::move(b.bd);
 		max_id = std::move(b.max_id);
+		max_dim = std::move(b.max_dim);
 		cells = std::move(b.cells);
 		return *this;
-	}
-
-	Term find_term( const Cell & s) const {
-		return Term( cells.find( s), 1);
 	}
 
  	iterator find_cell( const Cell & s) { 

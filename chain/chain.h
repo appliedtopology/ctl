@@ -83,7 +83,9 @@ public:
 	//needed for scaled_add below..	
 	const_iterator cbegin() const 	   { return _chain.begin(); }
 	const_iterator cend() const   	   { return _chain.end(); }
-	
+
+	template< class... Args>	
+	void emplace( Args&&... args){ _chain.emplace_back( std::forward< Args>( args)...); }
 
 	std::size_t   size() const   	   { return _chain.size(); }	
 	void reserve( const std::size_t n) { _chain.reserve( n); } 

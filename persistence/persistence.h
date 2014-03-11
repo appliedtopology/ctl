@@ -58,7 +58,6 @@ void eliminate_boundaries( Persistence_data & data){
 	const auto tau_partner = tau_partner_term.cell();
 	auto bd_cascade_tau_partner = data.cascade_boundary_map[ tau_partner];
 	const auto scalar = tau_partner_term.coefficient().inverse();
-	const auto & less = data.term_less;
   	data.cascade_boundary.scaled_add( scalar, bd_cascade_tau_partner,
 					  data.temporary_chain, data.term_less);
   }
@@ -143,7 +142,6 @@ void pair_cells( Filtration_iterator begin, Filtration_iterator end,
 	Persistence_data data( term_less, bd, 
 			       cascade_boundary_map, cascade_map, 
 			       output_policy); 
-	std::size_t total = std::distance( begin, end);
 	for( ; begin != end; ++begin){
 		//Filtration_iterators are specialized to know there position.
 		const std::size_t pos = begin.pos(); 	

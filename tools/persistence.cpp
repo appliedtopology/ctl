@@ -33,11 +33,13 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 *******************************************************************************/
-// serial_homology.cpp
-// Ryan Lewis
-// November 7, 2010
-// May 31, 2011
+#define ZOOM_PROFILE
 #define COMPUTE_BETTI
+
+#ifdef ZOOM_PROFILE
+#include "zoom.h"
+#endif
+
 
 //CTL Types for Building a Simplicial Chain Complex and Filtration
 #include "finite_field/finite_field.h"
@@ -126,8 +128,30 @@ void process_args(int & argc, char *argv[],Variable_map & vm){
 	std::exit( -1);
   }
 }
+//FOR DEBUGGING
+#include <stdio.h>
+#include <execinfo.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <unistd.h>
+void handler(int sig) {
+  void *array[10];
+  size_t size;
+
+  // get void*'s for all entries on the stack
+  size = backtrace(array, 10);
+
+  // print out all the frames to stderr
+  fprintf(stderr, "Error: signal %d:\n", sig);
+  backtrace_symbols_fd(array, size, STDERR_FILENO);
+  exit(1);
+}
 
 int main(int argc, char *argv[]){
+  signal(SIGSEGV, handler);   // install our handler
+  #ifdef ZOOM_PROFILE
+  std::cout << "Connect" <<  ZMConnect() << std::endl;
+  #endif
   po::variables_map vm;
   process_args(argc,argv,vm);
   
@@ -165,12 +189,25 @@ int main(int argc, char *argv[]){
   //we hand persistence a property map for genericity!                                         
   Complex_chain_map cascade_bd_property_map( complex_cascade_boundaries.begin(), 
 					     Complex_offset_map());
-
+  #ifdef ZOOM_PROFILE
+  std::cout << "Profiling Begin";
+  ZMError start_error = ZMStartSession();
+  std::cout << start_error << std::endl;
+  #endif 
   //serial persistence (complex)
   timer.start();
   ctl::persistence( complex_filtration.begin(), complex_filtration.end(),
   		    complex_boundary, cascade_bd_property_map);
   timer.stop();
+  #ifdef ZOOM_PROFILE
+  ZMError end_error = ZMStopSession();
+  std::cout << "Profiling End" << end_error << std::endl;
+  #endif
+  #ifdef ZOOM_PROFILE
+   std::cout << "Disconnect" <<  ZMDisconnect() << std::endl;
+  #endif
+
+
   double complex_persistence = timer.elapsed();
   std::cout << "serial persistence (complex): " 
             << complex_persistence << std::endl;

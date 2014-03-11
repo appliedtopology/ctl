@@ -44,7 +44,7 @@ namespace {
 //needed in filtration constructor
 template< typename Iterator>
 class _transform_iterator : 
-		public std::iterator< std::input_iterator_tag, Iterator> {
+		public std::iterator< std::forward_iterator_tag, Iterator> {
 	private:
 		typedef _transform_iterator< Iterator> Self;
 	public:
@@ -107,10 +107,11 @@ public:
 	Filtration( const Filtration & f): _filtration( f) {}
 	Filtration( const Filtration && f): _filtration( std::move( f)) {}	
 	Filtration( Complex & complex): 
-	_filtration( _create_transform_iterator(complex.begin()), 
-		      _create_transform_iterator( complex.end())){ 
-		Less less;
-		std::sort( _filtration.begin(), _filtration.end(), less);
+	_filtration( complex.size()){
+		std::copy( _create_transform_iterator(complex.begin()), 
+		           _create_transform_iterator(complex.end()),
+			   _filtration.begin());
+		std::sort( _filtration.begin(), _filtration.end(), Less());
 	}
 
 	//used typedefs above since the names were getting to long

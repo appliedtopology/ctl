@@ -124,5 +124,7 @@ int main( int argc, char** argv){
 	l.stop();
 	std::cout << timer.elapsed()/N << std::endl;
 	std::cout << l.elapsed() << std::endl;
+	std::cout << print_chain( bds+bdt) << std::endl;
 	return 0;
+
 }

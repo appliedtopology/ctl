@@ -69,12 +69,12 @@ class const_boundary_iterator :
 	}
 	//copy constructor
 	const_boundary_iterator( const Self & from): cellptr( from.cellptr), 
-	face(from.face), pos( from.pos), removed( from.removed){}
+	pos( from.pos), face(from.face), removed( from.removed){}
 	//move constructor
 	const_boundary_iterator( const Self && from): 
 	cellptr( std::move(from.cellptr)), 
-	face( std::move(from.face)), 
 	pos( std::move(from.pos)), 
+	face( std::move(from.face)), 
 	removed( std::move(from.removed)){}
 	
 	//equality
