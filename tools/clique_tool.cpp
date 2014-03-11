@@ -58,7 +58,6 @@ int main(int argc, char *argv[]) {
   }
   //initial stuff
   Complex complex;
-  std::ofstream out;
   std::string basename(argv[ 1]);
   basename.append(".").append(argv[ 2]).append(".asc");
   std::size_t n = atoi( argv[ 2]);
@@ -67,8 +66,9 @@ int main(int argc, char *argv[]) {
   std::cout << "building VR complex on: " << cell << std::endl;
   complex.insert_closed_cell(cell,true);
   std::cout << "complex has: " << complex.size() << " simplices" << std::endl;
-  ctl::open_file(out,basename.c_str());
-  out << complex;
+  std::ofstream out;
+  ctl::open_file(out, basename.c_str());
+  complex.write( out);
   ctl::close_file( out);
   return 0;
 }

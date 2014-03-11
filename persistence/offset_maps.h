@@ -1,5 +1,5 @@
-#ifndef CTLIB_PROPERTY_MAPS_H
-#define CTLIB_PROPERTY_MAPS_H
+#ifndef CTLIB_OFFSET_MAPS_H
+#define CTLIB_OFFSET_MAPS_H
 /*******************************************************************************
 * -Academic Honesty-
 * Plagarism: The unauthorized use or close imitation of the language and 
@@ -35,7 +35,6 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 *******************************************************************************/
-
 #include <boost/property_map/property_map.hpp>
 
 //code here modeled after:
@@ -43,32 +42,44 @@
 namespace ctl {
 
 template< typename Cell>
-struct Pos_property_map {
+struct Pos_offset_map {
   // types
   typedef Cell                             key_type;
   typedef std::size_t                      value_type;
   typedef std::size_t&                     reference;
-  typedef boost::readable_property_map_tag category;
-  Pos_property_map() {}
+  typedef boost::readable_property_map_tag category; 
+  Pos_offset_map() {}
 };
 
 template< typename Cell>
-typename Pos_property_map< Cell>::value_type 
-get( Pos_property_map< Cell>, const Cell& cell) { return cell->second.pos(); }
+typename Pos_offset_map< Cell>::value_type 
+get( Pos_offset_map< Cell>, const Cell& cell) { return cell->second.pos(); }
+
+template< typename Cell, typename Coefficient>
+typename Pos_offset_map< Cell>::value_type 
+get( Pos_offset_map< Cell>, const ctl::Term< Cell, Coefficient>& term) { 
+	return term.pos(); 
+}
 
 template< typename Cell>
-struct Id_property_map {
+struct Id_offset_map {
   // types
   typedef Cell                             key_type;
   typedef std::size_t                      value_type;
   typedef std::size_t&                     reference;
-  typedef boost::readable_property_map_tag category;
-  Id_property_map() {}
+  typedef boost::readable_property_map_tag category; 
+  Id_offset_map() {}
 };
 
 template< typename Cell>
-typename Id_property_map< Cell>::value_type 
-get( Id_property_map< Cell>, const Cell& cell) { return cell->second.id(); }
+typename Id_offset_map< Cell>::value_type 
+get( Id_offset_map< Cell>, const Cell& cell) { return cell->second.id(); }
+
+template< typename Cell, typename Coefficient>
+typename Id_offset_map< Cell>::value_type 
+get( Id_offset_map< Cell>, const ctl::Term< Cell, Coefficient>& term) { 
+	return term.pos(); 
+}
 
 } //end namespace ctl
-#endif //CTLIB_PROPERTY_MAPS_H
+#endif //CTLIB_OFFSET_MAPS_H

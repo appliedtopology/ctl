@@ -143,6 +143,9 @@ void pair_cells( Filtration_iterator begin, Filtration_iterator end,
 			       cascade_boundary_map, cascade_map, 
 			       output_policy); 
 	for( ; begin != end; ++begin){
+		std::cout << (*begin)->first 
+			 << " [" << begin.pos() << " / " << end-begin << "]" 
+			 << std::endl;
 		//Filtration_iterators are specialized to know there position.
 		const std::size_t pos = begin.pos(); 	
 		Cell_iterator sigma = *begin;

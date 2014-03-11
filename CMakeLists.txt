@@ -1,9 +1,31 @@
 # Created by the script cgal_create_cmake_script
 # This is the CMake script for compiling a CGAL application.
-
-
 project( ctlib CXX)
 set( CMAKE_VERBOSE_MAKEFILE  false)
+
+
+option(USE_CLANG "build application with clang" ON) # OFF is the default
+if( USE_CLANG)
+   SET (CMAKE_C_COMPILER             "/usr/bin/clang")
+   SET (CMAKE_C_FLAGS                "-Wall -std=c99")
+   SET (CMAKE_C_FLAGS_DEBUG          "-g")
+   SET (CMAKE_C_FLAGS_MINSIZEREL     "-Os -DNDEBUG")
+   SET (CMAKE_C_FLAGS_RELEASE        "-O4 -DNDEBUG")
+   SET (CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -g")
+
+   SET (CMAKE_CXX_COMPILER             "/usr/bin/clang++")
+   SET (CMAKE_CXX_FLAGS                "-Wall")
+   SET (CMAKE_CXX_FLAGS_DEBUG          "-g")
+   SET (CMAKE_CXX_FLAGS_MINSIZEREL     "-Os -DNDEBUG")
+   SET (CMAKE_CXX_FLAGS_RELEASE        "-O4 -DNDEBUG")
+   SET (CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g -fno-omit-frame-pointer")
+
+   SET (CMAKE_AR      "/usr/bin/llvm-ar")
+   SET (CMAKE_LINKER  "/usr/bin/llvm-link")
+   SET (CMAKE_NM      "/usr/bin/llvm-nm")
+   SET (CMAKE_OBJDUMP "/usr/bin/llvm-objdump")
+   SET (CMAKE_RANLIB  "/usr/bin/llvm-ranlib")
+endif( USE_CLANG)
 #set (CMAKE_INSTALL_PREFIX /usr/local)
 #for installing read:
 #http://www.cmake.org/cmake/help/cmake_tutorial.html
@@ -13,7 +35,7 @@ include_directories(${Boost_INCLUDE_DIR})
 link_directories(/usr/local/lib ${Boost_LIBRARY_DIR})
 
 add_definitions("-Wall -ansi -pedantic -fno-omit-frame-pointer -g -std=c++11")
-set(CMAKE_BUILD_TYPE Release) 
+set(CMAKE_BUILD_TYPE RELWITHDEBINFO) 
 
 cmake_minimum_required(VERSION 2.6.2)
 if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" VERSION_GREATER 2.6)

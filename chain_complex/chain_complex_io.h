@@ -44,7 +44,7 @@ template< typename Stream, typename Cell, typename Boundary,
 Stream& operator<<( Stream& out, 
 		    const ctl::Chain_complex< Cell, Boundary, Data, Hash> & c){ 
 	for(auto i = c.begin(); i != c.end(); ++i){
-		std::cout << i->second.id() <<": " << i->first << " --> {" 
+		      out << i->second.id() <<": " << i->first << " --> {" 
 		  	  << i->second << "}" << std::endl;
 	}
 	return out;

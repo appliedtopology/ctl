@@ -55,13 +55,10 @@
 
 #include "utility/timer.h"
 
-//Boost
-#include <boost/property_map/property_map.hpp> //For Cascades in persistence
-
 //Persistence 
 #include "chain/chain.h"
 #include "persistence/persistence.h"
-#include "persistence/property_maps.h"
+#include "persistence/offset_maps.h"
 #include "persistence/compute_betti.h"
 
 //Boost
@@ -96,10 +93,11 @@ typedef ctl::Chain< Complex_term, Complex_term_less_cell> Complex_chain;
 //It would be a good project to see if storing the internal pointer here
 //inside of the chain_complex would be a good idea
 typedef std::vector< Complex_chain> Complex_chains;
-typedef ctl::Id_property_map< Complex::iterator> Complex_offset_map;
+typedef ctl::Pos_offset_map< Complex::iterator> Complex_offset_map;
 typedef boost::iterator_property_map< Complex_chains::iterator, 
-	Complex_offset_map, Complex_chain, Complex_chain&> 
-	Complex_chain_map;
+				      Complex_offset_map, 
+				      Complex_chain, 
+				      Complex_chain&> Complex_chain_map;
 
 typedef ctl::Timer Timer;
 
