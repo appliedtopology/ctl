@@ -103,18 +103,21 @@ public:
 
 	template< typename Chain, typename Compare = Less>
 	Chain& scaled_add( const Coefficient & a, const Chain& rhs, 
-					      Compare c = Compare()){
-		Chain result( size() + rhs.size());	 
-		const_iterator 
-		_end = _ctl::chain_add( _chain.cbegin(), _chain.cend(),
+			   Compare c = Compare()){
+		Chain result;
+		return scaled_add( a, rhs, result, c);
+	}	
+	template< typename Chain, typename Compare = Less>
+	Chain& scaled_add( const Coefficient & a, const Chain& rhs, 
+			   Chain & result, Compare c = Compare()){
+		const std::size_t n = size() + rhs.size();	
+		if( result._chain.size() < n){ result._chain.resize( n); }
+		auto _end = _ctl::chain_add( _chain.cbegin(), _chain.cend(),
 				 	a, rhs.begin(), rhs.end(), 
 				 	result.begin(), c, 
 				 	coeff_tag());
-		//hopefully should cause no deallocation
-		//investigate this
 		result._chain.erase( _end, result.end());
-		//currently investigating if this is faster than swap.
-		_chain = std::move( result._chain);  
+		_chain.swap( result._chain);
 		return *this;
 	}
 

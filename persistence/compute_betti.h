@@ -1,5 +1,5 @@
-#ifndef CTLIB_PERSISTENCE_DATA_H
-#define CTLIB_PERSISTENCE_DATA_H
+#ifndef CTL_WRITE_BETTI_H
+#define CTL_WRITE_BETTI_H
 /*******************************************************************************
 * -Academic Honesty-
 * Plagarism: The unauthorized use or close imitation of the language and 
@@ -37,47 +37,29 @@
 *******************************************************************************/
 
 
-namespace _ctl {
+namespace ctl{
+template< typename Betti, typename Out>
+void write_betti( const Betti & b, Out & out){ 
+	for( auto n : b) { out << n << " "; }
+	out << std::endl;
+} 
+template< typename Betti, 
+	  typename Complex, 
+	  typename Cell_chain_map>
+void compute_betti( Complex & complex, 
+                    Cell_chain_map & cascade_boundary_map,
+		    Betti & _betti){ 
+       typedef typename Complex::iterator Cell_iterator;
+       typedef typename Cell_chain_map::value_type Chain;
+       Betti betti( complex.dimension()+1,0);
+       for(Cell_iterator cell = complex.begin(); cell != complex.end(); ++cell){
+               const Chain& bd = cascade_boundary_map[ cell];
+               const bool c = bd.empty()|| (cell->first < bd.youngest().cell()->first); 
+		betti[ cell->first.dimension()-(!c)] += (2*c -1);
+       }
+       ctl::write_betti( betti,std::cout);
+	_betti.swap( betti);
+}
 
-template< typename Term_less_, 
-	  typename Boundary_operator_, 
-	  typename Cascade_map_,
-	  typename Output_policy_ > 
-//hold onto persistence data
-struct Persistence_data {
-
-	typedef Term_less_ Term_less; 
-	typedef Boundary_operator_ Boundary_operator;
-	typedef Cascade_map_ Cascade_map;
-	typedef Output_policy_ Output_policy;
-	typedef typename Cascade_map::value_type Chain;
-
-	Persistence_data( Term_less t, 
-			  Boundary_operator & bd_,
-			  Cascade_map & bd_map_,	
-			  Cascade_map & map_,
-			  Output_policy p):
-	term_less( t), bd( bd_), cascade_boundary_map( bd_map_), 
-	cascade_map( map_), policy( p), 
-	cascade( 1), cascade_boundary(), temporary_chain() {};
-
-	Term_less term_less;
-	Boundary_operator bd;
-	Cascade_map& cascade_boundary_map; 
-	Cascade_map& cascade_map; 
-	Output_policy policy;
-
-	Chain cascade;
-	Chain cascade_boundary;
-	//when we do the x <- x+y in persistence we 
-	//end up creating a temporary:
-	// z <- x+y
-	// x.swap( z)
-	// by storing this temporary here, we avoid the reallocation 
-	// at every iteration
-	Chain temporary_chain;
-}; //struct Persistence_data 
-
-} //end namespace _ctl
-
-#endif //CTLIB_PERSISTENCE_DATA_H
+}//namespace ctl
+#endif //CTL_WRITE_BETTI

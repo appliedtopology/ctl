@@ -37,7 +37,7 @@
 // Ryan Lewis
 // November 7, 2010
 // May 31, 2011
-//#define COMPUTE_BETTI
+#define COMPUTE_BETTI
 
 //CTL Types for Building a Simplicial Chain Complex and Filtration
 #include "finite_field/finite_field.h"
@@ -60,6 +60,7 @@
 #include "chain/chain.h"
 #include "persistence/persistence.h"
 #include "persistence/property_maps.h"
+#include "persistence/compute_betti.h"
 
 //Boost
 #include <boost/program_options.hpp>
@@ -157,16 +158,16 @@ int main(int argc, char *argv[]){
 	    << complex_filtration_time << std::endl;
   
   //begin instantiate our vector of cascades homology
-  Complex_chains complex_cascades( complex.size(), Complex_chain());
+  Complex_chains complex_cascade_boundaries( complex.size(), Complex_chain());
   
   //we hand persistence a property map for genericity!                                         
-  Complex_chain_map cascade_property_map( complex_cascades.begin(), 
-					  Complex_offset_map());
+  Complex_chain_map cascade_bd_property_map( complex_cascade_boundaries.begin(), 
+					     Complex_offset_map());
 
   //serial persistence (complex)
   timer.start();
-  ctl::persistence(complex_filtration.begin(), complex_filtration.end(),
-  		 complex_boundary, cascade_property_map);
+  ctl::persistence( complex_filtration.begin(), complex_filtration.end(),
+  		    complex_boundary, cascade_bd_property_map);
   timer.stop();
   double complex_persistence = timer.elapsed();
   std::cout << "serial persistence (complex): " 
@@ -179,7 +180,7 @@ int main(int argc, char *argv[]){
   typedef std::vector<int> Betti;
   Betti betti;
   std::cout << "serial betti (complex): " << std::endl;
-  ctl::compute_betti(complex,cascade_property_map,betti);
+  ctl::compute_betti( complex, cascade_bd_property_map, betti);
   std::cout << std::endl;
   int euler=0;
   int coeff=1;
@@ -188,11 +189,10 @@ int main(int argc, char *argv[]){
 	coeff = coeff*(-1);
   }
   std::cout << "(betti) Euler Characteristic: " << euler << std::endl; 
-  std::vector< std::size_t> counts( complex.maximum_dimension()+1, 0);
-  for (cell_it i = complex.begin(); i != complex.end(); ++i){
-	 	counts[ i->first.dimension()]++; 
-  }
-  euler=0;
+  
+  std::vector< std::size_t> counts( complex.dimension()+1, 0);
+  euler=0; 
+  for (auto cell : complex){ counts[ cell.first.dimension()]++; }
   for (std::size_t i = 0; i < counts.size(); ++i){
    if( i % 2 == 0){ euler += counts[ i]; } 
    else{ euler -= counts[ i]; }

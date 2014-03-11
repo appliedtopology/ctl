@@ -37,6 +37,7 @@
 //STL
 #include <iostream>
 #include <sstream>
+#include <iomanip>
 
 //CTL
 //abstract_simplex
@@ -60,6 +61,7 @@
 
 //Term
 #include "term/term_less.h"
+#include "utility/timer.h"
 
 //We build a simplicial chain complex with Z2 coefficients
 typedef ctl::Abstract_simplex< int> Simplex;
@@ -85,29 +87,42 @@ std::string print_chain( const Chain & a){
 
 int main( int argc, char** argv){
 	Complex complex;
-	Cell s( {1,2,3,4} );
-	auto cell_and_count = complex.insert_closed_cell( s);
-	std::cout << cell_and_count.second << " cells inserted!" << std::endl;
-	std::cout << complex << std::endl;
-	Complex_boundary bd( complex);	
-	std::cout << "created complex boundary" << std::endl;
-	auto complex_cell = complex.begin();
-	auto begin_iterator = bd.begin( complex_cell);
-	auto end_iterator = bd.end( complex_cell);
+	ctl::Timer timer;
+	Cell s( {1,2,3,4,5,6,7,8,9,10} );
+	Cell t( {1,2,3,4,5,11,12,13,14,15} );
 
-	std::cout << "explicitify chain" << std::endl;
-	Chain bda( begin_iterator, end_iterator);
-	std::cout << "chain made." << std::endl;
-	std::cout << "a = " << complex_cell->first << std::endl; 
-	std::cout << ctl::delta << "(a) = " << print_chain( bda) << std::endl;
-	complex_cell++;
-	Chain bdb( bd.begin( complex_cell), bd.end( complex_cell));
-	std::cout << ctl::delta << "(b) = " << print_chain( bdb) << std::endl;
-	std::cout << "b = " << complex_cell->first << std::endl; 
-	Chain bdp = bda+bdb;
-	std::cout << ctl::delta << "(a+b) = " << print_chain( bdp) << std::endl;
-	std::cout << "Youngest["<<ctl::delta<<"(a+b)] = "
-		  << bdp.youngest().coefficient() << "*" 
-		  << bdp.youngest().cell()->first << std::endl;
+	std::cout  << std::setprecision( 20) << std::endl;
+	
+	timer.start();	
+	auto cell_and_count = complex.insert_closed_cell( s);
+	timer.stop();
+	std::cout << cell_and_count.second 
+		  << " cells inserted! in " << timer.elapsed() << std::endl;
+
+	timer.start();	
+	cell_and_count = complex.insert_closed_cell( t);
+	timer.stop();
+	std::cout << cell_and_count.second 
+		  << " cells inserted! in " << timer.elapsed() << std::endl;
+
+	Complex_boundary bd( complex);	
+	auto complex_s = complex.find_cell( s);
+	auto complex_t = complex.find_cell( t);
+	Chain bds( bd.begin( complex_s), bd.end( complex_s));
+	Chain bdt( bd.begin( complex_t), bd.end( complex_t));
+	constexpr int N = 600000;
+	Chain temp;
+	ctl::Timer l;
+	l.start();
+	timer.start();
+	for( int i = 0; i < N; ++i){	
+	bds.scaled_add( 1, bdt, temp);
+	timer.stop();
+	Chain bds( bd.begin( complex_s), bd.end( complex_s));
+	Chain bdt( bd.begin( complex_t), bd.end( complex_t));
+	}
+	l.stop();
+	std::cout << timer.elapsed()/N << std::endl;
+	std::cout << l.elapsed() << std::endl;
 	return 0;
 }

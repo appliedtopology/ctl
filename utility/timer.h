@@ -1,54 +1,38 @@
 #ifndef CTLIB_TIMER_H
 #define CTLIB_TIMER_H
 
-#include <ctime>
+#include <chrono>
 #include <iostream>  // cerr 
 
 #ifdef _OPENMP
 #include <omp.h>
 #endif
 
-#ifdef WITH_TBB
-//TBB timer
-#include <tbb/tick_count.h>
-#endif
-
 //exported functionality
 namespace ctl{
 
-class Timer {     
+class Timer {    
+	typedef std::chrono::steady_clock Clock;
+	typedef typename Clock::time_point time_point;
 public:
-  Timer() : time_(){}
+  Timer() : start_(), stop_(){}
 
   // method:  start
   // starts timer
-  void start() { time_ = std::clock(); }
+  void start() { start_ = Clock::now(); }
+  void stop() { stop_ = Clock::now(); } 
 
   // method:  stop
-  // returns time since start() in seconds
-  void stop() { time_ = ((double)(std::clock()- time_))/CLOCKS_PER_SEC; }
-  double elapsed() const { return time_; } 
+  // returns time since start() in units of T, which defaults to seconds.
+  template< typename T = std::chrono::seconds>
+  double elapsed() const {
+	typedef std::chrono::duration< double, typename T::period> D; 
+	return (std::chrono::duration_cast< D>(stop_ - start_).count());  
+  } 
 private:
-  double time_;
+  time_point start_;
+  time_point stop_;
 }; // class Timer
-
-#ifdef WITH_TBB
-class Thread_timer {     
-public:
-  Thread_timer() : time_(){}
-
-  // method:  start
-  // starts timer
-  void start() { time_ = tbb::tick_count::now(); }
-
-  // method:  stop
-  // returns time since start() in seconds
-  void stop() { time_ = (tbb::tick_count::now() - time_).seconds(); }
-  void elapsed() const { return time_; } 
-private:
-  tbb::tick_count time_;
-}; // class Thread_timer
-#endif
 
 } //namespace ctl
 

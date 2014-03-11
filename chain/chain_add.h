@@ -44,7 +44,7 @@ namespace _ctl{
 //this is our equivalent of the BLAS axpy for a=1
 //so its a 1xpy
 template< typename Chain_iterator, typename OutputIterator, typename Term_less>
-Chain_iterator chain_add( Chain_iterator x_begin, Chain_iterator x_end, 
+OutputIterator chain_add( Chain_iterator x_begin, Chain_iterator x_end, 
 		 	  Chain_iterator y_begin, Chain_iterator y_end,
 			  OutputIterator result, const Term_less less,   
 			  const _ctl::term_z2_tag t){
@@ -70,7 +70,7 @@ Chain_iterator chain_add( Chain_iterator x_begin, Chain_iterator x_end,
 
 template< typename Chain_iterator, typename Coefficient, 
 	  typename OutputIterator, typename Term_less>
-Chain_iterator chain_add( Chain_iterator x_begin, Chain_iterator x_end, 
+OutputIterator chain_add( Chain_iterator x_begin, Chain_iterator x_end, 
 			  const Coefficient& not_used, 
 		 	  Chain_iterator y_begin, Chain_iterator y_end,
 			  OutputIterator result, const Term_less less,   
@@ -86,7 +86,7 @@ Chain_iterator chain_add( Chain_iterator x_begin, Chain_iterator x_end,
 //any c++11 or better compiler will remove the outer branch when we have a Z2
 //term, so this will truly only matter for non_z2 terms.  
 template< typename Chain_iterator, typename OutputIterator, typename Term_less>
-Chain_iterator chain_add( Chain_iterator x_begin, Chain_iterator x_end, 
+OutputIterator chain_add( Chain_iterator x_begin, Chain_iterator x_end, 
 		  	  Chain_iterator y_begin, Chain_iterator y_end,
 		  	  OutputIterator result,
 			  const Term_less less,   
@@ -120,7 +120,7 @@ Chain_iterator chain_add( Chain_iterator x_begin, Chain_iterator x_end,
 //and this is an axpy call 
 //since a is in a finite field we could call it a faxpy
 template< typename Chain_iterator, typename OutputIterator, typename Term_less>
-Chain_iterator chain_add( Chain_iterator x_begin, Chain_iterator x_end, 
+OutputIterator chain_add( Chain_iterator x_begin, Chain_iterator x_end, 
 		  	  const typename Chain_iterator::value_type::
 					 Coefficient& a, 
 		  	  Chain_iterator y_begin, Chain_iterator y_end,
