@@ -137,14 +137,16 @@ int main(int argc, char *argv[]){
   std::string complex_name(full_complex_name);
   size_t found = complex_name.rfind('/');
   if (found != std::string::npos){ complex_name.replace(0, found+1, ""); }
-  std::cout << "full_complex_name: " << full_complex_name << std::endl;
   //create some data structures 
   Complex complex;
   Complex_boundary complex_boundary( complex);
   Timer timer;
                                        
   // Read the cell_set in  
+  timer.start();
   ctl::read_complex( full_complex_name, complex); 
+  timer.stop();
+  std::cout << "I/O Time: " << timer.elapsed() << std::endl;
   std::cout << "complex size: " << complex.size() << std::endl; 
   std::cout << "complex dimension: " << complex.dimension() << std::endl;
 

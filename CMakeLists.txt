@@ -7,6 +7,11 @@ set( CMAKE_VERBOSE_MAKEFILE  false)
 #set (CMAKE_INSTALL_PREFIX /usr/local)
 #for installing read:
 #http://www.cmake.org/cmake/help/cmake_tutorial.html
+set(Boost_USE_MULTITHREADED OFF)
+find_package(Boost COMPONENTS program_options REQUIRED)
+include_directories(${Boost_INCLUDE_DIR})
+link_directories(/usr/local/lib ${Boost_LIBRARY_DIR})
+
 add_definitions("-std=c++11")
 set(CMAKE_BUILD_TYPE Release) 
 cmake_minimum_required(VERSION 2.6.2)

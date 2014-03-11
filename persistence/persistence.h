@@ -156,10 +156,7 @@ void pair_cells( Filtration_iterator begin, Filtration_iterator end,
 			cascade_boundary_map[ sigma] = data.cascade_boundary;
 			store_scaled_cascade( data, sigma, output_policy);  
 		        //make sigma tau's partner
-			Term sigma_term( sigma, 1, pos); //keep filt. pos 	
-			Chain&& tau_boundary_chain( sigma_term);  
-			cascade_boundary_map[ tau] = 
-					std::move( tau_boundary_chain); 
+			cascade_boundary_map[ tau].emplace( sigma, 1, pos); 
 		} else{
 			store_cascade( data, sigma, output_policy); 
 		}

@@ -1,4 +1,5 @@
-include_directories( ${CMAKE_SOURCE_DIR})
+include_directories( ${CMAKE_SOURCE_DIR}  ${Boost_INCLUDE_DIR})
+link_directories(${Boost_LIBRARY_DIR})
 add_executable( persistence persistence.cpp)
 target_link_libraries( persistence boost_program_options)
 add_executable( duplicate build_blobs.cpp)
