@@ -41,36 +41,6 @@
 
 //non-exported functionality 
 namespace {
-//needed in filtration constructor
-template< typename Iterator>
-class _transform_iterator : 
-		public std::iterator< std::forward_iterator_tag, Iterator> {
-	private:
-		typedef _transform_iterator< Iterator> Self;
-	public:
-	//default
-	_transform_iterator() {}
-	//copy
-	_transform_iterator( Self & f): _i( f._i) {};
-	//move
-	_transform_iterator( Self && f): _i( std::move(f._i)) {};
-	//special
-	_transform_iterator( Iterator & i_): _i( i_) {};
-	_transform_iterator& operator++(){ _i++; return *this; }
- 	Iterator* operator->() { return &(_i); }
- 	bool operator!=(const Self& r) const { return (_i != r._i); }
- 	bool operator==(const Self& r) const { return !operator!=(r); }
-	Self& operator=(const Self& r) { _i = r._i; return *this; } 
-	//the details
-	Iterator operator*(){ return _i; }
-	private:
-	Iterator _i;
-}; //class _transform_iterator
-template< typename Iterator>
-inline _transform_iterator< Iterator> _create_transform_iterator ( Iterator i){
- 	return _transform_iterator< Iterator>( i);
- }
-
 } //anonymous namespace
 
 
@@ -103,33 +73,34 @@ class Filtration {
 	typedef const_reverse_iterator crit;
 	typedef reverse_iterator rit;
 public:
-	Filtration(): _filtration() {};
-	Filtration( const Filtration & f): _filtration( f) {}
-	Filtration( const Filtration && f): _filtration( std::move( f)) {}	
+	Filtration(): filtration_() {};
+	Filtration( const Filtration & f): filtration_( f) {}
+	Filtration( const Filtration && f): filtration_( std::move( f)) {}	
 	Filtration( Complex & complex): 
-	_filtration( complex.size()){
-		std::copy( _create_transform_iterator(complex.begin()), 
-		           _create_transform_iterator(complex.end()),
-			   _filtration.begin());
-		std::sort( _filtration.begin(), _filtration.end(), Less());
+	filtration_( complex.size()){
+		auto i = filtration_.begin();
+		for( auto j= complex.begin(); j != complex.end(); ++i, ++j){ 
+			 *i = j;
+		}
+		std::sort( filtration_.begin(), filtration_.end(), Less());
 	}
 
 	//used typedefs above since the names were getting to long
-	it  begin() { return it( _filtration.begin(), 0);    }
-	it  end()   { return it( _filtration.end(), size()); }
+	it  begin() { return it( filtration_.begin(), 0);    }
+	it  end()   { return it( filtration_.end(), size()); }
 	
-	cit begin() const { return cit( _filtration.begin(), 0);  }
-	cit end() const { return cit( _filtration.end(), size()); }
+	cit begin() const { return cit( filtration_.begin(), 0);  }
+	cit end() const { return cit( filtration_.end(), size()); }
 
-	rit rbegin() { return rit( _filtration.rbegin(), size()-1); }
-	rit rend()   { return rit( _filtration.rend(), 0);          }
+	rit rbegin() { return rit( filtration_.rbegin(), size()-1); }
+	rit rend()   { return rit( filtration_.rend(), 0);          }
 	
-	crit rbegin() const { return crit( _filtration.rbegin(), size()-1); }
-	crit rend()   const { return crit( _filtration.rend(), 0);          }
+	crit rbegin() const { return crit( filtration_.rbegin(), size()-1); }
+	crit rend()   const { return crit( filtration_.rend(), 0);          }
 
-	std::size_t size() const { return _filtration.size(); } 
+	std::size_t size() const { return filtration_.size(); } 
  private:
-	Vector _filtration;
+	Vector filtration_;
 }; //class Filtration
 
 } //namespace ct
