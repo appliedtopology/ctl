@@ -35,7 +35,7 @@ include_directories(${Boost_INCLUDE_DIR})
 link_directories(/usr/local/lib ${Boost_LIBRARY_DIR})
 
 add_definitions("-Wall -ansi -pedantic -fno-omit-frame-pointer -g -std=c++11")
-set(CMAKE_BUILD_TYPE RELWITHDEBINFO) 
+set(CMAKE_BUILD_TYPE RELWITHDEBINFO)
 
 cmake_minimum_required(VERSION 2.6.2)
 if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" VERSION_GREATER 2.6)

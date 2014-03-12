@@ -36,26 +36,28 @@
 *******************************************************************************
 *******************************************************************************/
 
+#include "boost/property_map/property_map.hpp"
 
 namespace _ctl {
 
 template< typename Term_less_, 
 	  typename Boundary_operator_, 
-	  typename Cascade_map_,
+	  typename Cell_chain_map_,
 	  typename Output_policy_ > 
 //hold onto persistence data
 struct Persistence_data {
 
 	typedef Term_less_ Term_less; 
 	typedef Boundary_operator_ Boundary_operator;
-	typedef Cascade_map_ Cascade_map;
+	typedef Cell_chain_map_ Cell_chain_map;
 	typedef Output_policy_ Output_policy;
-	typedef typename Cascade_map::value_type Chain;
-
+ 	typedef typename boost::property_traits< Cell_chain_map>::value_type Chain;
+	typedef typename Chain::value_type Term;
+ 
 	Persistence_data( Term_less t, 
 			  Boundary_operator & bd_,
-			  Cascade_map & bd_map_,	
-			  Cascade_map & map_,
+			  Cell_chain_map & bd_map_,	
+			  Cell_chain_map & map_,
 			  Output_policy p):
 	term_less( t), bd( bd_), cascade_boundary_map( bd_map_), 
 	cascade_map( map_), policy( p), 
@@ -63,10 +65,12 @@ struct Persistence_data {
 
 	Term_less term_less;
 	Boundary_operator bd;
-	Cascade_map& cascade_boundary_map; 
-	Cascade_map& cascade_map; 
+	Cell_chain_map& cascade_boundary_map; 
+	Cell_chain_map& cascade_map; 
 	Output_policy policy;
 
+	//at each iteration we use these temporaries and then
+	//we swap them into place in the vector. 
 	Chain cascade;
 	Chain cascade_boundary;
 	//when we do the x <- x+y in persistence we 

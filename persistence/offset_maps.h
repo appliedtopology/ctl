@@ -53,6 +53,10 @@ struct Pos_offset_map {
 
 template< typename Cell>
 typename Pos_offset_map< Cell>::value_type 
+get( Pos_offset_map< Cell>, const std::size_t pos) { return pos; }
+
+template< typename Cell>
+typename Pos_offset_map< Cell>::value_type 
 get( Pos_offset_map< Cell>, const Cell& cell) { return cell->second.pos(); }
 
 template< typename Cell, typename Coefficient>

@@ -33,7 +33,7 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 *******************************************************************************/
-#define ZOOM_PROFILE
+//#define ZOOM_PROFILE
 #define COMPUTE_BETTI
 
 #ifdef ZOOM_PROFILE
@@ -58,6 +58,7 @@
 //Persistence 
 #include "chain/chain.h"
 #include "persistence/persistence.h"
+#include "persistence/iterator_property_map.h"
 #include "persistence/offset_maps.h"
 #include "persistence/compute_betti.h"
 
@@ -93,11 +94,12 @@ typedef ctl::Chain< Complex_term, Complex_term_less_cell> Complex_chain;
 //It would be a good project to see if storing the internal pointer here
 //inside of the chain_complex would be a good idea
 typedef std::vector< Complex_chain> Complex_chains;
+
 typedef ctl::Pos_offset_map< Complex::iterator> Complex_offset_map;
-typedef boost::iterator_property_map< Complex_chains::iterator, 
-				      Complex_offset_map, 
-				      Complex_chain, 
-				      Complex_chain&> Complex_chain_map;
+typedef ctl::iterator_property_map< Complex_chains::iterator, 
+                                      Complex_offset_map, 
+                                      Complex_chain, 
+                                      Complex_chain&> Complex_chain_map;
 
 typedef ctl::Timer Timer;
 

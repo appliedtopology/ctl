@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
 
   std::ofstream out;
   ctl::open_file( out, name.c_str());
-  out << output_complex;
+  output_complex.write( out);
   out.close();
  return 0;
 }

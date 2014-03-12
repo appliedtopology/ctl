@@ -86,7 +86,8 @@ public:
 
 	template< class... Args>	
 	void emplace( Args&&... args){ _chain.emplace_back( std::forward< Args>( args)...); }
-
+	void swap( Chain & from){ _chain.swap( from._chain); }
+ 
 	std::size_t   size() const   	   { return _chain.size(); }	
 	void reserve( const std::size_t n) { _chain.reserve( n); } 
 	Chain& operator=( const Chain& from){ 

@@ -221,7 +221,14 @@ public:
 	const std::size_t dimension() const { return max_dim; }
 	const std::size_t size() const { return cells.size(); } 
 	Boundary& boundary() { return bd; }
-	
+	bool is_closed() const{ 
+		for( auto sigma : cells){
+			for( auto tau = bd.begin( sigma.first); tau != bd.end( sigma.first); ++tau){
+				if( find_cell( tau->cell()) == end()){ return false; }			
+			}
+		}
+		return true;
+	}
 private:
 	Map cells;
 	Boundary bd;

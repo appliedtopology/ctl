@@ -59,7 +59,9 @@ int main( int argc, char** argv){
 	Cell s( {1,2,3,4} );
 	auto pair = complex.insert_closed_cell( s);
 	std::cout << pair.second << " cells inserted!" << std::endl;
+	std::cout << "complex is " << ((complex.is_closed())? "closed":"not closed") << std::endl; 
 	std::cout << complex << std::endl;
+
 	Complex_boundary b( complex);
 	Complex_boundary copyd( b);
 	Complex_boundary moved( std::move( copyd));

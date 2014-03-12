@@ -163,8 +163,8 @@ public:
 		return *this;
 	}
 	//It only makes sense for const iterators
-	const_iterator begin( const Simplex & s) { return const_iterator( s); }
-	const_iterator end( const Simplex & s)   { return const_iterator(); }
+	const_iterator begin( const Simplex & s) const { return const_iterator( s); }
+	const_iterator end( const Simplex & s) const   { return const_iterator(); }
 	std::size_t length( const Simplex & s) const { 
 		return (s.size()>1)? s.size():0;
 	}

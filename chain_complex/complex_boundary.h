@@ -159,11 +159,11 @@ class Complex_boundary{
 
 	Complex_boundary( Complex & complex): _complex( complex) {};
 	
-	const_iterator begin( const typename Term::Cell & c) {
+	const_iterator begin( const typename Term::Cell & c) const {
 		return const_iterator( _complex, _complex.boundary(), c->first);
 	}
 	const_iterator begin( const typename Term::Cell & c, 
-			              const std::size_t & pos) {
+			              const std::size_t & pos) const {
 		c->second.pos( pos);
 		//the complex_boundary_iterator ++ always keeps track of the pos
 		//it may just be a zero value, but, it also may mirror a 
@@ -174,11 +174,11 @@ class Complex_boundary{
 		return const_iterator( _complex, _complex.boundary(), 
 				       c->first);
 	}
-	const_iterator end( const typename Term::Cell & c) {
+	const_iterator end( const typename Term::Cell & c) const {
 		return const_iterator( _complex);
 	}
 	inline const_iterator end( const typename Term::Cell & c, 
-				   const std::size_t & pos) { return end( c); }
+				   const std::size_t & pos) const { return end( c); }
 
 	size_type length( const typename Term::Cell & c) const {
 		return _complex.boundary().length( c->first);

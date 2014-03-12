@@ -13,7 +13,12 @@ include_directories( ${CMAKE_SOURCE_DIR}
 link_directories(${Boost_LIBRARY_DIR}) 
 
 add_executable( persistence persistence.cpp)
+if( APPLE)
 target_link_libraries( persistence m RRZoomScript boost_program_options)
+endif( APPLE)
+if( ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+target_link_libraries( persistence rt m RRZoomScript boost_program_options)
+endif( ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 add_executable( duplicate build_blobs.cpp)
 add_executable( build_clique clique_tool.cpp)
 add_executable( euler euler_tool.cpp)

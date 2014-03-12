@@ -57,14 +57,13 @@ class Term {
 
 		Term( const Cell & cell, 
 		      const Coefficient & coeff, const std::size_t pos):
-			cell_( cell), pos_(pos), coeff_( coeff) {}
+			cell_( cell), pos_( pos), coeff_( coeff) {}
 
 		Term( const Term & from): cell_( from.cell_),
 					  pos_( from.pos_),
 					  coeff_( from.coeff_) {}
 
-		Term( Term && from): cell_( std::move( from.cell_)),
-				     pos_( std::move( from.pos_)),
+		Term( Term && from): cell_( std::move( from.cell_)), pos_( from.pos_),
 				     coeff_( std::move( from.coeff_)){}
 
 		Coefficient coefficient() const { return coeff_; }
@@ -127,10 +126,8 @@ class Term< Cell_, ctl::Finite_field< 2> > {
 		typedef Term< Cell_, Coefficient > Self;
 	public:
 		Term() {}
-		Term( const Self & from): 
-		cell_( from.cell_), pos_( from.pos_){}
-		Term( const Self && from): cell_( std::move( from.cell_)), 
-					   pos_( std::move( from.pos_)) {}
+		Term( const Self & from): cell_( from.cell_), pos_( from.pos_){}
+		Term( const Self && from): cell_( std::move( from.cell_)), pos_( from.pos_) {}
 		Term( const Cell & cell): cell_( cell), pos_( 0) {}	
 		Term( const Cell & cell, const Coefficient & coeff, 
 		      const std::size_t pos): cell_( cell), pos_( pos) {}	
