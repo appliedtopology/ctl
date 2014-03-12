@@ -41,14 +41,19 @@ namespace {} //anon. namespace
 namespace ctl {
 	template< typename T>
 	struct Hash{
-		//TODO: make this smarter..
+		//TODO: Cite Aho compiler book,
+		//TODO: Explore what makes a good hash
 		std::size_t operator()( const T & key) const{
-			std::size_t hash=0;
-			std::size_t p=37;
-			for(auto i = key.begin(); i != key.end(); ++i){
-				hash += p*hash + *i;
+			std::size_t h=0;
+			std::size_t g=0;
+			for(auto elt : key){
+				h += (h<<4) + elt;
+				if( (g=h&0xf0000000)){
+					h = h^(g >> 24);
+					h = h^g;	
+				}
 			}
-			return hash;
+			return h;
 		}
 	}; //class Hash
 } //namespace ctl

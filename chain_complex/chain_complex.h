@@ -223,8 +223,11 @@ public:
 	Boundary& boundary() { return bd; }
 	bool is_closed() const{ 
 		for( auto sigma : cells){
-			for( auto tau = bd.begin( sigma.first); tau != bd.end( sigma.first); ++tau){
-				if( find_cell( tau->cell()) == end()){ return false; }			
+			for( auto tau = bd.begin( sigma.first); 
+				  tau != bd.end( sigma.first); ++tau){
+				if( find_cell( tau->cell()) == end()){ 
+					return false; 
+				}			
 			}
 		}
 		return true;
