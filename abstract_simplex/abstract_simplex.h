@@ -126,7 +126,7 @@ class Abstract_simplex {
 		vertices = b.vertices; 
 		return *this;
 	}
-	Self& operator=( const Self && b) {
+	Self& operator=( Self && b) {
 		vertices = std::move( b.vertices); 
 		return *this;
 	}

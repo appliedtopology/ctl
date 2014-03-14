@@ -74,7 +74,7 @@ class Data_wrapper : public Data_ {
 		pos_ = from.pos_;
 		return *this;
 	}
-	Self& operator=( const Self && from){
+	Self& operator=( Self && from){
 		Data_::operator=( from);
 		id_ = std::move( from.id_);
 		pos_ = std::move( from.pos_);
@@ -128,10 +128,10 @@ public:
 public:
 	//Constructors
 	//Default
-	Chain_complex(): max_id( 0), max_dim( 0) {}; 
+	Chain_complex(): max_id( 0), max_dim( 0) { cells.max_load_factor( 1); } 
 	//Copy
 	Chain_complex( const Chain_complex & b): cells( b.cells), bd( b.bd),
-					 max_id( b.max_id), max_dim( b.max_dim) {}; 
+					 max_id( b.max_id), max_dim( b.max_dim) { cells.max_load_factor( 1); }
 	//Move
 	Chain_complex( Chain_complex && b): cells( std::move( b.cells)), 
 				  bd( std::move( b.bd)), 
@@ -148,7 +148,7 @@ public:
 	}
 
 	// move assignment operator
-	Chain_complex& operator=( const Chain_complex&& b){
+	Chain_complex& operator=( Chain_complex&& b){
 		bd = std::move(b.bd);
 		max_id = std::move(b.max_id);
 		max_dim = std::move(b.max_dim);
@@ -211,6 +211,7 @@ public:
 	}
 	template< typename Stream>
 	void write( Stream& out) const {
+		out << "size " << cells.size() << std::endl;
 		for( auto cell: cells){
 		  out << cell.second.id() << " ";
 		  cell.first.write( out);
@@ -232,6 +233,18 @@ public:
 		}
 		return true;
 	}
+	void* _get_bucket_address( const Cell & cell) const { return &*(cells.cbegin( 0) + cells.bucket( key)); }
+	#ifdef COMPLEX_DIAGNOSTICS
+	typedef typename Map::local_iterator local_iterator;
+	typedef typename Map::const_local_iterator const_local_iterator;
+	const_local_iterator bucket_begin( std::size_t n ) const { return cells.begin( n); }
+	const_local_iterator bucket_end( std::size_t n ) const { return cells.cend( n); }
+	std::size_t bucket_count() const { return cells.bucket_count(); }	
+	std::size_t bucket_size( std::size_t n ) const { return cells.bucket_size( n); }
+	std::size_t max_bucket_count() const { return cells.max_bucket_count(); }
+	double max_load_factor() const { return cells.max_load_factor(); }
+	std::size_t bucket( const Cell& key ) const { return cells.bucket( key); } 
+	#endif //end COMPLEX_DIAGNOSTICS
 private:
 	Map cells;
 	Boundary bd;

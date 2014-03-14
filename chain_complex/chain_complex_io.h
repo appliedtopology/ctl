@@ -62,6 +62,16 @@ Stream& operator>>( Stream& in,
 	std::size_t line_num = 0;
 	std::string line;
 	std::size_t id=0;
+        char the_first_character = in.peek();
+        if( the_first_character == 's') {
+                ctl::get_line( in, line, line_num);
+                std::istringstream ss( line);
+                std::string the_word_size;
+                ss >> the_word_size;
+                std::size_t the_number_of_cells;
+                ss >> the_number_of_cells;
+		c.reserve( the_number_of_cells);
+        }
 	while( ctl::get_line(in, line, line_num)){
 		std::istringstream ss( line);
 		Cell cell;

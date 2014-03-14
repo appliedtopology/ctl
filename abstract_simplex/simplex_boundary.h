@@ -55,8 +55,8 @@ class const_boundary_iterator :
 	  typedef typename Cell::value_type Vertex;
 	public:
 	  //default constructor
-	const_boundary_iterator(): cellptr( 0), pos( 0){}
-	const_boundary_iterator( const Cell & s): pos( 0){ 
+	const_boundary_iterator(): cellptr( 0), pos( 0), face(){}
+	const_boundary_iterator( const Cell & s): pos( 0), face(){ 
 		if( s.dimension()){
 		    //begin by removing first vertex
 		    cellptr = &s;
@@ -65,18 +65,17 @@ class const_boundary_iterator :
 		    face.cell().vertices.resize( s.dimension());
 		    std::copy( s.begin()+1, s.end(), 
 			       face.cell().vertices.begin()); 
-		}else{ cellptr = 0; } //\partial(vertex) = 0
+		}else{ cellptr = 0; face.coefficient } //\partial(vertex) = 0
 	}
 	//copy constructor
 	const_boundary_iterator( const Self & from): cellptr( from.cellptr), 
 	pos( from.pos), face(from.face), removed( from.removed){}
 	//move constructor
-	const_boundary_iterator( const Self && from): 
+	const_boundary_iterator( Self && from): 
 	cellptr( std::move(from.cellptr)), 
 	pos( std::move(from.pos)), 
 	face( std::move(from.face)), 
-	removed( std::move(from.removed)){}
-	
+	removed( std::move(from.removed)){ from.cellptr == 0; }	
 	//equality
 	const_boundary_iterator& operator==( const Self & b) const { 
 		return (b.cellptr == cellptr) && (b.pos == pos); 
@@ -88,18 +87,24 @@ class const_boundary_iterator :
 		pos = b.pos;
 		return *this;
 	}
-	const_boundary_iterator& operator=(const Self && b){
+	const_boundary_iterator& operator=(Self && b){
 		cellptr = std::move(b.cellptr);
 		remove  = std::move(b.removed);
 		face    = std::move(b.face);
 		pos     = std::move(b.pos);
 		return *this;
 	}
-	
-	Term& operator*() { 
-		if( cellptr != 0) { return face; } 
-		std::cerr << "Cannot Dereference End" << std::endl; 
-		std::exit( -1); 
+	//We modify normal behavior for performance reasons.
+	//When we do prefetching we wish to prefetch the next element
+	//in the boundary and not experience a branch to check for the end
+	//therefore we use assert here so that in debug mode it will complain
+	//if your software has bugs, but in release mode we assume only
+	//correct usage of this software so we will "silently fail".
+	//this way the prefetch will work, and this bound checking wont
+	//happen on any dereference, saving a branch. 
+	Term& operator*() {
+		assert( cellptr != 0); 
+		return face; 
 	}
 	const Term* operator->() const { return &face; }
 	bool operator!=( const const_boundary_iterator & b) const { 
@@ -121,7 +126,6 @@ class const_boundary_iterator :
 	const_boundary_iterator& operator--(){
 		if(pos == 0){
 			cellptr = 0;
-			pos = 0;
 			return *this;
 		}
 		//return removed vertex, get rid of another one

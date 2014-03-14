@@ -35,25 +35,74 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 *******************************************************************************/
+
+#include <cstring>
+namespace hash{
+#include "city.h"
+#include "MurmurHash3.h"
+}
 //non-exported functionality 
-namespace {} //anon. namespace
+namespace {
+
+template< typename Container>
+inline std::size_t murmur3_hash( const Container & key){
+	typedef typename Container::value_type T;
+	std::size_t out;
+	//MurmurHash3_x86_32 
+	//MurmurHash3_x86_128
+	hash::MurmurHash3_x64_128 ( (const char*)&(*(key.begin())), sizeof(T)*key.size(), key.size(), &out );
+	return out;
+}
+
+template< typename Container>
+inline std::size_t city_hash( const Container & key){
+	typedef typename Container::value_type T;
+	return hash::CityHash64WithSeed( (const char*)&(*(key.begin())), sizeof(T)*key.size(),key.size()); 
+}
+
+template< typename T>
+inline std::size_t pjw_hash( const T & key){
+    std::size_t h, g;
+    h = 0;
+    for( auto i : key){
+      h = (h << 4) + i;
+      if ((g = h & 0xf0000000)) {
+	h = h^(g >> 24);
+	h = h^g;
+      }
+    }
+   return h;
+} 
+template< typename T>
+inline std::size_t jenkins_hash( const T & key){
+    std::size_t hash=0;
+    for(auto i : key){
+        hash += i;
+        hash += (hash << 10);
+        hash ^= (hash >> 6);
+    }
+    hash += (hash << 3);
+    hash ^= (hash >> 11);
+    hash += (hash << 15);
+    return hash;
+}
+
+} //anon. namespace
 
 namespace ctl {
 	template< typename T>
 	struct Hash{
-		//TODO: Cite Aho compiler book,
-		//TODO: Explore what makes a good hash
 		std::size_t operator()( const T & key) const{
-			std::size_t h=0;
-			std::size_t g=0;
-			for(auto elt : key){
-				h += (h<<4) + elt;
-				if( (g=h&0xf0000000)){
-					h = h^(g >> 24);
-					h = h^g;	
-				}
-			}
-			return h;
+			#ifdef  CTL_USE_MURMUR
+				return murmur3_hash( key);
+			#elif defined( CTL_USE_CITY)
+				return city_hash( key);
+			#elif defined( CTL_USE_JENKINS)
+				return jenkins_hash( key);
+			#else 
+				return pjw_hash( key);
+			#endif
+					
 		}
 	}; //class Hash
 } //namespace ctl

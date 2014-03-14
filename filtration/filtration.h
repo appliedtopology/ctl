@@ -73,14 +73,12 @@ class Filtration {
 	typedef const_reverse_iterator crit;
 	typedef reverse_iterator rit;
 public:
-	Filtration(): filtration_() {};
-	Filtration( const Filtration & f): filtration_( f) {}
-	Filtration( const Filtration && f): filtration_( std::move( f)) {}	
-	Filtration( Complex & complex): 
-	filtration_( complex.size()){
-		auto i = filtration_.begin();
-		for( auto j= complex.begin(); j != complex.end(); ++i, ++j){ 
-			 *i = j;
+	Filtration( const Filtration & f): filtration_( f), complex( f.complex) {}
+	Filtration( const Filtration && f): filtration_( std::move( f)), complex( f.complex) {}	
+	Filtration( Complex & c): filtration_( c.size()), complex( c){
+		std::size_t pos = 0;
+		for( auto i= c.begin(); i != c.end(); ++i, ++pos){ 
+			 filtration_[ pos] = i;
 		}
 		std::sort( filtration_.begin(), filtration_.end(), Less());
 	}
@@ -101,6 +99,7 @@ public:
 	std::size_t size() const { return filtration_.size(); } 
  private:
 	Vector filtration_;
+	Complex& complex;
 }; //class Filtration
 
 } //namespace ct

@@ -33,14 +33,19 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 *******************************************************************************/
-//#define ZOOM_PROFILE
-#define COMPUTE_BETTI
+//#define COMPUTE_BETTI
+//#define CTL_USE_MURMUR
+#define CTL_USE_CITY
+//#define CTL_USE_JENKINS
+#define COMPLEX_DIAGNOSTICS
 
 #ifdef ZOOM_PROFILE
 #include "zoom.h"
 #endif
 
-
+#ifdef COMPLEX_DIAGNOSTICS
+	#include "utility/complex_diagnostics.h"
+#endif
 //CTL Types for Building a Simplicial Chain Complex and Filtration
 #include "finite_field/finite_field.h"
 #include "abstract_simplex/abstract_simplex.h"
@@ -62,13 +67,8 @@
 #include "persistence/offset_maps.h"
 #include "persistence/compute_betti.h"
 
-//Boost
-#include <boost/program_options.hpp>
-
 //STL
 #include <sstream>
-
-namespace po = boost::program_options;
 
 //Build Complex type
 typedef ctl::Abstract_simplex< int> Simplex;
@@ -103,64 +103,20 @@ typedef ctl::iterator_property_map< Complex_chains::iterator,
 
 typedef ctl::Timer Timer;
 
-template<typename Variable_map>
-void process_args(int & argc, char *argv[],Variable_map & vm){
-  //parse command line options
-  po::options_description desc("Usage: persistence [options] input-file");
-  desc.add_options()
-  ( "help", "Display this message")
-  ( "input-file", "input .asc file to parse");
-  
-  po::positional_options_description p;
-  p.add("input-file",1);
-  po::store(po::command_line_parser(argc,argv)
-	    .options(desc)
-	    .positional(p)
-	    .run(),
-	     vm);
-  po::notify(vm);
-  if (vm.count("help")){
-	std::cout << desc << std::endl;
-	std::exit( 0);
-  }
-  if (vm.count("input-file") != 1){
-	std::cout << desc << std::endl;	
-	std::exit( -1);
-  }
-}
-//FOR DEBUGGING
-#include <stdio.h>
-#include <execinfo.h>
-#include <signal.h>
-#include <stdlib.h>
-#include <unistd.h>
-void handler(int sig) {
-  void *array[10];
-  size_t size;
-
-  // get void*'s for all entries on the stack
-  size = backtrace(array, 10);
-
-  // print out all the frames to stderr
-  fprintf(stderr, "Error: signal %d:\n", sig);
-  backtrace_symbols_fd(array, size, STDERR_FILENO);
-  exit(1);
+template<typename String>
+void process_args(int & argc, char *argv[], String & filename){
+  std::string usage = "Usage: persistence input-file";
+  if (argc != 2){ std::cerr << usage << std::endl; exit( 1); }
+  filename = std::string( argv[ 1]);
 }
 
 int main(int argc, char *argv[]){
-  signal(SIGSEGV, handler);   // install our handler
   #ifdef ZOOM_PROFILE
   std::cout << "Connect" <<  ZMConnect() << std::endl;
   #endif
-  po::variables_map vm;
-  process_args(argc,argv,vm);
+  std::string full_complex_name; 
+  process_args(argc, argv, full_complex_name);
   
-   //get `path/to/complex_name`
-  std::string full_complex_name = vm["input-file"].as< std::string>();
-  //get `complex_name`
-  std::string complex_name(full_complex_name);
-  size_t found = complex_name.rfind('/');
-  if (found != std::string::npos){ complex_name.replace(0, found+1, ""); }
   //create some data structures 
   Complex complex;
   Complex_boundary complex_boundary( complex);
@@ -174,6 +130,9 @@ int main(int argc, char *argv[]){
   std::cout << "complex size: " << complex.size() << std::endl; 
   std::cout << "complex dimension: " << complex.dimension() << std::endl;
 
+  #ifdef COMPLEX_DIAGNOSTICS
+  ctl::complex_diagnostics( complex);
+  #endif
   //produce a filtration
   timer.start();
   Filtration complex_filtration( complex);
@@ -222,19 +181,20 @@ int main(int argc, char *argv[]){
   ctl::compute_betti( complex, cascade_bd_property_map, betti);
   std::cout << std::endl;
   int euler=0;
-  int coeff=1;
-  for(Betti::iterator i = betti.begin(); i != betti.end(); ++i){
-	euler += (*i)*coeff;
-	coeff = coeff*(-1);
+  int m = 1;
+  for( std::size_t i = 0; i < betti.size(); ++i){
+	euler += betti[ i]*m;
+	m= -m;
   }
   std::cout << "(betti) Euler Characteristic: " << euler << std::endl; 
   
   std::vector< std::size_t> counts( complex.dimension()+1, 0);
   euler=0; 
+  m = 1;
   for (auto cell : complex){ counts[ cell.first.dimension()]++; }
   for (std::size_t i = 0; i < counts.size(); ++i){
-   if( i % 2 == 0){ euler += counts[ i]; } 
-   else{ euler -= counts[ i]; }
+   euler += counts[ i]*m;
+   m = -m;
   }
   std::cout << "(cell) Euler Characteristic: " << euler << std::endl; 
 #endif
