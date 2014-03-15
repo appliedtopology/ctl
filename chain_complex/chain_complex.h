@@ -35,7 +35,7 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 *******************************************************************************/
-#include <unordered_map>
+#include "unordered_map/unordered_map.h"
 #include <sstream>
 
 #include "hash/hash.h"
@@ -115,7 +115,7 @@ public:
 	typedef Hash_ Hash;
 private:
 	typedef Chain_complex< Cell, Boundary> Self;
-	typedef std::unordered_map< Cell, Data, Hash> Map;
+	typedef ctl::unordered_map< Cell, Data, Hash> Map;
 	typedef typename Boundary::Coefficient _Coefficient;
 public: 
 	typedef typename Map::size_type size_type;
@@ -156,13 +156,9 @@ public:
 		return *this;
 	}
 
- 	iterator find_cell( const Cell & s) { 
-		return cells.find( s); 
-	}
+ 	iterator find_cell( const Cell & s) { return cells.find( s); }
 	
- 	const_iterator find_cell( const Cell & s) const { 
-		return cells.find( s); 
-	}
+ 	const_iterator find_cell( const Cell & s) const { return cells.find( s); }
 
 	iterator       begin()       { return cells.begin(); }
 	iterator         end()       { return cells.end();   }
@@ -233,18 +229,7 @@ public:
 		}
 		return true;
 	}
-	void* _get_bucket_address( const Cell & cell) const { return &*(cells.cbegin( 0) + cells.bucket( key)); }
-	#ifdef COMPLEX_DIAGNOSTICS
-	typedef typename Map::local_iterator local_iterator;
-	typedef typename Map::const_local_iterator const_local_iterator;
-	const_local_iterator bucket_begin( std::size_t n ) const { return cells.begin( n); }
-	const_local_iterator bucket_end( std::size_t n ) const { return cells.cend( n); }
-	std::size_t bucket_count() const { return cells.bucket_count(); }	
-	std::size_t bucket_size( std::size_t n ) const { return cells.bucket_size( n); }
-	std::size_t max_bucket_count() const { return cells.max_bucket_count(); }
-	double max_load_factor() const { return cells.max_load_factor(); }
-	std::size_t bucket( const Cell& key ) const { return cells.bucket( key); } 
-	#endif //end COMPLEX_DIAGNOSTICS
+	void* _bucket_address( const Cell & cell) const { return (void*)((&*cells.begin(0))+cells.bucket( cell)); }
 private:
 	Map cells;
 	Boundary bd;

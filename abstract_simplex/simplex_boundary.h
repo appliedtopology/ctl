@@ -37,7 +37,7 @@
 *******************************************************************************/
 #include "term/term.h"
 #include "finite_field/finite_field.h"
-
+#include <cassert>
 //non-exported functionality
 namespace {
 
@@ -65,7 +65,7 @@ class const_boundary_iterator :
 		    face.cell().vertices.resize( s.dimension());
 		    std::copy( s.begin()+1, s.end(), 
 			       face.cell().vertices.begin()); 
-		}else{ cellptr = 0; face.coefficient } //\partial(vertex) = 0
+		}else{ cellptr = 0; } //\partial(vertex) = 0
 	}
 	//copy constructor
 	const_boundary_iterator( const Self & from): cellptr( from.cellptr), 
@@ -75,7 +75,7 @@ class const_boundary_iterator :
 	cellptr( std::move(from.cellptr)), 
 	pos( std::move(from.pos)), 
 	face( std::move(from.face)), 
-	removed( std::move(from.removed)){ from.cellptr == 0; }	
+	removed( std::move(from.removed)){ from.cellptr = 0; }	
 	//equality
 	const_boundary_iterator& operator==( const Self & b) const { 
 		return (b.cellptr == cellptr) && (b.pos == pos); 

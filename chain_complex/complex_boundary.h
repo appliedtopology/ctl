@@ -115,7 +115,7 @@ protected:
   void _next_term(){
 	if( next_term != end_term){
 		#ifdef NDEBUG
-		__built_in_prefetch( complex->_get_bucket_address( future_term->cell()));
+		__builtin_prefetch( complex->_get_bucket_address( future_term->cell()));
 		#endif
 		term.cell() = complex->find_cell( next_term->cell());
 		++future_term;

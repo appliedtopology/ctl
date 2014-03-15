@@ -65,15 +65,14 @@ int main( int argc, char** argv){
 	Complex_boundary b( complex);
 	Complex_boundary copyd( b);
 	Complex_boundary moved( std::move( copyd));
-	std::cout << "boundary test: " 
-		  << complex.begin()->first << std::endl;
-	auto wtf = complex.begin();
-	std::cout << "boundary length: " << b.length( wtf) << std::endl;
-	for( boundary_iterator i = b.begin( wtf, 0); i != b.end( wtf); ++i){
-		std::cout << i->cell()->first 
-			  << " --> {" 
-			  << i->cell()->second  
-			  << "}"<< std::endl;
+	for( auto i = complex.begin(); i != complex.end(); ++i){
+	std::cout << "boundary test: " << ctl::delta << "("  
+		  << i->first << ")" << std::endl;
+	std::cout << "boundary length: " << b.length( i) << std::endl;
+	for( boundary_iterator j = b.begin( i, 0); j != b.end( i); ++j){
+		std::cout << j->cell()->first << " ";
+	}
+	std::cout << std::endl;
 	}
 	std::ofstream out( "test.asc");
 	complex.write( out); 

@@ -37,7 +37,7 @@
 //#define CTL_USE_MURMUR
 #define CTL_USE_CITY
 //#define CTL_USE_JENKINS
-#define COMPLEX_DIAGNOSTICS
+//#define COMPLEX_DIAGNOSTICS
 
 #ifdef ZOOM_PROFILE
 #include "zoom.h"

@@ -1,7 +1,8 @@
 option(ZOOM_PROFILE "Profile code with Zoom profiler" off)
 
-if( ZOOM_PROFILE)
-add_definitions(-DZOOM_PROFILE)
+if( CMAKE_BUILD_TYPE MATCHES RELWITHDEBINFO)
+set( ZOOM_PROFILE ON)
+message( "foobarbaz")
 if( ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 include_directories( /opt/rotateright/Zoom/include/zoom)
 link_directories( /opt/rotateright/Zoom/lib
@@ -11,7 +12,7 @@ if( APPLE)
 include_directories( /Library/RotateRight/Zoom/include/zoom)
 link_directories( /Library/RotateRight/Zoom/lib64)
 endif( APPLE)
-endif( ZOOM_PROFILE)
+endif( CMAKE_BUILD_TYPE MATCHES RELWITHDEBINFO)
 
 include_directories( ${CMAKE_SOURCE_DIR}  
   		     ${Boost_INCLUDE_DIR})
@@ -27,7 +28,7 @@ endif( APPLE)
 if( ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 target_link_libraries( persistence boost_program_options)
 if( ZOOM_PROFILE)
-target_link_libraries( persistence rt m RRZoomScript)
+target_link_libraries( persistence pthread rt m RRZoomScript)
 endif( ZOOM_PROFILE)
 endif( ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 add_executable( duplicate build_blobs.cpp)
