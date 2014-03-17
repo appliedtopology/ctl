@@ -229,7 +229,6 @@ public:
 		}
 		return true;
 	}
-	void* _bucket_address( const Cell & cell) const { return (void*)((&*cells.begin(0))+cells.bucket( cell)); }
 private:
 	Map cells;
 	Boundary bd;
