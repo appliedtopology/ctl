@@ -35,6 +35,8 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 *******************************************************************************/
+#include <boost/graph/adjacency_list.hpp>
+#include <unordered_map>
 //NOTE: syntax in this file is C++1x style.
 
 //non-exported functionality
