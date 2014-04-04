@@ -52,7 +52,7 @@ template< typename Stream>
 void close_file( Stream & in){ in.close(); }
 
 template< typename Stream>
-bool get_line( Stream & in, std::string & line, std::size_t line_num){
+bool get_line( Stream & in, std::string & line, std::size_t & line_num){
 	while( in.good()){
 		std::getline( in, line);
 		++line_num;

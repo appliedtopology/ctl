@@ -160,9 +160,8 @@ public:
 	}
 
  	iterator find_cell( const Cell & s) { return cells.find( s); }
-	
  	const_iterator find_cell( const Cell & s) const { return cells.find( s); }
-
+	
 	iterator       begin()       { return cells.begin(); }
 	iterator         end()       { return cells.end();   }
 	

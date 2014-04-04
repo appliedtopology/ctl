@@ -70,7 +70,7 @@ class Abstract_simplex {
 	Abstract_simplex( const Iterator begin, 
 			  const Iterator end): vertices( begin,end){};
 	Abstract_simplex( const Self & from): vertices( from.vertices){};
-	Abstract_simplex( const Self && from): vertices( std::move(from.vertices)){};
+	Abstract_simplex( Self && from): vertices( std::move( from.vertices)){};
 
 	iterator       begin()	        { return vertices.begin(); }
 	const_iterator begin()  const	{ return vertices.begin(); }
@@ -86,7 +86,7 @@ class Abstract_simplex {
 
 	std::size_t       size() const	{ return vertices.size(); 	}
 	std::size_t  dimension() const	{ return size()-1; 	  	}
-
+	std::size_t   capacity() const  { return vertices.capacity();   }
 	iterator insert( const vertex_type & v){
 	      iterator pos = std::lower_bound( begin(), end(), v);
 	      if(pos != end() && *pos == v) { return pos; }

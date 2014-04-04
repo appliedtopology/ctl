@@ -195,15 +195,4 @@ ctl::Finite_field< N> operator* (T k, const ctl::Finite_field< N> &m) {
 	return m * k; 
 }
 
-template<typename T, std::size_t N> 
-ctl::Finite_field< N> operator/ (T k, const ctl::Finite_field< N> &m) { 
-	return m / k; 
-}
-
-
-template<typename T, std::size_t N> 
-ctl::Finite_field< N> operator+ (T k, const ctl::Finite_field< N> &m) { 
-	return m + k; 
-}
-
 #endif //FINITE_FIELD_H
