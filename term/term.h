@@ -111,7 +111,7 @@ class Term {
 	public:
 	template <typename Ce, typename Co > 
 	struct rebind {
-  		typedef Term< Ce, Co> Term;
+  		typedef Term< Ce, Co> T;
 	};
 };  //class Term
 
@@ -170,7 +170,7 @@ class Term< Cell_, ctl::Finite_field< 2> > {
 		std::size_t pos_;
 	public:
 	template <typename _Ce, typename _Co> 
-	struct rebind { typedef Term<_Ce, _Co> Term; };
+	struct rebind { typedef Term<_Ce, _Co> T; };
 
 }; //Class Term specialization for Z2
 } //namespace ctl

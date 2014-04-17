@@ -160,7 +160,7 @@ class Complex_boundary{
 	typedef typename Complex::size_type size_type;
 	//Complex boundary terms are iterators
 	typedef typename Cell_term::template 
-			rebind< Iterator, Coefficient>::Term Term;
+			rebind< Iterator, Coefficient>::T Term;
 	typedef _const_boundary_iterator< Complex, Term, Cell_boundary> 
 							const_iterator;
 	//copy constructor

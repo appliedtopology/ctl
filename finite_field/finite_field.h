@@ -83,7 +83,7 @@ class Finite_field{
 	Finite_field(){}
 
 	template< typename T>
-	Finite_field( const T n): x( mod( n) ){};
+	Finite_field( const T n): x( mod( n) ){}
 
 	//mod avoid branch when possible.
 	template <typename T>
