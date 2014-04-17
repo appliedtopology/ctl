@@ -39,7 +39,7 @@
 #include <initializer_list>  // std::initializer_list
 #include <iostream> //cout (debug only)
 #include <algorithm> //sort, unique
-#include "simplex_boundary.h"
+#include "abstract_simplex/simplex_boundary.h"
 namespace ctl {
 
 //T must be a type with `<` a strict-weak-ordering
