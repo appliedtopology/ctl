@@ -68,9 +68,9 @@ class Abstract_simplex {
 	}
 	template< typename Iterator>
 	Abstract_simplex( const Iterator begin, 
-			  const Iterator end): vertices( begin,end){};
-	Abstract_simplex( const Self & from): vertices( from.vertices){};
-	Abstract_simplex( Self && from): vertices( std::move( from.vertices)){};
+			  const Iterator end): vertices( begin,end){}
+	Abstract_simplex( const Self & from): vertices( from.vertices){}
+	Abstract_simplex( Self && from): vertices( std::move( from.vertices)){}
 
 	iterator       begin()	        { return vertices.begin(); }
 	const_iterator begin()  const	{ return vertices.begin(); }
