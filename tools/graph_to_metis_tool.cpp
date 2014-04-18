@@ -39,12 +39,12 @@
 #include <utility>
 
 // Project
-#include <abstract_simplex/abstract_simplex.h>
-#include <chain_complex/chain_complex.h>
-#include <abstract_simplex/simplex_boundary.h>
-#include <nbhd_graph/nbhd_graph.h>
-#include <one_skeleton/graph_to_metis.h>
-#include <io/io.h>
+#include <ctl/abstract_simplex/abstract_simplex.h>
+#include <ctl/chain_complex/chain_complex.h>
+#include <ctl/abstract_simplex/simplex_boundary.h>
+#include <ctl/nbhd_graph/nbhd_graph.h>
+#include <ctl/one_skeleton/graph_to_metis.h>
+#include <ctl/io/io.h>
 
 typedef ctl::Abstract_simplex< int> Simplex;
 typedef ctl::Finite_field< 2> Z2; 

@@ -36,8 +36,8 @@
 *******************************************************************************
 *******************************************************************************/
 
-#include "finite_field/finite_field.h"
-#include "term/term_tags.h"
+#include <ctl/finite_field/finite_field.h>
+#include <ctl/term/term_tags.h>
 
 //exported functionality
 namespace ctl{

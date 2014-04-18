@@ -54,7 +54,8 @@ void compute_betti( Complex & complex,
        Betti betti( complex.dimension()+1,0);
        for(Cell_iterator cell = complex.begin(); cell != complex.end(); ++cell){
                const Chain& bd = cascade_boundary_map[ cell];
-               const bool c = bd.empty()|| (cell->first < bd.youngest().cell()->first); 
+               const bool c = bd.empty() || 
+				(cell->first < bd.youngest().cell()->first); 
 		betti[ cell->first.dimension()-(!c)] += (2*c -1);
        }
        ctl::write_betti( betti,std::cout);

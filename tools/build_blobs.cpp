@@ -36,17 +36,16 @@
 // build_blobs.cpp
 // Ryan Lewis
 // July 8, 2011
-
-// Project
-#include "abstract_simplex/abstract_simplex.h"
-#include "chain_complex/chain_complex.h"
-#include "chain_complex/chain_complex_io.h"
-#include "io/io.h"
-
 // STL
 #include <string>
 #include <sstream>
 #include <fstream>
+
+// Project
+#include <ctl/abstract_simplex/abstract_simplex.h>
+#include <ctl/chain_complex/chain_complex.h>
+#include <ctl/chain_complex/chain_complex_io.h>
+#include <ctl/io/io.h>
 
 typedef ctl::Abstract_simplex< int> Simplex;
 typedef ctl::Finite_field< 2> Z2;

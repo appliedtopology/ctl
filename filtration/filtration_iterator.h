@@ -35,6 +35,9 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 *******************************************************************************/
+//STL
+#include <iterator>
+
 //private functionality 
 //the multiplier gracefully handles reverse iterators.
 namespace _ctl{

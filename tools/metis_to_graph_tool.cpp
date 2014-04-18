@@ -39,10 +39,12 @@
 #include <iostream> 
 #include <fstream>
 #include <utility>
+
 //BOOST
 #include <boost/throw_exception.hpp>
 #include <boost/graph/metis.hpp>
-// Project
+
+// CTL
 #include <ctl/nbhd_graph/nbhd_graph.h>
 #include <ctl/io/io.h>
 #include <ctl/one_skeleton/graph_to_metis.h>

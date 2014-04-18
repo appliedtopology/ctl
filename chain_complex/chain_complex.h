@@ -62,13 +62,17 @@
 * AND rehashing will be marginally less expensive.
 * begin()/end() would be overloaded to take a dimension as well.
 **********************/
+
+//STL
 #include <unordered_map>
 #include <vector>
 #include <sstream>
+#include <fstream>
 
-#include "hash/hash.h"
-#include "io/io.h"
-#include "abstract_simplex/abstract_simplex.h"
+//CTL
+#include <ctl/hash/hash.h>
+#include <ctl/io/io.h>
+#include <ctl/abstract_simplex/abstract_simplex.h>
 
 //forward declaration
 namespace ctl{
@@ -262,6 +266,62 @@ private:
    std::size_t max_id;
    std::size_t max_dim;
 }; //cell_map
+} //namespace ctl
+
+template< typename Stream, typename Cell, typename Boundary, 
+	   typename Data, typename Hash>
+Stream& operator<<( Stream& out, 
+		    const ctl::Chain_complex< Cell, Boundary, Data, Hash> & c){ 
+	for(auto i = c.begin(); i != c.end(); ++i){
+		      out << i->second.id() <<": " << i->first << " --> {" 
+		  	  << i->second << "}" << std::endl;
+	}
+	return out;
+}
+
+
+
+template< typename Stream, typename Cell, 
+	  typename Boundary, typename Data_, typename Hash>
+Stream& operator>>( Stream& in, 
+		    ctl::Chain_complex< Cell, Boundary, Data_, Hash> & c){ 
+	typedef typename ctl::Chain_complex< Cell, Boundary, 
+					     Data_, Hash> Chain_complex;  
+	typedef typename Chain_complex::Data Data;
+	std::size_t line_num = 0;
+	std::string line;
+	std::size_t id=0;
+        char the_first_character = in.peek();
+        if( the_first_character == 's') {
+                ctl::get_line( in, line, line_num);
+                std::istringstream ss( line);
+                std::string the_word_size;
+                ss >> the_word_size;
+                std::size_t the_number_of_cells;
+                ss >> the_number_of_cells;
+		c.reserve( the_number_of_cells);
+        }
+	while( ctl::get_line(in, line, line_num)){
+		std::istringstream ss( line);
+		Cell cell;
+		ss >> id;
+		ss >> cell;
+		Data d( id);
+		c.insert_open_cell( cell, d);
+	}
+	return in;
+}
+
+namespace ctl{
+template<typename String, typename Complex>
+void read_complex(String & complex_name, Complex & complex){
+	std::ifstream in;
+	std::cout << "File IO ..." << std::flush;
+	ctl::open_file( in, complex_name.c_str());
+	in >> complex;
+	ctl::close_file( in);
+	std::cout << "completed!" << std::endl;
+}
 } //namespace ctl
 
 #endif //CTL_CHAIN_COMPLEX_MAP_H

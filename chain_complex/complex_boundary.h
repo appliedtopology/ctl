@@ -38,8 +38,12 @@
 * NOTES
 * For now this is an input_iterator, cell boundary operations could be 
 * bidirectional so we could easily make this a bidirectional iterator
+* The ramifications of this could imply faster/slower algorithms, 
+* need to check this.
 *******************************************************************************
 *******************************************************************************/
+//STL
+#include <iterator>     // std::iterator, std::input_iterator_tag
 
 //non exported functionality 
 namespace {

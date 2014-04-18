@@ -36,28 +36,35 @@
 *******************************************************************************
 *******************************************************************************/
 
+//STL
 #include <cstring>
+
+//CTL
+namespace ctl{
 namespace hash{
-#include "city.h"
-#include "MurmurHash3.h"
-}
+#include <ctl/hash/city.h>
+#include <ctl/hash/MurmurHash3.h>
+} //end namespace hash
+} //end namespace ctl
 //non-exported functionality 
 namespace {
-
+namespace cth = ctl::hash;
 template< typename Container>
 inline std::size_t murmur3_hash( const Container & key){
 	typedef typename Container::value_type T;
 	std::size_t out;
 	//MurmurHash3_x86_32 
 	//MurmurHash3_x86_128
-	hash::MurmurHash3_x64_128 ( (const char*)&(*(key.begin())), sizeof(T)*key.size(), key.size(), &out );
+	cth::MurmurHash3_x64_128 ( (const char*)&(*(key.begin())), 
+				    sizeof(T)*key.size(), key.size(), &out );
 	return out;
 }
 
 template< typename Container>
 inline std::size_t city_hash( const Container & key){
 	typedef typename Container::value_type T;
-	return hash::CityHash64WithSeed( (const char*)&(*(key.begin())), sizeof(T)*key.size(),key.size()); 
+	return cth::CityHash64WithSeed( (const char*)&(*(key.begin())), 
+					 sizeof(T)*key.size(),key.size()); 
 }
 
 template< typename T>

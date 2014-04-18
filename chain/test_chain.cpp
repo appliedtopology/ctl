@@ -33,35 +33,36 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 *******************************************************************************/
-#include "chain/chain_add.h"
 //STL
 #include <iostream>
 #include <sstream>
 #include <iomanip>
 
 //CTL
-//abstract_simplex
-#include "abstract_simplex/abstract_simplex.h"
-#include "abstract_simplex/simplex_boundary.h"
 
-//chain_complex
-#include "chain_complex/chain_complex.h"
-#include "chain_complex/chain_complex_io.h"
-#include "chain_complex/complex_boundary.h"
+//abstract_simplex
+#include <ctl/abstract_simplex/abstract_simplex.h>
+#include <ctl/abstract_simplex/simplex_boundary.h>
+
+//Chain_complex
+#include <ctl/chain_complex/chain_complex.h>
+#include <ctl/chain_complex/chain_complex_io.h>
+#include <ctl/chain_complex/complex_boundary.h>
 
 //chain
-#include "chain/chain.h"
+#include <ctl/chain/chain_add.h>
+#include <ctl/chain/chain.h>
 
 //delta
-#include "io/io.h"
+#include <ctl/io/io.h>
 
 //filtration
-#include "filtration/filtration.h"
-#include "filtration/less.h"
+#include <ctl/filtration/filtration.h>
+#include <ctl/filtration/less.h>
 
 //Term
-#include "term/term_less.h"
-#include "utility/timer.h"
+#include <ctl/term/term_less.h>
+#include <ctl/utility/timer.h>
 
 //We build a simplicial chain complex with Z2 coefficients
 typedef ctl::Abstract_simplex< int> Simplex;

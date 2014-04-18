@@ -56,7 +56,7 @@ using Nbhd_graph = boost::adjacency_list< boost::vecS,
 					  boost::vecS,
 					  boost::undirectedS,
 					  vertex_name< vertex_name_t>,
-					  edge_weight< edge_weight_t>, 
+					  edge_weight< edge_weight_t>
 					>;
 
 template< typename Stream, typename Graph>

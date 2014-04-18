@@ -39,15 +39,15 @@
 #include <utility>
 #include <vector>
 // Project
-#include "finite_field/finite_field.h"
-#include "abstract_simplex/abstract_simplex.h"
-#include "abstract_simplex/simplex_boundary.h"
-#include "chain_complex/chain_complex.h"
-#include "nbhd_graph/nbhd_graph.h"
-#include "one_skeleton/complex_to_graph.h"
-#include "one_skeleton/one_skeleton.h"
-#include "one_skeleton/graph_to_metis.h"
-#include "io/io.h"
+#include <ctl/finite_field/finite_field.h>
+#include <ctl/abstract_simplex/abstract_simplex.h>
+#include <ctl/abstract_simplex/simplex_boundary.h>
+#include <ctl/chain_complex/chain_complex.h>
+#include <ctl/nbhd_graph/nbhd_graph.h>
+#include <ctl/one_skeleton/complex_to_graph.h>
+#include <ctl/one_skeleton/one_skeleton.h>
+#include <ctl/one_skeleton/graph_to_metis.h>
+#include <ctl/io/io.h>
 
 //BOOST
 #include <boost/program_options.hpp>

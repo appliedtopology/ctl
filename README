@@ -2,23 +2,29 @@
 Thanks for downloading The Computational Topology library!
 
 This C++11 library provides a set of generic tools for:
-	1) Generating point sets
-	2) Building Graphs
-	3) Building Cellular Complexes
+	1) Generating point sets (coming soon)
+	2) Building Graphs (coming soon)
+	3) Building Cellular Complexes (coming soon)
 	4) Computing [persistent] homology over finite fields
-	5) Parallel algorithm(s) for (4)
+	5) Parallel/Distributed algorithm(s) for (4) (coming soon)
 
 === LICENSE ===
-CTAL is GPLv3+. See LICENSE for more info. 
+CTL is GPLv2+ (or later at your discretion). See LICENSE for more info. 
 
-== BUILDING ====
+=== BUILDING ====
 To build the library type:
 	cmake .
 Then assuming no errors occur:
 	make
 
-==== USING ====
-See examples/ for a number of examples of using the library.
+=== INSTALL ==
+Coming soon:
+	make install
+
+==== USING (coming soon) ====
+See tools/ for a number of examples of using the library.
+
+See tutorial/ for a tutorial (coming soon)
 
 ==== SUBMITTING PATCHES ====
 Please Do! 
@@ -27,7 +33,7 @@ We have not yet developed a formal method for handling such requests.
 I ask that you follow the generic programming paradigm. 
 
 See examples/ for template headers, and 
-study the existing code for examples of good design framework.
+study the existing code for examples of what we consider good style.
 
 Email ctal@appliedtopology.org if there are any questions on this.
 

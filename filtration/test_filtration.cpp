@@ -38,17 +38,17 @@
 
 //CTL
 //abstract_simplex
-#include "abstract_simplex/abstract_simplex.h"
-#include "abstract_simplex/simplex_boundary.h"
+#include <ctl/abstract_simplex/abstract_simplex.h>
+#include <ctl/abstract_simplex/simplex_boundary.h>
 
 //chain_complex
-#include "chain_complex/chain_complex.h"
+#include <ctl/chain_complex/chain_complex.h>
 
 //filtration
-#include "filtration/filtration.h"
-#include "filtration/less.h"
+#include <ctl/filtration/filtration.h>
+#include <ctl/filtration/less.h>
 //timer
-#include "utility/timer.h"
+#include <ctl/utility/timer.h>
 
 //We build a simplicial chain complex with Z2 coefficients
 typedef ctl::Abstract_simplex< int> Simplex;

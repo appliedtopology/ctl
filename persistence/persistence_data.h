@@ -36,7 +36,7 @@
 *******************************************************************************
 *******************************************************************************/
 
-#include "boost/property_map/property_map.hpp"
+#include <boost/property_map/property_map.hpp>
 
 namespace _ctl {
 
@@ -51,7 +51,8 @@ struct Persistence_data {
 	typedef Boundary_operator_ Boundary_operator;
 	typedef Cell_chain_map_ Cell_chain_map;
 	typedef Output_policy_ Output_policy;
- 	typedef typename boost::property_traits< Cell_chain_map>::value_type Chain;
+ 	typedef typename boost::property_traits< Cell_chain_map>::value_type 
+								       Chain;
 	typedef typename Chain::value_type Term;
  
 	Persistence_data( Term_less t, 

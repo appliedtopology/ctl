@@ -46,15 +46,16 @@
 #ifdef COMPLEX_DIAGNOSTICS
 	#include "utility/complex_diagnostics.h"
 #endif
-//CTL Types for Building a Simplicial Chain Complex and Filtration
-#include "finite_field/finite_field.h"
-#include "abstract_simplex/abstract_simplex.h"
-#include "abstract_simplex/simplex_boundary.h"
-#include "io/io.h" 
-#include "chain_complex/chain_complex.h"
-#include "chain_complex/chain_complex_io.h"
+//CTL
+//Types for Building a Simplicial Chain Complex and Filtration
+#include <ctl/finite_field/finite_field.h>
+#include <ctl/abstract_simplex/abstract_simplex.h>
+#include <ctl/abstract_simplex/simplex_boundary.h>
+#include <ctl/io/io.h>
+#include <ctl/chain_complex/chain_complex.h>
+#include <ctl/chain_complex/chain_complex_io.h>
 
-#include "utility/timer.h"
+#include <ctl/utility/timer.h>
 
 //STL
 #include <sstream>
@@ -99,7 +100,7 @@ int main(int argc, char *argv[]){
   }
   std::cout << "Cells by dimension: " << std::endl;
   for( const auto size : counts){ std::cout << size << std::endl; }
-  std::cout << "Rough estimate of complex memory: " 
+  std::cout << "Rough estimate of memory used: " 
 	    << complex_bytes << " (bytes)" << std::endl; 
   return 0;
 }

@@ -35,8 +35,11 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 *******************************************************************************/
+//STL
 #include <algorithm> 
-#include "term/term_tags.h"
+
+//CTL
+#include <ctl/term/term_tags.h>
 
 //exported, but, internal functionality
 namespace _ctl{

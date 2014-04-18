@@ -46,26 +46,27 @@
 #ifdef COMPLEX_DIAGNOSTICS
 	#include "utility/complex_diagnostics.h"
 #endif
-//CTL Types for Building a Simplicial Chain Complex and Filtration
-#include "finite_field/finite_field.h"
-#include "abstract_simplex/abstract_simplex.h"
-#include "abstract_simplex/simplex_boundary.h"
-#include "chain_complex/complex_boundary.h"
-#include "filtration/filtration.h"
-#include "filtration/less.h"
-#include "io/io.h" 
-#include "chain_complex/chain_complex.h"
-#include "chain_complex/chain_complex_io.h"
-#include "term/term.h"
+//CTL 
+//Types for Building a Simplicial Chain Complex and Filtration
+#include <ctl/finite_field/finite_field.h>
+#include <ctl/abstract_simplex/abstract_simplex.h>
+#include <ctl/abstract_simplex/simplex_boundary.h>
+#include <ctl/chain_complex/complex_boundary.h>
+#include <ctl/filtration/filtration.h>
+#include <ctl/filtration/less.h>
+#include <ctl/io/io.h>
+#include <ctl/chain_complex/chain_complex.h>
+#include <ctl/chain_complex/chain_complex_io.h>
+#include <ctl/term/term.h>
 
-#include "utility/timer.h"
+#include <ctl/utility/timer.h>
 
 //Persistence 
-#include "chain/chain.h"
-#include "persistence/persistence.h"
-#include "persistence/iterator_property_map.h"
-#include "persistence/offset_maps.h"
-#include "persistence/compute_betti.h"
+#include <ctl/chain/chain.h>
+#include <ctl/persistence/persistence.h>
+#include <ctl/persistence/iterator_property_map.h>
+#include <ctl/persistence/offset_maps.h>
+#include <ctl/persistence/compute_betti.h>
 
 //STL
 #include <sstream>

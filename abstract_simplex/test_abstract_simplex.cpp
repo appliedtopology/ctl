@@ -33,10 +33,13 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 *******************************************************************************/
-#include "abstract_simplex/abstract_simplex.h"
-#include "abstract_simplex/simplex_boundary.h"
+//STL
 #include <iostream>
-#include "term/term.h"
+
+//CTL
+#include <ctl/abstract_simplex/abstract_simplex.h>
+#include <ctl/abstract_simplex/simplex_boundary.h>
+#include <ctl/term/term.h>
 
 
 typedef ctl::Abstract_simplex< int> Simplex;

@@ -40,7 +40,7 @@
 #include <iostream>
 
 //Project
-#include "one_skeleton/one_skeleton.h"
+#include <ctl/one_skeleton/one_skeleton.h>
 
 typedef ctl::Abstract_simplex< int> Simplex;
 typedef ctl::Finite_field< 2> Z2; 

@@ -2,7 +2,7 @@
 #define CTLIB_LP_H
 
 //exported functionality
-namespace ct{
+namespace ctl{
 
 template< typename Point, int p=2>
 value_type lp( const Point & a, const Point & b) {
@@ -26,7 +26,7 @@ value_type hamming( const Point & a, const Point & b) {
 	return dist;
 }
 
-} //namespace ct
+} //namespace ctl
 
 //non-exported functionality
 namespace {} //anonymous namespace

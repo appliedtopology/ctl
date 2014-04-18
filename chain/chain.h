@@ -35,10 +35,14 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 *******************************************************************************/
-#include "chain/chain_add.h"
-#include "term/term_less.h"
-#include "term/term_tags.h"
+//Project
 #include <algorithm>
+
+//CTL
+#include <ctl/chain/chain_add.h>
+#include <ctl/term/term_less.h>
+#include <ctl/term/term_tags.h>
+
 
 //exported functionality
 namespace ctl{

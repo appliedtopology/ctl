@@ -33,7 +33,7 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 *******************************************************************************/
-#include "finite_field.h"
+#include <ctl/finite_field/finite_field.h>
 #include <iostream>
 
 int main( int argc, char** argv){

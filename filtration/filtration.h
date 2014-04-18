@@ -35,9 +35,11 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 *******************************************************************************/
+//STL
 
-#include "filtration/less.h"
-#include "filtration/filtration_iterator.h"
+//CTL
+#include <ctl/filtration/less.h>
+#include <ctl/filtration/filtration_iterator.h>
 
 //non-exported functionality 
 namespace {
@@ -73,8 +75,10 @@ class Filtration {
 	typedef const_reverse_iterator crit;
 	typedef reverse_iterator rit;
 public:
-	Filtration( const Filtration & f): filtration_( f), complex( f.complex) {}
-	Filtration( const Filtration && f): filtration_( std::move( f)), complex( f.complex) {}	
+	Filtration( const Filtration & f): 
+		filtration_( f), complex( f.complex) {}
+	Filtration( const Filtration && f): 
+		filtration_( std::move( f)), complex( f.complex) {}	
 	Filtration( Complex & c): filtration_( c.size()), complex( c){
 		std::size_t pos = 0;
 		for( auto i= c.begin(); i != c.end(); ++i, ++pos){ 
