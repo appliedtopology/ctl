@@ -43,14 +43,14 @@
 #include <boost/throw_exception.hpp>
 #include <boost/graph/metis.hpp>
 // Project
-#include "nbhd_graph.h"
-#include "io.h"
-#include "graph_to_metis.h"
-#include "complex_to_graph.h"
+#include <ctl/nbhd_graph/nbhd_graph.h>
+#include <ctl/io/io.h>
+#include <ctl/one_skeleton/graph_to_metis.h>
+#include <ctl/one_skeleton/complex_to_graph.h>
 
 typedef  ctl::Nbhd_graph Graph;
-
-typedef  boost::property_map< Graph,boost::vertex_name_t>::const_type const_name_map_t;
+typedef  boost::property_map< Graph,boost::vertex_name_t>::const_type 
+							  const_name_map_t;
 typedef  boost::property_map< Graph,boost::vertex_name_t>::type name_map_t;
 typedef  boost::graph_traits< Graph> graph_traits;
 typedef  graph_traits::vertex_descriptor  vertex_descriptor;

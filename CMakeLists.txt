@@ -1,9 +1,5 @@
-# Created by the script cgal_create_cmake_script
-# This is the CMake script for compiling a CGAL application.
-project( ctlib CXX)
+project(ctl CXX)
 set( CMAKE_VERBOSE_MAKEFILE  false)
-
-
 option(USE_CLANG "build application with clang" ON) # OFF is the default
 if( USE_CLANG)
    SET (CMAKE_C_COMPILER             "/usr/bin/clang")
@@ -30,7 +26,13 @@ endif( USE_CLANG)
 #http://www.cmake.org/cmake/help/cmake_tutorial.html
 set(Boost_USE_MULTITHREADED OFF)
 find_package(Boost COMPONENTS program_options REQUIRED)
-include_directories(${Boost_INCLUDE_DIR})
+if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" VERSION_GREATER 2.8.11)
+	get_filename_component(PATH_TO_PROJECT "${CMAKE_SOURCE_DIR}" DIRECTORY)
+else()
+	get_filename_component(PATH_TO_PROJECT "${CMAKE_SOURCE_DIR}" PATH)
+endif()
+include_directories(${PATH_TO_PROJECT})
+include_directories( ${PROJECT_SOURCE_DIR} ${Boost_INCLUDE_DIR})
 link_directories(/usr/local/lib ${Boost_LIBRARY_DIR})
 add_definitions(" -Wall -ansi -pedantic -std=c++11")
 set(CMAKE_BUILD_TYPE RELWITHDEBINFO)
