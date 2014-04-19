@@ -52,7 +52,7 @@ typedef ctl::Simplex_boundary< Simplex, Z2> Simplex_boundary;
 typedef ctl::Chain_complex< Simplex, Simplex_boundary> Complex;
 typedef Complex::Cell Cell;
 
-typedef  ctl::Nbhd_graph Graph;
+typedef  ctl::Nbhd_graph<> Graph;
 typedef  boost::graph_traits< Graph>::edges_size_type edges_size_type;
 typedef  boost::vertex_name_t bvtx_name_t;
 typedef  boost::property_map< Graph, bvtx_name_t>::type name_map_t;
@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
     std::cerr << "Usage:  " << argv[ 0] << " graph" << std::endl;
   }
   // Set up complex
-  ctl::Nbhd_graph graph;
+  Graph graph;
 
   // Read the complex in 
   std::ifstream in;   

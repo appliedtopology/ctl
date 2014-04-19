@@ -119,20 +119,15 @@ Stream& read_graph( Stream& in, Graph & graph,
 		    std::size_t num_vertices, std::size_t num_edges){
     typedef typename boost::property_map< Graph, boost::vertex_name_t>::type 
     name_map_t;
-    typedef typename boost::property_map< Graph, boost::edge_weight_t>::type 
-    weight_map_t;
     
     typedef typename boost::property_traits< name_map_t>::value_type 
 							vertex_name_t;
-    typedef typename boost::property_traits< weight_map_t>::value_type 
-							edge_weight_t;
     typedef typename boost::graph_traits< Graph>::vertex_descriptor 
 						  vertex_descriptor; 
    //Relates vertex names
     typedef std::unordered_map< vertex_name_t, vertex_descriptor> 
     	Name_to_descriptor_map;
     
-    weight_map_t weight_map = boost::get( boost::edge_weight, graph);
         name_map_t name_map = boost::get( boost::vertex_name, graph);
      Name_to_descriptor_map   descriptor( num_vertices); //preallocate buckets!
     
@@ -154,9 +149,9 @@ Stream& read_graph( Stream& in, Graph & graph,
 		std::cerr << "Duplicate vertex!" << name << std::endl;
 		return in;
 	}
-	vertex_descriptor descriptor = boost::add_vertex( graph);
-	name_map[ descriptor] = name;
-	descriptor.emplace( name, descriptor);
+	vertex_descriptor v_descriptor = boost::add_vertex( graph);
+	name_map[ v_descriptor] = name;
+	descriptor.emplace( name, v_descriptor);
    }
 
    //Second, read edges
@@ -168,7 +163,7 @@ Stream& read_graph( Stream& in, Graph & graph,
 	ss.clear();
 	ss.str( line);
 	vertex_name_t source_name, target_name;
-	line >> source_name >> target_name;
+	ss >> source_name >> target_name;
 	if (ss.fail()){
 		std::cerr << "Incorrect line: " << std::endl 
 			  << line << std::endl;
@@ -180,11 +175,12 @@ Stream& read_graph( Stream& in, Graph & graph,
 		return in;
 	}
 	if ( target_name < source_name){ std::swap( source_name, target_name); }
-	edge_weight_t weight;
- 	line >> weight;
-	if (ss.fail()){ weight = 0.0; }
-	vertex_descriptor source = find_descriptor( descriptor, source_name);
- 	vertex_descriptor target = find_descriptor( descriptor, target_name);
+	double weight_;
+ 	ss >> weight_;
+	if (ss.fail()){ weight_ = 0.0; }
+	boost::edge_weight_t weight = boost::edge_weight_t( weight_); 
+	vertex_descriptor source = descriptor[ source_name];
+ 	vertex_descriptor target = descriptor[ target_name];
 	if( boost::edge( source, target, graph).second){
 		std::cerr << "error duplicate edges not allowed!" << std::endl;
 		return in;

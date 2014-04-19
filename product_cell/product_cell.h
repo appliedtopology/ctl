@@ -44,7 +44,7 @@
 #include <utility> //std::pair, and piecewise_construct
 #include <tuple> //std::pair, and piecewise_construct
 #include <iostream> //cout (debug only)
-#include "product_boundary.h"
+#include <ctl/product_cell/product_boundary.h>
 namespace ctl {
 
 template< typename Cell_iterator1_, Cell_iterator2_>

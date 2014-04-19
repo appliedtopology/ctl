@@ -1,1 +1,1 @@
-add_executable( test_simplex test_product_cell.cpp)
+add_executable( test_product_cell test_product_cell.cpp)

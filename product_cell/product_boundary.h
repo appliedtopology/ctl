@@ -35,9 +35,13 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 *******************************************************************************/
-#include "term/term.h"
-#include "finite_field/finite_field.h"
+//STL 
 #include <cassert>
+
+//CTL
+#include <ctl/term/term.h>
+#include <ctl/finite_field/finite_field.h>
+
 //non-exported functionality
 namespace {
 //TODO: Concept_check Boundary1_ and Boundary2_ should have the same coefficient 
@@ -54,7 +58,8 @@ class const_boundary_iterator :
 	  typedef Boundary2_ Boundary2; 
 	  typedef Term_ Term;
 	  typedef typename Term::Cell Product;
-	  typedef const_boundary_iterator< Term, Boundary1, Boundary2, Coefficient> Self;
+	  typedef const_boundary_iterator< Term, Boundary1, 
+					   Boundary2, Coefficient> Self;
 	  typedef Boundary1::const_iterator const_iterator1;
 	  typedef Boundary2::const_iterator const_iterator2;
 	public:
@@ -62,7 +67,8 @@ class const_boundary_iterator :
 	const_boundary_iterator() {}
 
 	//begin constructor
-	const_boundary_iterator( const Boundary1& b1, const Boundary2& b2, const Product & p): 
+	const_boundary_iterator( const Boundary1& b1, const Boundary2& b2, 
+				 const Product & p): 
 		cellptr( &product),
 		face1( b1.begin( p.first)),
 		face2( b2.begin( p.second)),
@@ -71,7 +77,8 @@ class const_boundary_iterator :
 		//even --> 1 and odd --> -1
 		sign( 2*(p.first_cell().dimension()%2!=0)-1){ next_term(); }
 
-	const_boundary_iterator( const Boundary1& b1, const Boundary2& b2, const Product & p, const bool b): 
+	const_boundary_iterator( const Boundary1& b1, const Boundary2& b2, 
+				 const Product & p, const bool b): 
 		end1( b1.end( p.first)),
 		end2( b2.end( p.second)){ end_term(); }	
 	//copy constructor
@@ -119,11 +126,15 @@ class const_boundary_iterator :
 	Term* operator->() { return &face; }
 	
 	//equality
-	bool operator==( const const_boundary_iterator & b) const { return (b.face == face); }
-	bool operator!=( const const_boundary_iterator & b) const { return (b.face != face); }
+	bool operator==( const const_boundary_iterator & b) const { 
+		return (b.face == face); 
+	}
+	bool operator!=( const const_boundary_iterator & b) const { 
+		return (b.face != face); 
+	}
 
 	const_boundary_iterator& operator++(){
-		get_term();
+		next_term();
 		return *this;	
 	}
 
@@ -131,6 +142,28 @@ class const_boundary_iterator :
 	 	const_boundary_iterator tmp( *this); 
 		++(*this); //now call previous operator
 		return tmp;
+	}
+	protected: 
+	void next_term(){
+		//\partial(\sigma) \times \tau 
+		if( face1 != end1){
+			face.cell().first = face1.cell();
+			face.cell().second = cellptr->second;
+			face.coefficient( face1.coefficient()); 
+			++face1;
+		} else if ( face2 != end2){
+			face.cell().first = cellptr->first;
+			face.cell().first = face2->cell();
+			face.coefficient( sign*face2.coefficient()); 
+			++face2;
+		} else {
+			end_term();
+		}
+	}
+	void end_term(){
+		face.cell().first  = end1.cell();
+		face.cell().second = end2.cell();
+		face.coefficient( 1);
 	}
 	private:
 	 const Product* cellptr;
@@ -151,24 +184,50 @@ public:
 	typedef Product_ Product;
 	typedef Boundary1_ Boundary1;
 	typedef Boundary2_ Boundary2;
-	typedef Boundary1::Term::template rebind< Product, Coefficient>::type Term;
-	typedef const_boundary_iterator< Term, Boundary1, Boundary2, Coefficient> const_iterator;
+	typedef Boundary1::Term::template rebind< Product, 
+						 Coefficient>::type Term;
+	typedef const_boundary_iterator< Term, Boundary1, 
+					 Boundary2, Coefficient> const_iterator;
 	//default constructor
 	//none since we store references.
 
 	//initialization constructor
-	Product_boundary( const Boundary1 & b1, const Boundary2 & b2): boundary1( b1), boundary2( b2) {};	
+	Product_boundary( const Boundary1 & b1, const Boundary2 & b2): 
+	boundary1( b1), boundary2( b2) {};	
 
 	//copy constructor	
-	Product_boundary( const Product_boundary & from): boundary1( from.boundary1), boundary2( from.boundary2) {};
+	Product_boundary( const Product_boundary & from): 
+	boundary1( from.boundary1), boundary2( from.boundary2) {};
+	
+	//copy constructor	
+	Product_boundary( const Product_boundary && from): 
+	boundary1( std::move( from.boundary1)), 
+	boundary2( std::move( from.boundary2)) {};
+	
 	//assignment operator
+	Product_boundary& operator=( const Product_boundary & from){
+		boundary1 = from.boundary1;
+		boundary2 = from.boundary2;
+		return *this;
+	}
 	//move operator
-	//none since we store references
+	Product_boundary& operator=( Product_boundary && from){
+		std::swap( boundary1, from.boundary1);
+		std::swap( boundary2, from.boundary2);
+		return *this;
+	}
 	
 	//It only makes sense for const iterators
-	const_iterator begin( const Product & p) const { return const_iterator( boundary1, boundary2, p); }
-	const_iterator end( const Product & p) const   { return const_iterator( boundary1, boundary2, p, true); }
-	std::size_t length( const Product & p) const { return boundary1.max_length( p.first) + boundary2.max_length( p.second); }
+	const_iterator begin( const Product & p) const { 
+		return const_iterator( boundary1, boundary2, p); 
+	}
+	const_iterator end( const Product & p) const   { 
+		return const_iterator( boundary1, boundary2, p, true); 
+	}
+	std::size_t length( const Product & p) const { 
+		return boundary1.max_length( p.first) + 
+			boundary2.max_length( p.second); 
+	}
 	const Boundary1& boundary1() const { return boundary1; }
 	const Boundary2& boundary2() const { return boundary2; }
 	private:
