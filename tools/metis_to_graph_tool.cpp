@@ -50,7 +50,7 @@
 #include <ctl/one_skeleton/graph_to_metis.h>
 #include <ctl/one_skeleton/complex_to_graph.h>
 
-typedef  ctl::Nbhd_graph Graph;
+typedef  ctl::Nbhd_graph<> Graph;
 typedef  boost::property_map< Graph,boost::vertex_name_t>::const_type 
 							  const_name_map_t;
 typedef  boost::property_map< Graph,boost::vertex_name_t>::type name_map_t;
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
   }
 
   //create graph
-  ctl::Nbhd_graph graph;
+  Graph graph;
   name_map_t name_map = get(boost::vertex_name, graph);
   Inverse_map to_descriptor;
 

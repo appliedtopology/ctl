@@ -58,7 +58,6 @@ namespace po = boost::program_options;
 // Complex type
 typedef ctl::Abstract_simplex< int> Simplex;
 typedef ctl::Finite_field< 2> Z2;
-typedef ctl::Abstract_simplex Cell;
 typedef ctl::Simplex_boundary< Simplex, Z2> Simplex_boundary;
 typedef ctl::Chain_complex< Simplex, Simplex_boundary> Complex;
 typedef std::vector<int> index_to_vertex_t;
@@ -93,7 +92,7 @@ int main(int argc, char *argv[]) {
 
   // Set up complex
   Complex complex;
-  ctl::Nbhd_graph graph;
+  ctl::Nbhd_graph<> graph;
 
   // Read the complex in 
   std::ifstream in;   

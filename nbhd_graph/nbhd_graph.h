@@ -35,9 +35,16 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 *******************************************************************************/
-#include <boost/graph/adjacency_list.hpp>
-#include <unordered_map>
 //NOTE: syntax in this file is C++1x style.
+//STL
+#include <unordered_map>
+
+//BOOST
+#include <boost/graph/adjacency_list.hpp>
+
+//CTL
+#include <ctl/io/io.h>
+
 
 //non-exported functionality
 namespace {
@@ -63,7 +70,8 @@ template< typename Stream, typename Graph>
 Stream& print_vertices( Stream & out, const Graph & graph){
     typedef typename boost::graph_traits<Graph> graph_traits;
     typedef typename graph_traits::vertex_iterator vertex_iterator;
-    typedef typename boost::property_map<Graph, boost::vertex_name>::const_type 
+    typedef typename boost::property_map< Graph, 
+					  boost::vertex_name_t>::const_type 
 		     const_name_map_t; 
 
     const_name_map_t name_map = get( boost::vertex_name, graph);
@@ -71,13 +79,14 @@ Stream& print_vertices( Stream & out, const Graph & graph){
     for( std::tie( vi, vlast) = boost::vertices( graph); vi != vlast; ++vi){
 	out << get( name_map, *vi) << std::endl;	  
     }
+    return out;
 }
 template< typename Stream, typename Graph>
 Stream& print_edges( Stream & out, const Graph & graph){
     typedef typename boost::graph_traits< Graph> graph_traits;
     typedef typename graph_traits::edge_iterator edge_iterator;
     typedef typename boost::property_map< Graph, 
-					   boost::vertex_name>::const_type 
+					   boost::vertex_name_t>::const_type 
 		     const_name_map_t; 
     typedef typename boost::property_map< Graph, 
 					  boost::edge_weight_t>::const_type 
@@ -86,12 +95,13 @@ Stream& print_edges( Stream & out, const Graph & graph){
     const_name_map_t name_map = get( boost::vertex_name, graph);
     const_weight_map_t weight_map = get( boost::edge_weight, graph);
     
-    edge_iterator ei, last; 
+    edge_iterator ei, elast; 
     for( std::tie( ei, elast) = boost::edges( graph); ei != elast; ++ei){
-	out << boost::get( name_map, source( *ei, boost::graph)) << " "
-	    << boost::get( name_map, target( *ei, boost::graph)) << " "
+	out << boost::get( name_map, source( *ei, graph)) << " "
+	    << boost::get( name_map, target( *ei, graph)) << " "
 	    << get( weight_map, *ei) << std::endl; 
     }
+    return out;
 }
 
 template< typename Stream, typename Graph>
@@ -105,16 +115,20 @@ Stream& print_graph( Stream& out, const Graph & graph,
 }
 
 template< typename Stream, typename Graph>
-Stream& read_graph( Stream& in, Graph & graph){
+Stream& read_graph( Stream& in, Graph & graph, 
+		    std::size_t num_vertices, std::size_t num_edges){
     typedef typename boost::property_map< Graph, boost::vertex_name_t>::type 
     name_map_t;
-    typedef boost::property_map< Graph, boost::edge_weight_t>::type 
+    typedef typename boost::property_map< Graph, boost::edge_weight_t>::type 
     weight_map_t;
     
-    typedef boost::property_traits< name_map_t>::value_type vertex_name_t;
-    typedef boost::property_traits< weight_map_t>::value_type edge_weight_t;
-    
-    //Relates vertex names
+    typedef typename boost::property_traits< name_map_t>::value_type 
+							vertex_name_t;
+    typedef typename boost::property_traits< weight_map_t>::value_type 
+							edge_weight_t;
+    typedef typename boost::graph_traits< Graph>::vertex_descriptor 
+						  vertex_descriptor; 
+   //Relates vertex names
     typedef std::unordered_map< vertex_name_t, vertex_descriptor> 
     	Name_to_descriptor_map;
     
@@ -169,8 +183,8 @@ Stream& read_graph( Stream& in, Graph & graph){
 	edge_weight_t weight;
  	line >> weight;
 	if (ss.fail()){ weight = 0.0; }
-	vertex_descriptor source = find_descriptor( to_descriptor, source_name);
- 	vertex_descriptor target = find_descriptor( to_descriptor, target_name);
+	vertex_descriptor source = find_descriptor( descriptor, source_name);
+ 	vertex_descriptor target = find_descriptor( descriptor, target_name);
 	if( boost::edge( source, target, graph).second){
 		std::cerr << "error duplicate edges not allowed!" << std::endl;
 		return in;
@@ -179,8 +193,9 @@ Stream& read_graph( Stream& in, Graph & graph){
    }
    return in;
 }
-
-std::istream& operator>>( std::istream& in, Nbhd_graph& graph){
+} //namespace ctl
+template < typename Stream, typename v, typename e> 
+Stream& operator>>( Stream& in, ctl::Nbhd_graph< v,e> & graph){
 	std::string header;
 	std::size_t line_num=0;
 	if( !ctl::get_line( in, header, line_num)){
@@ -190,16 +205,15 @@ std::istream& operator>>( std::istream& in, Nbhd_graph& graph){
 	std::istringstream ss( header);
 	std::size_t num_vertices, num_edges;
 	ss >> num_vertices >> num_edges;
-	return read_graph( in, graph, num_vertices, num_edges);
+	return ctl::read_graph( in, graph, num_vertices, num_edges);
 }
-
-std::ostream& operator<<( std::ostream& out, const Nbhd_graph& graph){
-	return print_graph( out, graph, 
+template < typename Stream, typename v, typename e> 
+Stream & operator<<( Stream& out, const ctl::Nbhd_graph< v, e> & graph){
+	return ctl::print_graph( out, graph, 
 			    boost::num_vertices( graph), 
 			    boost::num_edges( graph));	
 }
 
-} //namespace ctl
 
 
 #endif //CTLIB_NBHD_GRAPH_H
