@@ -46,8 +46,8 @@
 namespace {
 //TODO: Concept_check Boundary1_ and Boundary2_ should have the same coefficient 
 template< typename Term_, typename Boundary1_, typename Boundary2_, 
-	   typename Coefficient>
-class const_boundary_iterator : 
+	   typename Coefficient_>
+class const_product_boundary_iterator : 
 	public std::iterator< std::bidirectional_iterator_tag,
 			      Term_,
 			      std::ptrdiff_t,
@@ -57,19 +57,20 @@ class const_boundary_iterator :
 	  typedef Boundary1_ Boundary1; 
 	  typedef Boundary2_ Boundary2; 
 	  typedef Term_ Term;
+	  typedef Coefficient_ Coefficient;
 	  typedef typename Term::Cell Product;
-	  typedef const_boundary_iterator< Term, Boundary1, 
-					   Boundary2, Coefficient> Self;
-	  typedef Boundary1::const_iterator const_iterator1;
-	  typedef Boundary2::const_iterator const_iterator2;
+	  typedef const_product_boundary_iterator< Term_, Boundary1_, 
+					   Boundary2_, Coefficient_> Self;
+	  typedef typename Boundary1::const_iterator const_iterator1;
+	  typedef typename Boundary2::const_iterator const_iterator2;
 	public:
 	//default constructor
-	const_boundary_iterator() {}
+	const_product_boundary_iterator() {}
 
 	//begin constructor
-	const_boundary_iterator( const Boundary1& b1, const Boundary2& b2, 
+	const_product_boundary_iterator( const Boundary1& b1, const Boundary2& b2, 
 				 const Product & p): 
-		cellptr( &product),
+		cellptr( &p),
 		face1( b1.begin( p.first)),
 		face2( b2.begin( p.second)),
 		end1( b1.end( p.first)),
@@ -77,12 +78,12 @@ class const_boundary_iterator :
 		//even --> 1 and odd --> -1
 		sign( 2*(p.first_cell().dimension()%2!=0)-1){ next_term(); }
 
-	const_boundary_iterator( const Boundary1& b1, const Boundary2& b2, 
+	const_product_boundary_iterator( const Boundary1& b1, const Boundary2& b2, 
 				 const Product & p, const bool b): 
 		end1( b1.end( p.first)),
 		end2( b2.end( p.second)){ end_term(); }	
 	//copy constructor
-	const_boundary_iterator( const Self & f): 
+	const_product_boundary_iterator( const Self & f): 
 		cellptr( f.cellptr),
 		face1( f.face1),
 		face2( f.face2),
@@ -91,7 +92,7 @@ class const_boundary_iterator :
 		sign( f.sign){}
 
 	//move constructor
-	const_boundary_iterator( Self && f): 
+	const_product_boundary_iterator( Self && f): 
 		cellptr(std::move( f.cellptr)),
 		face1(  std::move( f.face1)),
 		face2(  std::move( f.face2)),
@@ -99,7 +100,7 @@ class const_boundary_iterator :
 		end2(   std::move( f.end2)),
 		sign(   std::move( f.sign)){ f.cellptr = 0; }
 
-	const_boundary_iterator& operator=(const Self & b){
+	const_product_boundary_iterator& operator=(const Self & b){
 		cellptr = b.cellptr;
 		face1 = b.face1;
 		face2 = b.face2;
@@ -110,7 +111,7 @@ class const_boundary_iterator :
 		return *this;
 	}
 
-	const_boundary_iterator& operator=(Self && b){
+	const_product_boundary_iterator& operator=(Self && b){
 		cellptr = std::move( b.cellptr);
 		face1   = std::move( b.face1);
 		face2   = std::move( b.face2);
@@ -126,20 +127,20 @@ class const_boundary_iterator :
 	Term* operator->() { return &face; }
 	
 	//equality
-	bool operator==( const const_boundary_iterator & b) const { 
+	bool operator==( const const_product_boundary_iterator & b) const { 
 		return (b.face == face); 
 	}
-	bool operator!=( const const_boundary_iterator & b) const { 
+	bool operator!=( const const_product_boundary_iterator & b) const { 
 		return (b.face != face); 
 	}
 
-	const_boundary_iterator& operator++(){
+	const_product_boundary_iterator& operator++(){
 		next_term();
 		return *this;	
 	}
 
-	const_boundary_iterator operator++( int){
-	 	const_boundary_iterator tmp( *this); 
+	const_product_boundary_iterator operator++( int){
+	 	const_product_boundary_iterator tmp( *this); 
 		++(*this); //now call previous operator
 		return tmp;
 	}
@@ -173,66 +174,65 @@ class const_boundary_iterator :
 	 const_iterator2 end2;
 	 Coefficient sign;
 	 Term face;
-}; // END const_boundary_iterator
+}; // END const_product_boundary_iterator
 } //END private namespace
 
 namespace ctl { 
 template< typename Product_, typename Boundary1_, typename Boundary2_, 
-	  typename Coefficient = Boundary1::Coefficient>
+	  typename Coefficient = typename Boundary1_::Coefficient>
 class Product_boundary {
 public:
 	typedef Product_ Product;
 	typedef Boundary1_ Boundary1;
 	typedef Boundary2_ Boundary2;
-	typedef Boundary1::Term::template rebind< Product, 
-						 Coefficient>::type Term;
-	typedef const_boundary_iterator< Term, Boundary1, 
+	typedef typename Boundary1::Term::template 
+			rebind< Product, Coefficient>::type Term;
+	typedef const_product_boundary_iterator< Term, Boundary1, 
 					 Boundary2, Coefficient> const_iterator;
 	//default constructor
 	//none since we store references.
 
 	//initialization constructor
 	Product_boundary( const Boundary1 & b1, const Boundary2 & b2): 
-	boundary1( b1), boundary2( b2) {};	
+	bd1( b1), bd2( b2) {};	
 
 	//copy constructor	
 	Product_boundary( const Product_boundary & from): 
-	boundary1( from.boundary1), boundary2( from.boundary2) {};
+	bd1( from.bd1), bd2( from.bd2) {};
 	
 	//copy constructor	
 	Product_boundary( const Product_boundary && from): 
-	boundary1( std::move( from.boundary1)), 
-	boundary2( std::move( from.boundary2)) {};
+	bd1( std::move( from.bd1)), 
+	bd2( std::move( from.bd2)) {};
 	
 	//assignment operator
 	Product_boundary& operator=( const Product_boundary & from){
-		boundary1 = from.boundary1;
-		boundary2 = from.boundary2;
+		bd1 = from.bd1;
+		bd2 = from.bd2;
 		return *this;
 	}
 	//move operator
 	Product_boundary& operator=( Product_boundary && from){
-		std::swap( boundary1, from.boundary1);
-		std::swap( boundary2, from.boundary2);
+		std::swap( bd1, from.bd1);
+		std::swap( bd2, from.bd2);
 		return *this;
 	}
 	
 	//It only makes sense for const iterators
 	const_iterator begin( const Product & p) const { 
-		return const_iterator( boundary1, boundary2, p); 
+		return const_iterator( bd1, bd2, p); 
 	}
 	const_iterator end( const Product & p) const   { 
-		return const_iterator( boundary1, boundary2, p, true); 
+		return const_iterator( bd1, bd2, p, true); 
 	}
 	std::size_t length( const Product & p) const { 
-		return boundary1.max_length( p.first) + 
-			boundary2.max_length( p.second); 
+		return bd1.max_length( p.first) + bd2.max_length( p.second); 
 	}
 	const Boundary1& boundary1() const { return boundary1; }
 	const Boundary2& boundary2() const { return boundary2; }
 	private:
-	Boundary1& boundary1;
-	Boundary2& boundary2;
+	Boundary1& bd1;
+	Boundary2& bd2;
 }; //Product_boundary
 
 } // namespace ctl

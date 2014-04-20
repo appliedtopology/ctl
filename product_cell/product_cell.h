@@ -47,11 +47,11 @@
 #include <ctl/product_cell/product_boundary.h>
 namespace ctl {
 
-template< typename Cell_iterator1_, Cell_iterator2_>
+template< typename Cell_iterator1_, typename Cell_iterator2_>
 class Product_cell : public std::pair< Cell_iterator1_ , Cell_iterator2_> {
 	public:	
-	typedef typename Cell_iterator1_ Cell_iterator1;
-	typedef typename Cell_iterator2_ Cell_iterator2;
+	typedef Cell_iterator1_ Cell_iterator1;
+	typedef Cell_iterator2_ Cell_iterator2;
 	typedef typename Cell_iterator1::value_type::first_type Cell1;
 	typedef typename Cell_iterator2::value_type::first_type Cell2;
 	private:
@@ -102,16 +102,16 @@ class Product_cell : public std::pair< Cell_iterator1_ , Cell_iterator2_> {
 	//Comparisons.	
 	bool operator<( const Self & b) const {
 		if (this->first == b.first) { 
-			return second_cell() < p.second()_cell();
+			return second_cell() < b.second_cell();
 		}
 		return first_cell() < b.first_cell();
 	}
 
 	bool operator==( const Self & b) const { 
-		return (this->first == b.first()) && (this->second == p.second); 
+		return (this->first == b.first) && (this->second == b.second); 
 	}
 	bool operator!=( const Self & b) const { 
-		return (this->first != b.first()) || (this->second != p.second); 
+		return (this->first != b.first) || (this->second != b.second); 
 	}
 	
 	//File I/O
@@ -122,14 +122,12 @@ class Product_cell : public std::pair< Cell_iterator1_ , Cell_iterator2_> {
 		second_cell().write( out);
 	}
 
-	template< typename Self, typename Coefficient> 
-	friend class ctl::Product_boundary< Self, Coefficient>::const_iterator; 
 }; //Product_cell
 } // namespace ctl
 
-template< typename Stream, typename T>
-Stream& operator<<(Stream& out, const ctl::Product_cell< T> & simplex){
-	out << i->first << " * " i->second;
+template< typename Stream, typename T1, typename T2>
+Stream& operator<<(Stream& out, const ctl::Product_cell< T1, T2> & alpha){
+	out << alpha.first_cell() << " * " << alpha.second_cell();
 	return out;
 }
 
