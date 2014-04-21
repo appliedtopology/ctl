@@ -37,8 +37,10 @@
 *******************************************************************************/
 
 
-namespace _ctl{
+namespace ctl{
+namespace detail{
 	struct term_z2_tag{};
 	struct term_non_z2_tag{};
-} //namespace _ctl
+} //detail namespace
+} //namespace ctl
 #endif //CTLIB_TERM_TAGS_H

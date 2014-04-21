@@ -49,7 +49,7 @@ class Term {
 	public:
 		typedef Cell_ Cell;
 		typedef Coefficient_ Coefficient;
-		typedef _ctl::term_non_z2_tag coeff_tag;
+		typedef ctl::detail::term_non_z2_tag coeff_tag;
 	public:	
 		Term() {}
 
@@ -121,7 +121,7 @@ class Term< Cell_, ctl::Finite_field< 2> > {
 	public:
 		typedef Cell_ Cell;
 		typedef ctl::Finite_field< 2> Coefficient;
-		typedef _ctl::term_z2_tag coeff_tag;
+		typedef ctl::detail::term_z2_tag coeff_tag;
 	private:
 		typedef Term< Cell_, Coefficient > Self;
 	public:
@@ -174,8 +174,5 @@ class Term< Cell_, ctl::Finite_field< 2> > {
 
 }; //Class Term specialization for Z2
 } //namespace ctl
-
-//non-exported functionality
-namespace {} //anonymous namespace
 
 #endif //CTLIB_TERM_H

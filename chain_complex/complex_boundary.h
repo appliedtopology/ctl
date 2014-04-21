@@ -46,7 +46,8 @@
 #include <iterator>     // std::iterator, std::input_iterator_tag
 
 //non exported functionality 
-namespace {
+namespace ctl{
+namespace detail{
 template< typename Complex_, typename Term_, typename Cell_boundary_> 
 class _const_boundary_iterator: 
 public std::iterator< std::input_iterator_tag,
@@ -145,7 +146,8 @@ protected:
   typename Cell_boundary::const_iterator end_term;
   Term term;
 }; //class _const_boundary_iterator
-} //anonymous namespace
+} //detail namespace
+} //ctl namespace
 
 //exported functionality
 namespace ctl{
@@ -165,7 +167,9 @@ class Complex_boundary{
 	//Complex boundary terms are iterators
 	typedef typename Cell_term::template 
 			rebind< Iterator, Coefficient>::T Term;
-	typedef _const_boundary_iterator< Complex, Term, Cell_boundary> 
+	typedef ctl::detail::_const_boundary_iterator< Complex, 
+							Term, 
+							Cell_boundary> 
 							const_iterator;
 	//copy constructor
 	Complex_boundary( Complex_boundary & f): _complex( f._complex) {};
@@ -193,7 +197,9 @@ class Complex_boundary{
 		return const_iterator( _complex);
 	}
 	inline const_iterator end( const typename Term::Cell & c, 
-				   const std::size_t & pos) const { return end( c); }
+				   const std::size_t & pos) const { 
+				return end( c); 
+	}
 
 	size_type length( const typename Term::Cell & c) const {
 		return _complex.boundary().length( c->first);

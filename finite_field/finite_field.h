@@ -47,8 +47,8 @@ template< std::size_t N> class Finite_field;
 }
 
 //non-exported functionality
-namespace _ctl {
-
+namespace ctl {
+namespace detail{
 //Extended Euclidean Algorithm 
 inline std::size_t inverse(const std::size_t a, const std::size_t prime){
     if (a == 0){ std::cerr << std::endl << "!!! divide by 0. !!!" << std::endl;}
@@ -71,8 +71,8 @@ std::size_t inverse( const ctl::Finite_field< N> & x, const std::size_t prime){
 	return inverse( x.value(), prime); 
 }
 
-} //anon. namespace
-
+} //detail namespace
+} //ctl namespace
 //exported functionality
 namespace ctl{
 template< std::size_t _prime>
@@ -161,16 +161,16 @@ class Finite_field{
 
 	template< typename T>
 	Self operator/(const T& rhs) const{ 
-		return *this*_ctl::inverse( rhs, _prime); 
+		return *this*ctl::detail::inverse( rhs, _prime); 
 	}
 
 	template< typename T>
 	Self& operator/=(const T& rhs){ 
-		*this= *this*_ctl::inverse( rhs, _prime); 
+		*this= *this*ctl::detail::inverse( rhs, _prime); 
 		return *this;
 	}
 	
-	Self inverse() const{ return Self( _ctl::inverse( x, _prime)); }
+	Self inverse() const{ return Self( ctl::detail::inverse( x, _prime)); }
 
 	const std::size_t prime() const { return _prime; }
 	const std::size_t value() const { return x; } 

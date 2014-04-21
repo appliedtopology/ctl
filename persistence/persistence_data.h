@@ -38,8 +38,8 @@
 
 #include <boost/property_map/property_map.hpp>
 
-namespace _ctl {
-
+namespace ctl {
+namespace detail{
 template< typename Term_less_, 
 	  typename Boundary_operator_, 
 	  typename Cell_chain_map_,
@@ -83,6 +83,7 @@ struct Persistence_data {
 	Chain temporary_chain;
 }; //struct Persistence_data 
 
-} //end namespace _ctl
+} //end namespace detail
+} //end namespace ctl
 
 #endif //CTLIB_PERSISTENCE_DATA_H

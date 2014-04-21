@@ -137,7 +137,7 @@ void pair_cells( Filtration_iterator begin, Filtration_iterator end,
 
 	//we will use the faster Term_pos_less always.	
 	typedef ctl::Term_pos_less Term_less;
-	typedef _ctl::Persistence_data< Term_less, Boundary_operator, 
+	typedef ctl::detail::Persistence_data< Term_less, Boundary_operator, 
 				  	Chain_map, Output_policy> 
 					            Persistence_data;
 	typedef typename Filtration_iterator::value_type Cell_iterator; 
@@ -190,8 +190,5 @@ void persistence( Filtration_iterator begin,
 			 not_going_to_be_used, partner());
 }		  
 } //namespace ctl
-
-//non-exported functionality
-namespace {} //anonymous namespace
 
 #endif //CTLIB_PERSISTENCE_H

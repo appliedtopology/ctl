@@ -42,15 +42,15 @@
 #include <ctl/term/term_tags.h>
 
 //exported, but, internal functionality
-namespace _ctl{
-
+namespace ctl{
+namespace detail {
 //this is our equivalent of the BLAS axpy for a=1
 //so its a 1xpy
 template< typename Chain_iterator, typename OutputIterator, typename Term_less>
 OutputIterator chain_add( Chain_iterator x_begin, Chain_iterator x_end, 
 		 	  Chain_iterator y_begin, Chain_iterator y_end,
 			  OutputIterator result, const Term_less less,   
-			  const _ctl::term_z2_tag t){
+			  const ctl::detail::term_z2_tag t){
 	//TODO: optimize set_symmetric_difference
 	//TODO: Can we avoid separate return result 
 	//and use x itself as the output? 
@@ -77,7 +77,7 @@ OutputIterator chain_add( Chain_iterator x_begin, Chain_iterator x_end,
 			  const Coefficient& not_used, 
 		 	  Chain_iterator y_begin, Chain_iterator y_end,
 			  OutputIterator result, const Term_less less,   
-			  const _ctl::term_z2_tag t){
+			  const ctl::detail::term_z2_tag t){
 	return chain_add( x_begin, x_end, y_begin, y_end, result, less, t);
 }	
 
@@ -93,7 +93,7 @@ OutputIterator chain_add( Chain_iterator x_begin, Chain_iterator x_end,
 		  	  Chain_iterator y_begin, Chain_iterator y_end,
 		  	  OutputIterator result,
 			  const Term_less less,   
-		  	  const _ctl::term_non_z2_tag t){
+		  	  const ctl::detail::term_non_z2_tag t){
 	typedef typename Chain_iterator::value_type Term;
 	typedef typename Term::Coefficient Coefficient;
 	
@@ -129,7 +129,7 @@ OutputIterator chain_add( Chain_iterator x_begin, Chain_iterator x_end,
 		  	  Chain_iterator y_begin, Chain_iterator y_end,
 		  	  OutputIterator  result,
 			  const Term_less less,   
-		  	  const _ctl::term_non_z2_tag t){
+		  	  const ctl::detail::term_non_z2_tag t){
 	typedef typename Chain_iterator::value_type Term;
 	typedef typename Term::Coefficient Coefficient;
 	
@@ -163,7 +163,7 @@ OutputIterator chain_add( Chain_iterator x_begin, Chain_iterator x_end,
 //over Z2 the only coeff is 1
 template< typename Vector, typename Less>
 Vector& chain_term_add( Vector & x, const typename Vector::value_type & y, 
-			Less less, const _ctl::term_z2_tag t){
+			Less less, const ctl::detail::term_z2_tag t){
 	auto pos = std::lower_bound( x.begin(), x.end(), y, less);
 	//new element, so add it at the end
 	if (pos == x.end()) { x.push_back( y); }
@@ -185,10 +185,10 @@ struct is_zero{
 //Since x=x+a*y is well defined for y a term we ignore the coefficient
 template< typename Vector, typename Less>
 Vector& chain_term_add( Vector & x, const typename Vector::value_type & y, 
-		        Less less, const _ctl::term_non_z2_tag t){
+		        Less less, const ctl::detail::term_non_z2_tag t){
 	typedef typename Vector::value_type Term;
 	typedef typename Term::Coefficient Coefficient;
-	typedef _ctl::is_zero< Term> Is_zero;
+	typedef ctl::detail::is_zero< Term> Is_zero;
 	auto pos = std::lower_bound( x.begin(), x.end(), y, less);
 	//new element, so add it at the end
 	if (pos == x.end()) { x.push_back( y); }
@@ -201,7 +201,7 @@ Vector& chain_term_add( Vector & x, const typename Vector::value_type & y,
 	}
 	return x;
 }
+} //namespace detail
+} //namespace ctl
 
-} //namespace _ctl
-
-#endif //CTLIB_CHAIN_ADD_H
+#endif //CTL_CHAIN_ADD_H

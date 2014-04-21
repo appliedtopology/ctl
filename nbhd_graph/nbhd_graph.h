@@ -47,13 +47,14 @@
 
 
 //non-exported functionality
-namespace {
+namespace ctl{
+namespace detail{
 template< typename vertex_name_t>
 using vertex_name = boost::property< boost::vertex_name_t, vertex_name_t>;
 template< typename weight_t>
 using edge_weight = boost::property< boost::edge_weight_t,  weight_t>;
-} //anonymous namespace
-
+} // detail anonymous namespace
+} //ctl namespace
 
 //exported functionality
 namespace ctl{
@@ -62,8 +63,8 @@ template < typename vertex_name_t = std::size_t,
 using Nbhd_graph = boost::adjacency_list< boost::vecS, 
 					  boost::vecS,
 					  boost::undirectedS,
-					  vertex_name< vertex_name_t>,
-					  edge_weight< edge_weight_t>
+					  detail::vertex_name< vertex_name_t>,
+					  detail::edge_weight< edge_weight_t>
 					>;
 
 template< typename Stream, typename Graph>

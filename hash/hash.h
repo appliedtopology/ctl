@@ -47,7 +47,8 @@ namespace hash{
 } //end namespace hash
 } //end namespace ctl
 //non-exported functionality 
-namespace {
+namespace ctl{
+namespace detail{ 
 namespace cth = ctl::hash;
 template< typename Container>
 inline std::size_t murmur3_hash( const Container & key){
@@ -94,20 +95,21 @@ inline std::size_t jenkins_hash( const T & key){
     return hash;
 }
 
-} //anon. namespace
+} //detail namespace
+} //ctl namespace
 
 namespace ctl {
 	template< typename T>
 	struct Hash{
 		std::size_t operator()( const T & key) const{
 			#ifdef  CTL_USE_MURMUR
-				return murmur3_hash( key);
+				return detail::murmur3_hash( key);
 			#elif defined( CTL_USE_CITY)
-				return city_hash( key);
+				return detail::city_hash( key);
 			#elif defined( CTL_USE_JENKINS)
-				return jenkins_hash( key);
+				return detail::jenkins_hash( key);
 			#else 
-				return pjw_hash( key);
+				return detail::pjw_hash( key);
 			#endif
 					
 		}

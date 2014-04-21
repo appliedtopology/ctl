@@ -119,7 +119,7 @@ public:
 			   Chain & result, Compare c = Compare()){
 		const std::size_t n = size() + rhs.size();	
 		if( result._chain.size() < n){ result._chain.resize( n); }
-		auto _end = _ctl::chain_add( _chain.cbegin(), _chain.cend(),
+		auto _end = ctl::detail::chain_add( _chain.cbegin(), _chain.cend(),
 				 	a, rhs.begin(), rhs.end(), 
 				 	result.begin(), c, 
 				 	coeff_tag());
@@ -130,24 +130,24 @@ public:
 
 	template< typename Term, typename Compare = Less>
 	Chain& add( const Term& rhs, Compare c = Compare() ){
-		_ctl::chain_term_add( _chain, rhs, c, coeff_tag());
+		ctl::detail::chain_term_add( _chain, rhs, c, coeff_tag());
 		return *this;
 	}
 	
 	Chain& operator+=( const Term & b){
-		_ctl::chain_term_add( _chain, b, Less(), coeff_tag());
+		ctl::detail::chain_term_add( _chain, b, Less(), coeff_tag());
 		return *this;
 	}
 
 	Chain operator+( const Term & b){
 		Chain result( *this);
-		_ctl::chain_term_add( result._chain, b, Less(), coeff_tag());
+		ctl::detail::chain_term_add( result._chain, b, Less(), coeff_tag());
 		return result;
 	}
 
 	Chain operator+( const Chain & b) const {
 	   Chain result( size()+b.size());
-	   auto leftover = _ctl::chain_add( begin(), end(), 
+	   auto leftover = ctl::detail::chain_add( begin(), end(), 
 	   			            b.begin(), b.end(),
 	   			            result.begin(),
 	   			            Less(),
@@ -156,15 +156,15 @@ public:
 	   return result;
 	}
  private:
-   Coefficient& normalize( _ctl::term_z2_tag) const { return Coefficient( 1); }
-   Coefficient& normalize( _ctl::term_z2_tag, bool) const { 
+   Coefficient& normalize( ctl::detail::term_z2_tag) const { return Coefficient( 1); }
+   Coefficient& normalize( ctl::detail::term_z2_tag, bool) const { 
 	return Coefficient( 1); 
    }
-   Coefficient& normalize( _ctl::term_non_z2_tag, bool) const  {
+   Coefficient& normalize( ctl::detail::term_non_z2_tag, bool) const  {
     	if (_chain.empty()) { return Coefficient( 0); }
     	return this->youngest.coefficient().inverse();
    }
-   Coefficient& normalize( _ctl::term_non_z2_tag)  {
+   Coefficient& normalize( ctl::detail::term_non_z2_tag)  {
     	if (_chain.empty()) { return Coefficient( 0); }
     	auto inverse = this->youngest.coefficient().inverse();
     	if ( inverse != 1){ (*this)*=inverse; }

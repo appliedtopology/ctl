@@ -45,12 +45,13 @@
 //CTL
 //#include <ctl/.../...h>
 
-//exported functionality
-namespace ctl{
-} //namespace ctl
-
 //non-exported functionality
-namespace {
-} //anonymous namespace
+namespace ctl {
+namespace detail{} // end namespace detail
+} //ctl namespace
+
+//exported functionality
+namespace ctl{} //namespace ctl
+
 
 #endif //CTLIB_EXAMPLE_H
