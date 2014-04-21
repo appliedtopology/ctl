@@ -113,7 +113,16 @@ class Product_cell : public std::pair< Cell_iterator1_ , Cell_iterator2_> {
 	bool operator!=( const Self & b) const { 
 		return (this->first != b.first) || (this->second != b.second); 
 	}
-	
+	std::size_t hash() const{
+		constexpr std::size_t shift_factor = sizeof(std::size_t) >> 2;
+		return this->second->second.id() | 
+			(this->first->second.id() << shift_factor);
+	}
+	struct Hash {
+  	   std::size_t operator()( const Product_cell & p) const {
+  		  return p.hash();
+  	   }
+	};
 	//File I/O
 	template< typename Stream>
 	void write( Stream & out) const {

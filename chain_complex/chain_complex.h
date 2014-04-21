@@ -160,6 +160,11 @@ public:
    //Constructors
    //Default
    Chain_complex(): max_id( 0), max_dim( 0) { cells.max_load_factor( 1); }
+   Chain_complex( Boundary & bd_, const std::size_t num_cells=1): 
+   cells( num_cells), bd( bd_), max_id( 0), max_dim( 0) {
+	cells.max_load_factor( 1); 
+   }
+
    //Copy
    Chain_complex( const Chain_complex & b): cells( b.cells), bd( b.bd),
    				 max_id( b.max_id), max_dim( b.max_dim)

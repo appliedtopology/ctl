@@ -156,8 +156,8 @@ template< typename Complex_,
 class Complex_boundary{
 	typedef Complex_boundary< Complex_> Self;
 	typedef typename Cell_boundary_::Term Cell_term;
-	typedef typename Cell_term::Coefficient Coefficient;
 	public:
+	typedef typename Cell_term::Coefficient Coefficient;
 	typedef	Complex_ Complex;
 	typedef	Cell_boundary_ Cell_boundary;
 	typedef Iterator_ Iterator;

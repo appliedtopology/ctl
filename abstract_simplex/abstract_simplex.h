@@ -60,6 +60,7 @@ class Abstract_simplex {
 	public:
 	Abstract_simplex(): vertices(){};
 	Abstract_simplex( std::size_t d) { vertices.reserve( d); }
+	Abstract_simplex( std::size_t d, const T & t): vertices( d, t){}
 	Abstract_simplex( const Init_list & il) : vertices( il) {
 		sort( vertices.begin(), vertices.end() );
 		vertices.erase( unique( vertices.begin(), vertices.end() ), 
