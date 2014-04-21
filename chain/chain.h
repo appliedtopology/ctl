@@ -185,7 +185,4 @@ template< typename T, typename L>
 inline typename ctl::Chain< T, L>& operator*( const typename T::Coefficient & s, 
 			      ctl::Chain< T, L>& c){ return c*s; }
 
-//non-exported functionality
-namespace {} //anonymous namespace
-
-#endif //CTLIB_CHAIN_H
+#endif //CTL_CHAIN_H

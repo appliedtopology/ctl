@@ -82,7 +82,8 @@ class Chain_complex;
 } //namespace ct
 
 //non-exported functionality
-namespace {
+namespace ctl {
+namespace detail {
 
 template< typename Data_>
 class Data_wrapper : public Data_ {
@@ -129,24 +130,28 @@ class Data_wrapper : public Data_ {
 }; // class Data_wrapper
 
 struct Default_data {}; //class Default_data for complex.
-} //anonymous namespace
+} //detail
+} //ctl namespace
 
 template< typename Stream>
-Stream& operator<<( Stream & out, const Default_data & d){ return out; }
+Stream& operator<<( Stream & out, const ctl::detail::Default_data & d){ 
+	return out; 
+}
 
 //exported functionality
 namespace ctl{
 
 template< typename Cell_,
 	  typename Boundary_,
-	  typename Data_ = Default_data,
+	  typename Data_ = ctl::detail::Default_data,
 	  typename Hash_ = ctl::Hash< Cell_> >
 class Chain_complex{
 public:
    typedef Cell_ Cell; //Describes a fundamental object,
    		    //e.g. simplex, cube, etc
    typedef Boundary_ Boundary; //Describes how to take its boundary
-   typedef Data_wrapper< Data_> Data; //Arbitrary data associated to space.
+   //Arbitrary data associated to space.
+   typedef ctl::detail::Data_wrapper< Data_> Data; 
    typedef Hash_ Hash;
 private:
    typedef std::unordered_map< Cell, Data, Hash>  Map;

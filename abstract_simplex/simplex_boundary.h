@@ -39,24 +39,24 @@
 #include <ctl/finite_field/finite_field.h>
 #include <cassert>
 //non-exported functionality
-namespace {
-
+namespace ctl {
+namespace detail {
 template< typename Term_>
-class const_boundary_iterator : 
+class const_simplex_boundary_iterator : 
 	public std::iterator< std::bidirectional_iterator_tag,
 			      Term_,
 			      std::ptrdiff_t,
 			      const Term_*,
 			      const Term_>{
 	private:
-	  typedef const_boundary_iterator< Term_> Self;
+	  typedef const_simplex_boundary_iterator< Term_> Self;
 	  typedef Term_ Term;
 	  typedef typename Term::Cell Cell;
 	  typedef typename Cell::value_type Vertex;
 	public:
 	  //default constructor
-	const_boundary_iterator(): cellptr( 0), pos( 0), face(){}
-	const_boundary_iterator( const Cell & s): pos( 0), face(){ 
+	const_simplex_boundary_iterator(): cellptr( 0), pos( 0), face(){}
+	const_simplex_boundary_iterator( const Cell & s): pos( 0), face(){ 
 		if( s.dimension()){
 		    //begin by removing first vertex
 		    cellptr = &s;
@@ -68,26 +68,26 @@ class const_boundary_iterator :
 		}else{ cellptr = 0; } //\partial(vertex) = 0
 	}
 	//copy constructor
-	const_boundary_iterator( const Self & from): cellptr( from.cellptr), 
+	const_simplex_boundary_iterator( const Self & from): cellptr( from.cellptr), 
 	pos( from.pos), face(from.face), removed( from.removed){}
 	//move constructor
-	const_boundary_iterator( Self && from): 
+	const_simplex_boundary_iterator( Self && from): 
 	cellptr( std::move(from.cellptr)), 
 	pos( std::move(from.pos)), 
 	face( std::move(from.face)), 
 	removed( std::move(from.removed)){ from.cellptr = 0; }	
 	//equality
-	const_boundary_iterator& operator==( const Self & b) const { 
+	const_simplex_boundary_iterator& operator==( const Self & b) const { 
 		return (b.cellptr == cellptr) && (b.pos == pos); 
 	} 
-	const_boundary_iterator& operator=(const Self & b){
+	const_simplex_boundary_iterator& operator=(const Self & b){
 		cellptr = b.cellptr;
 		remove = b.removed;
 		face = b.face;
 		pos = b.pos;
 		return *this;
 	}
-	const_boundary_iterator& operator=(Self && b){
+	const_simplex_boundary_iterator& operator=(Self && b){
 		cellptr = std::move(b.cellptr);
 		remove  = std::move(b.removed);
 		face    = std::move(b.face);
@@ -107,11 +107,11 @@ class const_boundary_iterator :
 		return face; 
 	}
 	const Term* operator->() const { return &face; }
-	bool operator!=( const const_boundary_iterator & b) const { 
+	bool operator!=( const const_simplex_boundary_iterator & b) const { 
 		return (b.cellptr != cellptr) || (b.pos != pos); 
 	}
 
-	const_boundary_iterator& operator++(){
+	const_simplex_boundary_iterator& operator++(){
 		if( pos == face.cell().size()){
 			cellptr = 0;
 			pos = 0;
@@ -123,7 +123,7 @@ class const_boundary_iterator :
 		return *this;	
 	}
 
-	const_boundary_iterator& operator--(){
+	const_simplex_boundary_iterator& operator--(){
 		if(pos == 0){
 			cellptr = 0;
 			return *this;
@@ -134,13 +134,13 @@ class const_boundary_iterator :
 		return *this;	
 	}
 
-	const_boundary_iterator operator++( int){
-	 	const_boundary_iterator tmp( *this); 
+	const_simplex_boundary_iterator operator++( int){
+	 	const_simplex_boundary_iterator tmp( *this); 
 		++(*this); //now call previous operator
 		return tmp;
 	}
-	const_boundary_iterator operator--( int){
-	 	const_boundary_iterator tmp( *this); 
+	const_simplex_boundary_iterator operator--( int){
+	 	const_simplex_boundary_iterator tmp( *this); 
 		--(*this); //now call previous operator
 		return tmp;
 	}
@@ -149,8 +149,9 @@ class const_boundary_iterator :
 		typename Cell::size_t pos;
 		Term face;
 		Vertex removed;
-}; // END const_boundary_iterator
-} //END private namespace
+}; // END const_simplex_boundary_iterator
+} //END detail namespace
+} //end ctl namespace
 
 namespace ctl { 
 template< typename Simplex_, typename Coefficient_>
@@ -159,7 +160,7 @@ public:
 	typedef Simplex_ Simplex;
 	typedef Coefficient_ Coefficient;
 	typedef ctl::Term< Simplex, Coefficient> Term;
-	typedef const_boundary_iterator< Term> const_iterator;
+	typedef detail::const_simplex_boundary_iterator< Term> const_iterator;
 	//default constructor
 	Simplex_boundary(){};	
 

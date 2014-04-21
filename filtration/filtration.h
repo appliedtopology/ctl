@@ -42,9 +42,10 @@
 #include <ctl/filtration/filtration_iterator.h>
 
 //non-exported functionality 
-namespace {
+namespace ctl {
+namespace detail{
 } //anonymous namespace
-
+}// namespace ctl
 
 namespace ctl{
 template< typename Complex_, 
@@ -61,12 +62,12 @@ class Filtration {
 	typedef typename Vector::reverse_iterator _vriterator;
 	typedef typename Vector::const_reverse_iterator _vcriterator;
  public:
-	typedef typename _ctl::_filtration_iterator< _viterator, 1> iterator;
-	typedef typename _ctl::_filtration_iterator< _vciterator, 1> 
+	typedef typename ctl::detail::_filtration_iterator< _viterator, 1> iterator;
+	typedef typename ctl::detail::_filtration_iterator< _vciterator, 1> 
 							const_iterator;
-	typedef typename _ctl::_filtration_iterator< _viterator, -1> 
+	typedef typename ctl::detail::_filtration_iterator< _viterator, -1> 
 							reverse_iterator;
-	typedef typename _ctl::_filtration_iterator<  _vciterator, -1>
+	typedef typename ctl::detail::_filtration_iterator<  _vciterator, -1>
 							const_reverse_iterator;
  private:
 	//just to make typing below easier

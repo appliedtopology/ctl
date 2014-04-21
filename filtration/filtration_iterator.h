@@ -40,7 +40,8 @@
 
 //private functionality 
 //the multiplier gracefully handles reverse iterators.
-namespace _ctl{
+namespace ctl{
+namespace detail{
 template< typename Iterator, int multiplier>
 class _filtration_iterator : 
 		public std::iterator< std::random_access_iterator_tag, 
@@ -109,5 +110,6 @@ class _filtration_iterator :
 	Iterator i;
 	std::size_t p;
 }; //class _filtration_iterator
+} //namespace detail
 } //namespace ctl
 #endif //CTLIB_FILTRATION_ITERATOR_H

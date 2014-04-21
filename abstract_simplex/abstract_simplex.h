@@ -153,8 +153,9 @@ class Abstract_simplex {
 	private:
 	Vector vertices;
 
-	template< typename Self, typename Coefficient> 
-	friend class ctl::Simplex_boundary< Self, Coefficient>::const_iterator; 
+	//typename Self since the compiler complains
+	template< typename Term> 
+	friend class ctl::detail::const_simplex_boundary_iterator;
 }; //Abstract_simplex
 } // namespace ctl
 
