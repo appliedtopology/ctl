@@ -86,7 +86,7 @@ struct Parallel_id_less  {
 
 template< typename Iterator >
 struct Filtration_property_map{
-    typedef const Iterator argument_type;
+    typedef Iterator argument_type;
     typedef typename Iterator::reference result_type; 
     result_type operator()( argument_type & a) const { return *a; }
 }; 
@@ -103,7 +103,9 @@ class Build_blowup_body{
 				   Nerve_filtration,
 				   Size_vector, 
 				   Nerve_cell> Self;
-	typedef typename Iterator_property_map::result_type Complex_iterator;
+	typedef typename Iterator_property_map::argument_type 
+						    Complex_filtration_iterator;
+	typedef typename Complex_filtration_iterator::value_type Complex_iterator;
 	typedef typename Complex_iterator::value_type::second_type Complex_data;
 	typedef typename Nerve_cell::value_type::first_type Nerve_simplex;
 	typedef typename Nerve_simplex::const_iterator Nerve_cell_iterator;
@@ -168,8 +170,8 @@ class Build_blowup_body{
 				  	 const size_type nerve_index){
 		const size_t id = sizes[ nerve_index] + 
 				  current_sizes[ nerve_index]++;
-		blowup.insert_open_cell( Product( sigma, tau), Data(id+1), 
-					 filtration[ id]);
+		filtration[ id] = blowup.insert_open_cell( Product( sigma, tau), 
+						       	Data(id+1)).first;
 	}
 
 

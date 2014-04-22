@@ -97,10 +97,14 @@ class Concurrent_data_wrapper : public Data_ {
    typedef tbb::atomic< Unsafe_id> Safe_id;
    //default
    Concurrent_data_wrapper(): id_( 0), pos_( 0) {}
-   //copy
-   Concurrent_data_wrapper( const std::size_t & tid, const std::size_t p=0):
+   
+   Concurrent_data_wrapper( const std::size_t tid):
+   Data_(), id_( tid), pos_( 0) {}
+
+   Concurrent_data_wrapper( const std::size_t tid, const std::size_t & p):
    Data_(), id_( tid), pos_( p) {}
 
+   //copy
    Concurrent_data_wrapper( const Concurrent_data_wrapper & from) :
      id_( from.id_), pos_( from.pos_) {}
    //move
@@ -131,7 +135,7 @@ class Concurrent_data_wrapper : public Data_ {
    //(to be read in Millhouse Van Houten's voice)
    //This lets the chain_complex & boundary touch my privates ;)
    template< typename C, typename B, typename D, typename H>
-   friend class ctl::Chain_complex;
+   friend class ctl::parallel::Chain_complex;
 }; // class Concurrent_data_wrapper
 } //anonymous namespace
 
@@ -215,16 +219,16 @@ public:
 
    std::pair< iterator, bool> insert_open_cell( const Cell & s,
    					     const Data& data=Data()){
-     std::pair< iterator, bool> c =  cells.emplace( s, data);
+     std::pair< iterator, bool> c =  cells.insert( std::make_pair( s, data));
      if( c.second) { 
-	const std::size_t old_max_dim = max_dim();
+	const std::size_t old_max_dim = max_dim.load();
 	if( s.dimension() > old_max_dim) { 
  		max_dim.compare_and_swap( s.dimension(), old_max_dim);
         } 
 	if( c.first->second.id_ == 0){
          c.first->second.id_ = max_id.fetch_and_add( 1);
         } else {
-         const std::size_t old_max_id = max_id();
+         const std::size_t old_max_id = max_id.load();
          if( c.first->second.id_ > old_max_id) {
          	max_id.compare_and_swap( c.first->second.id_, old_max_id);
          }

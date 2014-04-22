@@ -65,7 +65,6 @@
 #include <ctl/parallel/partition_covers/cover_data.h>
 #include <ctl/parallel/chain_complex/chain_complex.h>
 #include <ctl/parallel/build_blowup_complex/build_blowup_complex.h>
-#include <ctl/parallel/concurrent_homology/parallel_persistence.h>
 
 //BOOST
 #include <boost/program_options.hpp>
@@ -100,7 +99,7 @@ typedef ctl::parallel::Filtration< Complex, Complex_less> Complex_filtration;
 typedef Complex_filtration::iterator Complex_filtration_iterator;
 typedef ctl::parallel::Filtration_property_map< Complex_filtration_iterator> 
 					Complex_filtration_map;
-typedef ctl::Thread_timer Timer;
+typedef ctl::Timer Timer;
 
 template< typename Timer>
 struct Dual_stats:
@@ -245,13 +244,13 @@ int main( int argc, char *argv[]){
   
   stats.timer.start();
   Complex_filtration complex_filtration( complex);
-  double filtration_time = stats.timer.get();
+  double filtration_time = stats.timer.elapsed();
   std::cout << "time to filter complex: " << filtration_time << std::endl;
 
   stats.timer.start();
   ctl::parallel::init_cover_complex( nerve, num_parts);
   ctl::parallel::graph_partition_cover( complex_filtration, nerve);
-  double cover_time = stats.timer.get();
+  double cover_time = stats.timer.elapsed();
   std::cout << "cover time: " << cover_time << std::endl;
 
   Complex_boundary complex_boundary( complex);
@@ -269,7 +268,7 @@ int main( int argc, char *argv[]){
   stats.timer.start();
   ctl::parallel::build_blowup_complex( filtration_begin, filtration_end, 
 				       nerve_filtration, blowup_filtration, get);
-  double blowup_time = stats.timer.get();
+  double blowup_time = stats.timer.elapsed();
   std::cout << "parallel_build_blowup_complex " << blowup_time << std::endl;
   std::cout << "-----------------" << std::endl;
   std::cout << "-----------------" << std::endl;

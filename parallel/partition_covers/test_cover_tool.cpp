@@ -32,59 +32,61 @@
 * Free Software Foundation, Inc., 
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
+*******************************************************************************
+* NOTES
+*
+*
 *******************************************************************************/
-// Global Project Deps
-#include "abstract_simplex.h"
-#include "simplex_boundary.h"
-#include "complex_boundary.h"
-#include "parallel_filtration.h"
-#include "cell_set.h"
-#include "io.h" 
-#include "term.h"
-#include "timer.h"
-#include "thread_timer.h"
+
+//CTL
+#include <ctl/abstract_simplex/abstract_simplex.h>
+#include <ctl/abstract_simplex/simplex_boundary.h>
+#include <ctl/chain_complex/complex_boundary.h>
+#include <ctl/parallel/filtration/filtration.h>
+#include <ctl/chain_complex/chain_complex.h>
+#include <ctl/io/io.h>
+#include <ctl/term/term.h>
 
 //Local Project Deps
-#include "covers.h"
-#include "cover_tests.h"
+#include <ctl/parallel/partition_covers/covers.h>
+#include <ctl/parallel/partition_covers/cover_tests.h>
+#include <ctl/parallel/partition_covers/cover_data.h>
+#include <ctl/parallel/chain_complex/chain_complex.h>
+#include <ctl/parallel/build_blowup_complex/build_blowup_complex.h>
 
 //BOOST
 #include <boost/program_options.hpp>
 
 //STL
 #include <sstream>
+#include <iostream>
+#include <fstream>
 
 //TBB
-#include "tbb/task_scheduler_init.h"
-
+#include <tbb/task_scheduler_init.h>
 
 namespace po = boost::program_options;
 
 // Complex type
-typedef ctl::Abstract_simplex Cell;
-typedef ctl::Simplex_boundary< Cell, ctl::Term_Z2> Simplex_boundary;
-typedef ctl::Cell_set< Cell, Simplex_boundary, ctl::Nerve_data> Cover_complex;
+typedef ctl::Abstract_simplex< int> Cell;
+typedef ctl::Finite_field< 2> Z2;
+typedef ctl::Simplex_boundary< Cell, Z2> Simplex_boundary;
+typedef ctl::Chain_complex< Cell, Simplex_boundary, 
+			    ctl::parallel::Nerve_data> Nerve;
+typedef ctl::parallel::Filtration< Nerve, ctl::Cell_less> Nerve_filtration;
 
-typedef Cover_complex::iterator Cover_complex_iterator;
-typedef ctl::Cover_data< Cover_complex_iterator > Cover_data;
-typedef ctl::Cell_set< Cell, Simplex_boundary, Cover_data> Complex;
+typedef Nerve::iterator Nerve_iterator;
+typedef ctl::parallel::Cover_data< Nerve_iterator > Cover_data;
+typedef ctl::Chain_complex< Cell, Simplex_boundary, Cover_data> Complex;
+
 typedef Complex::iterator Complex_iterator;
-typedef ctl::Cell_less< Complex_iterator> Cell_less;
-typedef ctl::Cell_less< Cover_complex_iterator> Nerve_less;
-typedef ctl::Parallel_filtration< Complex, Cell_less> Filtration;
-typedef ctl::Parallel_filtration< Cover_complex, Nerve_less> Nerve_filtration;
-typedef ctl::Thread_timer Timer;
-typedef ctl::Cover_stats< Timer> Stats;
+typedef Complex::const_iterator Complex_const_iterator;
+typedef ctl::Cell_less Complex_less;
 
-template<typename String, typename Complex>
-void read_complex( String & complex_name, Complex & complex){
-	std::ifstream in;
-	std::cout << "File IO ..." << std::flush;
-	ctl::open_file( in, complex_name.c_str());
-	in >> complex;
-	ctl::close_file( in);
-	std::cout << "completed!" << std::endl;                     
-}
+typedef ctl::parallel::Filtration< Complex, Complex_less> Complex_filtration;
+
+typedef ctl::Timer Timer;
+typedef ctl::parallel::Cover_stats< Timer> Stats;
 
 template<typename Variable_map>
 void process_args( int & argc, char *argv[],Variable_map & vm){
@@ -93,7 +95,9 @@ void process_args( int & argc, char *argv[],Variable_map & vm){
   desc.add_options()
   ( "help", "Display this message")
   ( "input-file", "input .asc file to parse")
-  ( "num-parts", "specify partition size");
+  ( "num-parts", "specify partition size")
+  ( "num-threads", po::value<int>()->default_value(-1),
+			 "specify number of threads (Defaults to num_covers)");
   po::positional_options_description p;
   p.add( "input-file",1);
   p.add( "num-parts",1);
@@ -117,39 +121,45 @@ int main( int argc, char *argv[]){
   po::variables_map vm;
   process_args( argc, argv, vm);
   size_t num_parts = atoi( vm[ "num-parts"].as< std::string>().c_str());
-  tbb::task_scheduler_init init;
+
   //setup some variables
   std::string full_complex_name = vm[ "input-file"].as< std::string>();
   std::string complex_name( full_complex_name);
   std::string binary_name( argv[ 0]);
 
+  int num_threads = vm[ "num-threads"].as< int>();
   size_t found = complex_name.rfind( '/');
   if ( found != std::string::npos){
         complex_name.replace( 0, found+1, "");
   }
 
   Complex complex;
-  Cover_complex nerve;
-
-  // Read the cell_set in
-  read_complex( full_complex_name, complex);
-  if (!complex.is_closed()){
-	  std::cout << "complex is not closed" << std::endl;
-  }
-  Filtration filtration( complex);
+  Nerve nerve;
   Stats stats;
-  Timer timer; 
-  timer.start();
-  ctl::init_cover_complex( nerve, num_parts);
-  ctl::graph_partition_cover( filtration, nerve);
-  double cover_time = timer.get();
-  //display some timing info
-  std::cout << "total time: " << cover_time <<  std::endl;
-  Nerve_filtration ordered_nerve( nerve);
-  typedef Nerve_filtration::iterator Iterator;
-  for(Iterator i = ordered_nerve.begin(); i != ordered_nerve.end(); ++i){
- 	std::cout << (*i)->first << ": " << (*i)->second.count() << std::endl;
+  // Read the chain_complex in
+  ctl::read_complex( full_complex_name, complex);
+  if (num_threads != -1){
+  	tbb::task_scheduler_init init( num_threads);
+  }else{
+  	tbb::task_scheduler_init init;
   }
- //ctl::run_tests( complex);
+  
+  stats.timer.start();
+  Complex_filtration complex_filtration( complex);
+  double filtration_time = stats.timer.elapsed();
+  std::cout << "time to filter complex: " << filtration_time << std::endl;
+
+  stats.timer.start();
+  ctl::parallel::init_cover_complex( nerve, num_parts);
+  ctl::parallel::graph_partition_cover( complex_filtration, nerve);
+  double cover_time = stats.timer.elapsed();
+  std::cout << "cover time: " << cover_time << std::endl;
+  Nerve_filtration ordered_nerve( nerve);
+  
+  typedef Nerve_filtration::iterator Iterator;
+  for(const auto & cell:  ordered_nerve){ 
+ 	std::cout << cell->first << ": " << cell->second.count() << std::endl;
+  }
+
   return 0;
 }

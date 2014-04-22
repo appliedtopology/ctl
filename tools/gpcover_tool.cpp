@@ -73,7 +73,7 @@ typedef Complex::iterator Complex_iterator;
 typedef ctl::Cell_less Cell_less;
 typedef ctl::parallel::Filtration< Complex, Cell_less> Filtration;
 
-typedef ctl::Thread_timer Timer;
+typedef ctl::Timer Timer;
 typedef ctl::parallel::Cover_stats< Timer> Stats;
 
 template<typename Variable_map>
@@ -132,7 +132,7 @@ int main( int argc, char *argv[]){
   timer.start();
   ctl::parallel::init_cover_complex( nerve, num_parts);
   ctl::parallel::graph_partition_cover( filtration, nerve);
-  double cover_time = timer.get();
+  double cover_time = timer.elapsed();
   std::string cover_name ( full_complex_name);
   std::string nerve_name ( full_complex_name);
 

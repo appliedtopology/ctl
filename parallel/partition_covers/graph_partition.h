@@ -38,7 +38,7 @@
 
 //TIMER
 #include <iomanip>
-#include <ctl/parallel/utility/timer/timer.h>
+#include <ctl/utility/timer.h>
 
 //STL
 #include <algorithm> //max & min_element

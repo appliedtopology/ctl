@@ -73,7 +73,7 @@ class Product_cell : public std::pair< Cell_iterator1_ , Cell_iterator2_> {
 		      Cell_iterator2 && cell2): 
 		      Pair( std::forward(cell1), std::forward(cell2)) {}
 	//move
-	Product_cell( Product_cell && from): Pair( std::forward( from)) {}
+	Product_cell( Product_cell && from): Pair( std::forward< Pair>( from)){}
 
 	//piecewise
 	template< class... Args1, class... Args2>

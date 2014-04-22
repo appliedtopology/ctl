@@ -70,7 +70,10 @@ class Filtration {
 							       reverse_iterator;
 	typedef typename ctl::detail::_filtration_iterator<  _vciterator, -1>
 							 const_reverse_iterator;
- private:
+	typedef typename Vector::value_type value_type;
+	typedef typename Vector::reference reference;
+	typedef typename Vector::const_reference const_reference;
+private:
 	//just to make typing below easier
 	typedef iterator it;
 	typedef const_iterator cit;
@@ -88,7 +91,10 @@ public:
 		}
 		std::sort( filtration_.begin(), filtration_.end(), Less());
 	}
-
+	reference operator[] ( std::size_t n) { return filtration_[ n]; }
+	const_reference operator[] ( std::size_t n) const { 
+		return filtration_[ n]; 
+	}
 	//used typedefs above since the names were getting to long
 	it  begin() { return it( filtration_.begin(), 0);    }
 	it  end()   { return it( filtration_.end(), size()); }

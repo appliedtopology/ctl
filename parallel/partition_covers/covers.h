@@ -51,7 +51,7 @@
 #include <ctl/chain_complex/complex_boundary.h> //Complex_boundary
 
 //TIMER
-#include <ctl/parallel/utility/timer/timer.h>
+#include <ctl/utility/timer.h>
 
 
 //BOOST
