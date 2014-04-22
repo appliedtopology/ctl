@@ -25,7 +25,10 @@ endif( USE_CLANG)
 #for installing read:
 #http://www.cmake.org/cmake/help/cmake_tutorial.html
 set(Boost_USE_MULTITHREADED OFF)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules")
 find_package(Boost COMPONENTS program_options REQUIRED)
+find_package(TBB REQUIRED) 
+find_package(METIS REQUIRED) 
 if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" VERSION_GREATER 2.8.11)
 	get_filename_component(PATH_TO_PROJECT "${CMAKE_SOURCE_DIR}" DIRECTORY)
 else()
