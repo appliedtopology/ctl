@@ -1,3 +1,5 @@
+tools/gpcover
+parallel/build_blowup_complex/blowup_test
 product_cell/test_product_cell
 tools/metowgh
 tools/oneskeleton
