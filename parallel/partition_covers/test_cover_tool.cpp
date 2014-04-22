@@ -71,8 +71,8 @@ namespace po = boost::program_options;
 typedef ctl::Abstract_simplex< int> Cell;
 typedef ctl::Finite_field< 2> Z2;
 typedef ctl::Simplex_boundary< Cell, Z2> Simplex_boundary;
-typedef ctl::Chain_complex< Cell, Simplex_boundary, 
-			    ctl::parallel::Nerve_data> Nerve;
+typedef ctl::parallel::Chain_complex< Cell, Simplex_boundary, 
+			    	      ctl::parallel::Nerve_data> Nerve;
 typedef ctl::parallel::Filtration< Nerve, ctl::Cell_less> Nerve_filtration;
 
 typedef Nerve::iterator Nerve_iterator;
@@ -97,7 +97,7 @@ void process_args( int & argc, char *argv[],Variable_map & vm){
   ( "input-file", "input .asc file to parse")
   ( "num-parts", "specify partition size")
   ( "num-threads", po::value<int>()->default_value(-1),
-			 "specify number of threads (Defaults to num_covers)");
+			 "specify number of threads");
   po::positional_options_description p;
   p.add( "input-file",1);
   p.add( "num-parts",1);
@@ -141,17 +141,19 @@ int main( int argc, char *argv[]){
   if (num_threads != -1){
   	tbb::task_scheduler_init init( num_threads);
   }else{
-  	tbb::task_scheduler_init init;
+  	tbb::task_scheduler_init init; 
   }
   
   stats.timer.start();
   Complex_filtration complex_filtration( complex);
+  stats.timer.stop();
   double filtration_time = stats.timer.elapsed();
   std::cout << "time to filter complex: " << filtration_time << std::endl;
 
   stats.timer.start();
   ctl::parallel::init_cover_complex( nerve, num_parts);
   ctl::parallel::graph_partition_cover( complex_filtration, nerve);
+  stats.timer.stop();
   double cover_time = stats.timer.elapsed();
   std::cout << "cover time: " << cover_time << std::endl;
   Nerve_filtration ordered_nerve( nerve);

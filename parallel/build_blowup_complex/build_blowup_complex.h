@@ -270,6 +270,7 @@ void build_blowup_complex( Iterator  complex_begin,
 			        impure_cell);
 	tbb::parallel_scan( range, body);
 	//blowup_filtration.complex().set_max_id( blowup_filtration.size());
+	stats.timer.stop();
 	stats.blowup_time = stats.timer.elapsed();
 }
 

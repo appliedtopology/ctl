@@ -57,7 +57,7 @@ public:
 
   // method:  start
   // starts timer
-  void start() { start_ = Clock::now(); }
+  void start() { start_ = stop_ = Clock::now(); }
   void stop() { stop_ = Clock::now(); } 
 
   // method:  stop

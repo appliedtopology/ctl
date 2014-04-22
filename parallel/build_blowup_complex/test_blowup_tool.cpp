@@ -244,12 +244,14 @@ int main( int argc, char *argv[]){
   
   stats.timer.start();
   Complex_filtration complex_filtration( complex);
+  stats.timer.stop();
   double filtration_time = stats.timer.elapsed();
   std::cout << "time to filter complex: " << filtration_time << std::endl;
 
   stats.timer.start();
   ctl::parallel::init_cover_complex( nerve, num_parts);
   ctl::parallel::graph_partition_cover( complex_filtration, nerve);
+  stats.timer.stop();
   double cover_time = stats.timer.elapsed();
   std::cout << "cover time: " << cover_time << std::endl;
 
@@ -268,7 +270,9 @@ int main( int argc, char *argv[]){
   stats.timer.start();
   ctl::parallel::build_blowup_complex( filtration_begin, filtration_end, 
 				       nerve_filtration, blowup_filtration, get);
+  stats.timer.stop();
   double blowup_time = stats.timer.elapsed();
+
   std::cout << "parallel_build_blowup_complex " << blowup_time << std::endl;
   std::cout << "-----------------" << std::endl;
   std::cout << "-----------------" << std::endl;
