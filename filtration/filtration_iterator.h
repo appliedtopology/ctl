@@ -47,7 +47,7 @@ class _filtration_iterator :
 		public std::iterator< std::random_access_iterator_tag, 
 					typename Iterator::value_type> {
 	public:
-		
+	//Does not matter to be defined since we inherit
 		typedef typename Iterator::difference_type difference_type;
 		typedef typename Iterator::value_type value_type;
 		typedef typename Iterator::pointer pointer;
@@ -61,7 +61,7 @@ class _filtration_iterator :
 	//default
 	_filtration_iterator(): i(), p( 0) {}
 	//copy
-	_filtration_iterator( Self & f): i( f.i), p( f.p) {};
+	_filtration_iterator( const Self & f): i( f.i), p( f.p) {};
 	//move
 	_filtration_iterator( Self && f): i( std::move( f.i)),
 					  p( std::move(f.p)) {};

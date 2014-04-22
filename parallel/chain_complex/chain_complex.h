@@ -1,5 +1,5 @@
-#ifndef CTLIB_CELL_MAP_H
-#define CTLIB_CELL_MAP_H
+#ifndef CTLIB_CONCURRENT_CELL_MAP_H
+#define CTLIB_CONCURRENT_CELL_MAP_H
 /*******************************************************************************
 * -Academic Honesty-
 * Plagarism: The unauthorized use or close imitation of the language and
@@ -62,44 +62,49 @@
 * AND rehashing will be marginally less expensive.
 * begin()/end() would be overloaded to take a dimension as well.
 **********************/
-
 //STL
 #include <unordered_map>
 #include <vector>
 #include <sstream>
-#include <fstream>
 
 //CTL
 #include <ctl/hash/hash.h>
 #include <ctl/io/io.h>
 #include <ctl/abstract_simplex/abstract_simplex.h>
 
+#include <tbb/concurrent_unordered_map.h>
+#include <tbb/atomic.h>
+
 //forward declaration
 namespace ctl{
+namespace parallel{
+struct Default_data {}; //class Default_data for complex.
 template< typename Cell_, typename Boundary_,
 	  typename Data_, typename Hash_>
 class Chain_complex;
+} //namespace parallel
 } //namespace ct
 
 //non-exported functionality
-namespace ctl {
-namespace detail {
+namespace {
 
 template< typename Data_>
-class Data_wrapper : public Data_ {
+class Concurrent_data_wrapper : public Data_ {
    private:
-   typedef Data_wrapper< Data_> Self;
+   typedef Concurrent_data_wrapper< Data_> Self;
    public:
+   typedef std::size_t Unsafe_id;
+   typedef tbb::atomic< Unsafe_id> Safe_id;
    //default
-   Data_wrapper(): id_( 0), pos_( 0) {}
+   Concurrent_data_wrapper(): id_( 0), pos_( 0) {}
    //copy
-   Data_wrapper( const std::size_t & tid, const std::size_t p=0):
+   Concurrent_data_wrapper( const std::size_t & tid, const std::size_t p=0):
    Data_(), id_( tid), pos_( p) {}
 
-   Data_wrapper( const Data_wrapper & from) :
+   Concurrent_data_wrapper( const Concurrent_data_wrapper & from) :
      id_( from.id_), pos_( from.pos_) {}
    //move
-   Data_wrapper( const Data_wrapper && from):
+   Concurrent_data_wrapper( const Concurrent_data_wrapper && from):
    	id_( std::move( from.id_)), pos_( std::move( from.pos_)) {}
 
    Self& operator=( const Self & from){
@@ -116,34 +121,32 @@ class Data_wrapper : public Data_ {
    }
 
 
-   std::size_t id() const { return id_; }
+   Safe_id id() const { return id_; }
    //a bit akward.. probably should change this later.
    std::size_t pos() const { return pos_; }
    void pos( const std::size_t p) { pos_= p; }
    private:
-   std::size_t id_;
+   Safe_id id_;
    std::size_t pos_;
    //(to be read in Millhouse Van Houten's voice)
    //This lets the chain_complex & boundary touch my privates ;)
    template< typename C, typename B, typename D, typename H>
    friend class ctl::Chain_complex;
-}; // class Data_wrapper
+}; // class Concurrent_data_wrapper
+} //anonymous namespace
 
-struct Default_data {}; //class Default_data for complex.
-} //detail
-} //ctl namespace
 
 template< typename Stream>
-Stream& operator<<( Stream & out, const ctl::detail::Default_data & d){ 
+Stream& operator<<( Stream & out, const ctl::parallel::Default_data & d){ 
 	return out; 
 }
 
 //exported functionality
 namespace ctl{
-
+namespace parallel{
 template< typename Cell_,
 	  typename Boundary_,
-	  typename Data_ = ctl::detail::Default_data,
+	  typename Data_ = ctl::parallel::Default_data,
 	  typename Hash_ = ctl::Hash< Cell_> >
 class Chain_complex{
 public:
@@ -151,10 +154,10 @@ public:
    		    //e.g. simplex, cube, etc
    typedef Boundary_ Boundary; //Describes how to take its boundary
    //Arbitrary data associated to space.
-   typedef ctl::detail::Data_wrapper< Data_> Data; 
+   typedef Concurrent_data_wrapper< Data_> Data; 
    typedef Hash_ Hash;
 private:
-   typedef std::unordered_map< Cell, Data, Hash>  Map;
+   typedef tbb::concurrent_unordered_map< Cell, Data, Hash>  Map;
 public:
    typedef typename Map::size_type size_type;
    typedef typename Map::iterator iterator;
@@ -164,18 +167,21 @@ public:
 public:
    //Constructors
    //Default
-   Chain_complex(): max_id( 0), max_dim( 0) { cells.max_load_factor( 1); }
+   Chain_complex(): max_id( 0), max_dim( 0) { 
+	cells.max_load_factor( 1); 
+   }
    Chain_complex( Boundary & bd_, const std::size_t num_cells=1): 
    cells( num_cells), bd( bd_), max_id( 0), max_dim( 0) {
 	cells.max_load_factor( 1); 
    }
-
    //Copy
-   Chain_complex( const Chain_complex & b): cells( b.cells), bd( b.bd),
-   				 max_id( b.max_id), max_dim( b.max_dim)
-   { cells.max_load_factor( 1); }
+   Chain_complex( const Chain_complex & b): 
+   cells( b.cells), bd( b.bd), max_id( b.max_id), max_dim( b.max_dim) { 
+	cells.max_load_factor( 1); 
+   }
    //Move
-   Chain_complex( Chain_complex && b): cells( std::move( b.cells)),
+   Chain_complex( Chain_complex && b): 
+			  cells( std::move( b.cells)),
    			  bd( std::move( b.bd)),
    			  max_id( std::move(b.max_id)),
    			  max_dim( std::move( b.max_dim)) {}
@@ -210,13 +216,19 @@ public:
    std::pair< iterator, bool> insert_open_cell( const Cell & s,
    					     const Data& data=Data()){
      std::pair< iterator, bool> c =  cells.emplace( s, data);
-     if( c.second) { //this outer if is probably unnecessary
-       max_dim = std::max( max_dim, s.dimension());
-       if( c.first->second.id_ == 0){
-        c.first->second.id_ = ++max_id;
-       } else{
-        max_id=std::max( max_id, c.first->second.id_);
-       }
+     if( c.second) { 
+	const std::size_t old_max_dim = max_dim();
+	if( s.dimension() > old_max_dim) { 
+ 		max_dim.compare_and_swap( s.dimension(), old_max_dim);
+        } 
+	if( c.first->second.id_ == 0){
+         c.first->second.id_ = max_id.fetch_and_add( 1);
+        } else {
+         const std::size_t old_max_id = max_id();
+         if( c.first->second.id_ > old_max_id) {
+         	max_id.compare_and_swap( c.first->second.id_, old_max_id);
+         }
+        }
      }
      return c;
    }
@@ -246,21 +258,22 @@ public:
    	const std::pair< iterator, bool> p(insert_open_cell( s, data));
    	return std::make_pair( p.first, p.second+num_faces_inserted);
    }
+
+  template< typename Stream, typename Functor>
+   void write( Stream& out, const Functor & f) const {
+   	out << "size " << cells.size() << std::endl;
+   	for( auto cell: cells){
+   	  out << f( cell.second) << " ";
+   	  cell.first.write( out);
+   	  out << std::endl;
+   	}
+   }
+  
    template< typename Stream>
    void write( Stream& out) const {
    	out << "size " << cells.size() << std::endl;
    	for( auto cell: cells){
    	  out << cell.second.id() << " ";
-   	  cell.first.write( out);
-   	  out << std::endl;
-   	}
-   }
-
-   template< typename Stream, typename Functor>
-   void write( Stream& out, const Functor & f) const {
-   	out << "size " << cells.size() << std::endl;
-   	for( auto cell: cells){
-   	  out << f( cell.second) << " ";
    	  cell.first.write( out);
    	  out << std::endl;
    	}
@@ -283,64 +296,10 @@ public:
 private:
    Map cells;
    Boundary bd;
-   std::size_t max_id;
-   std::size_t max_dim;
+   typename Data::Safe_id max_id;
+   typename Data::Safe_id max_dim;
 }; //cell_map
+} //namespace parallel
 } //namespace ctl
 
-template< typename Stream, typename Cell, typename Boundary, 
-	   typename Data, typename Hash>
-Stream& operator<<( Stream& out, 
-		    const ctl::Chain_complex< Cell, Boundary, Data, Hash> & c){ 
-	for(auto i = c.begin(); i != c.end(); ++i){
-		      out << i->second.id() <<": " << i->first; 
-	}
-	return out;
-}
-
-
-
-template< typename Stream, typename Cell, 
-	  typename Boundary, typename Data_, typename Hash>
-Stream& operator>>( Stream& in, 
-		    ctl::Chain_complex< Cell, Boundary, Data_, Hash> & c){ 
-	typedef typename ctl::Chain_complex< Cell, Boundary, 
-					     Data_, Hash> Chain_complex;  
-	typedef typename Chain_complex::Data Data;
-	std::size_t line_num = 0;
-	std::string line;
-	std::size_t id=0;
-        char the_first_character = in.peek();
-        if( the_first_character == 's') {
-                ctl::get_line( in, line, line_num);
-                std::istringstream ss( line);
-                std::string the_word_size;
-                ss >> the_word_size;
-                std::size_t the_number_of_cells;
-                ss >> the_number_of_cells;
-		c.reserve( the_number_of_cells);
-        }
-	while( ctl::get_line(in, line, line_num)){
-		std::istringstream ss( line);
-		Cell cell;
-		ss >> id;
-		ss >> cell;
-		Data d( id);
-		c.insert_open_cell( cell, d);
-	}
-	return in;
-}
-
-namespace ctl{
-template<typename String, typename Complex>
-void read_complex(String & complex_name, Complex & complex){
-	std::ifstream in;
-	std::cout << "File IO ..." << std::flush;
-	ctl::open_file( in, complex_name.c_str());
-	in >> complex;
-	ctl::close_file( in);
-	std::cout << "completed!" << std::endl;
-}
-} //namespace ctl
-
-#endif //CTL_CHAIN_COMPLEX_MAP_H
+#endif //CTL_CONCURRENT_CHAIN_COMPLEX_MAP_H

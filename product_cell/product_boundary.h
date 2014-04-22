@@ -228,11 +228,11 @@ public:
 	std::size_t length( const Product & p) const { 
 		return bd1.max_length( p.first) + bd2.max_length( p.second); 
 	}
-	const Boundary1& boundary1() const { return boundary1; }
-	const Boundary2& boundary2() const { return boundary2; }
+	const Boundary1& boundary1() const { return bd1; }
+	const Boundary2& boundary2() const { return bd2; }
 	private:
-	Boundary1& bd1;
-	Boundary2& bd2;
+	const Boundary1& bd1;
+	const Boundary2& bd2;
 }; //Product_boundary
 
 } // namespace ctl

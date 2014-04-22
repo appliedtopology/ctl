@@ -1,5 +1,5 @@
-#ifndef CTLIB_FILTRATION_H
-#define CTLIB_FILTRATION_H
+#ifndef CTLIB_CONCURRENT_FILTRATION_H
+#define CTLIB_CONCURRENT_FILTRATION_H
 /*******************************************************************************
 * -Academic Honesty-
 * Plagarism: The unauthorized use or close imitation of the language and 
@@ -35,19 +35,19 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 *******************************************************************************/
-//STL
 
-//CTL
-#include <ctl/filtration/less.h>
-#include <ctl/filtration/filtration_iterator.h>
+#include "tbb/parallel_sort.h"
+#include "tbb/concurrent_vector.h"
 
-//non-exported functionality 
-namespace ctl {
-namespace detail{
-} //anonymous namespace
-}// namespace ctl
+#include "filtration/less.h"
+#include "filtration/filtration_iterator.h"
 
 namespace ctl{
+//non-exported functionality 
+namespace _filtration{
+} //anonymous namespace
+
+namespace parallel{
 template< typename Complex_, 
 	  typename Less_ = ctl::Cell_less>
 class Filtration {
@@ -56,20 +56,19 @@ class Filtration {
 	typedef  Less_ Less;
  private:
 	typedef typename Complex::iterator _Iterator;	
-	typedef typename std::vector< _Iterator> Vector;
+	typedef typename tbb::concurrent_vector< _Iterator> Vector;
 	typedef typename Vector::iterator _viterator;
 	typedef typename Vector::const_iterator _vciterator;
 	typedef typename Vector::reverse_iterator _vriterator;
 	typedef typename Vector::const_reverse_iterator _vcriterator;
  public:
-	typedef typename ctl::detail::_filtration_iterator< _viterator, 1> 
-								   iterator;
+	typedef typename ctl::detail::_filtration_iterator< _viterator, 1> iterator;
 	typedef typename ctl::detail::_filtration_iterator< _vciterator, 1> 
-								const_iterator;
+							const_iterator;
 	typedef typename ctl::detail::_filtration_iterator< _viterator, -1> 
-							       reverse_iterator;
+							reverse_iterator;
 	typedef typename ctl::detail::_filtration_iterator<  _vciterator, -1>
-							 const_reverse_iterator;
+							const_reverse_iterator;
  private:
 	//just to make typing below easier
 	typedef iterator it;
@@ -78,15 +77,16 @@ class Filtration {
 	typedef reverse_iterator rit;
 public:
 	Filtration( const Filtration & f): 
-		filtration_( f), complex_( f.complex_) {}
+	filtration_( f), complex_( f.complex_) {}
 	Filtration( const Filtration && f): 
-		filtration_( std::move( f)), complex_( f.complex_) {}	
+	filtration_( std::move( f)), complex_( std::move( f.complex_)) {}	
 	Filtration( Complex & c): filtration_( c.size()), complex_( c){
-		std::size_t pos = 0;
-		for( auto i= c.begin(); i != c.end(); ++i, ++pos){ 
-			 filtration_[ pos] = i;
-		}
-		std::sort( filtration_.begin(), filtration_.end(), Less());
+	   std::size_t pos = 0;
+	   for( auto i= c.begin(); i != c.end(); ++i, ++pos){ 
+	   	 filtration_[ pos] = i;
+	   }
+	   Less less;
+	   tbb::parallel_sort( filtration_.begin(), filtration_.end(), less);
 	}
 
 	//used typedefs above since the names were getting to long
@@ -101,12 +101,14 @@ public:
 	
 	crit rbegin() const { return crit( filtration_.rbegin(), size()-1); }
 	crit rend()   const { return crit( filtration_.rend(), 0);          }
-	Complex& complex() const { return complex_;}
+
+	Complex& complex() const { return complex_; }
+
 	std::size_t size() const { return filtration_.size(); } 
  private:
 	Vector filtration_;
 	Complex& complex_;
 }; //class Filtration
-
+} //namespace parallel
 } //namespace ct
-#endif //CTLIB_FILTRATION_H
+#endif //CTLIB_CONCURRENT_FILTRATION_H
