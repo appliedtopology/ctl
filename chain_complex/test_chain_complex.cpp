@@ -42,9 +42,9 @@
 #include <ctl/abstract_simplex/simplex_boundary.h>
 
 //chain_complex
-#include <chain_complex/chain_complex.h>
-#include <chain_complex/chain_complex_io.h>
-#include <chain_complex/complex_boundary.h>
+#include <ctl/chain_complex/chain_complex.h>
+#include <ctl/chain_complex/chain_complex_io.h>
+#include <ctl/chain_complex/complex_boundary.h>
 
 //We build a simplicial chain complex with Z2 coefficients
 typedef ctl::Abstract_simplex< int> Simplex;
