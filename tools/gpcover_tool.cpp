@@ -133,6 +133,7 @@ int main( int argc, char *argv[]){
   ctl::parallel::init_cover_complex( nerve, num_parts);
   ctl::parallel::graph_partition_cover( filtration, nerve);
   double cover_time = timer.elapsed();
+  std::cout << "cover compute time: " << cover_time << std::endl;
   std::string cover_name ( full_complex_name);
   std::string nerve_name ( full_complex_name);
 
