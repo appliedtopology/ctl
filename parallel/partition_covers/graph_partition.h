@@ -57,16 +57,16 @@ void metis( Vector & xadj,
 	    int & edgecut, 
 	    int & num_vertices, 
 	    int num_parts){
-	int ncon = 2;
+	idx_t ncon = 2;
 	//hopefully updated to v5.0 spec
-        METIS_PartGraphRecursive( &num_vertices,
+        METIS_PartGraphRecursive( (idx_t*)&num_vertices,
 				  &ncon, //no idea what this is for, but the manual
 					 //suggests making it = 2. 
-				  &xadj[0], &adjncy[0], 
+				  (idx_t*)&xadj[0], (idx_t*)&adjncy[0], 
 				  NULL, NULL, NULL,
-				  &num_parts, 
+				  (idx_t*)&num_parts, 
 				  NULL, NULL, NULL, 
-				  &edgecut, &part[0]);
+				  (idx_t*) &edgecut,  (idx_t*)&part[0]);
 }
 
 template< typename Complex,
