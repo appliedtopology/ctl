@@ -1,4 +1,5 @@
 add_subdirectory( build_blowup_complex)
+add_subdirectory( concurrent_homology)
 add_subdirectory( chain_complex)
 add_subdirectory( filtration)
 add_subdirectory( partition_covers)

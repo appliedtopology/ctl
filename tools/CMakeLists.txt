@@ -29,13 +29,26 @@ if( ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 endif( ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 add_executable( duplicate build_blobs.cpp)
+
 add_executable( build_clique clique_tool.cpp)
+
 add_executable( euler euler_tool.cpp)
 target_link_libraries( euler boost_program_options)
+
 add_executable( complex_size complex_size.cpp)
+
 add_executable (oneskeleton complex_to_graph_tool.cpp)
 target_link_libraries( oneskeleton metis boost_program_options)
+
 add_executable (wghtomet graph_to_metis_tool.cpp)
+
 add_executable (metowgh metis_to_graph_tool.cpp)
+
 add_executable (gpcover gpcover_tool.cpp)
 target_link_libraries( gpcover metis boost_program_options tbb)
+
+add_executable (concurrent_homology   concurrent_homology_tool)
+target_link_libraries (concurrent_homology boost_program_options tbb metis)
+
+add_executable (cover_homology   cover_homology_tool)
+target_link_libraries (cover_homology boost_program_options metis tbb)
