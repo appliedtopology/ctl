@@ -87,57 +87,57 @@
 namespace po = boost::program_options;
 
 // Complex type
-typedef ajz::Abstract_simplex Cell;
-typedef ajz::Simplex_boundary< Cell, ajz::Term_Z2> Simplex_boundary;
-typedef ajz::Cell_set< Cell, Simplex_boundary, ajz::Nerve_data> Nerve;
+typedef clt::Abstract_simplex Cell;
+typedef clt::Simplex_boundary< Cell, clt::Term_Z2> Simplex_boundary;
+typedef clt::Cell_set< Cell, Simplex_boundary, clt::Nerve_data> Nerve;
 typedef Nerve::iterator Nerve_iterator;
-typedef ajz::Cover_data< Nerve_iterator > Cover_data;
-typedef ajz::Cell_set< Cell, Simplex_boundary, Cover_data> Complex;
+typedef clt::Cover_data< Nerve_iterator > Cover_data;
+typedef clt::Cell_set< Cell, Simplex_boundary, Cover_data> Complex;
 typedef Complex::iterator Complex_iterator;
-typedef ajz::Cell_less< Complex_iterator> Complex_less;
-typedef ajz::Cell_less< Nerve_iterator> Nerve_less;
-typedef ajz::Parallel_filtration< Complex, Complex_less> Complex_filtration;
-typedef ajz::Parallel_filtration< Nerve, Nerve_less> 
+typedef clt::Cell_less< Complex_iterator> Complex_less;
+typedef clt::Cell_less< Nerve_iterator> Nerve_less;
+typedef clt::Parallel_filtration< Complex, Complex_less> Complex_filtration;
+typedef clt::Parallel_filtration< Nerve, Nerve_less> 
 						Nerve_filtration;
 typedef Complex_filtration::iterator Complex_filtration_iterator;
 typedef Nerve_filtration::iterator Nerve_filtration_iterator;
-typedef ajz::Filtration_property_map< Complex_filtration_iterator> 
+typedef clt::Filtration_property_map< Complex_filtration_iterator> 
 					Complex_filtration_map;
-typedef ajz::Thread_timer Timer;
+typedef clt::Thread_timer Timer;
 
 template< typename Timer>
-struct Tri_stats: ajz::Cover_stats< Timer>, 
-	      ajz::Blowup_stats< Timer>,
-	      ajz::Parallel_stats< Timer>
+struct Tri_stats: clt::Cover_stats< Timer>, 
+	      clt::Blowup_stats< Timer>,
+	      clt::Parallel_stats< Timer>
 	     { Timer timer; };
 typedef Tri_stats< Timer> Stats;
 
 //Types to build a Blowup complex
-typedef ajz::Complex_boundary< Complex, 
+typedef clt::Complex_boundary< Complex, 
 			       Complex::iterator> Complex_boundary;
 
-typedef ajz::Complex_boundary< Nerve,
+typedef clt::Complex_boundary< Nerve,
 			       Nerve_iterator> Nerve_boundary;
 
-typedef ajz::Iterator_product< Nerve_iterator, 
+typedef clt::Iterator_product< Nerve_iterator, 
 			       Complex::iterator> Product;
 
-typedef ajz::Product_boundary< Product, Nerve_boundary, 
+typedef clt::Product_boundary< Product, Nerve_boundary, 
 				        Complex_boundary> Product_boundary;
 
-typedef ajz::Concurrent_cell_set< Product, 
+typedef clt::Concurrent_cell_set< Product, 
 	       	  Product_boundary, 
-	       	  ajz::Default_cell_data, 
+	       	  clt::Default_cell_data, 
 	       	  Product::Hash1> Blowup;
 typedef Blowup::iterator Blowup_iterator;
-typedef ajz::Complex_boundary< Blowup, Blowup_iterator> 
+typedef clt::Complex_boundary< Blowup, Blowup_iterator> 
 	       			Blowup_complex_boundary;
-typedef ajz::Parallel_id_less< Blowup::iterator> Parallel_id_less;
-typedef ajz::Id_less< Blowup::iterator> Blowup_id_less;
-typedef ajz::Cell_less< Blowup::iterator> Blowup_cell_less;
+typedef clt::Parallel_id_less< Blowup::iterator> Parallel_id_less;
+typedef clt::Id_less< Blowup::iterator> Blowup_id_less;
+typedef clt::Cell_less< Blowup::iterator> Blowup_cell_less;
 typedef Blowup::iterator Blowup_iterator;
 typedef Blowup::Cell_boundary Cell_boundary;
-typedef ajz::Parallel_filtration< Blowup, 
+typedef clt::Parallel_filtration< Blowup, 
 	       		   Blowup_id_less> Blowup_filtration;
 typedef Blowup_filtration::iterator Blowup_filtration_iterator;
 typedef std::vector< int> Betti;
@@ -146,9 +146,9 @@ template<typename String, typename Complex>
 void read_complex( String & complex_name, Complex & complex){
 	std::ifstream in;
 	std::cerr << "File IO ..." << std::flush;
-	ajz::open_file( in, complex_name.c_str());
+	clt::open_file( in, complex_name.c_str());
 	in >> complex;
-	ajz::close_file( in);
+	clt::close_file( in);
 	std::cerr << "completed!" << std::endl;                     
 }
 
@@ -216,8 +216,8 @@ int main( int argc, char *argv[]){
   Complex_filtration complex_filtration( complex);
   double orig_filtration_time = stats.timer.get();
   stats.timer.start();
-  ajz::init_cover_complex( nerve, num_parts);
-  bool is_edgecut = ajz::graph_partition_cover( complex_filtration, nerve);
+  clt::init_cover_complex( nerve, num_parts);
+  bool is_edgecut = clt::graph_partition_cover( complex_filtration, nerve);
   int num_covers = (is_edgecut) ? num_parts+1 : num_parts; 
   std::size_t blowup_size = 0;
   Nerve_filtration nerve_filtration( nerve);
@@ -251,7 +251,7 @@ int main( int argc, char *argv[]){
  ZM_ASSERT("ZMStartSession", result);
 #endif
  stats.timer.start();
- ajz::build_blowup_complex( complex_filtration.begin(), 
+ clt::build_blowup_complex( complex_filtration.begin(), 
 			    complex_filtration.end(),
 			    nerve_filtration,
 			    blowup_filtration,
@@ -269,7 +269,7 @@ int main( int argc, char *argv[]){
   ZM_ASSERT("ZMDisconnect", result);
 #endif
 
-  ajz::do_blowup_homology( blowup_complex,
+  clt::do_blowup_homology( blowup_complex,
 			   blowup_filtration, 
 			   nerve_filtration, 
 			   num_covers,
@@ -378,7 +378,7 @@ int main( int argc, char *argv[]){
 	   << std::endl;
 
 #ifdef TESTS_ON
-  ajz::run_tests( complex, blowup_complex, nerve);
+  clt::run_tests( complex, blowup_complex, nerve);
 #endif
   return 0;
 }

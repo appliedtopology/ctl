@@ -84,21 +84,21 @@
 namespace po = boost::program_options;
 
 // Complex type
-typedef ajz::Abstract_simplex Cell;
-typedef ajz::Simplex_boundary< Cell, ajz::Term_Z2> Simplex_boundary;
-typedef ajz::Cell_set< Cell, Simplex_boundary, ajz::Nerve_data> Cover_complex;
+typedef ctl::Abstract_simplex Cell;
+typedef ctl::Simplex_boundary< Cell, ctl::Term_Z2> Simplex_boundary;
+typedef ctl::Cell_set< Cell, Simplex_boundary, ctl::Nerve_data> Cover_complex;
 typedef Cover_complex::iterator Cover_complex_iterator;
-typedef ajz::Cover_data< Cover_complex_iterator > Cover_data;
-typedef ajz::Cell_set< Cell, Simplex_boundary, Cover_data> Complex;
+typedef ctl::Cover_data< Cover_complex_iterator > Cover_data;
+typedef ctl::Cell_set< Cell, Simplex_boundary, Cover_data> Complex;
 typedef Complex::iterator Complex_iterator;
-typedef ajz::Cell_less< Complex_iterator> Complex_less;
-typedef ajz::Parallel_filtration< Complex, Complex_less> Complex_filtration;
+typedef ctl::Cell_less< Complex_iterator> Complex_less;
+typedef ctl::Parallel_filtration< Complex, Complex_less> Complex_filtration;
 typedef Complex_filtration::iterator Complex_filtration_iterator;
-typedef ajz::Thread_timer Timer;
+typedef ctl::Thread_timer Timer;
 
 template< typename Timer>
-struct Dual_stats: ajz::Cover_stats< Timer>, 
-	      ajz::Parallel_stats< Timer>
+struct Dual_stats: ctl::Cover_stats< Timer>, 
+	      ctl::Parallel_stats< Timer>
 	     { Timer timer; };
 typedef Dual_stats< Timer> Stats;
 
@@ -106,9 +106,9 @@ template<typename String, typename Complex>
 void read_complex( String & complex_name, Complex & complex){
 	std::ifstream in;
 	std::cout << "File IO ..." << std::flush;
-	ajz::open_file( in, complex_name.c_str());
+	ctl::open_file( in, complex_name.c_str());
 	in >> complex;
-	ajz::close_file( in);
+	ctl::close_file( in);
 	std::cout << "completed!" << std::endl;                     
 }
 
@@ -170,10 +170,10 @@ int main( int argc, char *argv[]){
   double orig_filtration_time = stats.timer.get();
 
   stats.timer.start();
-  ajz::init_cover_complex( nerve, num_parts);
-  ajz::graph_partition_open_cover( complex_filtration, nerve, nearly_pure);
+  ctl::init_cover_complex( nerve, num_parts);
+  ctl::graph_partition_open_cover( complex_filtration, nerve, nearly_pure);
   double cover_time = stats.timer.get();
-  ajz::compute_homology( complex, num_parts, stats);
+  ctl::compute_homology( complex, num_parts, stats);
 
   double total_time = cover_time + stats.filtration_time + stats.get_iterators +
          	     stats.parallel_persistence;
@@ -200,7 +200,7 @@ int main( int argc, char *argv[]){
   std::cout << "total time: " << total_time << " (100%)" << std::endl;
 
 #ifdef TESTS_ON
-  ajz::run_tests( complex, blowup_complex, nerve);
+  ctl::run_tests( complex, blowup_complex, nerve);
 #endif
   init.terminate();
   return 0;
