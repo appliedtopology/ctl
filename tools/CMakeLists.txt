@@ -52,3 +52,6 @@ target_link_libraries (concurrent_homology boost_program_options tbb metis)
 
 add_executable (cover_homology   cover_homology_tool)
 target_link_libraries (cover_homology boost_program_options metis tbb)
+
+add_executable (write_filtration write_filtration_tool.cpp)
+target_link_libraries( write_filtration boost_program_options)
