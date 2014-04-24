@@ -78,7 +78,7 @@ void compute_homology( Complex & complex,
 							     Filtration_pair;
 	typedef typename tbb::concurrent_vector< Filtration_pair> 
 						  Iterator_pairs;
-	typedef typename  Complex::Term Complex_term;
+	typedef typename  Complex_boundary::Term Complex_term;
 	typedef typename  ctl::Term_cell_less< ctl::Cell_less> Term_less;
 	typedef typename  ctl::Chain< Complex_term, Term_less> Chain;
 	typedef typename  tbb::concurrent_vector< Chain> Chains;
@@ -95,27 +95,29 @@ void compute_homology( Complex & complex,
 
 	stats.timer.start();
 	Filtration filtration( complex);
-	stats.filtration_time = stats.timer.get();
+	stats.timer.stop();
+	stats.filtration_time = stats.timer.elapsed();
 
 
 	Iterator_pairs ranges;
 	stats.timer.start();
 	ctl::parallel::get_cover_iterators( filtration.begin(), 
 				  filtration.end(), ranges, true);
-	stats.get_iterators = stats.timer.get();
+	stats.timer.stop();
+	stats.get_iterators = stats.timer.elapsed();
 
 	Chains cascades( complex.size());
 	Complex_chain_map cascade_prop_map( cascades.begin(), 
 					    Complex_offset_map());
-	Cell_boundary cell_boundary( complex.boundary());
-	Complex_boundary complex_boundary( complex, cell_boundary);
+	Complex_boundary complex_boundary( complex);
 
 	stats.timer.start();
 	ctl::parallel::persistence( ranges,
 			           complex_boundary,
 			           cascade_prop_map, 
 			           num_parts );
-	stats.parallel_persistence = stats.timer.get();
+	stats.timer.stop();
+	stats.parallel_persistence = stats.timer.elapsed();
 	#ifdef COMPUTE_BETTI
 	        //betti numbers
 	        Betti betti;
@@ -124,64 +126,7 @@ void compute_homology( Complex & complex,
 	        std::cout << std::endl;
 	#endif
 }
-/*
-template< typename Blowup, 
-	  typename Cell_less,    
-	  typename Stats>
-void do_blowup_homology( Blowup & blowup_complex, 
-			 Cell_less & less,
-			 size_t num_local_pieces,
-			 Stats & stats){
 
-	typedef typename Blowup::iterator Blowup_iterator;
-	typedef typename Blowup::Cell_boundary Cell_boundary;
-	typedef typename ctl::Parallel_filtration< Blowup, 
-						   Cell_less> Blowup_filtration;
-	typedef typename ctl::Complex_boundary< Blowup, 
-						Blowup_iterator> 
-							  Blowup_boundary;
-	typedef typename  Blowup_filtration::iterator Filtration_iterator;
-	typedef typename  std::pair< Filtration_iterator, 
-				     Filtration_iterator> Filtration_pair;
-	typedef typename  std::vector< Filtration_pair> Iterator_pairs;
-	
-	typedef typename  ctl::Term_Z2< Blowup_iterator> Term_Z2;
-	typedef typename  ctl::Term_less< Term_Z2, Cell_less> Term_less;
-	typedef typename  ctl::Chain< Term_Z2, Term_less> Chain;
-	typedef typename  std::vector< Chain> Chains;
-	typedef typename  Chains::iterator Chains_iterator;
-	typedef typename  ctl::Id_property_map< Blowup_iterator> Offset_map;
-	typedef typename  boost::iterator_property_map< Chains_iterator,
-				Offset_map, Chain, Chain&> Complex_chain_map;
-
-	stats.timer.start();
-	Blowup_filtration blowup_filtration( blowup_complex);
-	stats.filtration_time = stats.timer.get();
-	Iterator_pairs ranges;
-	stats.timer.start();
-	ctl::get_cover_iterators( blowup_filtration.begin(),
-			          blowup_filtration.end(),
-				  ranges);
-  	Chains cascades( blowup_complex.max_id()+1, Chain( Term_less() ));
-  	Complex_chain_map cascade_prop_map( cascades.begin(), Offset_map());
-	Cell_boundary cell_boundary( blowup_complex.cell_boundary());
-  	Blowup_boundary blowup_complex_boundary( blowup_complex, cell_boundary);
-	stats.timer.start();
-  	ctl::parallel_persistence( ranges,
-			           blowup_complex_boundary,
-			           cascade_prop_map, 
-			           num_local_pieces );
-	stats.parallel_persistence = stats.timer.get();
-#ifdef COMPUTE_BETTI
-	typedef typename tbb::concurrent_vector< int> Betti;
-        //betti numbers
-        Betti betti;
-        std::cout << "parallel betti (blowup): " << std::endl;
-        ctl::compute_betti( blowup_complex,cascade_prop_map,betti);
-        std::cout << std::endl;
-#endif
-}
-*/
 template< typename Blowup, 
 	  typename Blowup_filtration,
 	  typename Nerve_filtration,

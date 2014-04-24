@@ -36,81 +36,85 @@
 #define COMPUTE_BETTI
 //#define TESTS_ON
 
-// Global Project Deps
-#include "abstract_simplex.h"
-#include "simplex_boundary.h"
-#include "complex_boundary.h"
-#include "parallel_filtration.h"
-#include "cell_set.h"
-#include "io.h" 
-#include "term.h"
-#include "timer.h"
-#include "thread_timer.h"
-#include "point.h"
-#include "point_vector.h"
-#include "compute_betti.h"
-
-//Persistence 
-// Boost
-#include <boost/property_map/property_map.hpp>
-#include <boost/unordered_map.hpp>
-#include "finite_field.h"
-#include "term_z2.h"
-#include "chain.h"
-#include "persistence.h"
-#include "p2_helper.h"
-
-//Blowup
-#include "product_boundary.h"
-#include "iterator_product.h"
-#include "blowup_io.h"
-
-//Local Project Deps
-#include "covers.h"
-#include "cover_tests.h"
-
-#include "build_blowup_complex.h"
-#include "parallel_homology.h"
-
-
+//#define TESTS_ON
 //BOOST
 #include <boost/program_options.hpp>
 
 //STL
 #include <sstream>
+#include <vector>
 
+//TBB 
 #include <tbb/task_scheduler_init.h> 
+
+#include <ctl/io/io.h>
+#include <ctl/utility/timer.h>
+//Chain Complex
+#include <ctl/finite_field/finite_field.h>
+#include <ctl/abstract_simplex/abstract_simplex.h>
+#include <ctl/abstract_simplex/simplex_boundary.h>
+#include <ctl/chain_complex/chain_complex.h>
+#include <ctl/chain_complex/complex_boundary.h>
+#include <ctl/filtration/filtration.h>
+#include <ctl/term/term.h>
+
+//Parallel Chain Complex
+#include <ctl/parallel/chain_complex/chain_complex.h>
+#include <ctl/parallel/filtration/filtration.h>
+#include <ctl/parallel/utility/timer.h>
+
+//#include "point.h"
+//#include "point_vector.h"
+
+//Covers
+#include <ctl/parallel/partition_covers/covers.h>
+#include <ctl/parallel/partition_covers/cover_data.h>
+#include <ctl/parallel/partition_covers/cover_tests.h>
+
+//Blowup
+#include <ctl/product_cell/product_boundary.h>
+#include <ctl/product_cell/product_cell.h>
+#include <ctl/parallel/build_blowup_complex/build_blowup_complex.h>
+
+//Persistence 
+#include <ctl/chain/chain.h>
+#include <ctl/persistence/compute_betti.h>
+#include <ctl/persistence/persistence.h>
+#include <ctl/persistence/iterator_property_map.h>
+#include <ctl/persistence/offset_maps.h>
+#include <ctl/persistence/compute_betti.h>
+
+//Parallel Homology 
+#include <ctl/parallel/homology/persistence.h>
+#include <ctl/parallel/homology/homology.h>
 
 namespace po = boost::program_options;
 
 // Complex type
-typedef ctl::Abstract_simplex Cell;
-typedef ctl::Simplex_boundary< Cell, ctl::Term_Z2> Simplex_boundary;
-typedef ctl::Cell_set< Cell, Simplex_boundary, ctl::Nerve_data> Cover_complex;
-typedef Cover_complex::iterator Cover_complex_iterator;
-typedef ctl::Cover_data< Cover_complex_iterator > Cover_data;
-typedef ctl::Cell_set< Cell, Simplex_boundary, Cover_data> Complex;
+typedef ctl::Abstract_simplex< int> Cell;
+typedef ctl::Finite_field< 2> Z2;
+typedef ctl::Simplex_boundary< Cell, Z2> Simplex_boundary;
+typedef ctl::Chain_complex< Cell, Simplex_boundary, 
+				      ctl::parallel::Nerve_data> Nerve;
+typedef Nerve::iterator Nerve_iterator;
+typedef ctl::parallel::Cover_data< Nerve_iterator > Cover_data;
+typedef ctl::Chain_complex< Cell, Simplex_boundary, Cover_data> Complex;
 typedef Complex::iterator Complex_iterator;
-typedef ctl::Cell_less< Complex_iterator> Complex_less;
-typedef ctl::Parallel_filtration< Complex, Complex_less> Complex_filtration;
+typedef ctl::Cell_less Cell_less;
+typedef ctl::parallel::Filtration< Complex, Cell_less> Complex_filtration;
+typedef ctl::parallel::Filtration< Nerve, Cell_less> 
+						Nerve_filtration;
 typedef Complex_filtration::iterator Complex_filtration_iterator;
-typedef ctl::Thread_timer Timer;
+typedef Nerve_filtration::iterator Nerve_filtration_iterator;
+typedef ctl::parallel::Filtration_property_map< Complex_filtration_iterator> 
+					    Complex_filtration_map;
+typedef ctl::parallel::Timer Timer;
 
 template< typename Timer>
-struct Dual_stats: ctl::Cover_stats< Timer>, 
-	      ctl::Parallel_stats< Timer>
+struct Dual_stats: ctl::parallel::Cover_stats< Timer>, 
+	      ctl::parallel::Parallel_stats< Timer>
 	     { Timer timer; };
 typedef Dual_stats< Timer> Stats;
-
-template<typename String, typename Complex>
-void read_complex( String & complex_name, Complex & complex){
-	std::ifstream in;
-	std::cout << "File IO ..." << std::flush;
-	ctl::open_file( in, complex_name.c_str());
-	in >> complex;
-	ctl::close_file( in);
-	std::cout << "completed!" << std::endl;                     
-}
 
 template<typename Variable_map>
 void process_args( int & argc, char *argv[],Variable_map & vm){
@@ -158,7 +162,7 @@ int main( int argc, char *argv[]){
   tbb::task_scheduler_init init;
   
   Complex complex;
-  Cover_complex nerve;
+  Nerve nerve;
   tbb::concurrent_vector< Complex_iterator> nearly_pure;
   Stats stats;
 
@@ -167,14 +171,15 @@ int main( int argc, char *argv[]){
 
   stats.timer.start();
   Complex_filtration complex_filtration( complex);
-  double orig_filtration_time = stats.timer.get();
+  stats.timer.stop();
+  double orig_filtration_time = stats.timer.elapsed();
 
   stats.timer.start();
-  ctl::init_cover_complex( nerve, num_parts);
-  ctl::graph_partition_open_cover( complex_filtration, nerve, nearly_pure);
-  double cover_time = stats.timer.get();
-  ctl::compute_homology( complex, num_parts, stats);
-
+  ctl::parallel::init_cover_complex( nerve, num_parts);
+  ctl::parallel::graph_partition_open_cover( complex_filtration, nerve, nearly_pure);
+  stats.timer.stop();
+  double cover_time = stats.timer.elapsed();
+  ctl::parallel::compute_homology( complex, num_parts, stats);
   double total_time = cover_time + stats.filtration_time + stats.get_iterators +
          	     stats.parallel_persistence;
                                                                                 
