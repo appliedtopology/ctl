@@ -168,24 +168,22 @@ int main( int argc, char *argv[]){
 
   // Read the cell_set in
   read_complex( full_complex_name, complex);
-
   stats.timer.start();
   Complex_filtration complex_filtration( complex);
   stats.timer.stop();
   double orig_filtration_time = stats.timer.elapsed();
-
+  std::cout << "filter complex: " << orig_filtration_time << std::endl;
   stats.timer.start();
   ctl::parallel::init_cover_complex( nerve, num_parts);
   ctl::parallel::graph_partition_open_cover( complex_filtration, nerve, nearly_pure);
   stats.timer.stop();
   double cover_time = stats.timer.elapsed();
+  std::cout << "build cover: " << cover_time << std::endl;
   ctl::parallel::compute_homology( complex, num_parts, stats);
   double total_time = cover_time + stats.filtration_time + stats.get_iterators +
          	     stats.parallel_persistence;
                                                                                 
   std::cout << std::setprecision( 2) << std::fixed;
-                                                                                
-  std::cout << "filter complex: " << orig_filtration_time << std::endl;
                                                                                 
   std::cout << "build cover: " << cover_time 
             << " (" << (cover_time/total_time)*100 << "%)" << std::endl;
