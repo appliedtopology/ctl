@@ -40,35 +40,22 @@
 *
 *******************************************************************************/
 // Global Project Deps
-#include "abstract_simplex.h"
-#include "simplex_boundary.h"
-#include "complex_boundary.h"
-#include "parallel_filtration.h"
-#include "cell_set.h"
-#include "io.h" 
-#include "term.h"
-#include "timer.h"
-#include "thread_timer.h"
-#include "point.h"
-#include "point_vector.h"
+#include <ctl/io/io.h> 
+#include <ctl/term/term.h>
+#include <ctl/utility/timer.h>
+#include <ctl/parallel/utility/timer.h>
 
 //Persistence 
 // Boost
 #include <boost/property_map/property_map.hpp>
 #include <boost/unordered_map.hpp>
-#include "finite_field.h"
-#include "term_z2.h"
-#include "chain.h"
-#include "persistence.h"
-
-//Blowup
-#include "product_boundary.h"
-#include "iterator_product.h"
-#include "blowup_io.h"
+#include <ctl/finite_field/finite_field.h>
+#include <ctl/chain/chain.h>
+#include <ctl/persistence/persistence.h>
 
 //Local Project Deps
-#include "build_blowup_complex.h"
-#include "parallel_persistence.h"
+//#include <ctl/parallel/build_blowup_complex/build_blowup_complex.h>
+#include <ctl/parallel/homology/persistence.h>
 
 //TBB
 #include <tbb/concurrent_vector.h>
@@ -81,28 +68,28 @@ void compute_homology( Complex & complex,
 		       size_t & num_parts,
 		       Stats & stats){
 	typedef typename Complex::iterator Complex_iterator;
-	typedef typename ctl::Cover_less< Complex_iterator> Cell_less;
-	typedef typename ctl::Parallel_filtration< Complex, 
-						   Cell_less> Filtration;
-
-	typedef typename Complex::Cell_boundary Cell_boundary;
-	typedef typename ctl::Complex_boundary< Complex, 
-						Complex_iterator> 
-							  Complex_boundary;
-	typedef typename  Filtration::iterator Filtration_iterator;
-	typedef typename  std::pair< Filtration_iterator, 
-				     Filtration_iterator> Filtration_pair;
-	typedef typename  tbb::concurrent_vector< Filtration_pair> 
-								Iterator_pairs;
-	
-	typedef typename  ctl::Term_Z2< Complex_iterator> Term_Z2;
-	typedef typename  ctl::Term_less< Term_Z2, Cell_less> Term_less;
-	typedef typename  ctl::Chain< Term_Z2, Term_less> Chain;
+	typedef typename ctl::parallel::Cover_less< Complex_iterator> Cell_less;
+	typedef typename ctl::parallel::Filtration< Complex, Cell_less> 
+								Filtration;
+	typedef typename Complex::Boundary Cell_boundary;
+	typedef typename ctl::Complex_boundary< Complex> Complex_boundary;
+	typedef typename Filtration::iterator Filtration_iterator;
+	typedef typename std::pair< Filtration_iterator, Filtration_iterator> 
+							     Filtration_pair;
+	typedef typename tbb::concurrent_vector< Filtration_pair> 
+						  Iterator_pairs;
+	typedef typename  Complex::Term Complex_term;
+	typedef typename  ctl::Term_cell_less< ctl::Cell_less> Term_less;
+	typedef typename  ctl::Chain< Complex_term, Term_less> Chain;
 	typedef typename  tbb::concurrent_vector< Chain> Chains;
 	typedef typename  Chains::iterator Chains_iterator;
-	typedef typename  ctl::Id_property_map< Complex_iterator> Offset_map;
-	typedef typename  boost::iterator_property_map< Chains_iterator,
-				Offset_map, Chain, Chain&> Cell_chain_map;
+	typedef ctl::Pos_offset_map< Complex_iterator> Complex_offset_map;
+
+	typedef typename  ctl::iterator_property_map< Chains::iterator,
+						      Complex_offset_map, 
+						      Complex_chain, 
+						      Complex_chain&> 
+						      Complex_chain_map;
 
 	typedef typename tbb::concurrent_vector< int> Betti;
 
@@ -113,18 +100,18 @@ void compute_homology( Complex & complex,
 
 	Iterator_pairs ranges;
 	stats.timer.start();
-	ctl::get_cover_iterators( filtration.begin(),
-			          filtration.end(),
-				  ranges, true);
+	ctl::parallel::get_cover_iterators( filtration.begin(), 
+				  filtration.end(), ranges, true);
 	stats.get_iterators = stats.timer.get();
 
-	Chains cascades( complex.max_id()+1, Chain( Term_less() ));
-	Cell_chain_map cascade_prop_map( cascades.begin(), Offset_map());
+	Chains cascades( complex.size());
+	Complex_chain_map cascade_prop_map( cascades.begin(), 
+					    Complex_offset_map());
 	Cell_boundary cell_boundary( complex.cell_boundary());
 	Complex_boundary complex_boundary( complex, cell_boundary);
 
 	stats.timer.start();
-	ctl::parallel_persistence( ranges,
+	ctl::parallel::persistence( ranges,
 			           complex_boundary,
 			           cascade_prop_map, 
 			           num_parts );
@@ -165,7 +152,7 @@ void do_blowup_homology( Blowup & blowup_complex,
 	typedef typename  Chains::iterator Chains_iterator;
 	typedef typename  ctl::Id_property_map< Blowup_iterator> Offset_map;
 	typedef typename  boost::iterator_property_map< Chains_iterator,
-				Offset_map, Chain, Chain&> Cell_chain_map;
+				Offset_map, Chain, Chain&> Complex_chain_map;
 
 	stats.timer.start();
 	Blowup_filtration blowup_filtration( blowup_complex);
@@ -176,7 +163,7 @@ void do_blowup_homology( Blowup & blowup_complex,
 			          blowup_filtration.end(),
 				  ranges);
   	Chains cascades( blowup_complex.max_id()+1, Chain( Term_less() ));
-  	Cell_chain_map cascade_prop_map( cascades.begin(), Offset_map());
+  	Complex_chain_map cascade_prop_map( cascades.begin(), Offset_map());
 	Cell_boundary cell_boundary( blowup_complex.cell_boundary());
   	Blowup_boundary blowup_complex_boundary( blowup_complex, cell_boundary);
 	stats.timer.start();
@@ -215,14 +202,20 @@ void do_blowup_homology( Blowup & blowup_complex,
 						Blowup_filtration_iterator;
 	typedef typename  Nerve_filtration::iterator Nerve_filtration_iterator;
 	
-	typedef typename  ctl::Term_Z2< Blowup_iterator> Term_Z2;
-	typedef typename  ctl::Term_less< Term_Z2, Cell_less> Term_less;
-	typedef typename  ctl::Chain< Term_Z2, Term_less> Chain;
+      	typedef typename  Blowup::Term Blowup_term;
+	typedef typename  ctl::Term_cell_less< ctl::Cell_less> Term_less;
+	typedef typename  ctl::Chain< Blowup_term, Term_less> Chain;
 	typedef typename  std::vector< Chain> Chains;
 	typedef typename  Chains::iterator Chains_iterator;
-	typedef typename  ctl::Id_property_map< Blowup_iterator> Offset_map;
-	typedef typename  boost::iterator_property_map< Chains_iterator,
-				Offset_map, Chain, Chain&> Cell_chain_map;
+	typedef ctl::Pos_offset_map< Complex_iterator> Blowup_offset_map;
+
+	typedef typename  ctl::iterator_property_map< Chains::iterator,
+						      Complex_offset_map, 
+						      Complex_chain, 
+						      Complex_chain&> 
+						      Complex_chain_map;
+
+	typedef typename tbb::concurrent_vector< int> Betti;
 	typedef typename std::pair< Blowup_filtration_iterator, 
 				    Blowup_filtration_iterator> Filtration_pair;
 	typedef typename tbb::concurrent_vector< Filtration_pair> 
@@ -239,16 +232,14 @@ void do_blowup_homology( Blowup & blowup_complex,
 			current = beyond;
 	}
 	ranges.push_back( make_pair( current, blowup_filtration.end()));
-  	Chains cascades( blowup_complex.max_id()+1, Chain( Term_less() ));
-  	Cell_chain_map cascade_prop_map( cascades.begin(), Offset_map()); 
+  	Chains cascades( blowup_complex.size(), Chain); 
+	Complex_chain_map cascade_prop_map( cascades.begin(), Blowup_offset_map()); 
 	Cell_boundary cell_boundary( blowup_complex.cell_boundary());
   	Blowup_boundary blowup_complex_boundary( blowup_complex, cell_boundary);
   	std::cout << "calling parallel persistence: " << std::endl;
-	ctl::parallel_persistence( ranges,
-			           blowup_complex_boundary,
-			           cascade_prop_map, 
-			           num_local_pieces );
-	stats.parallel_persistence = stats.timer.get();
+	ctl::parallel_persistence( ranges, blowup_complex_boundary, cascade_prop_map, num_local_pieces );
+	stats.timer.stop();
+	stats.parallel_persistence = stats.timer.elapsed();
 #ifdef COMPUTE_BETTI
 	typedef typename tbb::concurrent_vector< int> Betti;
         //betti numbers

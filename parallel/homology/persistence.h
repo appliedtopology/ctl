@@ -39,8 +39,12 @@
 *
 *
 *******************************************************************************/
+#include <ctl/persistence/persistence.h>
+#include <ctl/parallel/utility/timer.h>
+
 #include <tbb/blocked_range.h>
 #include <tbb/parallel_for.h>
+#include <boost/functional/hash.hpp>
 
 namespace ctl {
 namespace parallel{
@@ -111,17 +115,17 @@ class Persistence_body{
 template< typename Iterator_pairs, 
 	  typename Boundary, 
 	  typename Cascade_map>
-void parallel_persistence(Iterator_pairs & ranges, 
-			  Boundary & complex_boundary,
-			  Cascade_map & cascade_prop_map,
-			  size_t & num_parallel_ranges){
+void persistence( Iterator_pairs & ranges, 
+		  Boundary & complex_boundary,
+		  Cascade_map & cascade_prop_map,
+		  size_t & num_parallel_ranges){
 	typedef typename Iterator_pairs::iterator Iterator;
 	typedef typename Iterator_pairs::value_type Pair;
 	typedef typename Pair::first_type Filtration_iterator;
 
 	typedef typename tbb::blocked_range< Iterator > Range;
-	typedef typename ctl::Persistence_body< Boundary, Cascade_map> Body;
-	ctl::Thread_timer timer;
+	typedef 	 Persistence_body< Boundary, Cascade_map> Body;
+	ctl::parallel::Timer timer;
 
 	Iterator parallel_end = ranges.begin()+num_parallel_ranges;
 	Body body( complex_boundary, cascade_prop_map);
