@@ -83,6 +83,12 @@ public:
 	filtration_( f), complex_( f.complex_) {}
 	Filtration( const Filtration && f): 
 	filtration_( std::move( f)), complex_( std::move( f.complex_)) {}	
+	//these are constructors used to hack together a filtration
+	Filtration( Complex & c, bool flag): 
+	filtration_( c.size()), complex_( c) {}	
+	Filtration( Complex & c, std::size_t size, bool flag): 
+	filtration_( size), complex_( c) {}	
+	//this is a default filtration
 	Filtration( Complex & c): filtration_( c.size()), complex_( c){
 	   std::size_t pos = 0;
 	   for( auto i= c.begin(); i != c.end(); ++i, ++pos){ 

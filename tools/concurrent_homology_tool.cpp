@@ -92,12 +92,11 @@ namespace po = boost::program_options;
 typedef ctl::Abstract_simplex< int> Cell;
 typedef ctl::Finite_field< 2> Z2;
 typedef ctl::Simplex_boundary< Cell, Z2> Simplex_boundary;
-typedef ctl::parallel::Chain_complex< Cell, Simplex_boundary, 
+typedef ctl::Chain_complex< Cell, Simplex_boundary, 
 				      ctl::parallel::Nerve_data> Nerve;
 typedef Nerve::iterator Nerve_iterator;
 typedef ctl::parallel::Cover_data< Nerve_iterator > Cover_data;
-typedef ctl::parallel::Chain_complex< Cell, 
-			    	      Simplex_boundary, Cover_data> Complex;
+typedef ctl::Chain_complex< Cell, Simplex_boundary, Cover_data> Complex;
 typedef Complex::iterator Complex_iterator;
 typedef ctl::Cell_less Cell_less;
 typedef ctl::parallel::Filtration< Complex, Cell_less> Complex_filtration;
@@ -129,14 +128,14 @@ typedef ctl::Product_boundary< Product, Nerve_boundary, Complex_boundary>
 
 typedef ctl::parallel::Chain_complex< Product, 
 				      Product_boundary, 
-				      ctl::Default_cell_data, 
+				      ctl::parallel::Default_data, 
 				      Product::Hash> Blowup;
 typedef Blowup::iterator Blowup_iterator;
 typedef ctl::Complex_boundary< Blowup, Blowup_iterator> Blowup_complex_boundary;
-typedef ctl::parallel::Id_less< Blowup_iterator> Parallel_id_less;
-typedef Blowup::Cell_boundary Cell_boundary;
+typedef ctl::parallel::Product_first_less < Blowup_iterator> Parallel_id_less;
+typedef Blowup::Boundary Cell_boundary;
 
-typedef ctl::parallel::Filtration< Blowup, Id_less> Blowup_filtration;
+typedef ctl::parallel::Filtration< Blowup, ctl::Id_less> Blowup_filtration;
 typedef Blowup_filtration::iterator Blowup_filtration_iterator;
 typedef std::vector< int> Betti;
 
@@ -203,17 +202,20 @@ int main( int argc, char *argv[]){
 
   stats.timer.start();
   Complex_filtration complex_filtration( complex);
-  double orig_filtration_time = stats.timer.get();
+  stats.timer.stop();
+  double orig_filtration_time = stats.timer.elapsed();
+
   stats.timer.start();
-  ctl::init_cover_complex( nerve, num_parts);
-  bool is_edgecut = ctl::graph_partition_cover( complex_filtration, nerve);
+  ctl::parallel::init_cover_complex( nerve, num_parts);
+  bool is_edgecut = ctl::parallel::graph_partition_cover( complex_filtration, nerve);
   int num_covers = (is_edgecut) ? num_parts+1 : num_parts; 
   std::size_t blowup_size = 0;
   Nerve_filtration nerve_filtration( nerve);
   for( Nerve_iterator i = nerve.begin(); i != nerve.end(); ++i){
 		blowup_size += (i->second.count());
   }
-  double cover_time = stats.timer.get();
+  stats.timer.stop();
+  double cover_time = stats.timer.elapsed();
   std::cerr << "cover computed" << std::endl;
   stats.timer.start();
   Nerve_boundary nerve_boundary( nerve);
@@ -226,7 +228,6 @@ int main( int argc, char *argv[]){
   //We introduce a single O(m) loop, which can be parallelized
   //and made to be O(m/p + p)
   Blowup_filtration blowup_filtration( blowup_complex, 
-				       Blowup_id_less(),
 				       false, blowup_size);
 #ifdef ZOOM
   /*Check if zoom is already sampling - if true, 
@@ -245,7 +246,8 @@ int main( int argc, char *argv[]){
 			              nerve_filtration,
 			              blowup_filtration,
 			              get, stats);
- double blowup_time = stats.timer.get();
+ stats.timer.stop();
+ double blowup_time = stats.timer.elapsed();
  std::cerr << "blowup built" << std::endl;
 
 #ifdef ZOOM

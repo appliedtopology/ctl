@@ -78,10 +78,12 @@ class const_product_boundary_iterator :
 		//even --> 1 and odd --> -1
 		sign( 2*(p.first_cell().dimension()%2!=0)-1){ next_term(); }
 
-	const_product_boundary_iterator( const Boundary1& b1, const Boundary2& b2, 
-				 const Product & p, const bool b): 
+	const_product_boundary_iterator( const Boundary1& b1, 
+					 const Boundary2& b2, 
+					 const Product & p, const bool b): 
 		end1( b1.end( p.first)),
-		end2( b2.end( p.second)){ end_term(); }	
+		end2( b2.end( p.second)),
+		sign( 2*(p.first_cell().dimension()%2!=0)-1){ end_term(); }
 	//copy constructor
 	const_product_boundary_iterator( const Self & f): 
 		cellptr( f.cellptr),
@@ -148,22 +150,22 @@ class const_product_boundary_iterator :
 	void next_term(){
 		//\partial(\sigma) \times \tau 
 		if( face1 != end1){
-			face.cell().first = face1.cell();
+			face.cell().first = face1->cell();
 			face.cell().second = cellptr->second;
-			face.coefficient( face1.coefficient()); 
+			face.coefficient( face1->coefficient()); 
 			++face1;
 		} else if ( face2 != end2){
 			face.cell().first = cellptr->first;
-			face.cell().first = face2->cell();
-			face.coefficient( sign*face2.coefficient()); 
+			face.cell().second = face2->cell();
+			face.coefficient( sign*face2->coefficient()); 
 			++face2;
 		} else {
 			end_term();
 		}
 	}
 	void end_term(){
-		face.cell().first  = end1.cell();
-		face.cell().second = end2.cell();
+		face.cell().first  = end1->cell();
+		face.cell().second = end2->cell();
 		face.coefficient( 1);
 	}
 	private:
@@ -172,7 +174,7 @@ class const_product_boundary_iterator :
 	 const_iterator2 face2;
 	 const_iterator1 end1;
 	 const_iterator2 end2;
-	 Coefficient sign;
+	 const int sign=0;
 	 Term face;
 }; // END const_product_boundary_iterator
 } //END private namespace
@@ -226,7 +228,7 @@ public:
 		return const_iterator( bd1, bd2, p, true); 
 	}
 	std::size_t length( const Product & p) const { 
-		return bd1.max_length( p.first) + bd2.max_length( p.second); 
+		return bd1.length( p.first) + bd2.length( p.second); 
 	}
 	const Boundary1& boundary1() const { return bd1; }
 	const Boundary2& boundary2() const { return bd2; }
