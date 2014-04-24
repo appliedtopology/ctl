@@ -35,44 +35,6 @@
 *******************************************************************************/
 #define COMPUTE_BETTI
 //#define TESTS_ON
-// Global Project Deps
-#include "abstract_simplex.h"
-#include "simplex_boundary.h"
-#include "complex_boundary.h"
-#include "filtration.h"
-#include "parallel_filtration.h"
-#include "cell_set.h"
-#include "io.h" 
-#include "term.h"
-#include "timer.h"
-#include "thread_timer.h"
-#include "point.h"
-#include "point_vector.h"
-#include "concurrent_cell_set.h"
-#include "compute_betti.h"
-
-//Persistence 
-// Boost
-#include <boost/property_map/property_map.hpp>
-#include <boost/unordered_map.hpp>
-#include "finite_field.h"
-#include "term_z2.h"
-#include "chain.h"
-#include "persistence.h"
-#include "p2_helper.h"
-
-//Blowup
-#include "product_boundary.h"
-#include "iterator_product.h"
-#include "blowup_io.h"
-
-//Local Project Deps
-#include "covers.h"
-#include "cover_tests.h"
-#include "build_blowup_complex.h"
-#include "parallel_homology.h"
-
-
 //BOOST
 #include <boost/program_options.hpp>
 
@@ -80,82 +42,109 @@
 #include <sstream>
 #include <vector>
 
+//TBB 
 #include <tbb/task_scheduler_init.h> 
-#ifdef ZOOM
-#include<zoom/zoom.h>
-#endif
+
+#include <ctl/io/io.h>
+#include <ctl/utility/timer.h>
+//Chain Complex
+#include <ctl/finite_field/finite_field.h>
+#include <ctl/abstract_simplex/abstract_simplex.h>
+#include <ctl/abstract_simplex/simplex_boundary.h>
+#include <ctl/chain_complex/chain_complex.h>
+#include <ctl/chain_complex/complex_boundary.h>
+#include <ctl/filtration/filtration.h>
+#include <ctl/term/term.h>
+
+//Parallel Chain Complex
+#include <ctl/parallel/chain_complex/chain_complex.h>
+#include <ctl/parallel/filtration/filtration.h>
+#include <ctl/parallel/utility/timer.h>
+
+//#include "point.h"
+//#include "point_vector.h"
+
+//Covers
+#include <ctl/parallel/partition_covers/covers.h>
+#include <ctl/parallel/partition_covers/cover_data.h>
+#include <ctl/parallel/partition_covers/cover_tests.h>
+
+//Blowup
+#include <ctl/product_cell/product_boundary.h>
+#include <ctl/product_cell/product_cell.h>
+#include <ctl/parallel/build_blowup_complex/build_blowup_complex.h>
+
+//Persistence 
+#include <ctl/chain/chain.h>
+#include <ctl/persistence/compute_betti.h>
+#include <ctl/persistence/persistence.h>
+#include <ctl/persistence/iterator_property_map.h>
+#include <ctl/persistence/offset_maps.h>
+#include <ctl/persistence/compute_betti.h>
+
+//Parallel Homology 
+#include <ctl/parallel/homology/persistence.h>
+#include <ctl/parallel/homology/homology.h>
+
 namespace po = boost::program_options;
 
 // Complex type
-typedef clt::Abstract_simplex Cell;
-typedef clt::Simplex_boundary< Cell, clt::Term_Z2> Simplex_boundary;
-typedef clt::Cell_set< Cell, Simplex_boundary, clt::Nerve_data> Nerve;
+typedef ctl::Abstract_simplex< int> Cell;
+typedef ctl::Finite_field< 2> Z2;
+typedef ctl::Simplex_boundary< Cell, Z2> Simplex_boundary;
+typedef ctl::parallel::Chain_complex< Cell, Simplex_boundary, 
+				      ctl::parallel::Nerve_data> Nerve;
 typedef Nerve::iterator Nerve_iterator;
-typedef clt::Cover_data< Nerve_iterator > Cover_data;
-typedef clt::Cell_set< Cell, Simplex_boundary, Cover_data> Complex;
+typedef ctl::parallel::Cover_data< Nerve_iterator > Cover_data;
+typedef ctl::parallel::Chain_complex< Cell, 
+			    	      Simplex_boundary, Cover_data> Complex;
 typedef Complex::iterator Complex_iterator;
-typedef clt::Cell_less< Complex_iterator> Complex_less;
-typedef clt::Cell_less< Nerve_iterator> Nerve_less;
-typedef clt::Parallel_filtration< Complex, Complex_less> Complex_filtration;
-typedef clt::Parallel_filtration< Nerve, Nerve_less> 
+typedef ctl::Cell_less Cell_less;
+typedef ctl::parallel::Filtration< Complex, Cell_less> Complex_filtration;
+typedef ctl::parallel::Filtration< Nerve, Cell_less> 
 						Nerve_filtration;
 typedef Complex_filtration::iterator Complex_filtration_iterator;
 typedef Nerve_filtration::iterator Nerve_filtration_iterator;
-typedef clt::Filtration_property_map< Complex_filtration_iterator> 
-					Complex_filtration_map;
-typedef clt::Thread_timer Timer;
+typedef ctl::parallel::Filtration_property_map< Complex_filtration_iterator> 
+					    Complex_filtration_map;
+typedef ctl::parallel::Timer Timer;
 
 template< typename Timer>
-struct Tri_stats: clt::Cover_stats< Timer>, 
-	      clt::Blowup_stats< Timer>,
-	      clt::Parallel_stats< Timer>
+struct Tri_stats: ctl::parallel::Cover_stats< Timer>, 
+	      ctl::parallel::Blowup_stats< Timer>,
+	      ctl::parallel::Parallel_stats< Timer>
 	     { Timer timer; };
+
 typedef Tri_stats< Timer> Stats;
 
 //Types to build a Blowup complex
-typedef clt::Complex_boundary< Complex, 
-			       Complex::iterator> Complex_boundary;
+typedef ctl::Complex_boundary< Complex> Complex_boundary;
 
-typedef clt::Complex_boundary< Nerve,
-			       Nerve_iterator> Nerve_boundary;
+typedef ctl::Complex_boundary< Nerve> Nerve_boundary;
 
-typedef clt::Iterator_product< Nerve_iterator, 
-			       Complex::iterator> Product;
+typedef ctl::Product_cell< Nerve_iterator,  Complex_iterator> Product;
 
-typedef clt::Product_boundary< Product, Nerve_boundary, 
-				        Complex_boundary> Product_boundary;
+typedef ctl::Product_boundary< Product, Nerve_boundary, Complex_boundary> 
+							 Product_boundary;
 
-typedef clt::Concurrent_cell_set< Product, 
-	       	  Product_boundary, 
-	       	  clt::Default_cell_data, 
-	       	  Product::Hash1> Blowup;
+typedef ctl::parallel::Chain_complex< Product, 
+				      Product_boundary, 
+				      ctl::Default_cell_data, 
+				      Product::Hash> Blowup;
 typedef Blowup::iterator Blowup_iterator;
-typedef clt::Complex_boundary< Blowup, Blowup_iterator> 
-	       			Blowup_complex_boundary;
-typedef clt::Parallel_id_less< Blowup::iterator> Parallel_id_less;
-typedef clt::Id_less< Blowup::iterator> Blowup_id_less;
-typedef clt::Cell_less< Blowup::iterator> Blowup_cell_less;
-typedef Blowup::iterator Blowup_iterator;
+typedef ctl::Complex_boundary< Blowup, Blowup_iterator> Blowup_complex_boundary;
+typedef ctl::parallel::Id_less< Blowup_iterator> Parallel_id_less;
 typedef Blowup::Cell_boundary Cell_boundary;
-typedef clt::Parallel_filtration< Blowup, 
-	       		   Blowup_id_less> Blowup_filtration;
+
+typedef ctl::parallel::Filtration< Blowup, Id_less> Blowup_filtration;
 typedef Blowup_filtration::iterator Blowup_filtration_iterator;
 typedef std::vector< int> Betti;
 
-template<typename String, typename Complex>
-void read_complex( String & complex_name, Complex & complex){
-	std::ifstream in;
-	std::cerr << "File IO ..." << std::flush;
-	clt::open_file( in, complex_name.c_str());
-	in >> complex;
-	clt::close_file( in);
-	std::cerr << "completed!" << std::endl;                     
-}
 
 template<typename Variable_map>
 void process_args( int & argc, char *argv[],Variable_map & vm){
   //parse command line options
-  po::options_description desc( "Usage: tp [options] input-file num-parts");
+  po::options_description desc( "Usage: concurrent_homology [options] input-file num-parts");
   desc.add_options()
   ( "help", "Display this message")
   ( "input-file", "input .asc file to parse")
@@ -216,8 +205,8 @@ int main( int argc, char *argv[]){
   Complex_filtration complex_filtration( complex);
   double orig_filtration_time = stats.timer.get();
   stats.timer.start();
-  clt::init_cover_complex( nerve, num_parts);
-  bool is_edgecut = clt::graph_partition_cover( complex_filtration, nerve);
+  ctl::init_cover_complex( nerve, num_parts);
+  bool is_edgecut = ctl::graph_partition_cover( complex_filtration, nerve);
   int num_covers = (is_edgecut) ? num_parts+1 : num_parts; 
   std::size_t blowup_size = 0;
   Nerve_filtration nerve_filtration( nerve);
@@ -251,11 +240,11 @@ int main( int argc, char *argv[]){
  ZM_ASSERT("ZMStartSession", result);
 #endif
  stats.timer.start();
- clt::build_blowup_complex( complex_filtration.begin(), 
-			    complex_filtration.end(),
-			    nerve_filtration,
-			    blowup_filtration,
-			    get, stats);
+ ctl::parallel::build_blowup_complex( complex_filtration.begin(), 
+			              complex_filtration.end(),
+			              nerve_filtration,
+			              blowup_filtration,
+			              get, stats);
  double blowup_time = stats.timer.get();
  std::cerr << "blowup built" << std::endl;
 
@@ -269,11 +258,11 @@ int main( int argc, char *argv[]){
   ZM_ASSERT("ZMDisconnect", result);
 #endif
 
-  clt::do_blowup_homology( blowup_complex,
-			   blowup_filtration, 
-			   nerve_filtration, 
-			   num_covers,
-			   stats);
+  ctl::parallel::do_blowup_homology( blowup_complex,
+			             blowup_filtration, 
+			             nerve_filtration, 
+			             num_covers,
+			             stats);
 
   std::cerr << "homology computed " << std::endl; 
   //END REAL COMPUTATION
@@ -378,7 +367,7 @@ int main( int argc, char *argv[]){
 	   << std::endl;
 
 #ifdef TESTS_ON
-  clt::run_tests( complex, blowup_complex, nerve);
+  ctl::run_tests( complex, blowup_complex, nerve);
 #endif
   return 0;
 }

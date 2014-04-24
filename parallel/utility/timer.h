@@ -42,15 +42,13 @@
 #include <chrono>
 #include <iostream>  // cerr 
 
-#ifdef _OPENMP
-#include <omp.h>
-#endif
+#include <tbb/tick_count.h>
 
 //exported functionality
 namespace ctl{
 namespace parallel{
 class Timer {    
-	typedef tbb::tick_count Clock();
+	typedef tbb::tick_count Clock;
 	typedef typename tbb::tick_count time_point;
 public:
   Timer() : start_(), stop_(){}
