@@ -1,3 +1,4 @@
+tools/cover_homology
 tools/concurrent_homology
 tools/write_filtration
 cover_test
