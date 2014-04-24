@@ -106,15 +106,15 @@ bool compute_graph_partition( Complex & complex,
 	//but will be at least for all /blowup codes
 	//num_parts needs to in general be the number of vertices in the nerve
 	const size_t num_parts = nerve.size();
-	typedef typename std::vector< int> Vector;
+	typedef typename std::vector< idx_t> Vector;
 	typedef typename Complex::Cell::vertex_type Vertex;
         typedef typename Cover_complex::Cell Cover_cell;
         Vector neighbors; //num_vertices+1
         Vector offsets; //2*num_edges
         Vector index_to_vertex_map; //num_vertices
         Vector part( 1, 0); //num_vertices
-        int num_vertices = 0;
-        int edgecut = 0;
+        idx_t num_vertices = 0;
+        idx_t edgecut = 0;
 
 	//complex --> graph        
         ctl::one_skeleton( complex, neighbors, offsets, 

@@ -54,19 +54,19 @@ template< typename Vector>
 void metis( Vector & xadj, 
 	    Vector & adjncy, 
 	    Vector & part, 
-	    int & edgecut, 
-	    int & num_vertices, 
-	    int num_parts){
-	idx_t ncon = 2;
+	    idx_t & edgecut, 
+	    idx_t & num_vertices, 
+	    idx_t num_parts){
+	idx_t ncon = 1;
 	//hopefully updated to v5.0 spec
-        METIS_PartGraphRecursive( (idx_t*)&num_vertices,
+        METIS_PartGraphRecursive( &num_vertices,
 				  &ncon, //no idea what this is for, but the manual
 					 //suggests making it = 2. 
-				  (idx_t*)&xadj[0], (idx_t*)&adjncy[0], 
+				  &xadj[0], &adjncy[0], 
 				  NULL, NULL, NULL,
-				  (idx_t*)&num_parts, 
+				  &num_parts, 
 				  NULL, NULL, NULL, 
-				  (idx_t*) &edgecut,  (idx_t*)&part[0]);
+				  &edgecut, &part[0]);
 }
 
 template< typename Complex,
@@ -88,8 +88,8 @@ void metis_to_complex( Complex & complex,
 	for( Index_iterator i = index_to_vertex.begin(); 
 			    i < index_to_vertex.end(); ++i){
 		const int j = std::distance( index_to_vertex.begin(), i);
-		Cell cell = { *i };
-		Nerve_cell part_cell = { part[ j] };
+		Cell cell = { (int)*i };
+		Nerve_cell part_cell = { (int)part[ j] };
 		Nerve_iterator iterator = nerve.find_cell( part_cell);
 		vertex_to_nerve.insert( make_pair( *i,  iterator) );
 		complex.find_cell( cell)->second.data() = iterator;
