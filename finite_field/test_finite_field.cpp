@@ -50,11 +50,11 @@ int main( int argc, char** argv){
 	std::cout << "bneg = " << bneg << std::endl;
 	Z11 c( 1);
 	std::cout << "c = " << c << " 11*c  = " << 11*c << std::endl;
-	for( int i = 1; i < c.prime(); ++i){
+	for( std::size_t i = 1; i < c.prime(); ++i){
 		c = i;
 		std::cout << c << " inverse: " << c.inverse() << std::flush << std::endl;
 	}
-	for( int i = 1; i < c.prime(); ++i){
+	for( std::size_t i = 1; i < c.prime(); ++i){
 		c = i;
 		std::cout << c << "/" << c << " should always be 1: " 
 			  << c/c << std::flush << std::endl; 

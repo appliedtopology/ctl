@@ -107,7 +107,7 @@ bool compute_graph_partition( Complex & complex,
 	//num_parts needs to in general be the number of vertices in the nerve
 	const size_t num_parts = nerve.size();
 	typedef typename std::vector< idx_t> Vector;
-	typedef typename Complex::Cell::vertex_type Vertex;
+	//typedef typename Complex::Cell::vertex_type Vertex;
         typedef typename Cover_complex::Cell Cover_cell;
         Vector neighbors; //num_vertices+1
         Vector offsets; //2*num_edges
@@ -429,9 +429,9 @@ void close_cover( Cell_list_iterator begin,
 
 	typedef typename Boundary::const_iterator Boundary_iterator;
 	typedef typename Cover_complex::Cell Cover_cell;
-	typedef typename Cover_complex::iterator Cover_iterator;
+	//typedef typename Cover_complex::iterator Cover_iterator;
 	typedef typename Cover_cell::vertex_type vertex_type;
-	typedef typename Cover_cell::iterator Cover_cell_iterator;
+	//typedef typename Cover_cell::iterator Cover_cell_iterator;
 	typedef typename Cover_complex::Data Cover_cell_data;
                                                                   
 	Cover_cell  impure_cell = (*begin)->second.data()->first;
@@ -496,13 +496,12 @@ bool graph_partition_cover( Filtration & filtration,
 	typedef typename Filtration::Complex Complex;	
 	typedef typename Complex::iterator Complex_iterator;
 	typedef typename tbb::concurrent_vector< Complex_iterator> Cell_list;
-	typedef typename ctl::Complex_boundary< Complex> Complex_boundary;	
+	//typedef typename ctl::Complex_boundary< Complex> Complex_boundary;	
 	Cell_list nearly_pure_cells;
 	//we find an open cover
 	if( graph_partition_open_cover( filtration, 
 					nerve, 
 					nearly_pure_cells) ){
-/*
 		// and if necessary
 		// we close it.
 		Complex_boundary boundary( filtration.complex());
@@ -510,7 +509,6 @@ bool graph_partition_cover( Filtration & filtration,
 			     nearly_pure_cells.end(), 
 			     boundary, 
 			     nerve );
-*/
 		return true;
 	}
 	return false;

@@ -81,7 +81,7 @@ void metis_to_complex( Complex & complex,
 		       const Vertex_to_part_map  & part){
 
         typedef typename Complex::Cell Cell;
-        typedef typename Complex::iterator Complex_iterator;
+        //typedef typename Complex::iterator Complex_iterator;
 	typedef typename Cover_complex::Cell Nerve_cell;
 	typedef typename Cover_complex::iterator Nerve_iterator;
 	typedef typename Index_to_vertex_map::const_iterator Index_iterator;

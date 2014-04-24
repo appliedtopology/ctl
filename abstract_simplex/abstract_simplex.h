@@ -172,9 +172,10 @@ Stream& operator>>( Stream & in, ctl::Abstract_simplex< T> & simplex){
 template< typename Stream, typename T>
 Stream& operator<<(Stream& out, const ctl::Abstract_simplex< T> & simplex){
 	typedef typename ctl::Abstract_simplex< T>::const_iterator iterator;
+	typedef typename iterator::value_type;
 	out << "[";
 	for(iterator i = simplex.begin(); i != simplex.end(); ++i){
-		out << *i;
+		out << (value_type)*i;
 		if ( i+1 != simplex.end()) { out << ", "; } else { out << "]";}
 	}
 	return out;

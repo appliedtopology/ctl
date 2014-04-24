@@ -1,6 +1,6 @@
 project(ctl CXX)
 set( CMAKE_VERBOSE_MAKEFILE  false)
-option(USE_CLANG "build application with clang" ON) # OFF is the default
+option(USE_CLANG "build application with clang" OFF) # OFF is the default
 if( USE_CLANG)
    SET (CMAKE_C_COMPILER             "/usr/bin/clang")
    SET (CMAKE_C_FLAGS                "-Wall -std=c99")
