@@ -63,7 +63,7 @@ bool insert_vertex( vertex_descriptor & descriptor,
                     Inverse_map& name_to_descriptor,
                     name_map_t& descriptor_to_name,
                     Graph & graph) {
-        typedef typename boost::graph_traits< Graph> graph_traits;
+        //typedef typename boost::graph_traits< Graph> graph_traits;
 	typedef typename Inverse_map::iterator Inverse_map_iterator;
 
 	//thus given one of the maps, we check the other one to 
@@ -95,8 +95,8 @@ void complex_to_graph(Complex &complex, Graph &graph){
 
 template<typename Complex, typename Graph, typename Inverse_Map>
 void complex_to_graph(Complex &c, Graph &g, Inverse_Map to_descriptor){	
-	typedef typename boost::property_map< Graph, 
-			 boost::vertex_name_t>::const_type const_name_map_t;
+	//typedef typename boost::property_map< Graph, 
+			 //boost::vertex_name_t>::const_type const_name_map_t;
 	typedef typename boost::property_map< Graph, 
 			boost::vertex_name_t>::type name_map_t; 
 	typedef typename boost::graph_traits< Graph> graph_traits;

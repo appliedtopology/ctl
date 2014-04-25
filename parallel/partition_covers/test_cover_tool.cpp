@@ -158,7 +158,7 @@ int main( int argc, char *argv[]){
   std::cout << "cover time: " << cover_time << std::endl;
   Nerve_filtration ordered_nerve( nerve);
   
-  typedef Nerve_filtration::iterator Iterator;
+  //typedef Nerve_filtration::iterator Iterator;
   for(const auto & cell:  ordered_nerve){ 
  	std::cout << cell->first << ": " << cell->second.count() << std::endl;
   }

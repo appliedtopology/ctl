@@ -91,7 +91,7 @@ void graph_to_metis( Graph & graph,
 	typedef typename boost::graph_traits<Graph>::adjacency_iterator 
 							Adjacency_iterator;
 	typedef typename std::pair<Adjacency_iterator,Adjacency_iterator> Pair;
-	typedef typename Vertex_to_index_map::value_type Index;
+	//typedef typename Vertex_to_index_map::value_type Index;
 	Name_map name_map = boost::get( boost::vertex_name, graph);
 
         Vertex_iterator vi, vlast;
