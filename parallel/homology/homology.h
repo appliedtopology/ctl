@@ -71,7 +71,7 @@ void compute_homology( Complex & complex,
 	typedef typename ctl::parallel::Cover_less< Complex_iterator> Cell_less;
 	typedef typename ctl::parallel::Filtration< Complex, Cell_less> 
 								Filtration;
-	typedef typename Complex::Boundary Cell_boundary;
+	//typedef typename Complex::Boundary Cell_boundary;
 	typedef typename ctl::Complex_boundary< Complex> Complex_boundary;
 	typedef typename Filtration::iterator Filtration_iterator;
 	typedef typename std::pair< Filtration_iterator, Filtration_iterator> 
@@ -138,9 +138,9 @@ void do_blowup_homology( Blowup & blowup_complex,
 			 Stats & stats){
 
 	typedef typename Blowup::iterator Blowup_iterator;
-	typedef typename Blowup::Boundary Cell_boundary;
+	//typedef typename Blowup::Boundary Cell_boundary;
 	typedef typename ctl::Complex_boundary< Blowup> Blowup_boundary;
-	typedef typename  Blowup_filtration::Less Cell_less;	
+	//typedef typename  Blowup_filtration::Less Cell_less;	
 	typedef typename  Blowup_filtration::iterator 
 						Blowup_filtration_iterator;
 	typedef typename  Nerve_filtration::iterator Nerve_filtration_iterator;

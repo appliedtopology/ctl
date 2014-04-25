@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
 		max_vertex_name < cur){ max_vertex_name = cur; }
   }
   for ( auto i : input_complex){  
-	for(int j = 1; j < num; ++j){
+	for(std::size_t j = 1; j < num; ++j){
 	    Cell cell = i.first;
 	    for( auto vertex_name : cell){ vertex_name+=max_vertex_name*j; }
 	    output_complex.insert_open_cell( cell);

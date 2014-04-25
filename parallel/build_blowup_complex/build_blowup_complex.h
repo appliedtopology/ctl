@@ -257,10 +257,10 @@ void build_blowup_complex( Iterator  complex_begin,
                            Blowup_filtration & blowup_filtration,
 			   Iterator_property_map & get,
 			   Stats & stats){
-	typedef typename Iterator::value_type Complex_iterator;
+	//typedef typename Iterator::value_type Complex_iterator;
 	typedef typename std::vector< std::size_t> Size_vector;
 	typedef typename Nerve_filtration::iterator Nerve_filtration_iterator;
-	typedef typename Complex_iterator::value_type::second_type Complex_data;
+	//typedef typename Complex_iterator::value_type::second_type Complex_data;
 	typedef typename Nerve_filtration_iterator::value_type Nerve_cell;
 	typedef Build_blowup_body< Iterator_property_map,
 				   Blowup_filtration,
@@ -268,7 +268,7 @@ void build_blowup_complex( Iterator  complex_begin,
 				   Size_vector, 
 				   Nerve_cell> Body;
 	typedef typename tbb::blocked_range< Iterator> Range;
-	typedef typename Blowup_filtration::Complex Blowup;	
+	//typedef typename Blowup_filtration::Complex Blowup;	
 	stats.timer.start();
 	Size_vector sizes( nerve_filtration.size()+1, 0);
 	//we build a histogram of the blowup filtration buckets

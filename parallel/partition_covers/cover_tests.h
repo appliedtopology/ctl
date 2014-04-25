@@ -120,11 +120,11 @@ template<typename Blowup, typename Cover_complex, typename Complex>
 bool factor_blowup(const Blowup & blowup,
 		   const Cover_complex & complex1, 
 		   const Complex & complex2){
-	typedef typename Blowup::Cell_boundary Blowup_boundary;
-	typedef typename Blowup::Cell Blowup_cell;
+	//typedef typename Blowup::Cell_boundary Blowup_boundary;
+	//typedef typename Blowup::Cell Blowup_cell;
 	typedef typename Blowup::const_iterator Blowup_iterator;
-	typedef typename Blowup_boundary::const_iterator 
-						Blowup_boundary_iterator;
+	//typedef typename Blowup_boundary::const_iterator 
+	//					Blowup_boundary_iterator;
 	
 	Cover_complex new_complex1;
 	Complex new_complex2;

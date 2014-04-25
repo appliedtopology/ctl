@@ -285,7 +285,7 @@ void generate_stats(Str & filename, Complex & complex,
 				   int & edgecut, double & partTime,
 				   double & coverTime, double & wholeTime){
 	//typedef typename Complex::iterator cell_it;
-	typedef typename std::set<int> coverType; //need more genericity for
+	//typedef typename std::set<int> coverType; //need more genericity for
 	//typedef typename coverType::iterator covIt;
 	std::vector< double > partDist(numparts);
 	std::vector< double > coverDist(numcovers);

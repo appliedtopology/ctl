@@ -496,7 +496,7 @@ bool graph_partition_cover( Filtration & filtration,
 	typedef typename Filtration::Complex Complex;	
 	typedef typename Complex::iterator Complex_iterator;
 	typedef typename tbb::concurrent_vector< Complex_iterator> Cell_list;
-	//typedef typename ctl::Complex_boundary< Complex> Complex_boundary;	
+	typedef typename ctl::Complex_boundary< Complex> Complex_boundary;	
 	Cell_list nearly_pure_cells;
 	//we find an open cover
 	if( graph_partition_open_cover( filtration, 

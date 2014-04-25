@@ -50,7 +50,7 @@ void eliminate_boundaries( Persistence_data & data){
    //Cell here is really a pointer into the complex
    typedef typename Persistence_data::Chain Chain;
    typedef typename Chain::value_type Term;
-   typedef typename Term::Cell Cell;
+   //typedef typename Term::Cell Cell;
    typedef typename Term::Coefficient Coefficient;
    while( !data.cascade_boundary.empty()){
 	//instead of directly accessing tau, we just get tau's position

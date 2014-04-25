@@ -208,7 +208,7 @@ int main( int argc, char *argv[]){
   stats.timer.start();
   ctl::parallel::init_cover_complex( nerve, num_parts);
   bool is_edgecut = ctl::parallel::graph_partition_cover( complex_filtration, nerve);
-  int num_covers = (is_edgecut) ? num_parts+1 : num_parts; 
+  std::size_t num_covers = (is_edgecut) ? num_parts+1 : num_parts; 
   std::size_t blowup_size = 0;
   Nerve_filtration nerve_filtration( nerve);
   for( Nerve_iterator i = nerve.begin(); i != nerve.end(); ++i){
@@ -297,7 +297,7 @@ int main( int argc, char *argv[]){
 		++num_edges; 
 		//are you an impure edge? if so, you are a cut -edge
 		if ( (*i)->second.data()->first.dimension() == 0 && 
-		     *((*i)->second.data()->first.begin()) == num_parts){
+		     *((*i)->second.data()->first.begin()) == (int)num_parts){
 			++edgecut;
 		}
 	}

@@ -187,7 +187,7 @@ template< typename Vector, typename Less>
 Vector& chain_term_add( Vector & x, const typename Vector::value_type & y, 
 		        Less less, const term_non_z2_tag t){
 	typedef typename Vector::value_type Term;
-	typedef typename Term::Coefficient Coefficient;
+	//typedef typename Term::Coefficient Coefficient;
 	typedef is_zero< Term> Is_zero;
 	auto pos = std::lower_bound( x.begin(), x.end(), y, less);
 	//new element, so add it at the end
