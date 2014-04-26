@@ -1,5 +1,13 @@
 project(ctl CXX)
 set( CMAKE_VERBOSE_MAKEFILE  false)
+cmake_minimum_required(VERSION 2.6.2)
+if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" VERSION_GREATER 2.6)
+  if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION}" VERSION_GREATER 2.8.3)
+    cmake_policy(VERSION 2.8.4)
+  else()
+    cmake_policy(VERSION 2.6)
+  endif()
+endif()
 option(USE_CLANG "build application with clang" OFF) # OFF is the default
 if( USE_CLANG)
    SET (CMAKE_C_COMPILER             "/usr/bin/clang")
@@ -24,6 +32,9 @@ endif( USE_CLANG)
 #set (CMAKE_INSTALL_PREFIX /usr/local)
 #for installing read:
 #http://www.cmake.org/cmake/help/cmake_tutorial.html
+set(CTL_INCLUDE_INSTALL_DIR ${CMAKE_SOURCE_DIR}/install)
+set(CTL_DOC_INSTALL_DIR ${CMAKE_SOURCE_DIR}/doc)
+set(CTL_BIN_INSTALL_DIR ${CMAKE_SOURCE_DIR}/bin)
 set(Boost_USE_MULTITHREADED OFF)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules")
 find_package(Boost COMPONENTS program_options REQUIRED)
@@ -34,19 +45,10 @@ include_directories( ${METIS_INCLUDE_DIR} ${Boost_INCLUDE_DIR} ${TBB_INCLUDE_DIR
 link_directories(/usr/local/lib ${Boost_LIBRARY_DIR} ${METIS_LIBRARY_DIR} ${TBB_LIBRARY_DIR})
 add_definitions(" -Wall -ansi -std=c++11")
 set(CMAKE_BUILD_TYPE RELWITHDEBINFO)
-cmake_minimum_required(VERSION 2.6.2)
-if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" VERSION_GREATER 2.6)
-  if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION}" VERSION_GREATER 2.8.3)
-    cmake_policy(VERSION 2.8.4)
-  else()
-    cmake_policy(VERSION 2.6)
-  endif()
-endif()
-set(CTL_INCLUDE_INSTALL_DIR ${CMAKE_SOURCE_DIR}/install)
-set(CTL_INCLUDE_DOC_DIR ${CMAKE_SOURCE_DIR}/doc)
-set(CTL_INCLUDE_BIN_DIR ${CMAKE_SOURCE_DIR}/bin)
 
 add_subdirectory( ctl)
-INSTALL( DIRECTORY ${CMAKE_SOURCE_DIR}/ctl 
+
+install( DIRECTORY ${CMAKE_SOURCE_DIR}/ctl 
 	 DESTINATION ${CTL_INCLUDE_INSTALL_DIR} 
-	 FILES_MATCHING PATTERN "*.h")
+	 FILES_MATCHING PATTERN "*.h"
+	 PATTERN "*/CMakeFiles/*" EXCLUDE)
