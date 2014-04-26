@@ -11,19 +11,41 @@ This C++11 library provides a set of generic tools for:
 === LICENSE ===
 CTL is GPLv2+ (or later at your discretion). See LICENSE for more info. 
 
+=== DEPENDENCIES ==
+C++11 compiler (clang or gcc)
+Boost
+Intel's TBB
+METIS (graph partitioning)
+ANN (in the next release)
+
 === BUILDING ====
 To build the library type:
 	cmake .
 Then assuming no errors occur:
 	make
 
-=== INSTALL ==
-Coming soon:
+=== INSTALL === 
+Fedora/CentOS/RHEL:
+
+yum install ctl (coming soon)
+
+Ubuntu:
+apt-get install ctl (coming soon)
+
+OS/X
+brew install ctl (coming soon)
+
+=== INSTALL (from source) ===
 	make install
+then move the contents of :
+/bin ---> /usr/local/bin (or appropriate other location)
+/include/ctl ----> /usr/local/include/ctl
+/doc -->  /usr/share/doc/ctl
+
+There are no shared libraries!
 
 ==== USING (coming soon) ====
-See tools/ for a number of examples of using the library.
-
+See /usr/share/doc/examples for a number of examples of using the library. (coming soon)
 See tutorial/ for a tutorial (coming soon)
 
 ==== SUBMITTING PATCHES ====

@@ -3,7 +3,7 @@ ctl/tools/concurrent_homology
 ctl/tools/write_filtration
 cover_test
 bin/
-install/
+include/
 install_manifest.txt
 ctl/tools/gpcover
 ctl/parallel/build_blowup_complex/blowup_test
