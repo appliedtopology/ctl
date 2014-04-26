@@ -51,4 +51,4 @@ add_subdirectory( ctl)
 install( DIRECTORY ${CMAKE_SOURCE_DIR}/ctl 
 	 DESTINATION ${CTL_INCLUDE_INSTALL_DIR} 
 	 FILES_MATCHING PATTERN "*.h"
-	 PATTERN "*/CMakeFiles/*" EXCLUDE)
+	 PATTERN "CMakeFiles" EXCLUDE)
