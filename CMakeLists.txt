@@ -32,7 +32,7 @@ endif( USE_CLANG)
 #set (CMAKE_INSTALL_PREFIX /usr/local)
 #for installing read:
 #http://www.cmake.org/cmake/help/cmake_tutorial.html
-set(CTL_INCLUDE_INSTALL_DIR ${CMAKE_SOURCE_DIR}/install)
+set(CTL_INCLUDE_INSTALL_DIR ${CMAKE_SOURCE_DIR}/include)
 set(CTL_DOC_INSTALL_DIR ${CMAKE_SOURCE_DIR}/doc)
 set(CTL_BIN_INSTALL_DIR ${CMAKE_SOURCE_DIR}/bin)
 set(Boost_USE_MULTITHREADED OFF)
