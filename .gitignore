@@ -2,6 +2,9 @@ ctl/tools/cover_homology
 ctl/tools/concurrent_homology
 ctl/tools/write_filtration
 cover_test
+bin/
+install/
+install_manifest.txt
 ctl/tools/gpcover
 ctl/parallel/build_blowup_complex/blowup_test
 ctl/product_cell/test_product_cell
