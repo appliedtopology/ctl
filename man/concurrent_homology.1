@@ -1,0 +1,26 @@
+.TH CONCURRENT_HOMOLOGY 1 "v\ 0.1" "Sun, April 27, 2014" "DARWIN\ \-\ MAC\ OS\ X"
+.SH NAME
+.B concurrent_homology
+\- computes the homology of a space in parallel
+.SH SYNOPSIS
+concurrent_homology input-file num-parts:
+.br
+.SH OPTIONS
+.SH DESCRIPTION
+Uses a graph partitioning algorithm to find a partition of the underlying graph with num-parts
+pieces, then it bootraps this to a (num-parts+1) size cover of the input complex. It computes
+the homology of this space in parallel
+.br
+.SH VERSION
+This documentation describes
+.B build_clique
+version 0.1
+.SH "SEE ALSO"
+build_clique, concurrent_homology, duplicate, gpcover, oneskeleton, wghtomet, complex_size,  cover_homology, euler, metowgh, persistence, write_filtration
+.br
+.I http://ctl.appliedtopology.org site
+.SH AUTHOR
+.br
+.B Ryan H. Lewis
+.br
+.I \<rhl@stanford.edu\>
