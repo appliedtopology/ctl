@@ -533,9 +533,63 @@ uint128 CityHash128(const char *s, size_t len) {
                           uint128(Fetch64(s), Fetch64(s + 8) + k0)) :
       CityHash128WithSeed(s, len, uint128(k0, k1));
 }
-
 #ifdef __SSE4_2__
-#include <citycrc.h>
+//RHL: Begin insert declarations from city.
+//forward declare
+void CityHashCrc256Long(const char *s, size_t len,
+                               uint32 seed, uint64 *result); 
+
+// Requires len < 240.
+static void CityHashCrc256Short(const char *s, size_t len, uint64 *result) {
+  char buf[240];
+  std::memcpy(buf, s, len);
+  std::memset(buf + len, 0, 240 - len);
+  CityHashCrc256Long(buf, 240, ~static_cast<uint32>(len), result);
+}
+
+void CityHashCrc256(const char *s, size_t len, uint64 *result) {
+  if (LIKELY(len >= 240)) {
+    CityHashCrc256Long(s, len, 0, result);
+  } else {
+    CityHashCrc256Short(s, len, result);
+  }
+}
+
+uint128 CityHashCrc128(const char *s, size_t len) {
+  if (len <= 900) {
+    return CityHash128(s, len);
+  } else {
+    uint64 result[4];
+    CityHashCrc256(s, len, result);
+    return uint128(result[2], result[3]);
+  }
+}
+
+uint128 CityHashCrc128WithSeed(const char *s, size_t len, uint128 seed) {
+  if (len <= 900) {
+    return CityHash128WithSeed(s, len, seed);
+  } else {
+    uint64 result[4];
+    CityHashCrc256(s, len, result);
+    uint64 u = Uint128High64(seed) + result[0];
+    uint64 v = Uint128Low64(seed) + result[1];
+    return uint128(HashLen16(u, v + result[2]),
+                   HashLen16(Rotate(v, 32), u * k0 + result[3]));
+  }
+}
+
+
+
+
+
+
+
+//END insert declarations
+
+
+
+
+
 #include <nmmintrin.h>
 
 // Requires len >= 240.
@@ -633,7 +687,7 @@ static void CityHashCrc256Short(const char *s, size_t len, uint64 *result) {
   std::memset(buf + len, 0, 240 - len);
   CityHashCrc256Long(buf, 240, ~static_cast<uint32>(len), result);
 }
-
+/*
 void CityHashCrc256(const char *s, size_t len, uint64 *result) {
   if (LIKELY(len >= 240)) {
     CityHashCrc256Long(s, len, 0, result);
@@ -641,7 +695,6 @@ void CityHashCrc256(const char *s, size_t len, uint64 *result) {
     CityHashCrc256Short(s, len, result);
   }
 }
-
 uint128 CityHashCrc128WithSeed(const char *s, size_t len, uint128 seed) {
   if (len <= 900) {
     return CityHash128WithSeed(s, len, seed);
@@ -664,5 +717,5 @@ uint128 CityHashCrc128(const char *s, size_t len) {
     return uint128(result[2], result[3]);
   }
 }
-
+*/
 #endif
