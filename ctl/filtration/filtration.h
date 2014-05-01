@@ -64,6 +64,7 @@ class Filtration {
 	typedef typename Complex::Boundary Cell_boundary;
 	typedef typename Cell_boundary::Term Cell_term;
  public:
+	/*
 	typedef typename ctl::detail::_filtration_iterator< _viterator, 1> 
 								   iterator;
 	typedef typename ctl::detail::_filtration_iterator< _vciterator, 1> 
@@ -72,6 +73,12 @@ class Filtration {
 							       reverse_iterator;
 	typedef typename ctl::detail::_filtration_iterator<  _vciterator, -1>
 							 const_reverse_iterator;
+	*/
+	typedef _viterator iterator;
+	typedef _vciterator const_iterator;
+	typedef _vriterator reverse_iterator;
+	typedef _vcriterator const_reverse_iterator;
+
 	//A graded term! iterators themselves can represent grading via address.
 	typedef typename Cell_term::template 
 			rebind< iterator, Coefficient>::T Term;
@@ -90,9 +97,14 @@ public:
 		filtration_( f), complex_( f.complex_) {}
 	Filtration( const Filtration && f): 
 		filtration_( std::move( f)), complex_( f.complex_) {}	
-	//these are used to hack together a filtration
-	Filtration( Complex & c, bool flag): filtration_( c.size()), complex_( c) {}	
-	Filtration( Complex & c, std::size_t size, bool flag): filtration_( size), complex_( c) {}
+	//create a noncorrect filtration first.
+	//useful if we are going to create a filtration inside another
+	//algorithm
+	Filtration( Complex & c, bool flag): filtration_( c.size()), 
+					     complex_( c) {}
+	//maybe we have an empty complex, but we know its size in advance	
+	Filtration( Complex & c, std::size_t s, bool flag): filtration_( s), 
+							    complex_( c) {}
 	//default constructor	
 	Filtration( Complex & c): filtration_( c.size()), complex_( c){
 		std::size_t pos = 0;
