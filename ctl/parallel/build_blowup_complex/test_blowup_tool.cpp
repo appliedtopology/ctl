@@ -251,6 +251,10 @@ int main( int argc, char *argv[]){
   stats.timer.start();
   ctl::parallel::init_cover_complex( nerve, num_parts);
   ctl::parallel::graph_partition_cover( complex_filtration, nerve);
+  std::size_t blowup_size = 0;
+  for( Nerve_iterator i = nerve.begin(); i != nerve.end(); ++i){
+                blowup_size += (i->second.count());
+  }
   stats.timer.stop();
   double cover_time = stats.timer.elapsed();
   std::cout << "cover time: " << cover_time << std::endl;
@@ -263,8 +267,8 @@ int main( int argc, char *argv[]){
   Complex_filtration_iterator filtration_begin = complex_filtration.begin();
   Complex_filtration_iterator filtration_end = complex_filtration.end();
   Complex_filtration_map get;
-  Concurrent_blowup blowup_complex( blowup_cell_boundary);
-  Concurrent_blowup_filtration blowup_filtration( blowup_complex);
+  Concurrent_blowup blowup_complex( blowup_cell_boundary, blowup_size);
+  Concurrent_blowup_filtration blowup_filtration( blowup_complex, blowup_size, true);
   std::cout << "begin parallel build blowup" << std::endl;
   
   stats.timer.start();

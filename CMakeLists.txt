@@ -32,10 +32,6 @@ endif( USE_CLANG)
 #set (CMAKE_INSTALL_PREFIX /usr/local)
 #for installing read:
 #http://www.cmake.org/cmake/help/cmake_tutorial.html
-set(CTL_INCLUDE_INSTALL_DIR ${CMAKE_SOURCE_DIR}/include)
-set(CTL_DOC_INSTALL_DIR ${CMAKE_SOURCE_DIR}/doc)
-set(CTL_BIN_INSTALL_DIR ${CMAKE_SOURCE_DIR}/bin)
-set(CTL_EXAMPLES_INSTALL_DIR ${CMAKE_SOURCE_DIR}/examples)
 set(Boost_USE_MULTITHREADED OFF)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules")
 find_package(Boost COMPONENTS program_options REQUIRED)
@@ -50,12 +46,12 @@ set(CMAKE_BUILD_TYPE RELWITHDEBINFO)
 add_subdirectory( ctl)
 
 install( DIRECTORY ${CMAKE_SOURCE_DIR}/ctl 
-	 DESTINATION ${CTL_INCLUDE_INSTALL_DIR} 
+	 DESTINATION include 
 	 FILES_MATCHING PATTERN "*.h"
 	 PATTERN "CMakeFiles" EXCLUDE)
 
 install( DIRECTORY ${CMAKE_SOURCE_DIR}/ctl
-	 DESTINATION ${CTL_EXAMPLES_INSTALL_DIR}
+	 DESTINATION share/ctl/examples
 	 FILES_MATCHING PATTERN "*.cpp"
 	 PATTERN "CMakeLists.txt"
 	 PATTERN "CMakeFiles" EXCLUDE)

@@ -216,19 +216,18 @@ int main( int argc, char *argv[]){
   }
   stats.timer.stop();
   double cover_time = stats.timer.elapsed();
-  std::cerr << "cover computed" << std::endl;
   stats.timer.start();
   Nerve_boundary nerve_boundary( nerve);
   Complex_boundary complex_boundary( complex);
   Product_boundary blowup_cell_boundary( nerve_boundary, complex_boundary);
-  Blowup blowup_complex( blowup_cell_boundary);
+  Blowup blowup_complex( blowup_cell_boundary, blowup_size);
   //We construct an empty filtration, which we fill out in parallel
   //When we build the complex, with Id's so that Id_less provides a valid
   //filtration order using this structure.
   //We introduce a single O(m) loop, which can be parallelized
   //and made to be O(m/p + p)
   Blowup_filtration blowup_filtration( blowup_complex, 
-				       false, blowup_size);
+				       blowup_size, true);
 #ifdef ZOOM
   /*Check if zoom is already sampling - if true, 
   the following ZMStartSession call will fail.*/ 
@@ -248,7 +247,6 @@ int main( int argc, char *argv[]){
 			              get, stats);
  stats.timer.stop();
  double blowup_time = stats.timer.elapsed();
- std::cerr << "blowup built" << std::endl;
 
 #ifdef ZOOM
   /* Stop profiling. */
@@ -266,7 +264,6 @@ int main( int argc, char *argv[]){
 			             num_covers,
 			             stats);
 
-  std::cerr << "homology computed " << std::endl; 
   //END REAL COMPUTATION
   typedef std::vector< double> Size_vector;
   typedef Size_vector::iterator Size_iterator;

@@ -39,7 +39,6 @@
 *******************************************************************************/
 #ifndef _CTL_BUILD_COVER_COMPLEX_H_
 #define _CTL_BUILD_COVER_COMPLEX_H_
-#define PARALLEL_BLOWUP
 //STL
 #include <numeric>
 
@@ -192,9 +191,13 @@ class Build_blowup_body{
 				  	 const size_type nerve_index){
 		const size_t id = sizes[ nerve_index] + 
 				  current_sizes[ nerve_index]++;
-		filtration[ id] = blowup.insert_open_cell( Product( sigma, tau), 
-						       	Data(id+1)).first;
+		Product p( sigma, tau);
+		Data d(id+1);
+		auto result = blowup.insert_open_cell( p,d);
+		filtration[ id] = result.first;
 	}
+
+
 
 
 	public:
