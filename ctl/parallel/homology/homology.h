@@ -81,7 +81,10 @@ void compute_homology( Complex & complex,
 	typedef typename  Complex_boundary::Term Complex_term;
 	typedef typename  ctl::Term_cell_less< ctl::Cell_less> Term_less;
 	typedef typename  ctl::Chain< Complex_term, Term_less> Chain;
-	typedef typename  tbb::concurrent_vector< Chain> Chains;
+	//This should be thread safe since we preallocate *before* threads 
+	// and threads never access the same vector at the same time
+	// even if they did, it's not *these* chains that have to be thread safe.
+	typedef typename  std::vector< Chain> Chains;
 	typedef typename  Chains::iterator Chains_iterator;
 	typedef ctl::Pos_offset_map< Complex_iterator> Complex_offset_map;
 
@@ -157,8 +160,6 @@ void do_blowup_homology( Blowup & blowup_complex,
 						      Chain, 
 						      Chain&> 
 						      Complex_chain_map;
-
-	typedef typename tbb::concurrent_vector< int> Betti;
 	typedef typename std::pair< Blowup_filtration_iterator, 
 				    Blowup_filtration_iterator> Filtration_pair;
 	typedef typename tbb::concurrent_vector< Filtration_pair> 
