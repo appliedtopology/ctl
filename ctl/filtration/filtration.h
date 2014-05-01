@@ -61,6 +61,8 @@ class Filtration {
 	typedef typename Vector::const_iterator _vciterator;
 	typedef typename Vector::reverse_iterator _vriterator;
 	typedef typename Vector::const_reverse_iterator _vcriterator;
+	typedef typename Complex::Boundary Cell_boundary;
+	typedef typename Cell_boundary::Term Cell_term;
  public:
 	typedef typename ctl::detail::_filtration_iterator< _viterator, 1> 
 								   iterator;
@@ -70,9 +72,13 @@ class Filtration {
 							       reverse_iterator;
 	typedef typename ctl::detail::_filtration_iterator<  _vciterator, -1>
 							 const_reverse_iterator;
+	//A graded term! iterators themselves can represent grading via address.
+	typedef typename Cell_term::template 
+			rebind< iterator, Coefficient>::T Term;
 	typedef typename Vector::value_type value_type;
 	typedef typename Vector::reference reference;
 	typedef typename Vector::const_reference const_reference;
+	
 private:
 	//just to make typing below easier
 	typedef iterator it;
