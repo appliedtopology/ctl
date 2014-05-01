@@ -42,13 +42,11 @@ template< typename Cell_less>
 struct Term_cell_less{
    template< typename Term>
    bool operator()( const Term & l, const Term & r) const { 
-	const Cell_less c; 
-  	return c( l.cell(), r.cell()); 
-
+  	return Cell_less( l.cell(), r.cell()); 
    } 
 }; //struct Term_less
 
-
+/*
 //we mirror pos_() from l.cell()->second.pos() in the term
 //so that we avoid a dereference.
 struct Term_pos_less{
@@ -57,7 +55,7 @@ struct Term_pos_less{
    	return l.pos() < r.pos();
    }
 };// struct Term_pos_less
-
+*/
 } //namespace ctl
 
 #endif //CTLIB_TERM_LESS_H

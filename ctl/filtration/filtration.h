@@ -63,6 +63,7 @@ class Filtration {
 	typedef typename Vector::const_reverse_iterator _vcriterator;
 	typedef typename Complex::Boundary Cell_boundary;
 	typedef typename Cell_boundary::Term Cell_term;
+	typedef typename Cell_term::Coefficient Coefficient;
  public:
 	/*
 	typedef typename ctl::detail::_filtration_iterator< _viterator, 1> 
@@ -118,17 +119,17 @@ public:
 		return filtration_[ n]; 
 	}
 	//used typedefs above since the names were getting to long
-	it  begin() { return it( filtration_.begin(), 0);    }
-	it  end()   { return it( filtration_.end(), size()); }
+	it  begin() { return filtration_.begin();    }
+	it  end()   { return filtration_.end(); }
 	
-	cit begin() const { return cit( filtration_.begin(), 0);  }
-	cit end() const { return cit( filtration_.end(), size()); }
+	cit begin() const { return filtration_.begin();  }
+	cit end() const { return filtration_.end(); }
 
-	rit rbegin() { return rit( filtration_.rbegin(), size()-1); }
-	rit rend()   { return rit( filtration_.rend(), 0);          }
+	rit rbegin() { return filtration_.rbegin(); }
+	rit rend()   { return filtration_.rend();   }
 	
-	crit rbegin() const { return crit( filtration_.rbegin(), size()-1); }
-	crit rend()   const { return crit( filtration_.rend(), 0);          }
+	crit rbegin() const { return filtration_.rbegin(); }
+	crit rend()   const { return filtration_.rend();   }
 	Complex& complex() const { return complex_;}
 	std::size_t size() const { return filtration_.size(); } 
  private:

@@ -90,8 +90,9 @@ int main( int argc, char** argv){
 	t.stop();
 	std::cout << "f2 is sorted " << is_sorted( f2) 
 		  << " " << t.elapsed() << std::endl; 
-	for( auto i = f2.begin(); i != f2.end(); ++i){
-		std::cout << i.pos() << ": " << (*i)->first << std::endl;
+	std::size_t pos=0;
+	for( auto i = f2.begin(); i != f2.end(); ++i, ++pos){
+		std::cout << pos << ": " << (*i)->first << std::endl;
 	}
 	return 0;
 }

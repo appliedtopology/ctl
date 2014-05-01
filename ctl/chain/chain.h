@@ -37,6 +37,7 @@
 *******************************************************************************/
 //Project
 #include <algorithm>
+#include <functional>
 
 //CTL
 #include <ctl/chain/chain_add.h>
@@ -44,9 +45,8 @@
 #include <ctl/term/term_tags.h>
 
 
-//exported functionality
 namespace ctl{
-
+//exported functionality
 template< typename _Term, 
 	  typename _Less = std::less< _Term> >
 class Chain {
@@ -59,8 +59,11 @@ class Chain {
 	typedef Chain< Term, Less> Self;
  public:
 	typedef typename Vector::value_type value_type;
-	typedef typename Vector::iterator iterator;
-	typedef typename Vector::const_iterator const_iterator;
+	typedef typename Vector::reverse_iterator iterator;
+	typedef typename Vector::const_reverse_iterator const_iterator;
+	typedef typename Vector::iterator reverse_iterator;
+	typedef typename Vector::const_iterator const_reverse_iterator;
+	
 	typedef typename Term::coeff_tag coeff_tag; 
 public:
 	Chain(){}
@@ -70,28 +73,45 @@ public:
 	Chain( const Term & t): _chain( 1, t) {}
 	template< typename Iterator, typename Compare = Less>
 	Chain( Iterator begin, Iterator end, Compare c = Compare()): 
-	_chain( begin, end){ std::sort( _chain.begin(), _chain.end(), c); }
+	_chain( begin, end){ 
+		std::sort( _chain.begin(), _chain.end(), std::bind(c, std::placeholders::_2, std::placeholders::_1)); 
+	}
 	template< typename Iterator>
 	Chain( Iterator begin, Iterator end, const bool sorted): 
 	_chain(  begin, end) {}
 	
 	bool 		  empty()    const { return _chain.empty(); }
-	Term&	       youngest() 	   { return _chain.back();  }
-	const Term&    youngest() const	   { return _chain.back();  }
-	iterator       begin() 	     	   { return _chain.begin(); }
-	const_iterator begin() const 	   { return _chain.begin(); }
-		
-	iterator       end() 	     	   { return _chain.end(); }
-	const_iterator end() const   	   { return _chain.end(); }
+	Term&	       youngest() 	   { return _chain.front();  }
+	const Term&    youngest() const	   { return _chain.front();  }
+
+	iterator       begin() 	     	   { return _chain.rbegin(); }
+	const_iterator begin() const 	   { return _chain.rbegin(); }
+	iterator       end() 	     	   { return _chain.rend(); }
+	const_iterator end() const   	   { return _chain.rend(); }
 
 	//needed for scaled_add below..	
-	const_iterator cbegin() const 	   { return _chain.begin(); }
-	const_iterator cend() const   	   { return _chain.end(); }
+	const_iterator cbegin() const 	   { return _chain.rbegin(); }
+	const_iterator cend() const   	   { return _chain.rend(); }
+
+	reverse_iterator       rbegin() 	   { return _chain.begin(); }
+	const_reverse_iterator rbegin() const 	   { return _chain.begin(); }
+	reverse_iterator       rend() 	     	   { return _chain.end(); }
+	const_reverse_iterator rend() const   	   { return _chain.end(); }
+
+	//needed for scaled_add below..	
+	const_reverse_iterator crbegin() const 	   { return _chain.begin(); }
+	const_reverse_iterator crend() const   	   { return _chain.end(); }
 
 	template< class... Args>	
 	void emplace( Args&&... args){ _chain.emplace_back( std::forward< Args>( args)...); }
 	void swap( Chain & from){ _chain.swap( from._chain); }
- 
+	template< typename Compare = Less>
+ 	void sort( Compare c = Less()){
+		std::sort( _chain.begin(), _chain.end(), 
+			   std::bind(c, std::placeholders::_2, 
+					std::placeholders::_1));
+	}
+
 	std::size_t   size() const   	   { return _chain.size(); }	
 	void reserve( const std::size_t n) { _chain.reserve( n); } 
 	Chain& operator=( const Chain& from){ 
@@ -113,17 +133,19 @@ public:
 			   Compare c = Compare()){
 		Chain result;
 		return scaled_add( a, rhs, result, c);
-	}	
+	}
+	
 	template< typename Chain, typename Compare = Less>
 	Chain& scaled_add( const Coefficient & a, const Chain& rhs, 
 			   Chain & result, Compare c = Compare()){
 		const std::size_t n = size() + rhs.size();	
 		if( result._chain.size() < n){ result._chain.resize( n); }
-		auto _end = ctl::detail::chain_add( _chain.cbegin(), _chain.cend(),
-				 	a, rhs.begin(), rhs.end(), 
-				 	result.begin(), c, 
+		auto _end = ctl::detail::chain_add( _chain.cbegin(), 
+						    _chain.cend(),
+				 	a, rhs.crbegin(), rhs.crend(), 
+				 	result.rbegin(), std::bind(c, std::placeholders::_2, std::placeholders::_1), 
 				 	coeff_tag());
-		result._chain.erase( _end, result.end());
+		result._chain.erase( _end, result.rend());
 		_chain.swap( result._chain);
 		return *this;
 	}
@@ -135,28 +157,33 @@ public:
 	}
 	
 	Chain& operator+=( const Term & b){
-		ctl::detail::chain_term_add( _chain, b, Less(), coeff_tag());
+		ctl::detail::chain_term_add( _chain, b, 
+			std::bind(Less(), std::placeholders::_2, std::placeholders::_1), coeff_tag());
 		return *this;
 	}
 
 	Chain operator+( const Term & b){
 		Chain result( *this);
-		ctl::detail::chain_term_add( result._chain, b, Less(), coeff_tag());
+		ctl::detail::chain_term_add( result._chain, b,
+					     std::bind(Less(), std::placeholders::_2, std::placeholders::_1), 
+					     coeff_tag());
 		return result;
 	}
 
 	Chain operator+( const Chain & b) const {
 	   Chain result( size()+b.size());
-	   auto leftover = ctl::detail::chain_add( begin(), end(), 
-	   			            b.begin(), b.end(),
-	   			            result.begin(),
-	   			            Less(),
+	   auto leftover = ctl::detail::chain_add( rbegin(), rend(), 
+	   			            b.rbegin(), b.rend(),
+	   			            result.rbegin(),
+	   			            std::bind(Less(), std::placeholders::_2, std::placeholders::_1),
 	   			            Chain::coeff_tag());
-	   result._chain.erase( leftover, result.end());
+	   result._chain.erase( leftover, result.rend());
 	   return result;
 	}
  private:
-   Coefficient& normalize( ctl::detail::term_z2_tag) const { return Coefficient( 1); }
+   Coefficient& normalize( ctl::detail::term_z2_tag) const { 
+	return Coefficient( 1); 
+   }
    Coefficient& normalize( ctl::detail::term_z2_tag, bool) const { 
 	return Coefficient( 1); 
    }
@@ -178,7 +205,7 @@ private:
 template< typename Chain>
 Chain& operator+( const typename Chain::Term & b, Chain & a){ return a+b; }
 
-} //namespace ct
+} //namespace ctl
 
 //\alpha*[chain] = [chain]*\alpha
 template< typename T, typename L>

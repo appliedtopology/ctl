@@ -129,7 +129,6 @@ protected:
 		//TODO: see if it improves performace,
 		//complex_iterators can store this position
 		//to avoid the extra dereference
-		term.pos( term.cell()->second.pos());
 		++next_term;
 		return;
 	}
