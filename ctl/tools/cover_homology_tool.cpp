@@ -35,6 +35,11 @@
 *******************************************************************************/
 #define COMPUTE_BETTI
 //#define TESTS_ON
+#define CTL_USE_CITY
+#define ZOOM_PROFILE
+#ifdef ZOOM_PROFILE
+#include "zoom.h"
+#endif
 
 //#define TESTS_ON
 //BOOST
@@ -144,8 +149,11 @@ void process_args( int & argc, char *argv[],Variable_map & vm){
 	std::exit( -1);
   }
 }
-
 int main( int argc, char *argv[]){
+  #ifdef ZOOM_PROFILE
+  std::cout << "Connect" <<  ZMConnect() << std::endl;
+  #endif
+ 
   po::variables_map vm;
   process_args( argc, argv, vm);
   size_t num_parts = atoi( vm[ "num-parts"].as< std::string>().c_str());
@@ -179,7 +187,22 @@ int main( int argc, char *argv[]){
   stats.timer.stop();
   double cover_time = stats.timer.elapsed();
   std::cout << "build cover: " << cover_time << std::endl;
+  #ifdef ZOOM_PROFILE
+  std::cout << "Profiling Begin";
+  ZMError start_error = ZMStartSession();
+  std::cout << start_error << std::endl;
+  #endif 
+ 
   ctl::parallel::compute_homology( complex, num_parts, stats);
+  #ifdef ZOOM_PROFILE
+  ZMError end_error = ZMStopSession();
+  std::cout << "Profiling End" << end_error << std::endl;
+  #endif
+  #ifdef ZOOM_PROFILE
+   std::cout << "Disconnect" <<  ZMDisconnect() << std::endl;
+  #endif
+
+
   double total_time = cover_time + stats.filtration_time + stats.get_iterators +
          	     stats.parallel_persistence;
                                                                                 
