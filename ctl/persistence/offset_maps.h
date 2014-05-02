@@ -69,7 +69,7 @@ template< typename Filtration_iterator, typename Coefficient>
 typename Pos_offset_map< Filtration_iterator>::value_type 
 get( const Pos_offset_map< Filtration_iterator>& map, 
      const ctl::Term< Filtration_iterator, Coefficient> & term) { 
-	return std::distance(map.begin, term.cell);
+	return std::distance(map.begin, term.cell());
 }
 
 template< typename Cell>

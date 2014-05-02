@@ -53,6 +53,7 @@
 #include <ctl/abstract_simplex/simplex_boundary.h>
 #include <ctl/chain_complex/complex_boundary.h>
 #include <ctl/filtration/filtration.h>
+#include <ctl/filtration/filtration_boundary.h>
 #include <ctl/filtration/less.h>
 #include <ctl/io/io.h>
 #include <ctl/chain_complex/chain_complex.h>
@@ -82,21 +83,22 @@ typedef	Complex::iterator Complex_iterator;
 typedef ctl::Cell_less Complex_cell_less;
 typedef ctl::Filtration< Complex, Complex_cell_less > Filtration;
 typedef Filtration::iterator Filtration_iterator;
+typedef ctl::Filtration_boundary< Filtration> Filtration_boundary;
+typedef Filtration::Term Filtration_term;
 
 //Complex Boundary Operator
-typedef ctl::Complex_boundary< Complex> Complex_boundary;
+//typedef ctl::Complex_boundary< Complex> Complex_boundary;
+//typedef Complex_boundary::Term Complex_term;
 
 //Build Chain Type
-typedef Complex_boundary::Term Complex_term;
-typedef ctl::Term_cell_less< Complex_cell_less> Complex_term_less_cell;
-typedef ctl::Chain< Complex_term, Complex_term_less_cell> Complex_chain;
+typedef ctl::Chain< Filtration_term> Complex_chain;
 
 //Type which stores all the chains for persistence
 //It would be a good project to see if storing the internal pointer here
 //inside of the chain_complex would be a good idea
 typedef std::vector< Complex_chain> Complex_chains;
 
-typedef ctl::Pos_offset_map< Complex::iterator> Complex_offset_map;
+typedef ctl::Pos_offset_map< Filtration::iterator> Complex_offset_map;
 typedef ctl::iterator_property_map< Complex_chains::iterator, 
                                       Complex_offset_map, 
                                       Complex_chain, 
@@ -120,7 +122,6 @@ int main(int argc, char *argv[]){
   
   //create some data structures 
   Complex complex;
-  Complex_boundary complex_boundary( complex);
   Timer timer;
                                        
   // Read the cell_set in  
@@ -137,6 +138,7 @@ int main(int argc, char *argv[]){
   //produce a filtration
   timer.start();
   Filtration complex_filtration( complex);
+  Filtration_boundary filtration_boundary( complex_filtration);
   timer.stop();
   double complex_filtration_time = timer.elapsed();
   //display some info
@@ -146,9 +148,10 @@ int main(int argc, char *argv[]){
   //begin instantiate our vector of cascades homology
   Complex_chains complex_cascade_boundaries( complex.size(), Complex_chain());
   
+  Complex_offset_map offset_map( complex_filtration.begin());
   //we hand persistence a property map for genericity!                                         
-  Complex_chain_map cascade_bd_property_map( complex_cascade_boundaries.begin(), 
-					     Complex_offset_map());
+  Complex_chain_map cascade_bd_property_map( complex_cascade_boundaries.begin(),
+					     offset_map);
   #ifdef ZOOM_PROFILE
   std::cout << "Profiling Begin";
   ZMError start_error = ZMStartSession();
@@ -157,7 +160,7 @@ int main(int argc, char *argv[]){
   //serial persistence (complex)
   timer.start();
   ctl::persistence( complex_filtration.begin(), complex_filtration.end(),
-  		    complex_boundary, cascade_bd_property_map);
+  		    filtration_boundary, cascade_bd_property_map);
   timer.stop();
   #ifdef ZOOM_PROFILE
   ZMError end_error = ZMStopSession();
@@ -179,7 +182,7 @@ int main(int argc, char *argv[]){
   typedef std::vector<int> Betti;
   Betti betti;
   std::cout << "serial betti (complex): " << std::endl;
-  ctl::compute_betti( complex, cascade_bd_property_map, betti);
+  ctl::compute_betti( filtration, cascade_bd_property_map, betti);
   std::cout << std::endl;
   int euler=0;
   int m = 1;

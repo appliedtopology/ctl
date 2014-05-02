@@ -140,7 +140,6 @@ void persistence( Iterator_pairs & ranges,
 				  cascade_prop_map);
 	}
 	//double serial_time = timer.get();
-	
 }
 
 /*

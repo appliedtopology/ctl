@@ -80,7 +80,6 @@ bool is_creator( const Term & term, Chain_map & cascade_boundary_map){
 template< typename Filtration_iterator, 
 	  typename Persistence_data>
 void initialize_cascade_data( const Filtration_iterator sigma, 
-			      const Filtration_iterator begin,
 			      Persistence_data & data, partner){
      typedef typename Filtration_iterator::value_type Cell;
      typedef typename Persistence_data::Chain Chain;
@@ -88,15 +87,15 @@ void initialize_cascade_data( const Filtration_iterator sigma,
      cascade_boundary.reserve( data.bd.length( sigma));
      for( auto i = data.bd.begin( sigma); i != data.bd.end( sigma); ++i){
          if( is_creator( *i, data.cascade_boundary_map)){
-		cascade_boundary.emplace( *i, i->coefficient());
+		cascade_boundary.emplace( i->cell(), i->coefficient());
 	}
      }
      cascade_boundary.sort();
 }
 
 
-template< typename Cell, typename Persistence_data>
-void initialize_cascade_data( const Cell & cell, const std::size_t pos, 
+template< typename Filtration_iterator, typename Persistence_data>
+void initialize_cascade_data( const Filtration_iterator & cell, 
 			      Persistence_data & data, partner_and_cascade){
 	typedef typename Persistence_data::Chain::Term Term;
 	//TODO: Replace me!
@@ -106,8 +105,9 @@ void initialize_cascade_data( const Cell & cell, const std::size_t pos,
 }
 
 //nothing to store when we don't store cascades.
-template< typename Persistence_data, typename Cell>
-void store_cascade( Persistence_data & data, const Cell & cell, partner){}	
+template< typename Persistence_data, typename Filtration_iterator>
+void store_cascade( const Persistence_data & data, 
+		    const Filtration_iterator & cell, partner){}	
 
 //nothing to store when we don't store cascades.
 template< typename Persistence_data, typename Filtration_iterator>
@@ -150,8 +150,8 @@ void pair_cells( Filtration_iterator begin, Filtration_iterator end,
 	Term_less term_less; 
 	Persistence_data data( term_less, bd, cascade_boundary_map, cascade_map, 
 			       output_policy);
-	for(Filtration_iterator sigma = begin ; sigma != end; ++sigma){
-		initialize_cascade_data( sigma, begin, data, output_policy);
+	for(Filtration_iterator sigma = begin; sigma != end; ++sigma){
+		initialize_cascade_data( sigma, data, output_policy);
 		eliminate_boundaries( data);
 		if( !data.cascade_boundary.empty() ){
 		     //make tau sigma's partner

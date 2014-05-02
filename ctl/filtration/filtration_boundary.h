@@ -55,18 +55,18 @@ public std::iterator< std::input_iterator_tag,
 			      std::ptrdiff_t,
 			      const Term_*,
 			      const Term_>{
-  typedef _const_boundary_iterator< Filtration_, Term_, Cell_boundary_> Self;
+  typedef _const_filtration_boundary_iterator< Filtration_, Term_, Cell_boundary_> Self;
   typedef Filtration_ Filtration;
-  typedef Filtration::Complex Complex;
+  typedef typename Filtration::Complex Complex;
   typedef Term_ Term;
   typedef Cell_boundary_ Cell_boundary;
 
 public:
 	//default
-	_const_boundary_iterator() {}
+	_const_filtration_boundary_iterator() {}
 	
 	//copy
-	_const_boundary_iterator( const Self & i):
+	_const_filtration_boundary_iterator( const Self & i):
 	filtration( i.filtration),
 	next_term( i.next_term),
 	//future_term( i.future_term),
@@ -74,7 +74,7 @@ public:
 	term( i.term) {}
 	
 	//move
-	_const_boundary_iterator( Self && i):
+	_const_filtration_boundary_iterator( Self && i):
 	filtration ( std::move( i.filtration)),
 	next_term ( std::move( i.next_term)),
 	//future_term ( std::move( i.future_term)),
@@ -82,17 +82,17 @@ public:
 	term( std::move( i.term)) { i.filtration = NULL; }
 
 	//begin constructor
-	_const_boundary_iterator( Filtration& _f, 
+	_const_filtration_boundary_iterator( Filtration& _f, 
 				  Cell_boundary & _bd,
-				  const typename Complex::Cell& cell):
+				  const typename Term::Cell& cell):
 	  filtration( &_f),
-	  next_term ( _bd.begin( cell)), 
+	  next_term ( _bd.begin( (*cell)->first)), 
 	  //future_term( next_term), 
-	  end_term( _bd.end( cell)){ 
+	  end_term( _bd.end( (*cell)->first)){ 
 		_next_term();
 	}
         //end constructor
-	_const_boundary_iterator( Filtration & _f): filtration( &_f){ 
+	_const_filtration_boundary_iterator( Filtration & _f): filtration( &_f){ 
 	  	_end_term(); 
 	}
 	Self& operator=( const Self& from){
@@ -138,7 +138,7 @@ protected:
   //typename Cell_boundary::const_iterator future_term;
   typename Cell_boundary::const_iterator end_term;
   Term term;
-}; //class _const_boundary_iterator
+}; //class _const_filtration_boundary_iterator
 } //detail namespace
 } //ctl namespace
 
@@ -149,7 +149,7 @@ template< typename Filtration_,
 	  typename Cell_boundary_ = typename Filtration_::Complex::Boundary,
 	  typename Iterator_ = typename Filtration_::iterator >
 class Filtration_boundary{
-	typedef Filtration_boundary< Filtation_, 
+	typedef Filtration_boundary< Filtration_, 
 				     Cell_boundary_, Iterator_> Self;
 	typedef typename Cell_boundary_::Term Cell_term;
 	public:
@@ -162,23 +162,23 @@ class Filtration_boundary{
 	//Complex boundary terms are iterators
 	typedef typename Cell_term::template 
 			rebind< Iterator, Coefficient>::T Term;
-	typedef ctl::detail::_const_boundary_iterator< Complex, 
+	typedef ctl::detail::_const_filtration_boundary_iterator< Filtration, 
 							Term, 
 							Cell_boundary> 
 							const_iterator;
 	//copy constructor
-	Filtration_boundary( Complex_boundary & f): 
+	Filtration_boundary( Filtration_boundary & f): 
 	_filtration( f._filtration) {};
 
 	//move constructor, we don't care since we store references
-	Filtration_boundary( Complex_boundary && f): 
+	Filtration_boundary( Filtration_boundary && f): 
 	_filtration( f._filtration) {};
 	
 	Filtration_boundary( Filtration & f): 
 	_filtration( f) {};
 	
 	const_iterator begin( const typename Term::Cell & c) const {
-		const std::size_t pos = std::distance( filtration.begin(), c);
+		const std::size_t pos = std::distance( _filtration.begin(), c);
 		(*c)->second.pos( pos);
 		return const_iterator( _filtration, 
 				      _filtration.complex().boundary(), c);
@@ -187,7 +187,7 @@ class Filtration_boundary{
 		return const_iterator( _filtration);
 	}
 	size_type length( const typename Term::Cell & c) const {
-		return _complex.boundary().length( (*c)->first);
+		return _filtration.complex().boundary().length( (*c)->first);
 	}
 		
 	private:		
