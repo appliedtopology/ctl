@@ -44,6 +44,7 @@
 #include <ctl/term/term.h>
 #include <ctl/utility/timer.h>
 #include <ctl/parallel/utility/timer.h>
+#include <ctl/filtration/filtration_boundary.h>
 
 //Persistence 
 // Boost
@@ -72,14 +73,13 @@ void compute_homology( Complex & complex,
 	typedef typename ctl::parallel::Filtration< Complex, Cell_less> 
 								Filtration;
 	//typedef typename Complex::Boundary Cell_boundary;
-	typedef typename ctl::Complex_boundary< Complex> Complex_boundary;
+	typedef typename ctl::Filtration_boundary< Complex> Filtration_boundary;
 	typedef typename Filtration::iterator Filtration_iterator;
 	typedef typename Filtration::Term Filtration_term;
 	typedef typename std::pair< Filtration_iterator, Filtration_iterator> 
 							     Filtration_pair;
 	typedef typename tbb::concurrent_vector< Filtration_pair> 
 						  Iterator_pairs;
-	typedef typename  Complex_boundary::Term Complex_term;
 	//Change this to filtration term
 	typedef typename  ctl::Chain< Filtration_term> Chain;
 	//This should be thread safe since we preallocate *before* threads 
@@ -113,11 +113,11 @@ void compute_homology( Complex & complex,
 	Chains cascades( complex.size());
 	Complex_chain_map cascade_prop_map( cascades.begin(), 
 					    Complex_offset_map());
-	Complex_boundary complex_boundary( complex);
+	Filtration_boundary filtration_boundary( filtration);
 
 	stats.timer.start();
 	ctl::parallel::persistence( ranges,
-			           complex_boundary,
+			           filtration_boundary,
 			           cascade_prop_map, 
 			           num_parts );
 	stats.timer.stop();
@@ -143,7 +143,7 @@ void do_blowup_homology( Blowup & blowup_complex,
 
 	typedef typename Blowup::iterator Blowup_iterator;
 	//typedef typename Blowup::Boundary Cell_boundary;
-	typedef typename ctl::Complex_boundary< Blowup> Blowup_boundary;
+	typedef typename ctl::Filtration_boundary< Blowup> Blowup_boundary;
 	//typedef typename  Blowup_filtration::Less Cell_less;	
 	typedef typename  Blowup_filtration::iterator 
 						Blowup_filtration_iterator;
@@ -180,7 +180,7 @@ void do_blowup_homology( Blowup & blowup_complex,
 	ranges.push_back( make_pair( current, blowup_filtration.end()));
   	Chains cascades( blowup_complex.size()); 
 	Complex_chain_map cascade_prop_map( cascades.begin(), Blowup_offset_map( blowup_filtration.begin())); 
-  	Blowup_boundary blowup_complex_boundary( blowup_complex); 
+  	Blowup_boundary blowup_filtration_boundary( blowup_filtration); 
   	std::cout << "calling parallel persistence: " << std::endl;
 	ctl::parallel::persistence( ranges, blowup_complex_boundary, cascade_prop_map, num_local_pieces );
 	stats.timer.stop();

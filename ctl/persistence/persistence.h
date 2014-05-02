@@ -70,7 +70,7 @@ void eliminate_boundaries( Persistence_data & data){
 
 template< typename Term, typename Chain_map>
 bool is_creator( const Term & term, Chain_map & cascade_boundary_map){
-	typedef typename Chain_map::value_type Chain;
+	typedef typename boost::property_traits< Chain_map>::value_type Chain;
 	typedef typename Chain::Less Term_less;
 	const Chain& bd = cascade_boundary_map[ term];
 	Term_less term_less;
@@ -79,24 +79,16 @@ bool is_creator( const Term & term, Chain_map & cascade_boundary_map){
 
 template< typename Filtration_iterator, 
 	  typename Persistence_data>
-void initialize_cascade_data( const Filtration_iterator sigma_iterator, 
+void initialize_cascade_data( const Filtration_iterator sigma, 
 			      const Filtration_iterator begin,
 			      Persistence_data & data, partner){
      typedef typename Filtration_iterator::value_type Cell;
      typedef typename Persistence_data::Chain Chain;
-     typedef typename Chain::value_type Term;
-     const Cell & sigma = *sigma_iterator;
      Chain& cascade_boundary = data.cascade_boundary;
      cascade_boundary.reserve( data.bd.length( sigma));
-     //using pos here stores the pos in the data section of the complex
-     const std::size_t pos = std::distance( begin, sigma_iterator); 
-     for( auto i = data.bd.begin( sigma, pos); i != data.bd.end( sigma); ++i){
+     for( auto i = data.bd.begin( sigma); i != data.bd.end( sigma); ++i){
          if( is_creator( *i, data.cascade_boundary_map)){
-		//What we did was rebind the term in Filtration so that terms 
-		//contain filtration iterators. These are in order so 
-		//set_symmetric_difference
-		cascade_boundary.emplace( begin + i->cell()->second.pos(), 
-					  i->coefficient());
+		cascade_boundary.emplace( *i, i->coefficient());
 	}
      }
      cascade_boundary.sort();
@@ -107,8 +99,9 @@ template< typename Cell, typename Persistence_data>
 void initialize_cascade_data( const Cell & cell, const std::size_t pos, 
 			      Persistence_data & data, partner_and_cascade){
 	typedef typename Persistence_data::Chain::Term Term;
-	//TODO: fix cascade to avoid this
-	data.cascade.add( Term( cell, 1, pos)); 
+	//TODO: Replace me!
+	//data.cascade.emplace( cell, Coefficient( 1));
+	data.cascade.add( Term( cell, 1)); 
 	initialize_cascade_data( cell, data, partner());
 }
 

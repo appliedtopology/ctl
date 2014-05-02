@@ -119,7 +119,7 @@ class Term< Cell_, ctl::Finite_field< 2> > {
 		Term( const Self & from): cell_( from.cell_){}
 		Term( const Self && from): cell_( std::move( from.cell_)){}
 		Term( const Cell & cell): cell_( cell) {}	
-		Term( const Cell & cell, const Coefficient & coeff) 
+		Term( const Cell & cell, const Coefficient & coeff): 
 		cell_( cell) {}	
 		Cell& cell() { return cell_; }
 		const Cell& cell() const { return cell_; }

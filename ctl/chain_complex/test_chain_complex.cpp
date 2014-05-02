@@ -69,7 +69,7 @@ int main( int argc, char** argv){
 	std::cout << "boundary test: " << ctl::delta << "("  
 		  << i->first << ")" << std::endl;
 	std::cout << "boundary length: " << b.length( i) << std::endl;
-	for( boundary_iterator j = b.begin( i, 0); j != b.end( i); ++j){
+	for( boundary_iterator j = b.begin( i); j != b.end( i); ++j){
 		std::cout << j->cell()->first << " ";
 	}
 	std::cout << std::endl;

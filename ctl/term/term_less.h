@@ -38,6 +38,20 @@
 
 //exported functionality
 namespace ctl{
+
+template< typename Cell_less>
+struct Term_cell_less{
+   Term_cell_less(){}
+   Term_cell_less( const Cell_less & l): less( l){} 
+   template< typename Term>
+   bool operator()( const Term & l, const Term & r) const { 
+       return less( l.cell(), r.cell()); 
+   } 
+   Cell_less less;
+}; //struct Term_less
+
+
+
 /*
 //we mirror pos_() from l.cell()->second.pos() in the term
 //so that we avoid a dereference.
