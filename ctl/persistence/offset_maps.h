@@ -41,28 +41,35 @@
 
 namespace ctl {
 
-template< typename Cell>
+template< typename Filtration_iterator>
 struct Pos_offset_map {
   // types
-  typedef Cell                             key_type;
+  typedef Filtration_iterator              key_type;
   typedef std::size_t                      value_type;
   typedef std::size_t&                     reference;
   typedef boost::readable_property_map_tag category; 
-  Pos_offset_map() {}
+  Pos_offset_map( const Filtration_iterator _b) : begin( _b) {}
+  Filtration_iterator begin;
 };
 
-template< typename Cell>
-typename Pos_offset_map< Cell>::value_type 
-get( Pos_offset_map< Cell>, const std::size_t pos) { return pos; }
+template< typename Filtration_iterator>
+typename Pos_offset_map< Filtration_iterator>::value_type 
+get( const Pos_offset_map< Filtration_iterator>& map, const std::size_t pos) { 
+	return pos; 
+}
 
-template< typename Cell>
-typename Pos_offset_map< Cell>::value_type 
-get( Pos_offset_map< Cell>, const Cell& cell) { return cell->second.pos(); }
+template< typename Filtration_iterator>
+typename Pos_offset_map< Filtration_iterator>::value_type 
+get( const Pos_offset_map< Filtration_iterator>& map , 
+     const Filtration_iterator& cell) { 
+	return std::distance(map.begin, cell);
+}
 
-template< typename Cell, typename Coefficient>
-typename Pos_offset_map< Cell>::value_type 
-get( Pos_offset_map< Cell>, const ctl::Term< Cell, Coefficient>& term) { 
-	return term.pos(); 
+template< typename Filtration_iterator, typename Coefficient>
+typename Pos_offset_map< Filtration_iterator>::value_type 
+get( const Pos_offset_map< Filtration_iterator>& map, 
+     const ctl::Term< Filtration_iterator, Coefficient> & term) { 
+	return std::distance(map.begin, term.cell);
 }
 
 template< typename Cell>

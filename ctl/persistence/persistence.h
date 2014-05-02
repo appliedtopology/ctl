@@ -64,7 +64,7 @@ void eliminate_boundaries( Persistence_data & data){
 				data.cascade_boundary_map[ tau_partner_term];
 	const Coefficient scalar = tau_partner_term.coefficient().inverse();
   	data.cascade_boundary.scaled_add( scalar, bd_cascade_tau_partner,
-					  data.temporary_chain, data.term_less);
+					  data.temporary_chain);
   }
 }
 
@@ -99,7 +99,7 @@ void initialize_cascade_data( const Filtration_iterator sigma_iterator,
 					  i->coefficient());
 	}
      }
-     cascade_boundary.sort( data.term_less);
+     cascade_boundary.sort();
 }
 
 
@@ -146,16 +146,15 @@ void pair_cells( Filtration_iterator begin, Filtration_iterator end,
 		 Chain_map & cascade_boundary_map, Chain_map & cascade_map,
 		 Output_policy output_policy){
 
+	typedef typename boost::property_traits< Chain_map>::value_type Chain;
+	typedef typename Chain::Less Term_less;
 	//this should now operator on filtration pointers, so it should be fast.	
-	typedef ctl::Term_cell_less Term_less;
 	typedef ctl::detail::Persistence_data< Term_less, Boundary_operator, 
 				  	Chain_map, Output_policy> 
 					            Persistence_data;
 	typedef typename Filtration_iterator::value_type Cell_iterator; 
-	typedef typename Persistence_data::Chain Chain;
 	typedef typename Chain::Term Term;
-
-	Term_less term_less;
+	Term_less term_less; 
 	Persistence_data data( term_less, bd, cascade_boundary_map, cascade_map, 
 			       output_policy);
 	for(Filtration_iterator sigma = begin ; sigma != end; ++sigma){
@@ -192,7 +191,7 @@ void persistence( Filtration_iterator begin,
 		  Filtration_iterator end,
 		  Boundary_operator & bd,
 		  Chain_map & cascade_boundary_map){
-	Chain_map not_going_to_be_used; 
+	Chain_map not_going_to_be_used = cascade_boundary_map; 
 	ctl::pair_cells( begin, end, bd, cascade_boundary_map, 
 			 not_going_to_be_used, partner());
 }		  

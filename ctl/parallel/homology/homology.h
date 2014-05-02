@@ -74,19 +74,20 @@ void compute_homology( Complex & complex,
 	//typedef typename Complex::Boundary Cell_boundary;
 	typedef typename ctl::Complex_boundary< Complex> Complex_boundary;
 	typedef typename Filtration::iterator Filtration_iterator;
+	typedef typename Filtration::Term Filtration_term;
 	typedef typename std::pair< Filtration_iterator, Filtration_iterator> 
 							     Filtration_pair;
 	typedef typename tbb::concurrent_vector< Filtration_pair> 
 						  Iterator_pairs;
 	typedef typename  Complex_boundary::Term Complex_term;
-	typedef typename  ctl::Term_cell_less< ctl::Cell_less> Term_less;
-	typedef typename  ctl::Chain< Complex_term, Term_less> Chain;
+	//Change this to filtration term
+	typedef typename  ctl::Chain< Filtration_term> Chain;
 	//This should be thread safe since we preallocate *before* threads 
 	// and threads never access the same vector at the same time
 	// even if they did, it's not *these* chains that have to be thread safe.
 	typedef typename  std::vector< Chain> Chains;
 	typedef typename  Chains::iterator Chains_iterator;
-	typedef ctl::Pos_offset_map< Complex_iterator> Complex_offset_map;
+	typedef ctl::Pos_offset_map< Filtration_iterator> Complex_offset_map;
 
 	typedef typename  ctl::iterator_property_map< Chains_iterator,
 						      Complex_offset_map, 
@@ -149,11 +150,12 @@ void do_blowup_homology( Blowup & blowup_complex,
 	typedef typename  Nerve_filtration::iterator Nerve_filtration_iterator;
 	
       	typedef typename  Blowup_boundary::Term Blowup_term;
-	typedef typename  ctl::Term_cell_less< ctl::Cell_less> Term_less;
-	typedef typename  ctl::Chain< Blowup_term, Term_less> Chain;
+	typedef typename  Blowup_filtration::Term Blowup_filtration_term;	
+	typedef typename  ctl::Chain< Blowup_filtration_term> Chain;
 	typedef typename  std::vector< Chain> Chains;
 	typedef typename  Chains::iterator Chains_iterator;
-	typedef ctl::Pos_offset_map< Blowup_iterator> Blowup_offset_map;
+	typedef ctl::Pos_offset_map< Blowup_filtration_iterator> 
+						Blowup_offset_map;
 
 	typedef typename  ctl::iterator_property_map< Chains_iterator,
 						      Blowup_offset_map, 
@@ -177,7 +179,7 @@ void do_blowup_homology( Blowup & blowup_complex,
 	}
 	ranges.push_back( make_pair( current, blowup_filtration.end()));
   	Chains cascades( blowup_complex.size()); 
-	Complex_chain_map cascade_prop_map( cascades.begin(), Blowup_offset_map()); 
+	Complex_chain_map cascade_prop_map( cascades.begin(), Blowup_offset_map( blowup_filtration.begin())); 
   	Blowup_boundary blowup_complex_boundary( blowup_complex); 
   	std::cout << "calling parallel persistence: " << std::endl;
 	ctl::parallel::persistence( ranges, blowup_complex_boundary, cascade_prop_map, num_local_pieces );

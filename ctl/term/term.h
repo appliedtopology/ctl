@@ -52,30 +52,20 @@ class Term {
 		typedef ctl::detail::term_non_z2_tag coeff_tag;
 	public:	
 		Term() {}
-
-		Term( Cell & cell): cell_( cell), /*pos_( 0),*/ coeff_( 1) {}
-/*
+		Term( Cell & cell): cell_( cell), coeff_( 1) {}
 		Term( const Cell & cell, 
-		      const Coefficient & coeff, const std::size_t pos):
-			cell_( cell), pos_( pos), coeff_( coeff) {}
-*/
+		      const Coefficient & coeff):
+			cell_( cell), coeff_( coeff) {}
 		Term( const Term & from): cell_( from.cell_),
-					  //pos_( from.pos_),
 					  coeff_( from.coeff_) {}
 
 		Term( Term && from): cell_( std::move( from.cell_)), 
-				     //pos_( from.pos_),
 				     coeff_( std::move( from.coeff_)){}
 
 		Coefficient coefficient() const { return coeff_; }
 		void coefficient( const Coefficient n) { coeff_ = n; }
 		void coefficient( const Coefficient n, 
 				         const bool f) { coeff_ *= n; }
-		//we may store a filtration index.
-		/*
-		const std::size_t pos() const { return pos_; }
-		void pos( const std::size_t p) { pos_ = p; }
-		*/
 		Cell&            cell()       { return cell_; }
 		const Cell&      cell() const { return cell_; }
 			
@@ -88,7 +78,6 @@ class Term {
  		Self& operator=( const Self && from) { 
 			cell_= std::move( from.cell_);
 			coeff_ = std::move( from.coeff_);
-			//pos_ = std::move( from.pos_);
 			return *this; 
 		}
 		bool operator==( const Self & from) const { 
@@ -107,7 +96,6 @@ class Term {
 		
 	private:
 		Cell cell_;
-		//std::size_t pos_;
 		Coefficient coeff_;
 		
 	public:
@@ -128,24 +116,14 @@ class Term< Cell_, ctl::Finite_field< 2> > {
 		typedef Term< Cell_, Coefficient > Self;
 	public:
 		Term() {}
-		Term( const Self & from): cell_( from.cell_) 
-					  /*,pos_( from.pos_)*/{}
-		Term( const Self && from): cell_( std::move( from.cell_))
-					   /*,pos_( from.pos_)*/ {}
-		Term( const Cell & cell): cell_( cell) /*,pos_( 0)*/ {}	
-		/*
-		Term( const Cell & cell, const Coefficient & coeff, 
-		      const std::size_t pos): cell_( cell), pos_( pos) {}	
-		*/
+		Term( const Self & from): cell_( from.cell_){}
+		Term( const Self && from): cell_( std::move( from.cell_)){}
+		Term( const Cell & cell): cell_( cell) {}	
+		Term( const Cell & cell, const Coefficient & coeff) 
+		cell_( cell) {}	
 		Cell& cell() { return cell_; }
 		const Cell& cell() const { return cell_; }
 		const Coefficient coefficient() const { return Coefficient( 1);}
-		//for internal use to couple filtration order to our otherwise 
-		//unordered objects.
-		/*
-		const std::size_t pos() const { return pos_; }
-		void pos( const std::size_t p) { pos_ = p; }
-		*/
 		template< typename C>
 		void coefficient( const C & n) const {}
 
@@ -154,12 +132,10 @@ class Term< Cell_, ctl::Finite_field< 2> > {
 	
 		Self& operator=( const Self & from) { 
 			cell_=from.cell_;
-			//pos_=from.pos_;
 			return *this; 
 		}
 		Self& operator=( const Self && from) { 
 			cell_= std::move( from.cell_);
-			//pos_= std::move( from.pos_);
 			return *this; 
 		}
 
@@ -174,7 +150,6 @@ class Term< Cell_, ctl::Finite_field< 2> > {
 		}
 	private:
 		Cell cell_;
-	//	std::size_t pos_;
 	public:
 	template <typename _Ce, typename _Co> 
 	struct rebind { typedef Term<_Ce, _Co> T; };

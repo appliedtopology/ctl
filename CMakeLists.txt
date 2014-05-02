@@ -40,7 +40,7 @@ find_package(METIS REQUIRED)
 include_directories(${CMAKE_SOURCE_DIR})
 include_directories( ${METIS_INCLUDE_DIR} ${Boost_INCLUDE_DIR} ${TBB_INCLUDE_DIR})
 link_directories(/usr/local/lib ${Boost_LIBRARY_DIR} ${METIS_LIBRARY_DIR} ${TBB_LIBRARY_DIR})
-add_definitions(" -Wall -ansi -std=c++11")
+add_definitions(" -ftemplate-backtrace-limit=0 -Wall -ansi -std=c++11")
 set(CMAKE_BUILD_TYPE RELWITHDEBINFO)
 
 add_subdirectory( ctl)

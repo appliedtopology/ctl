@@ -35,17 +35,9 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 *******************************************************************************/
+
 //exported functionality
 namespace ctl{
-
-template< typename Cell_less>
-struct Term_cell_less{
-   template< typename Term>
-   bool operator()( const Term & l, const Term & r) const { 
-  	return Cell_less( l.cell(), r.cell()); 
-   } 
-}; //struct Term_less
-
 /*
 //we mirror pos_() from l.cell()->second.pos() in the term
 //so that we avoid a dereference.
