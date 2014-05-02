@@ -32,6 +32,10 @@ endif( USE_CLANG)
 #set (CMAKE_INSTALL_PREFIX /usr/local)
 #for installing read:
 #http://www.cmake.org/cmake/help/cmake_tutorial.html
+set(CTL_INCLUDE_INSTALL_DIR ${CMAKE_SOURCE_DIR}/include)
+set(CTL_DOC_INSTALL_DIR ${CMAKE_SOURCE_DIR}/doc)
+set(CTL_BIN_INSTALL_DIR ${CMAKE_SOURCE_DIR}/bin)
+set(CTL_EXAMPLES_INSTALL_DIR ${CMAKE_SOURCE_DIR}/examples)
 set(Boost_USE_MULTITHREADED OFF)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules")
 find_package(Boost COMPONENTS program_options REQUIRED)
@@ -40,9 +44,8 @@ find_package(METIS REQUIRED)
 include_directories(${CMAKE_SOURCE_DIR})
 include_directories( ${METIS_INCLUDE_DIR} ${Boost_INCLUDE_DIR} ${TBB_INCLUDE_DIR})
 link_directories(/usr/local/lib ${Boost_LIBRARY_DIR} ${METIS_LIBRARY_DIR} ${TBB_LIBRARY_DIR})
-add_definitions(" -ftemplate-backtrace-limit=0 -Wall -ansi -std=c++11")
+add_definitions(" -fno-omit-frame-pointer -ftemplate-backtrace-limit=0 -Wall -ansi -std=c++11")
 set(CMAKE_BUILD_TYPE RELWITHDEBINFO)
-
 add_subdirectory( ctl)
 
 install( DIRECTORY ${CMAKE_SOURCE_DIR}/ctl 

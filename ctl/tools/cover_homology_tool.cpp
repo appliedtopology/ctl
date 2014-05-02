@@ -201,8 +201,6 @@ int main( int argc, char *argv[]){
   #ifdef ZOOM_PROFILE
    std::cout << "Disconnect" <<  ZMDisconnect() << std::endl;
   #endif
-
-
   double total_time = cover_time + stats.filtration_time + stats.get_iterators +
          	     stats.parallel_persistence;
                                                                                 

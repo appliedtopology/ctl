@@ -1,17 +1,8 @@
-option(ZOOM_PROFILE "Profile code with Zoom profiler" off)
+option(ZOOM_PROFILE "Profile code with Zoom profiler" on)
 
-if( ZOOM_PROFILE)
-add_definitions( "-DZOOM_PROFILE")
-if( ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 include_directories( /opt/rotateright/Zoom/include/zoom)
 link_directories( /opt/rotateright/Zoom/lib
   		  /opt/rotateright/Zoom/lib64)
-endif( ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-if( APPLE)
-include_directories( /Library/RotateRight/Zoom/include/zoom)
-link_directories( /Library/RotateRight/Zoom/lib64)
-endif( APPLE)
-endif( ZOOM_PROFILE)
 
 add_executable(persistence persistence.cpp)
 install( TARGETS persistence RUNTIME DESTINATION bin)
@@ -57,11 +48,11 @@ target_link_libraries( gpcover metis boost_program_options tbb)
 install( TARGETS gpcover RUNTIME DESTINATION bin)
 
 add_executable (concurrent_homology   concurrent_homology_tool)
-target_link_libraries (concurrent_homology boost_program_options tbb metis)
+target_link_libraries (concurrent_homology boost_program_options tbb metis tbbmalloc  pthread rt m RRZoomScript )
 install( TARGETS concurrent_homology RUNTIME DESTINATION bin)
 
 add_executable (cover_homology   cover_homology_tool)
-target_link_libraries (cover_homology boost_program_options metis tbb)
+target_link_libraries (cover_homology boost_program_options metis tbb pthread rt m RRZoomScript)
 install( TARGETS cover_homology RUNTIME DESTINATION bin)
 
 add_executable (write_filtration write_filtration_tool.cpp)
