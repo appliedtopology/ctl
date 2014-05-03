@@ -45,9 +45,9 @@ struct Term_cell_less{
    Term_cell_less( const Cell_less & l): less( l){} 
    template< typename Term>
    inline bool operator()( const Term & l, const Term & r) const { 
-       Cell_less less;
        return less( l.cell(), r.cell()); 
    } 
+   Cell_less less;
 }; //struct Term_less
 
 
