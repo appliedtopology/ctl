@@ -184,6 +184,8 @@ void compute_open_cell_cover( Complex_iterator & cell,
         typedef typename Complex_cell::const_iterator Cell_iterator;
 	typedef typename Complex_cell::vertex_type Vertex;
         //commence terrible names.
+        //TODO: this maybe can be a simple array O(p) in size.
+        //Then removes branch around 207?
         typedef typename std::map< vertex_t, size_t > Nerve_map; 
         typedef typename Nerve_map::iterator Nerve_map_iterator;
         typedef typename Nerve_map::value_type Nerve_pair;

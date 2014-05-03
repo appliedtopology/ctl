@@ -64,8 +64,10 @@
 namespace ctl {
 namespace parallel{
 template< typename Complex,
+	  typename Nerve,
 	  typename Stats>
-void compute_homology( Complex & complex, 
+void compute_homology( Complex & complex,
+		       const Nerve & nerve, 
 		       size_t & num_parts,
 		       Stats & stats){
 	typedef typename Complex::iterator Complex_iterator;
@@ -80,8 +82,7 @@ void compute_homology( Complex & complex,
 	typedef typename Filtration::Term Filtration_term;
 	typedef typename std::pair< Filtration_iterator, Filtration_iterator> 
 							     Filtration_pair;
-	typedef typename tbb::concurrent_vector< Filtration_pair> 
-						  Iterator_pairs;
+	typedef typename std::vector< Filtration_pair> Iterator_pairs;
 	//Change this to filtration term
 	typedef typename  ctl::Chain< Filtration_term> Chain;
 	//This should be thread safe since we preallocate *before* threads 
@@ -105,10 +106,32 @@ void compute_homology( Complex & complex,
 	stats.filtration_time = stats.timer.elapsed();
 
 
-	Iterator_pairs ranges;
+
 	stats.timer.start();
+	Iterator_pairs ranges( nerve.size(), 
+		std::make_pair( filtration.begin(), filtration.begin()) );
+	for( auto i = nerve.begin(); i != nerve.end(); ++i){
+		//the vertex i has id i-1 by design.
+		const std::size_t range_index = i->second.id()-1;
+		ranges[ range_index].second += i->second.count();
+	}
+	for( std::size_t i = 1, offset=0; i < ranges.size(); ++i){
+		offset += std::distance( ranges[ i-1].first, ranges[ i-1].second);
+		ranges[ i].first += offset;
+		ranges[ i].second += offset;
+	}
+	/*
+	Iterator_pairs correct_ranges;
 	ctl::parallel::get_cover_iterators( filtration.begin(), 
-				  filtration.end(), ranges, true);
+		  			      filtration.end(), correct_ranges, true);
+	auto begin = filtration.begin();
+	for(auto i = ranges.begin(), j = correct_ranges.begin(); i != ranges.end(); ++i, ++j){
+		std::cout << "(" << std::distance( begin, i->first) 
+			  << "," << std::distance( begin, i->second) << ")" 
+			  << " VS. correct " << "(" << std::distance( begin, j->first) 
+			  << "," << std::distance( begin, j->second) << ")";
+		std::cout << std::endl; 
+	}*/	
 	stats.timer.stop();
 	stats.get_iterators = stats.timer.elapsed();
 

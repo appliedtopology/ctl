@@ -36,7 +36,7 @@
 //#define COMPUTE_BETTI
 //#define TESTS_ON
 #define CTL_USE_CITY
-#define ZOOM_PROFILE
+//#define ZOOM_PROFILE
 #ifdef ZOOM_PROFILE
 #include "zoom.h"
 #endif
@@ -193,7 +193,7 @@ int main( int argc, char *argv[]){
   std::cout << start_error << std::endl;
   #endif 
  
-  ctl::parallel::compute_homology( complex, num_parts, stats);
+  ctl::parallel::compute_homology( complex, nerve, num_parts, stats);
   #ifdef ZOOM_PROFILE
   ZMError end_error = ZMStopSession();
   std::cout << "Profiling End" << end_error << std::endl;
