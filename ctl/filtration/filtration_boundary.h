@@ -86,6 +86,7 @@ public:
 				  Cell_boundary & _bd,
 				  const typename Term::Cell& cell):
 	  filtration( &_f),
+	  begin ( _f.begin()),
 	  next_term ( _bd.begin( (*cell)->first)), 
 	  //future_term( next_term), 
 	  end_term( _bd.end( (*cell)->first)){ 
@@ -97,6 +98,7 @@ public:
 	}
 	Self& operator=( const Self& from){
 		filtration = from.filtration;
+		begin = from.begin;
 		next_term = from.next_term;
 		//future_term = from.future_term;
 		end_term = from.end_term;
@@ -121,7 +123,7 @@ protected:
 	if( next_term != end_term){
 		const Complex & complex = filtration->complex();
 		const auto & cell = complex.find_cell( next_term->cell());
-		term.cell() = filtration->begin() + cell->second.pos();
+		term.cell() = begin + cell->second.pos();
 		term.coefficient( next_term->coefficient());
 		++next_term;
 		return;
@@ -132,6 +134,7 @@ protected:
   void _end_term(){ term.cell() = filtration->end(); }
   //we use a pointer since references are not default constructible
   Filtration* filtration;
+  typename Filtration::iterator begin;
   //if we want to define operator-- 
   //typename Cell_boundary::const_iterator begin_term; 
   typename Cell_boundary::const_iterator next_term;

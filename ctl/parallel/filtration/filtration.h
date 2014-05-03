@@ -37,6 +37,7 @@
 *******************************************************************************/
 
 #include <tbb/parallel_sort.h>
+#include <vector>
 #include <tbb/concurrent_vector.h>
 
 #include <ctl/filtration/less.h>
@@ -49,14 +50,15 @@ namespace _filtration{
 
 namespace parallel{
 template< typename Complex_, 
-	  typename Less_ = ctl::Cell_less>
+	  typename Less_ = ctl::Cell_less,
+	  typename Iterator_ = typename Complex_::iterator, 
+	  typename Vector_ = tbb::concurrent_vector< Iterator_> >
 class Filtration {
  public:
 	typedef  Complex_ Complex;
 	typedef  Less_ Less;
  private:
-	typedef typename Complex::iterator _Iterator;	
-	typedef typename tbb::concurrent_vector< _Iterator> Vector;
+	typedef Vector_ Vector;
 	typedef typename Vector::iterator _viterator;
 	typedef typename Vector::const_iterator _vciterator;
 	typedef typename Vector::reverse_iterator _vriterator;
@@ -124,6 +126,9 @@ public:
 	
 	cit begin() const { return filtration_.begin();  }
 	cit end() const { return filtration_.end(); }
+
+	cit cbegin() const { return filtration_.begin();  }
+	cit cend() const { return filtration_.end(); }
 
 	rit rbegin() { return filtration_.rbegin(); }
 	rit rend()   { return filtration_.rend();          }

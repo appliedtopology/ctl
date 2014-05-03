@@ -46,7 +46,7 @@ void write_betti( const Betti & b, Out & out){
 template< typename Betti, 
 	  typename Complex, 
 	  typename Cell_chain_map>
-void compute_betti( Complex & complex, 
+void compute_betti( const Complex & complex, 
                     Cell_chain_map & cascade_boundary_map,
 		    Betti & _betti){ 
        typedef typename Complex::iterator Cell_iterator;

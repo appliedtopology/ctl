@@ -125,6 +125,9 @@ public:
 	cit begin() const { return filtration_.begin();  }
 	cit end() const { return filtration_.end(); }
 
+	cit cbegin() const { return filtration_.begin();  }
+	cit cend() const { return filtration_.end(); }
+
 	rit rbegin() { return filtration_.rbegin(); }
 	rit rend()   { return filtration_.rend();   }
 	

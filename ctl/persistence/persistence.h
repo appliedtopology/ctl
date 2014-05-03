@@ -81,7 +81,7 @@ template< typename Filtration_iterator,
 	  typename Persistence_data>
 void initialize_cascade_data( const Filtration_iterator sigma, 
 			      Persistence_data & data, partner){
-     typedef typename Filtration_iterator::value_type Cell;
+     //typedef typename Filtration_iterator::value_type Cell;
      typedef typename Persistence_data::Chain Chain;
      Chain& cascade_boundary = data.cascade_boundary;
      cascade_boundary.reserve( data.bd.length( sigma));
@@ -143,9 +143,9 @@ void pair_cells( Filtration_iterator begin, Filtration_iterator end,
 	typedef typename Chain::Less Term_less;
 	//this should now operator on filtration pointers, so it should be fast.	
 	typedef ctl::detail::Persistence_data< Term_less, Boundary_operator, 
-				  	Chain_map, Output_policy> 
+				  		Chain_map, Output_policy> 
 					            Persistence_data;
-	typedef typename Filtration_iterator::value_type Cell_iterator; 
+	//typedef typename Filtration_iterator::value_type Cell_iterator; 
 	typedef typename Chain::Term Term;
 	Term_less term_less; 
 	Persistence_data data( term_less, bd, cascade_boundary_map, cascade_map, 

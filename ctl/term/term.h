@@ -88,7 +88,7 @@ class Term {
 			return cell_ != from.cell_;
 		}
 		template< typename T>
-		bool operator< ( const T & t) const { return cell_ < t.cell(); } 
+		inline bool operator< ( const T & t) const { return cell_ < t.cell(); } 
 		Term& operator+( const Coefficient & a){
 			coeff_+=a;
 			return *this;	

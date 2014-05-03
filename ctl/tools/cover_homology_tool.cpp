@@ -33,7 +33,7 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 *******************************************************************************/
-#define COMPUTE_BETTI
+//#define COMPUTE_BETTI
 //#define TESTS_ON
 #define CTL_USE_CITY
 #define ZOOM_PROFILE
@@ -180,13 +180,13 @@ int main( int argc, char *argv[]){
   Complex_filtration complex_filtration( complex);
   stats.timer.stop();
   double orig_filtration_time = stats.timer.elapsed();
-  std::cout << "filter complex: " << orig_filtration_time << std::endl;
+  std::cout << "filtered complex " << orig_filtration_time << std::endl;
   stats.timer.start();
   ctl::parallel::init_cover_complex( nerve, num_parts);
   ctl::parallel::graph_partition_open_cover( complex_filtration, nerve, nearly_pure);
   stats.timer.stop();
   double cover_time = stats.timer.elapsed();
-  std::cout << "build cover: " << cover_time << std::endl;
+  std::cout << "built cover." << std::endl;
   #ifdef ZOOM_PROFILE
   std::cout << "Profiling Begin";
   ZMError start_error = ZMStartSession();
@@ -212,12 +212,9 @@ int main( int argc, char *argv[]){
   std::cout << "re-filter complex: " << stats.filtration_time 
             << " (" << (stats.filtration_time/total_time)*100 << "%)" 
             << std::endl;
- /*
   std::cout << "compute parallel ranges: " << stats.get_iterators
             << " (" << (stats.get_iterators/total_time)*100 << "%)" 
 	    << std::endl;
-  */
-                                                                             
   std::cout << "time for parallel_homology: " 
             << stats.parallel_persistence << " (" 
             << (stats.parallel_persistence/total_time)*100 << "%)" << std::endl;

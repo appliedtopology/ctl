@@ -51,12 +51,12 @@ struct Pos_offset_map {
   Pos_offset_map( const Filtration_iterator _b) : begin( _b) {}
   Filtration_iterator begin;
 };
-
+/*
 template< typename Filtration_iterator>
 typename Pos_offset_map< Filtration_iterator>::value_type 
 get( const Pos_offset_map< Filtration_iterator>& map, const std::size_t pos) { 
 	return pos; 
-}
+}*/
 
 template< typename Filtration_iterator>
 typename Pos_offset_map< Filtration_iterator>::value_type 
@@ -71,7 +71,7 @@ get( const Pos_offset_map< Filtration_iterator>& map,
      const ctl::Term< Filtration_iterator, Coefficient> & term) { 
 	return std::distance(map.begin, term.cell());
 }
-
+/*
 template< typename Cell>
 struct Id_offset_map {
   // types
@@ -85,12 +85,6 @@ struct Id_offset_map {
 template< typename Cell>
 typename Id_offset_map< Cell>::value_type 
 get( Id_offset_map< Cell>, const Cell& cell) { return cell->second.id(); }
-
-template< typename Cell, typename Coefficient>
-typename Id_offset_map< Cell>::value_type 
-get( Id_offset_map< Cell>, const ctl::Term< Cell, Coefficient>& term) { 
-	return term.pos(); 
-}
-
+*/
 } //end namespace ctl
 #endif //CTLIB_OFFSET_MAPS_H

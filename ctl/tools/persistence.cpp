@@ -98,7 +98,7 @@ typedef ctl::Chain< Filtration_term> Complex_chain;
 //inside of the chain_complex would be a good idea
 typedef std::vector< Complex_chain> Complex_chains;
 
-typedef ctl::Pos_offset_map< Filtration::iterator> Complex_offset_map;
+typedef ctl::Pos_offset_map< Filtration_term::Cell> Complex_offset_map;
 typedef ctl::iterator_property_map< Complex_chains::iterator, 
                                       Complex_offset_map, 
                                       Complex_chain, 
