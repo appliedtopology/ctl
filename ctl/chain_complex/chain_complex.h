@@ -279,7 +279,7 @@ public:
                 ss >> the_word_size;
                 std::size_t the_number_of_cells;
                 ss >> the_number_of_cells;
-		c.reserve( the_number_of_cells);
+		reserve( the_number_of_cells);
 	}
 	if( headers_enabled){
 	   std::size_t size;
@@ -290,7 +290,7 @@ public:
 	   	cell.read( ss, size);
 	   	ss >> id;
 	   	Data d( f( id));
-	   	c.insert_open_cell( cell, d);
+	   	insert_open_cell( cell, d);
 	   }
 	} else{
 	    while( ctl::get_line(in, line, line_num)){
@@ -299,7 +299,7 @@ public:
 	    	ss >> id;
 	    	ss >> cell;
 	    	Data d( f( id));
-	    	c.insert_open_cell( cell, d);
+	    	insert_open_cell( cell, d);
 	    }
 	}
 	return in;

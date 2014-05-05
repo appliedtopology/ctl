@@ -160,18 +160,18 @@ class Abstract_simplex {
 		T vertex;
 		while( in.good()){
 			in >> vertex;
-			simplex.insert( vertex);	
+			insert( vertex);
 		}
 		return in;
 	}
 
 	template< typename Stream>
 	void read( Stream & in, std::size_t size) {
-		simplex.reserve( size);
+		vertices.reserve( size);
 		T vertex;
 		while( in.good()){
 			in >> vertex;
-			simplex.insert( vertex);	
+			insert( vertex);	
 		}
 		return in;
 	}
