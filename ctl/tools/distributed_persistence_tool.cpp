@@ -57,6 +57,9 @@
 #include <ctl/filtration/filtration.h>
 #include <ctl/term/term.h>
 
+//Distributed Data
+#include <ctl/distributed/cover_data.h>
+
 /*
 //Blowup
 #include <ctl/product_cell/product_boundary.h>
@@ -71,7 +74,10 @@
 #include <ctl/persistence/compute_betti.h>
 */
 
+//Namespaces
+namespace mpi = boost::mpi;
 namespace po = boost::program_options;
+
 
 // Simplex and Boundary Type
 typedef ctl::Abstract_simplex< int> Cell;
@@ -79,13 +85,11 @@ typedef ctl::Finite_field< 2> Z2;
 typedef ctl::Simplex_boundary< Cell, Z2> Simplex_boundary;
 typedef ctl::Cell_less Cell_less;
 
-/*
 //Nerve & Filtration
-typedef ctl::Chain_complex< Cell, Simplex_boundary, 
-				      ctl::parallel::Nerve_data> Nerve;
+typedef ctl::Chain_complex< Cell, Simplex_boundary> Nerve;
 typedef ctl::Complex_boundary< Nerve> Nerve_boundary;
 typedef Nerve::iterator Nerve_iterator;
-typedef ctl::parallel::Cover_data< Nerve_iterator > Cover_data;
+typedef ctl::distributed::Cover_data< Nerve_iterator > Cover_data;
 typedef ctl::Filtration< Nerve, Cell_less>  Nerve_filtration;
 typedef Nerve_filtration::iterator Nerve_filtration_iterator;
 
@@ -95,10 +99,9 @@ typedef ctl::Complex_boundary< Complex> Complex_boundary;
 typedef Complex::iterator Complex_iterator;
 typedef ctl::Filtration< Complex, Cell_less> Complex_filtration;
 typedef Complex_filtration::iterator Complex_filtration_iterator;
-typedef ctl::parallel::Filtration_property_map< Complex_filtration_iterator> 
-					    Complex_filtration_map;
-//Utility Types
-//TODO Implement me
+
+/*
+//Utility Types //TODO: Implement me
 typedef ctl::distributed::Timer Timer;
 
 //Product Cell & Boundary
@@ -121,7 +124,7 @@ void process_args( int & argc, char *argv[],Variable_map & vm){
   po::options_description desc( "Usage: distributed_homology [options] input-file");
   desc.add_options()
   ( "help", "Display this message")
-  ( "input-file", "input .asc file to parse")
+  ( "input-file", "input .asc file to parse");
   po::positional_options_description p;
   p.add( "input-file",1);
   po::store( po::command_line_parser( argc,argv)
@@ -141,12 +144,35 @@ void process_args( int & argc, char *argv[],Variable_map & vm){
 }
 
 int main( int argc, char *argv[]){
+  /** mpi::threading::level choices 
+   single     = MPI_THREAD_SINGLE,
+  -----------------------------------
+   Only one thread will execute. 
+   
+   funneled   = MPI_THREAD_FUNNELED,
+  -----------------------------------
+   Only main thread will do MPI calls.
+   The process may be multi-threaded, but only the main 
+   thread will make MPI calls (all MPI calls are ``funneled''
+   to the main thread). 
+
+  serialized = MPI_THREAD_SERIALIZED,
+  -----------------------------------
+  Only one thread at the time do MPI calls.
+  The process may be multi-threaded, and multiple 
+  threads may make MPI calls, but only one at a time:
+  MPI calls are not made concurrently from two distinct 
+  threads (all MPI calls are ``serialized'').
+
+  multiple   = MPI_THREAD_MULTIPLE
+  -----------------------------------
+  Multiple threads may call MPI, with no restrictions.
+   */
   mpi::environment env(argc, argv);
   mpi::communicator world;
   po::variables_map vm;
   process_args( argc, argv, vm);
 
-/*
   //setup some variables
   std::string full_complex_name = vm[ "input-file"].as< std::string>();
   std::string complex_name( full_complex_name);
@@ -158,25 +184,24 @@ int main( int argc, char *argv[]){
   
   Complex complex;
   Nerve nerve;
-  Complex_filtration_map get;
-  Stats stats;
   // Read the relevant cells of the complex into memory
   // all cells of K such that \sigma \in { ... my_rank() ... } \in nerve
-  stats.timer.start();
+  timer.start();
   //TODO: implement this
-  ctl::distributed::read_complex( full_complex_name, world, complex, nerve);
-  stats.timer.stop();
-  double io_time = stats.timer.elapsed();
+  ctl::distributed::read_complex( full_complex_name, complex, nerve, world);
+  timer.stop();
+  double io_time = timer.elapsed();
 
-  stats.timer.start();
+  /*
+  timer.start();
   Complex_filtration complex_filtration( complex);
   Nerve_filtration nerve_filtration( nerve);
   std::size_t blowup_size = 0;
   for( Nerve_iterator i = nerve.begin(); i != nerve.end(); ++i){ blowup_size += (i->second.count()); }
-  stats.timer.stop();
-  double filtration_time = stats.timer.elapsed();
+  timer.stop();
+  double filtration_time = timer.elapsed();
 
-  stats.timer.start();
+  timer.start();
   Nerve_boundary nerve_boundary( nerve);
   Complex_boundary complex_boundary( complex);
   Product_boundary blowup_cell_boundary( nerve_boundary, complex_boundary);
@@ -188,10 +213,11 @@ int main( int argc, char *argv[]){
   //and made to be O(m/p + p)
   Blowup_filtration blowup_filtration( blowup_complex, blowup_size, true);
 
-  stats.timer.start();
-  ctl::distributed::build_blowup( complex_filtration, nerve_filtration, blowup_filtration, get, stats);
-  stats.timer.stop();
-  double blowup_time = stats.timer.elapsed();
+  Complex_filtration_map get;
+  timer.start();
+  ctl::distributed::build_blowup( complex_filtration, nerve_filtration, blowup_filtration, get);
+  timer.stop();
+  double blowup_time = timer.elapsed();
 
   ctl::distributed::persistence( blowup_complex, blowup_filtration, nerve_filtration, world);
 
