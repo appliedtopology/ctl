@@ -79,6 +79,7 @@ typedef ctl::Finite_field< 2> Z2;
 typedef ctl::Simplex_boundary< Cell, Z2> Simplex_boundary;
 typedef ctl::Cell_less Cell_less;
 
+/*
 //Nerve & Filtration
 typedef ctl::Chain_complex< Cell, Simplex_boundary, 
 				      ctl::parallel::Nerve_data> Nerve;
@@ -96,7 +97,6 @@ typedef ctl::Filtration< Complex, Cell_less> Complex_filtration;
 typedef Complex_filtration::iterator Complex_filtration_iterator;
 typedef ctl::parallel::Filtration_property_map< Complex_filtration_iterator> 
 					    Complex_filtration_map;
-/*
 //Utility Types
 //TODO Implement me
 typedef ctl::distributed::Timer Timer;
@@ -146,6 +146,7 @@ int main( int argc, char *argv[]){
   po::variables_map vm;
   process_args( argc, argv, vm);
 
+/*
   //setup some variables
   std::string full_complex_name = vm[ "input-file"].as< std::string>();
   std::string complex_name( full_complex_name);
@@ -159,7 +160,6 @@ int main( int argc, char *argv[]){
   Nerve nerve;
   Complex_filtration_map get;
   Stats stats;
-/*
   // Read the relevant cells of the complex into memory
   // all cells of K such that \sigma \in { ... my_rank() ... } \in nerve
   stats.timer.start();
