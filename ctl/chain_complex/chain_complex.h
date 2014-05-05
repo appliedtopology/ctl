@@ -222,8 +222,9 @@ public:
    }
 
    std::pair< iterator, std::size_t>
-   insert_closed_cell( const Cell & s, const bool closed=false,
-   		    const Data&  data = Data()){
+   insert_closed_cell( const Cell & s, 
+		       const bool closed=false,
+   		       const Data&  data = Data()){
    	typedef typename std::pair< iterator, std::size_t> Pair;
    	iterator iter = cells.find( s);
    	std::size_t num_faces_inserted=0;
@@ -246,25 +247,68 @@ public:
    	const std::pair< iterator, bool> p(insert_open_cell( s, data));
    	return std::make_pair( p.first, p.second+num_faces_inserted);
    }
-   template< typename Stream>
-   void write( Stream& out) const {
-   	out << "size " << cells.size() << std::endl;
-   	for( auto cell: cells){
-   	  out << cell.second.id() << " ";
-   	  cell.first.write( out);
-   	  out << std::endl;
-   	}
-   }
 
    template< typename Stream, typename Functor>
    void write( Stream& out, const Functor & f) const {
    	out << "size " << cells.size() << std::endl;
    	for( auto cell: cells){
+   	  out << cell.first.size() << " ";
+	  cell.first.write( out);
    	  out << f( cell.second) << " ";
-   	  cell.first.write( out);
    	  out << std::endl;
    	}
    }
+
+   template< typename Stream>
+   void write( Stream& out) const { 
+	ctl::identity i;
+	return write( out, i);
+   }
+   
+   template< typename Stream, typename Functor>
+   Stream& read( Stream & in, Functor & f){ 
+	std::size_t line_num = 0;
+	std::string line;
+	std::size_t id=0;
+        char the_first_character = in.peek();
+	const bool headers_enabled = (the_first_character == 's');
+	if( headers_enabled) {
+                ctl::get_line( in, line, line_num);
+                std::istringstream ss( line);
+                std::string the_word_size;
+                ss >> the_word_size;
+                std::size_t the_number_of_cells;
+                ss >> the_number_of_cells;
+		c.reserve( the_number_of_cells);
+	}
+	if( headers_enabled){
+	   std::size_t size;
+	   while( ctl::get_line(in, line, line_num)){
+	   	std::istringstream ss( line);
+	   	Cell cell;
+	   	ss >> size;
+	   	cell.read( ss, size);
+	   	ss >> id;
+	   	Data d( f( id));
+	   	c.insert_open_cell( cell, d);
+	   }
+	} else{
+	    while( ctl::get_line(in, line, line_num)){
+	    	std::istringstream ss( line);
+	    	Cell cell;
+	    	ss >> id;
+	    	ss >> cell;
+	    	Data d( f( id));
+	    	c.insert_open_cell( cell, d);
+	    }
+	}
+	return in;
+   }
+   template< typename Stream>
+   Stream& read( Stream & in){
+	ctl::identity i; 
+	return read( in, i); 
+   }	
    void reserve( const std::size_t n) { cells.reserve( n); }
    const std::size_t dimension() const { return max_dim; }
    const std::size_t size() const { return cells.size(); }
@@ -300,49 +344,31 @@ Stream& operator<<( Stream& out,
 	return out;
 }
 
-
-
 template< typename Stream, typename Cell, 
 	  typename Boundary, typename Data_, typename Hash>
 Stream& operator>>( Stream& in, 
-		    ctl::Chain_complex< Cell, Boundary, Data_, Hash> & c){ 
-	typedef typename ctl::Chain_complex< Cell, Boundary, 
-					     Data_, Hash> Chain_complex;  
-	typedef typename Chain_complex::Data Data;
-	std::size_t line_num = 0;
-	std::string line;
-	std::size_t id=0;
-        char the_first_character = in.peek();
-        if( the_first_character == 's') {
-                ctl::get_line( in, line, line_num);
-                std::istringstream ss( line);
-                std::string the_word_size;
-                ss >> the_word_size;
-                std::size_t the_number_of_cells;
-                ss >> the_number_of_cells;
-		c.reserve( the_number_of_cells);
-        }
-	while( ctl::get_line(in, line, line_num)){
-		std::istringstream ss( line);
-		Cell cell;
-		ss >> id;
-		ss >> cell;
-		Data d( id);
-		c.insert_open_cell( cell, d);
-	}
-	return in;
-}
+		    ctl::Chain_complex< Cell, Boundary, Data_, Hash> & c){  return c.read( in); }
 
 namespace ctl{
-template<typename String, typename Complex>
-void read_complex(String & complex_name, Complex & complex){
+
+template<typename String, typename Complex, typename Functor>
+void read_complex(String & complex_name, Complex & complex, Functor & f){
 	std::ifstream in;
 	std::cout << "File IO ..." << std::flush;
 	ctl::open_file( in, complex_name.c_str());
-	in >> complex;
+	complex.read( in, f);
 	ctl::close_file( in);
 	std::cout << "completed!" << std::endl;
 }
+
+template<typename String, typename Complex>
+void read_complex(String & complex_name, Complex & complex){
+	ctl::identity ident;
+	read_complex( complex_name, complex, ident);
+}
+
+
+
 } //namespace ctl
 
 #endif //CTL_CHAIN_COMPLEX_MAP_H

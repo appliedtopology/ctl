@@ -44,6 +44,15 @@ constexpr char delta[] = "\u2202";
 constexpr char sigma[] = "\u03C3";
 constexpr char tau[] = "\u1D6D5";
 
+struct identity {
+    template<typename U>
+    constexpr auto operator()(U&& v) const noexcept
+        -> decltype(std::forward<U>(v))
+    {
+        return std::forward<U>(v);
+    }
+};
+
 template< typename Stream>
 bool open_file( Stream & in, const char* file_name){
 	in.open( file_name);

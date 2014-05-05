@@ -146,6 +146,7 @@ class Abstract_simplex {
 		const bool equal_size = (b.size() == size());
 		return !equal_size || !std::equal( begin(), end(), b.begin());
 	}
+
 	template< typename Stream>
 	void write( Stream & out) const {
 		for( auto i : vertices){ 
@@ -153,6 +154,28 @@ class Abstract_simplex {
 			out << " "; 
 		}
 	}
+
+	template< typename Stream>
+	void read( Stream & in)  {
+		T vertex;
+		while( in.good()){
+			in >> vertex;
+			simplex.insert( vertex);	
+		}
+		return in;
+	}
+
+	template< typename Stream>
+	void read( Stream & in, std::size_t size) {
+		simplex.reserve( size);
+		T vertex;
+		while( in.good()){
+			in >> vertex;
+			simplex.insert( vertex);	
+		}
+		return in;
+	}
+
 	private:
 	Vector vertices;
 
@@ -163,14 +186,7 @@ class Abstract_simplex {
 } // namespace ctl
 
 template< typename Stream, typename T>
-Stream& operator>>( Stream & in, ctl::Abstract_simplex< T> & simplex){
-	T vertex;
-	while( in.good()){
-		in >> vertex;
-		simplex.insert( vertex);	
-	}
-	return in;
-}
+Stream& operator>>( Stream & in, ctl::Abstract_simplex< T> & simplex){ return simplex.read( in); }
 	
 template< typename Stream, typename T>
 Stream& operator<<(Stream& out, const ctl::Abstract_simplex< T> & simplex){
