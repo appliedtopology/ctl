@@ -27,7 +27,6 @@ if( USE_GCC)
 endif( USE_GCC)
 option(USE_CLANG "build application with clang" OFF) # OFF is the default
 option(USE_MPI "build distributed codes" OFF) #OFF is default
-
 if( USE_CLANG)
    SET (CMAKE_C_COMPILER             "/usr/bin/clang")
    SET (CMAKE_C_FLAGS                "-Wall -std=c99")

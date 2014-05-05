@@ -104,6 +104,11 @@ public:
 
 	template< class... Args>	
 	void emplace( Args&&... args){ _chain.emplace_back( std::forward< Args>( args)...); }
+	reverse_iterator erase( reverse_iterator b, reverse_iterator e){
+		//since we are lying in this datastructure and reverse
+		//iterators really are iterators we can erase from begin --> erase
+		return _chain.erase( b, e);
+	}
 	void swap( Chain & from){ _chain.swap( from._chain); }
 	void clear(){ _chain.clear(); }
 
