@@ -131,7 +131,6 @@ void persistence( Iterator_pairs & ranges,
 	Body body( complex_boundary, cascade_prop_map);
 	Range range( ranges.begin(), parallel_end, 1);
 	tbb::parallel_for( range, body);
-	std::cout << "parallel for complete" << std::endl;
 	if(parallel_end != ranges.end()){
 	        Filtration_iterator begin = parallel_end->first;
 		Filtration_iterator end = ranges.rbegin()->second;
