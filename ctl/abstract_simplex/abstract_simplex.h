@@ -148,15 +148,16 @@ class Abstract_simplex {
 	}
 
 	template< typename Stream>
-	void write( Stream & out) const {
+	Stream& write( Stream & out) const {
 		for( auto i : vertices){ 
 			out << i;
 			out << " "; 
 		}
+		return out;
 	}
 
 	template< typename Stream>
-	void read( Stream & in)  {
+	Stream& read( Stream & in)  {
 		T vertex;
 		while( in.good()){
 			in >> vertex;
@@ -166,7 +167,7 @@ class Abstract_simplex {
 	}
 
 	template< typename Stream>
-	void read( Stream & in, std::size_t size) {
+	Stream& read( Stream & in, std::size_t size) {
 		vertices.reserve( size);
 		T vertex;
 		while( in.good()){

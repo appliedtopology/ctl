@@ -51,6 +51,18 @@ struct identity {
     {
         return std::forward<U>(v);
     }
+    template<typename X, typename U>
+    constexpr auto operator()(X && y, U&& v) const noexcept
+        -> decltype(std::forward<U>(v))
+    {
+        return std::forward<U>(v);
+    }
+ 
+    template<typename Cell, typename U>
+    constexpr bool operator()(Cell && c, U&& v, bool f) const noexcept {
+        return true;
+    }
+
 };
 
 template< typename Stream>

@@ -43,10 +43,8 @@
 
 //CTL
 //Utility
-/*
-#include <ctl/distributed/io/io.h>
+#include <ctl/distributed/read_complex.h>
 #include <ctl/distributed/utility/timer.h>
-*/
 
 //Chain Complex
 #include <ctl/finite_field/finite_field.h>
@@ -86,10 +84,11 @@ typedef ctl::Simplex_boundary< Cell, Z2> Simplex_boundary;
 typedef ctl::Cell_less Cell_less;
 
 //Nerve & Filtration
-typedef ctl::Chain_complex< Cell, Simplex_boundary> Nerve;
+typedef ctl::distributed::Nerve_data Nerve_data;
+typedef ctl::Chain_complex< Cell, Simplex_boundary, Nerve_data> Nerve;
 typedef ctl::Complex_boundary< Nerve> Nerve_boundary;
 typedef Nerve::iterator Nerve_iterator;
-typedef ctl::distributed::Cover_data< Nerve_iterator > Cover_data;
+typedef ctl::distributed::Cover_data< std::size_t > Cover_data;
 typedef ctl::Filtration< Nerve, Cell_less>  Nerve_filtration;
 typedef Nerve_filtration::iterator Nerve_filtration_iterator;
 
@@ -100,10 +99,10 @@ typedef Complex::iterator Complex_iterator;
 typedef ctl::Filtration< Complex, Cell_less> Complex_filtration;
 typedef Complex_filtration::iterator Complex_filtration_iterator;
 
-/*
 //Utility Types //TODO: Implement me
 typedef ctl::distributed::Timer Timer;
 
+/*
 //Product Cell & Boundary
 typedef ctl::distributed::Product_cell< Nerve_filtration_iterator,  Complex_filtration_iterator> Product;
 typedef ctl::distributed::Product_boundary< Product, Complex_filtration_boundary, Nerve_filtration_boundary> Product_boundary;
@@ -182,6 +181,7 @@ int main( int argc, char *argv[]){
         complex_name.replace( 0, found+1, "");
   }
   
+  Timer timer;
   Complex complex;
   Nerve nerve;
   // Read the relevant cells of the complex into memory
@@ -191,7 +191,7 @@ int main( int argc, char *argv[]){
   ctl::distributed::read_complex( full_complex_name, complex, nerve, world);
   timer.stop();
   double io_time = timer.elapsed();
-
+  std::cout << "I/O: " << io_time << std::endl;
   /*
   timer.start();
   Complex_filtration complex_filtration( complex);

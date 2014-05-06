@@ -289,8 +289,12 @@ public:
 	   	ss >> size;
 	   	cell.read( ss, size);
 	   	ss >> id;
-	   	Data d( f( id));
-	   	insert_open_cell( cell, d);
+		//optimized away for standard reads.
+		if( f( cell, id, true)){
+	   	   Data d( id);
+		   //apply f
+	   	   insert_open_cell( cell, f(cell, d));
+		}
 	   }
 	} else{
 	    while( ctl::get_line(in, line, line_num)){
@@ -298,8 +302,12 @@ public:
 	    	Cell cell;
 	    	ss >> id;
 	    	ss >> cell;
-	    	Data d( f( id));
-	    	insert_open_cell( cell, d);
+		//optimized away for standard reads.
+		if( f( cell, id, true)){
+	    	  Data d(  id);
+		  //apply f
+	    	  insert_open_cell( cell, f(cell, d));
+		}
 	    }
 	}
 	return in;
