@@ -4,10 +4,6 @@ include_directories( /opt/rotateright/Zoom/include/zoom)
 link_directories( /opt/rotateright/Zoom/lib
   		  /opt/rotateright/Zoom/lib64)
 
-add_executable(distributed_persistence distributed_persistence_tool.cpp)
-target_link_libraries(distributed_persistence ${MPI_LIBRARIES} ${Boost_LIBRARIES})
-install( TARGETS distributed_persistence RUNTIME DESTINATION bin)
-
 #add_executable(persistence persistence.cpp)
 #install( TARGETS persistence RUNTIME DESTINATION bin)
 #
