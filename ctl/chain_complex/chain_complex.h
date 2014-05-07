@@ -249,7 +249,7 @@ public:
    }
 
    template< typename Stream, typename Functor>
-   void write( Stream& out, const Functor & f) const {
+   Stream& write( Stream& out, const Functor & f) const {
    	out << "size " << cells.size() << std::endl;
    	for( auto cell: cells){
    	  out << cell.first.size() << " ";
@@ -257,10 +257,11 @@ public:
    	  out << f( cell.second) << " ";
    	  out << std::endl;
    	}
+	return out;
    }
 
    template< typename Stream>
-   void write( Stream& out) const { 
+   Stream& write( Stream& out) const { 
 	ctl::identity i;
 	return write( out, i);
    }
