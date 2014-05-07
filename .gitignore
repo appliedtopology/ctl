@@ -1,3 +1,4 @@
+ctl/distributed/distributed_persistence
 ctl/tools/distributed_persistence
 examples/
 ctl/tools/cover_homology

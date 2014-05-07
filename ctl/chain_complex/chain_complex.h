@@ -96,10 +96,10 @@ class Data_wrapper : public Data_ {
    Data_wrapper( const std::size_t & tid, const std::size_t p=0):
    Data_(), id_( tid), pos_( p) {}
 
-   Data_wrapper( const Data_wrapper & from) :
+   Data_wrapper( const Data_wrapper & from):Data_( from),
      id_( from.id_), pos_( from.pos_) {}
    //move
-   Data_wrapper( const Data_wrapper && from):
+   Data_wrapper( const Data_wrapper && from): Data_( std::forward( from)),
    	id_( std::move( from.id_)), pos_( std::move( from.pos_)) {}
 
    Self& operator=( const Self & from){
@@ -251,10 +251,11 @@ public:
    template< typename Stream, typename Functor>
    Stream& write( Stream& out, const Functor & f) const {
    	out << "size " << cells.size() << std::endl;
-   	for( auto cell: cells){
-   	  out << cell.first.size() << " ";
+   	for( const auto & cell: cells){
+   	  out << cell.first.size() << " " << std::flush;
 	  cell.first.write( out);
-   	  out << f( cell.second) << " ";
+	  out << std::flush;
+   	  out << f( cell.second) << " " << std::flush;
    	  out << std::endl;
    	}
 	return out;
@@ -339,14 +340,15 @@ private:
    std::size_t max_id;
    std::size_t max_dim;
 }; //cell_map
-} //namespace ctl
 
+} //namespace ctl
 template< typename Stream, typename Cell, typename Boundary, 
 	   typename Data, typename Hash>
 Stream& operator<<( Stream& out, 
 		    const ctl::Chain_complex< Cell, Boundary, Data, Hash> & c){ 
 	for(auto i = c.begin(); i != c.end(); ++i){
-		      out << (i->second.id()); 
+		      const std::size_t id = i->second.id();
+		      out << id; 
 		      out << ": ";
 		      out << i->first; 
 	}
