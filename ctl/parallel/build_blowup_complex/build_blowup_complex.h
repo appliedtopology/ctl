@@ -1,3 +1,5 @@
+#ifndef _CTL_BUILD_COVER_COMPLEX_H_
+#define _CTL_BUILD_COVER_COMPLEX_H_
 /*******************************************************************************
 * -Academic Honesty-
 * Plagarism: The unauthorized use or close imitation of the language and 
@@ -37,8 +39,6 @@
 *
 *
 *******************************************************************************/
-#ifndef _CTL_BUILD_COVER_COMPLEX_H_
-#define _CTL_BUILD_COVER_COMPLEX_H_
 //STL
 #include <numeric>
 
@@ -54,6 +54,7 @@
 
 namespace ctl{
 namespace parallel{ 
+
 template<typename Timer>
 struct Blowup_stats {
 	Timer timer;
@@ -62,48 +63,6 @@ struct Blowup_stats {
 	double complex_size;
 	double blowup_size;
 };
-
-// For testing
-// Id comparison and cover_cell ordering
-template< typename Cell_iterator>
-struct Product_first_less  {
-  typedef Cell_iterator first_argument_type;
-  typedef Cell_iterator second_argument_type;
-  typedef         bool result_type;
-  bool operator()( const Cell_iterator& c1,
-		   const Cell_iterator& c2) const {
-
-    const std::size_t nerve_id_1 = c1->first.first->second.id();
-    const std::size_t nerve_id_2 = c2->first.first->second.id();
-    //assumes the nerve has been built closed. 
-    return (nerve_id_1 < nerve_id_2) || (!(nerve_id_1 > nerve_id_2) && 
-	   (c1->first.second_cell() < c2->first.second_cell()));
-  }
-}; // class Product_first_less
-
-template< typename Cell_iterator>
-struct Product_second_less  {
-  typedef Cell_iterator first_argument_type;
-  typedef Cell_iterator second_argument_type;
-  typedef         bool result_type;
-  private:
-  typedef typename Cell_iterator::value_type::first_type Product_cell;
-  typedef typename Product_cell::Cell_iterator1 First_cell_iterator;
-  typedef typename Product_cell::Cell_iterator2 Second_cell_iterator;
-  public:
-  bool operator()( const Cell_iterator& c1,
-		   const Cell_iterator& c2) const {
-
-    const std::size_t nerve_id_1 = c1->first.first->second.id();
-    const std::size_t nerve_id_2 = c2->first.first->second.id();
-    //assumes the nerve has been built closed.
-    //also it assumes pointer arithmetic fancyness in or statement to avoid
-    //second cell < other_cell comparison 
-    return (c1->first.second_cell() < c2->first.second_cell()) || 
-		((c1->first.second == c2->first.second) &&  
-			nerve_id_1 < nerve_id_2);
-  }
-}; // class Product_second_less
 
 template< typename Iterator >
 struct Filtration_property_map{
