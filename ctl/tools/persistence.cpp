@@ -33,19 +33,6 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 *******************************************************************************/
-//#define COMPUTE_BETTI
-//#define CTL_USE_MURMUR
-#define CTL_USE_CITY
-//#define CTL_USE_JENKINS
-//#define COMPLEX_DIAGNOSTICS
-
-#ifdef ZOOM_PROFILE
-#include "zoom.h"
-#endif
-
-#ifdef COMPLEX_DIAGNOSTICS
-	#include "utility/complex_diagnostics.h"
-#endif
 //CTL 
 //Types for Building a Simplicial Chain Complex and Filtration
 #include <ctl/finite_field/finite_field.h>
@@ -149,9 +136,9 @@ int main(int argc, char *argv[]){
   		    filtration_boundary, cascade_bd_property_map);
   timer.stop();
 
-
   double complex_persistence = timer.elapsed();
   std::cout << "serial persistence: " 
             << complex_persistence << std::endl;
+  
   return 0;
 }
