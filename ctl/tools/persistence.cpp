@@ -86,10 +86,6 @@ typedef Filtration::iterator Filtration_iterator;
 typedef ctl::Filtration_boundary< Filtration> Filtration_boundary;
 typedef Filtration::Term Filtration_term;
 
-//Complex Boundary Operator
-//typedef ctl::Complex_boundary< Complex> Complex_boundary;
-//typedef Complex_boundary::Term Complex_term;
-
 //Build Chain Type
 typedef ctl::Chain< Filtration_term> Complex_chain;
 
@@ -114,9 +110,6 @@ void process_args(int & argc, char *argv[], String & filename){
 }
 
 int main(int argc, char *argv[]){
-  #ifdef ZOOM_PROFILE
-  std::cout << "Connect" <<  ZMConnect() << std::endl;
-  #endif
   std::string full_complex_name; 
   process_args(argc, argv, full_complex_name);
   
@@ -128,13 +121,11 @@ int main(int argc, char *argv[]){
   timer.start();
   ctl::read_complex( full_complex_name, complex); 
   timer.stop();
+
   std::cout << "I/O Time: " << timer.elapsed() << std::endl;
   std::cout << "complex size: " << complex.size() << std::endl; 
   std::cout << "complex dimension: " << complex.dimension() << std::endl;
 
-  #ifdef COMPLEX_DIAGNOSTICS
-  ctl::complex_diagnostics( complex);
-  #endif
   //produce a filtration
   timer.start();
   Filtration complex_filtration( complex);
@@ -142,7 +133,7 @@ int main(int argc, char *argv[]){
   timer.stop();
   double complex_filtration_time = timer.elapsed();
   //display some info
-  std::cout << "time for complex filtration (secs): " 
+  std::cout << "time to compute complex filtration (secs): " 
 	    << complex_filtration_time << std::endl;
   
   //begin instantiate our vector of cascades homology
@@ -152,55 +143,15 @@ int main(int argc, char *argv[]){
   //we hand persistence a property map for genericity!                                         
   Complex_chain_map cascade_bd_property_map( complex_cascade_boundaries.begin(),
 					     offset_map);
-  #ifdef ZOOM_PROFILE
-  std::cout << "Profiling Begin";
-  ZMError start_error = ZMStartSession();
-  std::cout << start_error << std::endl;
-  #endif 
   //serial persistence (complex)
   timer.start();
   ctl::persistence( complex_filtration.begin(), complex_filtration.end(),
   		    filtration_boundary, cascade_bd_property_map);
   timer.stop();
-  #ifdef ZOOM_PROFILE
-  ZMError end_error = ZMStopSession();
-  std::cout << "Profiling End" << end_error << std::endl;
-  #endif
-  #ifdef ZOOM_PROFILE
-   std::cout << "Disconnect" <<  ZMDisconnect() << std::endl;
-  #endif
 
 
   double complex_persistence = timer.elapsed();
-  std::cout << "serial persistence (complex): " 
+  std::cout << "serial persistence: " 
             << complex_persistence << std::endl;
-  std::cout << "total time : " << complex_filtration_time + complex_persistence 
-	   << std::endl;
-                                                                  
-#ifdef COMPUTE_BETTI  
-  //betti numbers
-  typedef std::vector<int> Betti;
-  Betti betti;
-  std::cout << "serial betti (complex): " << std::endl;
-  ctl::compute_betti( filtration, cascade_bd_property_map, betti);
-  std::cout << std::endl;
-  int euler=0;
-  int m = 1;
-  for( std::size_t i = 0; i < betti.size(); ++i){
-	euler += betti[ i]*m;
-	m= -m;
-  }
-  std::cout << "(betti) Euler Characteristic: " << euler << std::endl; 
-  
-  std::vector< std::size_t> counts( complex.dimension()+1, 0);
-  euler=0; 
-  m = 1;
-  for (auto cell : complex){ counts[ cell.first.dimension()]++; }
-  for (std::size_t i = 0; i < counts.size(); ++i){
-   euler += counts[ i]*m;
-   m = -m;
-  }
-  std::cout << "(cell) Euler Characteristic: " << euler << std::endl; 
-#endif
   return 0;
 }
