@@ -79,7 +79,7 @@ public:
     : data_( data){}
   
   // copy constructor
-  Cover_data( const Cover_data  &from) : data_( from.data_){}
+  Cover_data( const Cover_data  &from): data_( from.data_){}
 
   // assignment operator
   Cover_data& operator=( const Cover_data& from) {
@@ -88,7 +88,7 @@ public:
   }
  
   Data1&        data()         { return data_; }
-  const Data1   data() const   { return data_; }
+  const Data1&   data() const   { return data_; }
 
 private:
   Data_ data_;
@@ -99,20 +99,17 @@ struct Get_cover :
 public std::unary_function< Data &, 
 			typename Data::Data1::value_type::first_type &>
 {
-	typedef typename Data::Data1 Cover_complex_iterator;
-	typedef typename Cover_complex_iterator::value_type Nerve_cell;
-	typedef typename Nerve_cell::first_type Cell;
-
-	Cell operator()( Data & data) const{
+	typedef typename Data::Data1 Nerve_iterator;
+	typedef typename Nerve_iterator::value_type::first_type Cell;
+	Get_cover(){}
+	Cell& operator()( Data & data) const{
 	  return data.data()->first;
 	}
 
-	const Cell operator()( const Data & data) const{
+	const Cell& operator()( const Data & data) const{
 	  return data.data()->first;
         }
 };
-} // namespace parallel
-} //namespace ctl
 
 template< typename Stream>
 Stream& operator<<( Stream & out, const ctl::parallel::Nerve_data & d){
@@ -123,4 +120,6 @@ template< typename Stream, typename Data>
 Stream& operator<<( Stream & out, const ctl::parallel::Cover_data< Data> & d){
 	return out;
 }
+} // namespace parallel
+} //namespace ctl
 #endif // _CTL_COVER_DATA_H

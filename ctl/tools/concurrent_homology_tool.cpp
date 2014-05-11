@@ -72,6 +72,7 @@
 //Blowup
 #include <ctl/product_cell/product_boundary.h>
 #include <ctl/product_cell/product_cell.h>
+#include <ctl/product_cell/product_cell_less.h>
 #include <ctl/parallel/build_blowup_complex/build_blowup_complex.h>
 
 //Persistence 
@@ -131,7 +132,7 @@ typedef ctl::parallel::Chain_complex< Product,
 				      Product::Hash> Blowup;
 typedef Blowup::iterator Blowup_iterator;
 typedef ctl::Complex_boundary< Blowup, Blowup_iterator> Blowup_complex_boundary;
-typedef ctl::parallel::Product_first_less < Blowup_iterator> Parallel_id_less;
+typedef ctl::Product_first_less < Blowup_iterator> Parallel_id_less;
 typedef Blowup::Boundary Cell_boundary;
 
 typedef ctl::parallel::Filtration< Blowup, ctl::Id_less> Blowup_filtration;

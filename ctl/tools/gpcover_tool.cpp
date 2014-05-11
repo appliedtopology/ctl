@@ -65,9 +65,9 @@ typedef ctl::Finite_field< 2> Z2;
 typedef ctl::Simplex_boundary< Cell, Z2> Simplex_boundary;
 typedef ctl::Chain_complex< Cell, 
 			    Simplex_boundary, 
-			    ctl::parallel::Nerve_data> Cover_complex;
-typedef Cover_complex::iterator Cover_complex_iterator;
-typedef ctl::parallel::Cover_data< Cover_complex_iterator > Cover_data;
+			    ctl::parallel::Nerve_data> Nerve;
+typedef Nerve::iterator Nerve_iterator;
+typedef ctl::parallel::Cover_data< Nerve_iterator > Cover_data;
 typedef ctl::Chain_complex< Cell, Simplex_boundary, Cover_data> Complex;
 typedef Complex::iterator Complex_iterator;
 typedef ctl::Cell_less Cell_less;
@@ -107,7 +107,6 @@ int main( int argc, char *argv[]){
   po::variables_map vm;
   process_args( argc, argv, vm);
   size_t num_parts = atoi( vm[ "num-parts"].as< std::string>().c_str());
-  tbb::task_scheduler_init init;
   //setup some variables
   std::string full_complex_name = vm[ "input-file"].as< std::string>();
   std::string complex_name( full_complex_name);
@@ -117,9 +116,10 @@ int main( int argc, char *argv[]){
   if ( found != std::string::npos){
         complex_name.replace( 0, found+1, "");
   }
+  tbb::task_scheduler_init init;
 
   Complex complex;
-  Cover_complex nerve;
+  Nerve nerve;
 
   // Read the cell_set in
   read_complex( full_complex_name, complex);
@@ -132,6 +132,7 @@ int main( int argc, char *argv[]){
   timer.start();
   ctl::parallel::init_cover_complex( nerve, num_parts);
   ctl::parallel::graph_partition_cover( filtration, nerve);
+  timer.stop();
   double cover_time = timer.elapsed();
   std::cout << "cover compute time: " << cover_time << std::endl;
   std::string cover_name ( full_complex_name);
@@ -158,7 +159,7 @@ int main( int argc, char *argv[]){
 
   ctl::open_file( out, cover_name.c_str());
   typedef ctl::parallel::Get_cover< Complex::Data> Cover_functor;
-  complex.write(out,Cover_functor());
+  complex.write( out, Cover_functor());
   ctl::close_file( out);
   return 0;
 }

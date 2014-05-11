@@ -71,7 +71,7 @@ typedef Complex_filtration::iterator Complex_filtration_iterator;
 template<typename Variable_map>
 void process_args( int & argc, char *argv[],Variable_map & vm){
   //parse command line options
-  po::options_description desc( "Usage: write_filtration [options] input-file num-parts");
+  po::options_description desc( "Usage: write_filtration [options] input-file");
   desc.add_options()
   ( "help", "Display this message")
   ( "input-file", "input .asc file to parse");
