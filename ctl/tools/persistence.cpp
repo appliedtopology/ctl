@@ -33,23 +33,31 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 *******************************************************************************/
-//CTL 
-//Types for Building a Simplicial Chain Complex and Filtration
+//CTL Headers
+
+//Utility 
+#include <ctl/io/io.h>
+#include <ctl/utility/timer.h>
+
+//Abstract Simplex
 #include <ctl/finite_field/finite_field.h>
 #include <ctl/abstract_simplex/abstract_simplex.h>
 #include <ctl/abstract_simplex/simplex_boundary.h>
-#include <ctl/chain_complex/complex_boundary.h>
+
+//Filtration & Filtration Boundary Operator
 #include <ctl/filtration/filtration.h>
 #include <ctl/filtration/filtration_boundary.h>
 #include <ctl/filtration/less.h>
-#include <ctl/io/io.h>
+
+//Weights
+#include <ctl/weight_data/weight_data.h>
+
+//Chaim Complex
 #include <ctl/chain_complex/chain_complex.h>
-#include <ctl/chain_complex/chain_complex_io.h>
+#include <ctl/chain_complex/complex_boundary.h>
 #include <ctl/term/term.h>
 
-#include <ctl/utility/timer.h>
-
-//Persistence 
+//Chains & Persistence 
 #include <ctl/chain/chain.h>
 #include <ctl/persistence/persistence.h>
 #include <ctl/persistence/iterator_property_map.h>
@@ -59,35 +67,45 @@
 //STL
 #include <sstream>
 
-//Build Complex type
+
+//Timer
+typedef ctl::Timer Timer;
+
+//Simplex
 typedef ctl::Abstract_simplex< int> Simplex;
 typedef ctl::Finite_field< 2> Z2;
 typedef ctl::Simplex_boundary< Simplex, Z2> Simplex_boundary;
-typedef ctl::Chain_complex< Simplex, Simplex_boundary> Complex;
 
-//Build Filtration type
+//Chain Complex
+typedef ctl::Weight_data< double> Weight_data;
+typedef ctl::Chain_complex< Simplex, Simplex_boundary, Weight_data> Complex;
+
+//Filtration
 typedef	Complex::iterator Complex_iterator;
 typedef ctl::Cell_less Complex_cell_less;
 typedef ctl::Filtration< Complex, Complex_cell_less > Filtration;
+
+//Boundary Operator
+//NOTE: This is not a general purpose boundary operator.
+//It works correctly only when successive 
+//boundaries are taken in a filtration order
 typedef Filtration::iterator Filtration_iterator;
 typedef ctl::Filtration_boundary< Filtration> Filtration_boundary;
 typedef Filtration::Term Filtration_term;
 
-//Build Chain Type
+//Chain Type
 typedef ctl::Chain< Filtration_term> Complex_chain;
 
-//Type which stores all the chains for persistence
-//It would be a good project to see if storing the internal pointer here
-//inside of the chain_complex would be a good idea
+//Essentially our sparse boundary matrix
 typedef std::vector< Complex_chain> Complex_chains;
 
+//Generic wrapper to access the sparse matrix.
 typedef ctl::Pos_offset_map< Filtration_term::Cell> Complex_offset_map;
 typedef ctl::iterator_property_map< Complex_chains::iterator, 
                                       Complex_offset_map, 
                                       Complex_chain, 
                                       Complex_chain&> Complex_chain_map;
 
-typedef ctl::Timer Timer;
 
 template<typename String>
 void process_args(int & argc, char *argv[], String & filename){
@@ -95,6 +113,11 @@ void process_args(int & argc, char *argv[], String & filename){
   if (argc != 2){ std::cerr << usage << std::endl; exit( 1); }
   filename = std::string( argv[ 1]);
 }
+
+template< typename Complex, typename Filtration, typename 
+void 
+
+
 
 int main(int argc, char *argv[]){
   std::string full_complex_name; 
