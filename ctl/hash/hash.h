@@ -98,6 +98,7 @@ inline std::size_t jenkins_hash( const T & key){
 } //detail namespace
 } //ctl namespace
 
+#define CTL_USE_CITY
 namespace ctl {
 	template< typename T>
 	struct Hash{
