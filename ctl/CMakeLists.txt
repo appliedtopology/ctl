@@ -1,4 +1,5 @@
 add_subdirectory( term)
+add_subdirectory( barcodes)
 add_subdirectory( abstract_simplex)
 add_subdirectory( chain)
 add_subdirectory( chain_complex)
