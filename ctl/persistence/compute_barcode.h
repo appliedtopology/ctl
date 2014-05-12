@@ -39,10 +39,10 @@
 template< typename Barcodes, 
 	  typename Filtration, 
 	  typename Cell_chain_map>
-void compute_barcodes( const Filtration & filtration, 
-                       const Cell_chain_map & cascade_boundary_map,
-		       Barcodes & barcodes, 
-		       bool include_last_dim=false){ 
+void compute_weighted_barcodes( const Filtration & filtration, 
+                                const Cell_chain_map & cascade_boundary_map,
+		                Barcodes & barcodes,
+		                bool include_last_dim=false){ 
        typedef typename Complex::const_iterator Filtration_iterator;
        typedef typename Cell_chain_map::value_type Chain;
        typedef typename Barcodes::value_type Barcode;
@@ -64,5 +64,32 @@ void compute_barcodes( const Filtration & filtration,
        if( !include_last_dim){ barcodes.pop_back(); }
 }
 
+template< typename Barcodes, 
+	  typename Filtration, 
+	  typename Cell_chain_map>
+void compute_barcodes( const Filtration & filtration, 
+                       const Cell_chain_map & cascade_boundary_map,
+		       Barcodes & barcodes,
+		       bool include_last_dim=false){ 
+       typedef typename Complex::const_iterator Filtration_iterator;
+       typedef typename Cell_chain_map::value_type Chain;
+       typedef typename Barcodes::value_type Barcode;
+       barcodes.resize( filtration.complex().max_dimension()+1);
+       std::size_t pos=0;
+       for(Filtration_iterator sigma = filtration.begin(); 
+			       sigma != filtration.end(); ++sigma, ++pos){
+               const Chain& bd = cascade_boundary_map[ sigma];
+	       if( bd.empty()){
+	        Barcode & barcode = barcodes[ (*sigma)->first.dimension()];
+	      	barcode.emplace( pos, std::numeric_limits< Weight>::infinity());	 
+	       }else if( sigma < bd.youngest().cell()){
+	          Barcode & barcode = barcodes[ (*sigma)->first.dimension()];
+	 	  const Filtration_iterator & destroyer = bd.youngest().cell();
+		  barcode.emplace( pos, destroyer-filtration.begin());
+	       }
+       }
+       if( !include_last_dim){ barcodes.pop_back(); }
+}
+
 }//namespace ctl
-#endif //CTL_WRITE_BETTI
+#endif //CTL_WRITE_BARCODES

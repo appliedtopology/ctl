@@ -9,6 +9,8 @@ if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" VERSION_GREATER 2.6)
   endif()
 endif()
 option(USE_CLANG "build application with clang" OFF) # OFF is the default
+option(USE_MPI "build distributed codes" OFF) #OFF is default
+
 if( USE_CLANG)
    SET (CMAKE_C_COMPILER             "/usr/bin/clang")
    SET (CMAKE_C_FLAGS                "-Wall -std=c99")
@@ -29,9 +31,7 @@ if( USE_CLANG)
    SET (CMAKE_OBJDUMP "/usr/bin/llvm-objdump")
    SET (CMAKE_RANLIB  "/usr/bin/llvm-ranlib")
 endif( USE_CLANG)
-#set (CMAKE_INSTALL_PREFIX /usr/local)
-#for installing read:
-#http://www.cmake.org/cmake/help/cmake_tutorial.html
+
 set(CTL_INCLUDE_INSTALL_DIR ${CMAKE_SOURCE_DIR}/include)
 set(CTL_DOC_INSTALL_DIR ${CMAKE_SOURCE_DIR}/doc)
 set(CTL_BIN_INSTALL_DIR ${CMAKE_SOURCE_DIR}/bin)
@@ -42,7 +42,14 @@ set(MPI_CXX_COMPILER mpic++)
 find_package(MPI REQUIRED)
 
 set(Boost_USE_MULTITHREADED OFF)
-find_package(Boost COMPONENTS program_options mpi serialization REQUIRED)
+
+if(NOT USE_MPI)
+  find_package(Boost COMPONENTS program_options serialization REQUIRED)
+endif(NOT USE_MPI)
+if( USE_MPI)
+  find_package(Boost COMPONENTS program_options mpi serialization REQUIRED)
+endif(  USE_MPI)
+
 find_package(TBB REQUIRED) 
 find_package(METIS REQUIRED) 
 include_directories(${CMAKE_SOURCE_DIR})
