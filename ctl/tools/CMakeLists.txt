@@ -1,25 +1,11 @@
-option(ZOOM_PROFILE "Profile code with Zoom profiler" off)
-
-if( ZOOM_PROFILE)
-include_directories( /opt/rotateright/Zoom/include/zoom)
-link_directories( /opt/rotateright/Zoom/lib
-  		  /opt/rotateright/Zoom/lib64)
-endif( ZOOM_PROFILE)
-
 add_executable(persistence persistence.cpp)
 install( TARGETS persistence RUNTIME DESTINATION bin)
 
 if( APPLE)
 	target_link_libraries( persistence boost_program_options) 
-	if( ZOOM_PROFILE)
-		target_link_libraries( persistence m RRZoomScript) 
-	endif( ZOOM_PROFILE)
 endif( APPLE)
 if( ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	target_link_libraries( persistence boost_program_options)
-	if( ZOOM_PROFILE)
-		target_link_libraries( persistence pthread rt m RRZoomScript)
-	endif( ZOOM_PROFILE)
 endif( ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 add_executable(duplicate build_blobs.cpp)
