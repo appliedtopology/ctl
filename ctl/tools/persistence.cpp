@@ -64,6 +64,10 @@
 #include <ctl/persistence/iterator_property_map.h>
 #include <ctl/persistence/offset_maps.h>
 #include <ctl/persistence/compute_betti.h>
+#include <ctl/persistence/compute_barcodes.h>
+
+//Barcodes
+#include <ctl/barcodes/barcodes.h>
 
 //STL
 #include <sstream>
@@ -89,19 +93,21 @@ typedef ctl::Chain_complex< Simplex, Simplex_boundary, Weight_data>
 typedef ctl::Cell_less Complex_cell_less;
 typedef ctl::Weight_less Complex_weight_less;
 
-template< typename Complex, typename Cell_less, typename Barcode>
+template< typename Complex, typename Cell_less, 
+	  typename Barcode, typename Timer>
 void run_persistence( Complex & complex, 
 		      Cell_less & less, 
-		      Barcode & barcode, 
+		      Barcode & barcode,
+ 		      Timer & timer,
 		      bool weighted_complex=false){
    typedef ctl::Filtration< Complex, Cell_less > Filtration;
    //Boundary Operator
    //NOTE: This is not a general purpose boundary operator.
    //It works correctly only when successive 
    //boundaries are taken in a filtration order
-   typedef Filtration::iterator Filtration_iterator;
+   typedef typename Filtration::iterator Filtration_iterator;
    typedef ctl::Filtration_boundary< Filtration> Filtration_boundary;
-   typedef Filtration::Term Filtration_term;
+   typedef typename Filtration::Term Filtration_term;
    
    //Chain Type
    typedef ctl::Chain< Filtration_term> Complex_chain;
@@ -110,8 +116,9 @@ void run_persistence( Complex & complex,
    typedef std::vector< Complex_chain> Complex_chains;
    
    //Generic wrapper to access the sparse matrix.
-   typedef ctl::Pos_offset_map< Filtration_term::Cell> Complex_offset_map;
-   typedef ctl::iterator_property_map< Complex_chains::iterator, 
+   typedef ctl::Pos_offset_map< typename Filtration_term::Cell> 
+						Complex_offset_map;
+   typedef ctl::iterator_property_map< typename Complex_chains::iterator, 
                                          Complex_offset_map, 
                                          Complex_chain, 
                                          Complex_chain&> Complex_chain_map;
@@ -141,16 +148,15 @@ void run_persistence( Complex & complex,
    double complex_persistence = timer.elapsed();
    std::cout << "serial persistence: " << complex_persistence << std::endl;
    if( weighted_complex){
-   	ctl::compute_weighted_barcodes( complex_filtration, 
-					cascade_boundary_map, barcode);
+   	ctl::compute_barcodes( complex_filtration, 
+			       cascade_bd_property_map, 
+			       barcode, ctl::weighted_tag());
    }else{ 
    	ctl::compute_barcodes( complex_filtration, 
-			       cascade_boundary_map, barcode); 
+			       cascade_bd_property_map, barcode, 
+			       ctl::non_weighted_tag()); 
    }
 }
-
-
-
 
 template<typename String>
 void process_args(int & argc, char *argv[], 
@@ -160,13 +166,19 @@ void process_args(int & argc, char *argv[],
   filename = std::string( argv[ 1]);
   filtration = filename;
   std::size_t pos = filtration.rfind('.');
-  if (pos != std::npos){
+  if (pos != std::string::npos){
   	filtration.erase(pos);
   }
   filtration.append(".flt");
 }
 
-
+template< typename String, typename Weight_functor>
+bool read_weights( const String & filename, Weight_functor & f){
+	std::ifstream in;
+	if( !ctl::open_file( in, filename.c_str())){ return false; }
+	in >> f;
+	return true;
+}
 
 int main(int argc, char *argv[]){
   std::string full_complex_name, filtration_file;
@@ -174,9 +186,9 @@ int main(int argc, char *argv[]){
  
   //Create some data structures 
   Timer timer;
-  ctl::Weight_data_functor< Complex> weight_functor;
+  ctl::Weight_data_functor< Weighted_complex> weight_functor;
   timer.start();
-  if( ctl::read_weights( filtration_file, weight_functor) ){
+  if( read_weights( filtration_file, weight_functor) ){
 	typedef typename ctl::Barcodes< double> Barcodes;
 	Barcodes barcodes;
   	Weighted_complex complex;
@@ -185,8 +197,8 @@ int main(int argc, char *argv[]){
   	std::cout << "I/O Time: " << timer.elapsed() << std::endl;
   	std::cout << "complex size: " << complex.size() << std::endl; 
   	std::cout << "complex dimension: " << complex.dimension() << std::endl;
-	Weight_less less;
-	run_persistence( complex, less, barcodes);
+	Complex_weight_less less;
+	run_persistence( complex, less, barcodes, timer);
 
   }else{
 	typedef typename ctl::Barcodes< std::size_t> Barcodes;
@@ -197,8 +209,8 @@ int main(int argc, char *argv[]){
   	std::cout << "I/O Time: " << timer.elapsed() << std::endl;
 	std::cout << "complex size: " << complex.size() << std::endl; 
   	std::cout << "complex dimension: " << complex.dimension() << std::endl;
-	Complex_less less;
-  	run_persistence( complex, less, barcodes);   
+	Complex_cell_less less;
+  	run_persistence( complex, less, barcodes, timer);   
   } 
   
   return 0;

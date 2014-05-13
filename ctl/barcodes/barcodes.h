@@ -41,9 +41,11 @@
 * on the other hand it doesn't seem like this should really cause an issue here.
 *******************************************************************************/
 //STL
-#include <unordered_multiset>
+#include <unordered_set>
 #include <vector>
-#include <pair>
+#include <utility>
+#include <functional>
+#include <ctl/hash/hash.h>
 
 //exported functionality
 namespace ctl{
@@ -51,13 +53,32 @@ namespace ctl{
 template< typename Weight>
 using Interval = std::pair< Weight, Weight>;
 
+namespace detail{
+
+struct Interval_hash{
+	template< typename Weight>	
+	std::size_t operator()( const ctl::Interval< Weight> & I) const {
+	      return ctl::Hash< Weight>( I.first)*ctl::Hash< Weight>( I.second);    
+	} 
+}; //struct Interval_hash
+
+} //end namespace detail
+
 //a multiset of intervals in a fixed dimension is a barcode
 template< typename Weight>
-using Barcode = std::unordered_multiset< ctl::Interval< weight> >;
+using Barcode = std::unordered_multiset< ctl::Interval< Weight>, 
+					 detail::Interval_hash >;
 
 //and the barcodes for a space are an array of them, one for each dimension
 template< typename Weight>
-using Barcodes = std::vector< Barcode< Weight> >;
+struct Barcodes : std::vector< Barcode< Weight> > {
+	private:
+	typedef std::vector< Barcode< Weight> > Vector;
+	public:
+	Barcodes(): Vector() {}
+	Barcodes( const Barcodes & b): Vector( b) {}
+	using Vector::operator=;
+}; //struct Barcodes
 
 //I/O for an interval
 template< typename Stream, typename Weight>
@@ -117,7 +138,7 @@ Stream& operator<<( Stream& out, const ctl::Barcodes< Weight> & barcodes) {
 template< typename Stream, typename Weight>
 Stream& operator>>( Stream& in, ctl::Barcodes< Weight>& barcodes) {
   typedef ctl::Barcodes< Weight> Barcodes;
-  typedef Barcodes::size_type bsize_t;
+  typedef typename Barcodes::size_type bsize_t;
   typedef typename Barcodes::iterator Iterator;
   // Get max dimension
   assert(in.good());

@@ -44,6 +44,7 @@
 
 //CTL
 #include <ctl/io/io.h>
+#include <sstream>
 
 //non-exported functionality
 namespace ctl {
@@ -56,6 +57,7 @@ namespace ctl{
 template< typename Complex>
 struct Weight_data_functor {
     typedef typename Complex::Data Weight_data;
+    typedef typename Weight_data::Weight Weight;
     typedef typename Complex::Cell Cell;
     typedef std::unordered_map< std::size_t, std::size_t> Map;
  
@@ -117,7 +119,7 @@ struct Weight_data_functor {
 	return in;
     }
    
-    template< typename Stream, typename Complex>
+    template< typename Stream>
     Stream& write( Stream& out, const Complex & complex){
 	out << "size " << complex.size(); 
 	for( auto & cell: complex){
@@ -131,8 +133,8 @@ struct Weight_data_functor {
     Map values;
 }; //end struct Weight_data_functor
 
-template< typename Stream, typename N, typename C>
-Stream& operator>>(Stream & in, Weight_data_functor< N, C> & f){ 
+template< typename Stream, typename C>
+Stream& operator>>(Stream & in, Weight_data_functor< C> & f){ 
 	return f.read( in); 
 }
 

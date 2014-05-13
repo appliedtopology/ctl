@@ -32,31 +32,38 @@ if( USE_CLANG)
    SET (CMAKE_RANLIB  "/usr/bin/llvm-ranlib")
 endif( USE_CLANG)
 
+set(CMAKE_BUILD_TYPE RELWITHDEBINFO)
+
 set(CTL_INCLUDE_INSTALL_DIR ${CMAKE_SOURCE_DIR}/include)
 set(CTL_DOC_INSTALL_DIR ${CMAKE_SOURCE_DIR}/doc)
 set(CTL_BIN_INSTALL_DIR ${CMAKE_SOURCE_DIR}/bin)
 set(CTL_EXAMPLES_INSTALL_DIR ${CMAKE_SOURCE_DIR}/examples)
-set(Boost_USE_MULTITHREADED OFF)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules")
-set(MPI_CXX_COMPILER mpic++)
-find_package(MPI REQUIRED)
-
-set(Boost_USE_MULTITHREADED OFF)
 
 if(NOT USE_MPI)
   find_package(Boost COMPONENTS program_options serialization REQUIRED)
+  link_directories(/usr/local/lib ${Boost_LIBRARY_DIR})
 endif(NOT USE_MPI)
 if( USE_MPI)
+  set(MPI_CXX_COMPILER mpic++)
+  find_package(MPI REQUIRED)
   find_package(Boost COMPONENTS program_options mpi serialization REQUIRED)
+  include_directories(${MPI_INCLUDE_PATH})
+  link_directories(${MPI_LIBRARY_DIRS})
 endif(  USE_MPI)
+
+set(Boost_USE_MULTITHREADED OFF)
+add_definitions(" -fno-omit-frame-pointer -Wall -ansi -std=c++11")
 
 find_package(TBB REQUIRED) 
 find_package(METIS REQUIRED) 
-include_directories(${CMAKE_SOURCE_DIR})
-include_directories( ${MPI_INCLUDE_PATH} ${METIS_INCLUDE_DIR} ${Boost_INCLUDE_DIR} ${TBB_INCLUDE_DIR})
-link_directories(/usr/local/lib ${Boost_LIBRARY_DIR} ${METIS_LIBRARY_DIR} ${TBB_LIBRARY_DIR} ${MPI_LIBRARY_DIRS})
-add_definitions(" -fno-omit-frame-pointer -ftemplate-backtrace-limit=0 -Wall -ansi -std=c++11")
-set(CMAKE_BUILD_TYPE RELWITHDEBINFO)
+
+include_directories(${CMAKE_SOURCE_DIR} ${Boost_INCLUDE_DIR})
+include_directories(${METIS_INCLUDE_DIR} ${TBB_INCLUDE_DIR})
+
+link_directories(/usr/local/lib ${Boost_LIBRARY_DIR})
+link_directories(${METIS_LIBRARY_DIR} ${TBB_LIBRARY_DIR})
+
 add_subdirectory( ctl)
 
 install( DIRECTORY ${CMAKE_SOURCE_DIR}/ctl 

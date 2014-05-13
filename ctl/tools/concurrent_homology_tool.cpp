@@ -33,7 +33,7 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 *******************************************************************************/
-#define COMPUTE_BETTI
+//#define COMPUTE_BETTI
 //#define TESTS_ON
 //BOOST
 #include <boost/program_options.hpp>
