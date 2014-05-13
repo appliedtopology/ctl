@@ -1,5 +1,5 @@
-#ifndef CTL_WRITE_BETTI_H
-#define CTL_WRITE_BETTI_H
+#ifndef CTL_COMPUTE_BARCODES_H
+#define CTL_COMPUTE_BARCODES_H
 /*******************************************************************************
 * -Academic Honesty-
 * Plagarism: The unauthorized use or close imitation of the language and 
@@ -35,18 +35,26 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 *******************************************************************************/
+namespace ctl{
+//tag dispatching
+struct weighted_tag {};
+struct non_weighted_tag {};
 
 template< typename Barcodes, 
 	  typename Filtration, 
 	  typename Cell_chain_map>
-void compute_weighted_barcodes( const Filtration & filtration, 
-                                const Cell_chain_map & cascade_boundary_map,
-		                Barcodes & barcodes,
-		                bool include_last_dim=false){ 
-       typedef typename Complex::const_iterator Filtration_iterator;
+void compute_barcodes( Filtration & filtration, 
+                       Cell_chain_map & cascade_boundary_map,
+		       Barcodes & barcodes,
+		       ctl::weighted_tag t,
+		       bool include_last_dim=false){ 
+       typedef typename Filtration::const_iterator Filtration_iterator; 
+       typedef typename Filtration::Complex Complex;
+       typedef typename Complex::Data Data;
+       typedef typename Data::Weight Weight;
        typedef typename Cell_chain_map::value_type Chain;
        typedef typename Barcodes::value_type Barcode;
-       barcodes.resize( filtration.complex().max_dimension()+1);
+       barcodes.resize( filtration.complex().dimension()+1);
        for(Filtration_iterator sigma = filtration.begin(); 
 			       sigma != filtration.end(); ++sigma){
                const Chain& bd = cascade_boundary_map[ sigma];
@@ -67,21 +75,24 @@ void compute_weighted_barcodes( const Filtration & filtration,
 template< typename Barcodes, 
 	  typename Filtration, 
 	  typename Cell_chain_map>
-void compute_barcodes( const Filtration & filtration, 
-                       const Cell_chain_map & cascade_boundary_map,
+void compute_barcodes( Filtration & filtration, 
+                       Cell_chain_map & cascade_boundary_map,
 		       Barcodes & barcodes,
-		       bool include_last_dim=false){ 
+		       ctl::non_weighted_tag t,
+		       bool include_last_dim=false){
+       typedef typename Filtration::const_iterator Filtration_iterator; 
+       typedef typename Filtration::Complex Complex;
        typedef typename Complex::const_iterator Filtration_iterator;
        typedef typename Cell_chain_map::value_type Chain;
        typedef typename Barcodes::value_type Barcode;
-       barcodes.resize( filtration.complex().max_dimension()+1);
+       barcodes.resize( filtration.complex().dimension()+1);
        std::size_t pos=0;
        for(Filtration_iterator sigma = filtration.begin(); 
 			       sigma != filtration.end(); ++sigma, ++pos){
                const Chain& bd = cascade_boundary_map[ sigma];
 	       if( bd.empty()){
 	        Barcode & barcode = barcodes[ (*sigma)->first.dimension()];
-	      	barcode.emplace( pos, std::numeric_limits< Weight>::infinity());	 
+	      	barcode.emplace( pos, std::numeric_limits< std::size_t>::infinity());	 
 	       }else if( sigma < bd.youngest().cell()){
 	          Barcode & barcode = barcodes[ (*sigma)->first.dimension()];
 	 	  const Filtration_iterator & destroyer = bd.youngest().cell();

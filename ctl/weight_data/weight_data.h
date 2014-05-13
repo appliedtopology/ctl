@@ -48,11 +48,11 @@ namespace detail{} // end namespace detail
 //exported functionality
 namespace ctl{
 
-template< typename Weight_, typename Weight_less = std::less< Weight_> >
+template< typename Weight_, typename Weight_less_ = std::less< Weight_> >
 class Weight_data {
 public:
   typedef Weight_ Weight;
-  typedef Weight_less Weight_less;
+  typedef Weight_less_ Weight_less;
 
   Weight_data( const Weight& weight = Weight( 0)) : weight_( weight) {}
   Weight_data( const Weight_data &from) : weight_( from.weight_) {}
@@ -75,9 +75,9 @@ private:
   Weight_ weight_;
 }; // class Weight_data
 
-struct Weight_less 
+struct Weight_less {
   template< typename Cell_iterator>
-  bool operator()( const Cell_iterator& a, const Cell_Iterator& b) const {
+  bool operator()( const Cell_iterator& a, const Cell_iterator& b) const {
     if( a->second.weight() < b->second.weight()) return true;
     if( b->second.weight() > a->second.weight()) return false;
     return a->first < b->first;
