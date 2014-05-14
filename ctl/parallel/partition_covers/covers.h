@@ -82,7 +82,7 @@ struct Cover_less :
 
     //assumes the nerve's VERTICES have been built closed. 
     return nerve_id_1 < nerve_id_2 || 
-	   (!(nerve_id_2 < nerve_id_1) && c1->second.pos() < c2->second.pos());
+	   (!(nerve_id_2 < nerve_id_1) && c1->second.id() < c2->second.id());
   }
 }; // class Parallel_id_less
 
@@ -270,7 +270,7 @@ class Open_cell_body{
        		                    		 _cell_list);
 			size_t new_pos = std::distance( _complex_begin, 
 						        cur_cell);
-			(*cur_cell)->second.pos( new_pos);
+			(*cur_cell)->second.id( new_pos);
 		}
 	}
 
@@ -309,7 +309,7 @@ class No_edgecut_body{
 			(*cur_cell)->second.data() = 
 				_vert_to_nerve.find( vertex)->second;
 			(*cur_cell)->second.data()->second.pp(); 
-			(*cur_cell)->second.pos( new_pos);
+			(*cur_cell)->second.id( new_pos);
 		}
 	}
 
@@ -341,7 +341,7 @@ class No_partition_body{
 			size_t new_pos = std::distance( _begin, 
 						        cur_cell);
 			(*cur_cell)->second.data() =  _any; 
-			(*cur_cell)->second.pos( new_pos);
+			(*cur_cell)->second.id( new_pos);
 			_any->second.pp();
 		}
 	}

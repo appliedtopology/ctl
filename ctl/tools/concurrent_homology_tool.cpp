@@ -35,6 +35,10 @@
 *******************************************************************************/
 //#define COMPUTE_BETTI
 //#define TESTS_ON
+//#define ZOOM
+#ifdef ZOOM
+#include "zoom.h"
+#endif
 //BOOST
 #include <boost/program_options.hpp>
 

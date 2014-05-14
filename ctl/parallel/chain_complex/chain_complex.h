@@ -96,42 +96,35 @@ class Concurrent_data_wrapper : public Data_ {
    typedef std::size_t Unsafe_id;
    typedef tbb::atomic< Unsafe_id> Safe_id;
    //default
-   Concurrent_data_wrapper(): id_( 0), pos_( 0) {}
+   Concurrent_data_wrapper(): id_( 0) {}
    
    Concurrent_data_wrapper( const std::size_t tid):
-   Data_(), id_( tid), pos_( 0) {}
-
-   Concurrent_data_wrapper( const std::size_t tid, const std::size_t & p):
-   Data_(), id_( tid), pos_( p) {}
+   Data_(), id_( tid) {}
 
    //copy
    Concurrent_data_wrapper( const Concurrent_data_wrapper & from) :
-     id_( from.id_), pos_( from.pos_) {}
+     id_( from.id_){}
    //move
    Concurrent_data_wrapper( const Concurrent_data_wrapper && from):
-   	id_( std::move( from.id_)), pos_( std::move( from.pos_)) {}
+   	id_( std::move( from.id_)){}
 
    Self& operator=( const Self & from){
    	Data_::operator=( from);
    	id_ = from.id_;
-   	pos_ = from.pos_;
    	return *this;
    }
    Self& operator=( Self && from){
    	Data_::operator=( from);
    	id_ = std::move( from.id_);
-   	pos_ = std::move( from.pos_);
    	return *this;
    }
 
 
    Safe_id id() const { return id_; }
    //a bit akward.. probably should change this later.
-   std::size_t pos() const { return pos_; }
-   void pos( const std::size_t p) { pos_= p; }
+   void id( const std::size_t p) { id_= p; }
    private:
    Safe_id id_;
-   std::size_t pos_;
    //(to be read in Millhouse Van Houten's voice)
    //This lets the chain_complex & boundary touch my privates ;)
    template< typename C, typename B, typename D, typename H>

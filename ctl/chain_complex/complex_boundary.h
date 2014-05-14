@@ -125,10 +125,6 @@ protected:
 		term.cell() = complex->find_cell( next_term->cell());
 		//++future_term;
 		term.coefficient( next_term->coefficient());
-		//mirror the internal filtration position
-		//TODO: see if it improves performace,
-		//complex_iterators can store this position
-		//to avoid the extra dereference
 		++next_term;
 		return;
 	}
