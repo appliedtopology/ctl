@@ -91,38 +91,33 @@ class Data_wrapper : public Data_ {
    typedef Data_wrapper< Data_> Self;
    public:
    //default
-   Data_wrapper(): id_( 0), pos_( 0) {}
+   Data_wrapper(): id_( 0) {}
    //copy
-   Data_wrapper( const std::size_t & tid, const std::size_t p=0):
-   Data_(), id_( tid), pos_( p) {}
+   Data_wrapper( const std::size_t & tid):
+   Data_(), id_( tid){}
 
-   Data_wrapper( const Data_wrapper & from):Data_( from),
-     id_( from.id_), pos_( from.pos_) {}
+   Data_wrapper( const Data_wrapper & from) : id_( from.id_){}
    //move
-   Data_wrapper( const Data_wrapper && from): Data_( std::forward( from)),
-   	id_( std::move( from.id_)), pos_( std::move( from.pos_)) {}
+   Data_wrapper( const Data_wrapper && from):
+   	id_( std::move( from.id_)){}
 
    Self& operator=( const Self & from){
    	Data_::operator=( from);
    	id_ = from.id_;
-   	pos_ = from.pos_;
    	return *this;
    }
+
    Self& operator=( Self && from){
    	Data_::operator=( from);
    	id_ = std::move( from.id_);
-   	pos_ = std::move( from.pos_);
    	return *this;
    }
 
 
    std::size_t id() const { return id_; }
-   //a bit akward.. probably should change this later.
-   std::size_t pos() const { return pos_; }
-   void pos( const std::size_t p) { pos_= p; }
+   void id( std::size_t n){ id_ = n; }
    private:
    std::size_t id_;
-   std::size_t pos_;
    //(to be read in Millhouse Van Houten's voice)
    //This lets the chain_complex & boundary touch my privates ;)
    template< typename C, typename B, typename D, typename H>

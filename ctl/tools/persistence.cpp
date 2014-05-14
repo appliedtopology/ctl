@@ -39,6 +39,18 @@
 #include <ctl/io/io.h>
 #include <ctl/utility/timer.h>
 
+//#define COMPUTE_BETTI
+//#define CTL_USE_MURMUR
+#define CTL_USE_CITY
+//#define CTL_USE_JENKINS
+//#define COMPLEX_DIAGNOSTICS
+//#define ZOOM_PROFILE
+#ifdef ZOOM_PROFILE
+#include "zoom.h"
+#endif
+
+//CTL 
+//Types for Building a Simplicial Chain Complex and Filtration
 //Abstract Simplex
 #include <ctl/finite_field/finite_field.h>
 #include <ctl/abstract_simplex/abstract_simplex.h>

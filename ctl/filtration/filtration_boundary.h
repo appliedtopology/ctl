@@ -121,9 +121,8 @@ public:
 protected:
   void _next_term(){
 	if( next_term != end_term){
-		const Complex & complex = filtration->complex();
-		const auto & cell = complex.find_cell( next_term->cell());
-		term.cell() = begin + cell->second.pos();
+		const auto & cell = complex->find_cell( next_term->cell());
+		term.cell() = begin + cell->second.id();
 		term.coefficient( next_term->coefficient());
 		++next_term;
 		return;
@@ -182,7 +181,7 @@ class Filtration_boundary{
 	
 	const_iterator begin( const typename Term::Cell & c) const {
 		const std::size_t pos = std::distance( _filtration.begin(), c);
-		(*c)->second.pos( pos);
+		(*c)->second.id( pos);
 		return const_iterator( _filtration, 
 				      _filtration.complex().boundary(), c);
 	}
