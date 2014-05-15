@@ -1,8 +1,10 @@
-option(ZOOM_PROFILE "Profile code with Zoom profiler" on)
+option(ZOOM_PROFILE "Profile code with Zoom profiler" off)
 
+if( ZOOM_PROFILE)
 include_directories( /opt/rotateright/Zoom/include/zoom)
 link_directories( /opt/rotateright/Zoom/lib
   		  /opt/rotateright/Zoom/lib64)
+endif( ZOOM_PROFILE)
 
 add_executable(persistence persistence.cpp)
 install( TARGETS persistence RUNTIME DESTINATION bin)
@@ -48,11 +50,11 @@ target_link_libraries( gpcover metis boost_program_options tbb)
 install( TARGETS gpcover RUNTIME DESTINATION bin)
 
 add_executable (concurrent_homology   concurrent_homology_tool)
-target_link_libraries (concurrent_homology boost_program_options tbb metis tbbmalloc  pthread rt m RRZoomScript )
+target_link_libraries (concurrent_homology ${Boost_Libraries} tbb metis tbbmalloc)
 install( TARGETS concurrent_homology RUNTIME DESTINATION bin)
 
 add_executable (cover_homology   cover_homology_tool)
-target_link_libraries (cover_homology boost_program_options metis tbb pthread rt m RRZoomScript)
+target_link_libraries (cover_homology boost_program_options metis tbb)
 install( TARGETS cover_homology RUNTIME DESTINATION bin)
 
 add_executable (write_filtration write_filtration_tool.cpp)
