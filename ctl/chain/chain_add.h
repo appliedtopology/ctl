@@ -162,9 +162,9 @@ OutputIterator chain_add( Chain_iterator x_begin, Chain_iterator x_end,
 template< typename Vector, typename Less>
 Vector& chain_term_add( Vector & x, const typename Vector::value_type & y, 
 			Less less, const term_z2_tag t){
-	auto pos = std::lower_bound( x.rbegin(), x.rend(), y, less);
+	auto pos = std::lower_bound( x.begin(), x.end(), y, less);
 	//new element, so add it at the end
-	if (pos == x.rend()) { x.push_back( y); }
+	if (pos == x.end()) { x.push_back( y); }
 	//new element in the middle, add it.
 	else if (less(y, *pos)){ x.insert( pos, y); }
 	//element exists, in Z2 this means delete!
@@ -187,9 +187,9 @@ Vector& chain_term_add( Vector & x, const typename Vector::value_type & y,
 	typedef typename Vector::value_type Term;
 	//typedef typename Term::Coefficient Coefficient;
 	typedef is_zero< Term> Is_zero;
-	auto pos = std::lower_bound( x.rbegin(), x.rend(), y, less);
+	auto pos = std::lower_bound( x.begin(), x.end(), y, less);
 	//new element is larger than all the rest so add it at the end
-	if (pos == x.rend()) { x.push_back( y); }
+	if (pos == x.end()) { x.push_back( y); }
 	//new element in the middle, add it.
 	else if (less(y,*pos)){ x.insert( pos, y); }
 	//element exists, but adding y might delete it!

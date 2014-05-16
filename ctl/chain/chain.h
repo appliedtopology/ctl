@@ -67,7 +67,7 @@ class Chain {
 	typedef typename Term::coeff_tag coeff_tag; 
 public:
 	Chain(){}
-	Chain( const std::size_t n): _chain( n) {}
+	Chain( const std::size_t n, Term t = Term()): _chain( n, t) {}
 	Chain( const Chain & c): _chain( c._chain) {}
 	Chain( const Chain && c): _chain( std::move( c._chain)) {}
 	Chain( const Term & t): _chain( 1, t) {}
@@ -105,6 +105,8 @@ public:
 	template< class... Args>	
 	void emplace( Args&&... args){ _chain.emplace_back( std::forward< Args>( args)...); }
 	void swap( Chain & from){ _chain.swap( from._chain); }
+	void clear(){ _chain.clear(); }
+
 	template< typename Compare = Less>
  	void sort( Compare c = Less()){
 		std::sort( _chain.begin(), _chain.end(), 
@@ -114,6 +116,7 @@ public:
 
 	std::size_t   size() const   	   { return _chain.size(); }	
 	void reserve( const std::size_t n) { _chain.reserve( n); } 
+	bool operator==( const Chain & from) const { return std::equal( rbegin(), rend(), from.rbegin()); }
 	Chain& operator=( const Chain& from){ 
 		_chain = from._chain; 
 		return *this;
@@ -152,7 +155,8 @@ public:
 
 	template< typename Term, typename Compare = Less>
 	Chain& add( const Term& rhs, Compare c = Compare() ){
-		ctl::detail::chain_term_add( _chain, rhs, c, coeff_tag());
+		ctl::detail::chain_term_add( _chain, rhs, std::bind(c, std::placeholders::_2, std::placeholders::_1), 
+					      coeff_tag());
 		return *this;
 	}
 	

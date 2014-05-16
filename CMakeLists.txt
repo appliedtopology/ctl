@@ -64,7 +64,7 @@ include_directories(${CMAKE_SOURCE_DIR})
 include_directories( ${MPI_INCLUDE_PATH} ${METIS_INCLUDE_DIR} ${Boost_INCLUDE_DIR} ${TBB_INCLUDE_DIR})
 link_directories(/usr/local/lib ${Boost_LIBRARY_DIR} ${METIS_LIBRARY_DIR} ${TBB_LIBRARY_DIR} ${MPI_LIBRARY_DIRS})
 add_definitions(" -fno-omit-frame-pointer -ftemplate-backtrace-limit=0 -Wall -ansi -std=c++11")
-set(CMAKE_BUILD_TYPE RELWITHDEBINFO)
+set(CMAKE_BUILD_TYPE RELEASE)
 add_subdirectory( ctl)
 
 install( DIRECTORY ${CMAKE_SOURCE_DIR}/ctl 

@@ -50,7 +50,7 @@ target_link_libraries( gpcover metis boost_program_options tbb)
 install( TARGETS gpcover RUNTIME DESTINATION bin)
 
 add_executable (concurrent_homology   concurrent_homology_tool)
-target_link_libraries (concurrent_homology ${Boost_Libraries} tbb metis tbbmalloc)
+target_link_libraries (concurrent_homology ${Boost_Libraries} boost_program_options tbb metis tbbmalloc)
 install( TARGETS concurrent_homology RUNTIME DESTINATION bin)
 
 add_executable (cover_homology   cover_homology_tool)
