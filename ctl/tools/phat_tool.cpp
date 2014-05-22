@@ -43,8 +43,11 @@
 #include <ctl/chain_complex/complex_boundary.h>
 #include <ctl/chain_complex/chain_complex.h>
 #include <ctl/filtration/filtration.h>
+#include <ctl/filtration/filtration_boundary.h>
 #include <ctl/io/io.h> 
 #include <ctl/utility/timer.h>
+
+#include <ctl/chain/chain.h>
 
 //BOOST
 #include <boost/program_options.hpp>
@@ -110,8 +113,9 @@ int main( int argc, char *argv[]){
   found = full_complex_name.rfind('.');
    if ( found != std::string::npos){
         base_name.replace(found,full_complex_name.length(), "");
-  	output_name = base_name + ".flt";
+  	output_name = base_name + ".phat";
   }
+  std::ofstream out(output_name.c_str());
   
   Complex complex;
 
@@ -119,12 +123,26 @@ int main( int argc, char *argv[]){
   ctl::read_complex( full_complex_name, complex);
  
   Complex_filtration complex_filtration( complex);
-  std::cout << "Writing Filtration To: " << output_name << std::endl;
-  std::ofstream out(output_name.c_str());
-  std::size_t count = 0;
-  for (Complex_filtration_iterator i = complex_filtration.begin(); i != complex_filtration.end(); ++i){
-	out << (*i)->second.id() << " " << ++count << std::endl;
+
+
+  typedef ctl::Filtration_boundary< Complex_filtration> 
+				   Filtration_boundary;
+  typedef Complex_filtration::Term Filtration_term;
+  typedef ctl::Chain< Filtration_term> Chain;
+  std::cout << "Writing PHAT ASCII file To: " << output_name << std::endl;
+  Filtration_boundary bd( complex_filtration);
+  for (Complex_filtration_iterator sigma = complex_filtration.begin(); sigma != complex_filtration.end(); ++sigma){
+       Chain cascade_boundary;
+       cascade_boundary.reserve( bd.length( sigma));
+       for( auto i = bd.begin( sigma); i != bd.end( sigma); ++i){
+                  cascade_boundary.emplace( i->cell(), i->coefficient());
+       }
+       cascade_boundary.sort();
+       out << (*sigma)->first.dimension();
+       for( auto term : cascade_boundary){
+       	out << " " << std::distance( complex_filtration.begin(), term.cell());
+       }
+       out << std::endl;
   }
-  
   return 0;
 }
