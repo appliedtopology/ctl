@@ -286,7 +286,7 @@ public:
 	   	ss >> size;
 	   	cell.read( ss, size);
 	   	ss >> id;
-		//optimized away for standard reads.
+		//should be optimized away for standard reads.
 		if( f( cell, id, true)){
 	   	   Data d( id);
 		   //apply f
@@ -299,7 +299,7 @@ public:
 	    	Cell cell;
 	    	ss >> id;
 	    	ss >> cell;
-		//optimized away for standard reads.
+		//should be optimized away for standard reads.
 		if( f( cell, id, true)){
 	    	  Data d(  id);
 		  //apply f

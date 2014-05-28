@@ -117,7 +117,7 @@ void run_persistence( Complex & complex,
    //NOTE: This is not a general purpose boundary operator.
    //It works correctly only when successive 
    //boundaries are taken in a filtration order
-   typedef typename Filtration::iterator Filtration_iterator;
+   //typedef typename Filtration::iterator Filtration_iterator;
    typedef ctl::Filtration_boundary< Filtration> Filtration_boundary;
    typedef typename Filtration::Term Filtration_term;
    

@@ -81,8 +81,7 @@ void compute_barcodes( Filtration & filtration,
 		       ctl::non_weighted_tag t,
 		       bool include_last_dim=false){
        typedef typename Filtration::const_iterator Filtration_iterator; 
-       typedef typename Filtration::Complex Complex;
-       typedef typename Complex::const_iterator Filtration_iterator;
+       //typedef typename Filtration::Complex Complex;
        typedef typename Cell_chain_map::value_type Chain;
        typedef typename Barcodes::value_type Barcode;
        barcodes.resize( filtration.complex().dimension()+1);
