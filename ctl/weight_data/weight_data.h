@@ -70,6 +70,7 @@ public:
   }
   
   Weight&        weight()         { return weight_; }
+  void 		 weight( const Weight & w)         { weight_ = w; }
   const Weight   weight() const   { return weight_; }
 private:
   Weight_ weight_;

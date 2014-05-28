@@ -83,7 +83,11 @@ struct Weight_data_functor {
     Weight_data& operator()( const Cell & c, Weight_data & d) const { 
 	auto i = values.find( d.id());
 	assert( i != values.end());
-	d.weight() = i->second;
+	if( i != values.end()){
+		d.weight( i->second);
+	} else {
+		std::cerr << "warning no weight for this id." << std::endl;
+	}
 	return d;  
     }
     

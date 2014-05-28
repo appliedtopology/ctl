@@ -168,15 +168,19 @@ void run_persistence( Complex & complex,
 template<typename String>
 void process_args(int & argc, char *argv[], 
 		  String & filename, String & filtration){
-  std::string usage = "Usage: persistence input-file";
-  if (argc != 2){ std::cerr << usage << std::endl; exit( 1); }
+  std::string usage = "Usage: persistence input-space.asc [filtration.flt]";
+  if (argc != 2 && argc != 3){ std::cerr << usage << std::endl; exit( 1); }
   filename = std::string( argv[ 1]);
-  filtration = filename;
-  std::size_t pos = filtration.rfind('.');
-  if (pos != std::string::npos){
-  	filtration.erase(pos);
-  }
-  filtration.append(".flt");
+  if( argc == 2){
+    filtration = filename;
+    std::size_t pos = filtration.rfind('.');
+    if (pos != std::string::npos){ filtration.erase(pos); }
+    filtration.append(".flt");
+    return;
+  }else { filtration = std::string( argv[ 2]); }
+  std::cout << "filename: " << filename << std::endl;
+  std::cout << "filtration filename: " << filtration << std::endl;
+
 }
 
 template< typename String, typename Weight_functor>
@@ -190,7 +194,14 @@ bool read_weights( const String & filename, Weight_functor & f){
 int main(int argc, char *argv[]){
   std::string full_complex_name, filtration_file;
   process_args(argc, argv, full_complex_name, filtration_file);
- 
+  
+  std::string barcode_file_name( full_complex_name); 
+  std::size_t pos = barcode_file_name.rfind( '.');
+  if( pos != std::string::npos){
+	barcode_file_name.replace(pos, barcode_file_name.length(), ".bcs");
+  }
+  std::ofstream out; 
+  ctl::open_file( out, barcode_file_name.c_str());
   //Create some data structures 
   Timer timer;
   ctl::Weight_data_functor< Weighted_complex> weight_functor;
@@ -206,6 +217,7 @@ int main(int argc, char *argv[]){
   	std::cout << "complex dimension: " << complex.dimension() << std::endl;
 	Complex_weight_less less;
 	run_persistence( complex, less, barcodes, timer, ctl::detail::weighted_tag());
+	out << barcodes << std::endl;
 
   }else{
 	typedef typename ctl::Barcodes< std::size_t> Barcodes;
@@ -218,6 +230,7 @@ int main(int argc, char *argv[]){
   	std::cout << "complex dimension: " << complex.dimension() << std::endl;
 	Complex_cell_less less;
   	run_persistence( complex, less, barcodes, timer, ctl::detail::non_weighted_tag());   
+	out << barcodes << std::endl;
   } 
   
   return 0;
