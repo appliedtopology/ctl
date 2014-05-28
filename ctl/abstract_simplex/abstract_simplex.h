@@ -184,13 +184,12 @@ class Abstract_simplex {
 	template< typename Term> 
 	friend class ctl::detail::const_simplex_boundary_iterator;
 }; //Abstract_simplex
-} // namespace ctl
-
 template< typename Stream, typename T>
-Stream& operator>>( Stream & in, ctl::Abstract_simplex< T> & simplex){ return simplex.read( in); }
+inline Stream& operator>>( Stream & in, ctl::Abstract_simplex< T> & simplex){ return simplex.read( in); }
+} // namespace ctl
 	
 template< typename Stream, typename T>
-Stream& operator<<(Stream& out, const ctl::Abstract_simplex< T> & simplex){
+inline Stream& operator<<(Stream& out, const ctl::Abstract_simplex< T>& simplex){
 	typedef typename ctl::Abstract_simplex< T>::const_iterator iterator;
 	out << "[";
 	for(iterator i = simplex.begin(); i != simplex.end(); ++i){
@@ -199,5 +198,7 @@ Stream& operator<<(Stream& out, const ctl::Abstract_simplex< T> & simplex){
 	}
 	return out;
 }
+template< typename Stream, typename T>
+Stream& operator<<(Stream& out, const ctl::Abstract_simplex< T>&& simplex){ out << simplex; }
 
 #endif // ABSTRACT_SIMPLEX_H

@@ -106,12 +106,13 @@ typedef ctl::Cell_less Complex_cell_less;
 typedef ctl::Weight_less Complex_weight_less;
 
 template< typename Complex, typename Cell_less, 
-	  typename Barcode, typename Timer>
+	  typename Barcode, typename Timer, 
+	  typename Tag>
 void run_persistence( Complex & complex, 
 		      Cell_less & less, 
 		      Barcode & barcode,
  		      Timer & timer,
-		      bool weighted_complex=false){
+		      const Tag tag){
    typedef ctl::Filtration< Complex, Cell_less > Filtration;
    //Boundary Operator
    //NOTE: This is not a general purpose boundary operator.
@@ -159,15 +160,9 @@ void run_persistence( Complex & complex,
    
    double complex_persistence = timer.elapsed();
    std::cout << "serial persistence: " << complex_persistence << std::endl;
-   if( weighted_complex){
-   	ctl::compute_barcodes( complex_filtration, 
-			       cascade_bd_property_map, 
-			       barcode, ctl::weighted_tag());
-   }else{ 
-   	ctl::compute_barcodes( complex_filtration, 
-			       cascade_bd_property_map, barcode, 
-			       ctl::non_weighted_tag()); 
-   }
+   ctl::compute_barcodes( complex_filtration, 
+			  cascade_bd_property_map, 
+			  barcode, tag);
 }
 
 template<typename String>
@@ -210,7 +205,7 @@ int main(int argc, char *argv[]){
   	std::cout << "complex size: " << complex.size() << std::endl; 
   	std::cout << "complex dimension: " << complex.dimension() << std::endl;
 	Complex_weight_less less;
-	run_persistence( complex, less, barcodes, timer);
+	run_persistence( complex, less, barcodes, timer, ctl::detail::weighted_tag());
 
   }else{
 	typedef typename ctl::Barcodes< std::size_t> Barcodes;
@@ -222,7 +217,7 @@ int main(int argc, char *argv[]){
 	std::cout << "complex size: " << complex.size() << std::endl; 
   	std::cout << "complex dimension: " << complex.dimension() << std::endl;
 	Complex_cell_less less;
-  	run_persistence( complex, less, barcodes, timer);   
+  	run_persistence( complex, less, barcodes, timer, ctl::detail::non_weighted_tag());   
   } 
   
   return 0;

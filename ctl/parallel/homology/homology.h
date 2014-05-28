@@ -98,7 +98,7 @@ void compute_homology( Complex & complex,
 						      Chain&> 
 						      Complex_chain_map;
 
-	typedef typename tbb::concurrent_vector< int> Betti;
+	//typedef typename tbb::concurrent_vector< int> Betti;
 
 	stats.timer.start();
 	Filtration filtration( complex);

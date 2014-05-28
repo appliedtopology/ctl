@@ -41,7 +41,7 @@
 * on the other hand it doesn't seem like this should really cause an issue here.
 *******************************************************************************/
 //STL
-#include <unordered_set>
+#include <set>
 #include <vector>
 #include <utility>
 #include <functional>
@@ -53,21 +53,9 @@ namespace ctl{
 template< typename Weight>
 using Interval = std::pair< Weight, Weight>;
 
-namespace detail{
-
-struct Interval_hash{
-	template< typename Weight>	
-	std::size_t operator()( const ctl::Interval< Weight> & I) const {
-	      return ctl::Hash< Weight>( I.first)*ctl::Hash< Weight>( I.second);    
-	} 
-}; //struct Interval_hash
-
-} //end namespace detail
-
 //a multiset of intervals in a fixed dimension is a barcode
 template< typename Weight>
-using Barcode = std::unordered_multiset< ctl::Interval< Weight>, 
-					 detail::Interval_hash >;
+using Barcode = std::multiset< ctl::Interval< Weight> >;
 
 //and the barcodes for a space are an array of them, one for each dimension
 template< typename Weight>
