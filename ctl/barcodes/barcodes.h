@@ -71,7 +71,7 @@ struct Barcodes : std::vector< Barcode< Weight> > {
 //I/O for an interval
 template< typename Stream, typename Weight>
 Stream& operator<<( Stream& out, const ctl::Interval< Weight>& interval) {
-  out << "[" << interval.first << " " << interval.second << "]";
+  out  << interval.first << " " << interval.second;
   return out;
 }
 
@@ -84,10 +84,9 @@ Stream& operator>>( Stream& in, ctl::Interval< Weight>& interval) {
 //I/O for a barcode
 template< typename Stream, typename Weight>
 Stream& operator<<( Stream& out, const ctl::Barcode< Weight>& barcode){
-  out << "size " << barcode.size() << std::endl;
   typedef typename Barcode< Weight>::const_iterator Iterator;
   for( Iterator i = barcode.begin(); i != barcode.end(); ++i) {
-   out << *i;
+   out << *i << std::endl;
   }
   return out;
 }
