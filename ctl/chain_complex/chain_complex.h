@@ -298,7 +298,7 @@ public:
 	    	std::istringstream ss( line);
 	    	Cell cell;
 	    	ss >> id;
-	    	ss >> cell;
+	   	ss >> cell; 
 		//should be optimized away for standard reads.
 		if( f( cell, id, true)){
 	    	  Data d(  id);
@@ -337,6 +337,7 @@ private:
 }; //cell_map
 
 } //namespace ctl
+
 template< typename Stream, typename Cell, typename Boundary, 
 	   typename Data, typename Hash>
 Stream& operator<<( Stream& out, 
@@ -350,12 +351,12 @@ Stream& operator<<( Stream& out,
 	return out;
 }
 
+namespace ctl{
+
 template< typename Stream, typename Cell, 
 	  typename Boundary, typename Data_, typename Hash>
 Stream& operator>>( Stream& in, 
-		    ctl::Chain_complex< Cell, Boundary, Data_, Hash> & c){  return c.read( in); }
-
-namespace ctl{
+		    Chain_complex< Cell, Boundary, Data_, Hash> & c){  return c.read( in); }
 
 template<typename String, typename Complex, typename Functor>
 void read_complex(String & complex_name, Complex & complex, Functor & f){

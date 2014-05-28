@@ -37,8 +37,10 @@
 *******************************************************************************/
 namespace ctl{
 //tag dispatching
+namespace detail{
 struct weighted_tag {};
 struct non_weighted_tag {};
+} //namespace detail
 
 template< typename Barcodes, 
 	  typename Filtration, 
@@ -46,9 +48,9 @@ template< typename Barcodes,
 void compute_barcodes( Filtration & filtration, 
                        Cell_chain_map & cascade_boundary_map,
 		       Barcodes & barcodes,
-		       ctl::weighted_tag t,
+		       ctl::detail::weighted_tag t,
 		       bool include_last_dim=false){ 
-       typedef typename Filtration::const_iterator Filtration_iterator; 
+       typedef typename Filtration::iterator Filtration_iterator; 
        typedef typename Filtration::Complex Complex;
        typedef typename Complex::Data Data;
        typedef typename Data::Weight Weight;
@@ -78,9 +80,9 @@ template< typename Barcodes,
 void compute_barcodes( Filtration & filtration, 
                        Cell_chain_map & cascade_boundary_map,
 		       Barcodes & barcodes,
-		       ctl::non_weighted_tag t,
+		       ctl::detail::non_weighted_tag t,
 		       bool include_last_dim=false){
-       typedef typename Filtration::const_iterator Filtration_iterator; 
+       typedef typename Filtration::iterator Filtration_iterator; 
        //typedef typename Filtration::Complex Complex;
        typedef typename Cell_chain_map::value_type Chain;
        typedef typename Barcodes::value_type Barcode;
