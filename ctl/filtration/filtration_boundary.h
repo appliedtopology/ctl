@@ -76,16 +76,18 @@ public:
 	//move
 	_const_filtration_boundary_iterator( Self && i):
 	filtration ( std::move( i.filtration)),
+	complex( std::move( i.complex)),
 	next_term ( std::move( i.next_term)),
 	//future_term ( std::move( i.future_term)),
 	end_term ( std::move( i.end_term)),
-	term( std::move( i.term)) { i.filtration = NULL; }
+	term( std::move( i.term)) { i.filtration = NULL; i.complex = NULL;}
 
 	//begin constructor
 	_const_filtration_boundary_iterator( Filtration& _f, 
 				  Cell_boundary & _bd,
 				  const typename Term::Cell& cell):
 	  filtration( &_f),
+	  complex( &(_f.complex())),
 	  begin ( _f.begin()),
 	  next_term ( _bd.begin( (*cell)->first)), 
 	  //future_term( next_term), 
@@ -93,11 +95,12 @@ public:
 		_next_term();
 	}
         //end constructor
-	_const_filtration_boundary_iterator( Filtration & _f): filtration( &_f){ 
+	_const_filtration_boundary_iterator( Filtration & _f): filtration( &_f), complex( &(_f.complex())){ 
 	  	_end_term(); 
 	}
 	Self& operator=( const Self& from){
 		filtration = from.filtration;
+		complex = from.complex;
 		begin = from.begin;
 		next_term = from.next_term;
 		//future_term = from.future_term;
@@ -133,6 +136,7 @@ protected:
   void _end_term(){ term.cell() = filtration->end(); }
   //we use a pointer since references are not default constructible
   Filtration* filtration;
+  Complex* complex;
   typename Filtration::iterator begin;
   //if we want to define operator-- 
   //typename Cell_boundary::const_iterator begin_term; 
