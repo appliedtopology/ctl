@@ -64,18 +64,27 @@ if( USE_MPI)
   link_directories(${MPI_LIBRARY_DIRS})
 endif(  USE_MPI)
 
-set(Boost_USE_MULTITHREADED OFF)
+set(Boost_USE_MULTITHREADED ON)
 add_definitions(" -fno-omit-frame-pointer -Wall -ansi -std=c++11")
 
 find_package(TBB REQUIRED) 
 find_package(METIS REQUIRED) 
-<<<<<<< HEAD
 include_directories(${CMAKE_SOURCE_DIR})
 include_directories( ${MPI_INCLUDE_PATH} ${METIS_INCLUDE_DIR} ${Boost_INCLUDE_DIR} ${TBB_INCLUDE_DIR})
 link_directories(/usr/local/lib ${Boost_LIBRARY_DIR} ${METIS_LIBRARY_DIR} ${TBB_LIBRARY_DIR} ${MPI_LIBRARY_DIRS})
 add_definitions(" -fno-omit-frame-pointer -ftemplate-backtrace-limit=0 -Wall -ansi -std=c++11")
 set(CMAKE_BUILD_TYPE RELEASE)
-=======
+
+find_package(Doxygen)
+if(DOXYGEN_FOUND)
+configure_file(${CMAKE_SOURCE_DIR}/doc/Doxyfile.in ${CMAKE_BINARY_DIR}/Doxyfile @ONLY)
+add_custom_target(doc
+${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/Doxyfile
+WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+COMMENT "Generating API documentation with Doxygen" VERBATIM
+)
+endif(DOXYGEN_FOUND)
+
 
 include_directories(${CMAKE_SOURCE_DIR} ${Boost_INCLUDE_DIR})
 include_directories(${METIS_INCLUDE_DIR} ${TBB_INCLUDE_DIR})
