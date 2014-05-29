@@ -1,4 +1,6 @@
+doc/doxygen/*
 ctl/distributed/distributed_persistence
+Doxyfile
 ctl/tools/distributed_persistence
 examples/
 ctl/tools/cover_homology

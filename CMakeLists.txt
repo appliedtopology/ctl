@@ -8,7 +8,7 @@ if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" VERSION_GREATER 2.6)
     cmake_policy(VERSION 2.6)
   endif()
 endif()
-option(USE_CLANG "build application with clang" OFF) # OFF is the default
+option(USE_CLANG "build application with clang" ON) # OFF is the default
 option(USE_MPI "build distributed codes" OFF) #OFF is default
 
 if( USE_CLANG)
@@ -52,11 +52,22 @@ if( USE_MPI)
   link_directories(${MPI_LIBRARY_DIRS})
 endif(  USE_MPI)
 
-set(Boost_USE_MULTITHREADED OFF)
+set(Boost_USE_MULTITHREADED ON)
 add_definitions(" -fno-omit-frame-pointer -Wall -ansi -std=c++11")
 
 find_package(TBB REQUIRED) 
 find_package(METIS REQUIRED) 
+
+find_package(Doxygen)
+if(DOXYGEN_FOUND)
+configure_file(${CMAKE_SOURCE_DIR}/doc/Doxyfile.in ${CMAKE_BINARY_DIR}/Doxyfile @ONLY)
+add_custom_target(doc
+${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/Doxyfile
+WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+COMMENT "Generating API documentation with Doxygen" VERBATIM
+)
+endif(DOXYGEN_FOUND)
+
 
 include_directories(${CMAKE_SOURCE_DIR} ${Boost_INCLUDE_DIR})
 include_directories(${METIS_INCLUDE_DIR} ${TBB_INCLUDE_DIR})

@@ -40,9 +40,13 @@
 #include <iostream> //cout (debug only)
 #include <algorithm> //sort, unique
 #include <ctl/abstract_simplex/simplex_boundary.h>
+//! \namespace ctl
 namespace ctl {
 
-//T must be a type with `<` a strict-weak-ordering
+/**
+* \class Abstract_simplex< T>
+* @brief 
+*/
 template< typename T>
 class Abstract_simplex {
 	private:
@@ -50,44 +54,81 @@ class Abstract_simplex {
 	typedef Abstract_simplex< T> Self;
 	typedef std::initializer_list< T> Init_list;
 	public:
+	//! \typedef  
 	typedef std::size_t size_t;
+	//! \typedef synonomous with vertex_type  
 	typedef typename Vector::value_type value_type;
+	//! \typedef The vertex type of the simplex  
 	typedef typename Vector::value_type vertex_type;
+	//! \typedef const_iterator to the simplex
 	typedef typename Vector::const_iterator const_iterator;
+	//! \typedef const_reverse_iterator to the simplex
 	typedef typename Vector::const_reverse_iterator const_reverse_iterator;
+	//! \typedef an iterator to the simplex
 	typedef typename Vector::iterator iterator;
+	//! \typedef reverse_iterator to the simplex
 	typedef typename Vector::reverse_iterator reverse_iterator;
 	public:
+	//! Default constructor
 	Abstract_simplex(): vertices(){};
+	//! Reserves space for at least d vertices.
 	Abstract_simplex( std::size_t d) { vertices.reserve( d); }
+	//! Reserves space for at least d vertices and initializes them to t
 	Abstract_simplex( std::size_t d, const T & t): vertices( d, t){}
+	//! Initializer list constructor
 	Abstract_simplex( const Init_list & il) : vertices( il) {
 		sort( vertices.begin(), vertices.end() );
 		vertices.erase( unique( vertices.begin(), vertices.end() ), 
 				vertices.end() );
 
 	}
+	//!  Range constructor 
 	template< typename Iterator>
 	Abstract_simplex( const Iterator begin, 
 			  const Iterator end): vertices( begin,end){}
+	//! Copy constructor 
 	Abstract_simplex( const Self & from): vertices( from.vertices){}
+	//! Move constructor 
 	Abstract_simplex( Self && from): vertices( std::move( from.vertices)){}
-
+	//! returns an iterator to the first vertex in the simplex
 	iterator       begin()	        { return vertices.begin(); }
+	//! returns a const_iterator to the first vertex in the simplex
 	const_iterator begin()  const	{ return vertices.begin(); }
 	
+	//! returns an iterator to the past-the-end vertex in the simplex
 	iterator         end()	  	{ return vertices.end();   }
+	//! returns a const_iterator to the past-the-end vertex in the simplex
 	const_iterator   end()  const	{ return vertices.end();   }
 	
+	//! returns a reverse_iterator to the last element in the simplex
 	reverse_iterator        rbegin()	{ return vertices.rbegin(); }
+	//! returns a const_reverse_iterator to the last element in the simplex
 	const_reverse_iterator  rbegin()  const	{ return vertices.rbegin(); }
-	
+	/**
+	 * Returns a reverse_iterator pointing to the theoretical element 
+ 	 * preceding the first element in the container 
+	 * (which is considered its reverse end).
+	 */
 	reverse_iterator         rend()	        { return vertices.rend(); }
+	/**
+	 * Returns a const_reverse_iterator pointing to the theoretical element 
+ 	 * preceding the first element in the container 
+	 * (which is considered its reverse end).
+	 */
 	const_reverse_iterator   rend()  const	{ return vertices.rend(); }
-
-	std::size_t       size() const	{ return vertices.size(); 	}
-	std::size_t  dimension() const	{ return size()-1; 	  	}
-	std::size_t   capacity() const  { return vertices.capacity();   }
+	/** Returns the size of the simplex
+	 * @param None.
+	 * @return size_t
+	 */
+	size_t       size() const	{ return vertices.size(); 	}
+	/** Returns the dimension of the simplex
+	 * @param None.
+	 * @return size_t
+	 */
+	size_t  dimension() const	{ return size()-1; 	  	}
+	//! Returns the capacity of the simplex
+	size_t   capacity() const  { return vertices.capacity();   }
+		
 	iterator insert( const vertex_type & v){
 	      iterator pos = std::lower_bound( begin(), end(), v);
 	      if(pos != end() && *pos == v) { return pos; }
