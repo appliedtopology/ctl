@@ -341,7 +341,7 @@ int main( int argc, char *argv[]){
 	    << std::endl;
  stats.filtration_time = 0;
  double total_time = orig_filtration_time + cover_time + blowup_time + 
-		     stats.parallel_persistence;
+		     stats.initialize_cascade_boundary + stats.parallel_persistence;
 
  std::cout << "sort_complex:       \t" << std::right << orig_filtration_time
 	#ifdef PERCENTAGES 
@@ -356,6 +356,11 @@ int main( int argc, char *argv[]){
  std::cout << "build_blowup:       \t" << blowup_time
 	#ifdef PERCENTAGES 
 	   << " (" << (blowup_time/total_time)*100 << "%)" 
+	#endif
+	   << std::endl;
+ std::cout << "parallel_initialize_cascade_boundary:  \t" << stats.initialize_cascade_boundary
+	#ifdef PERCENTAGES 
+	   << " (" << (stats.initialize_cascade_boundary/total_time)*100 << "%)" 
 	#endif
 	   << std::endl;
  std::cout << "parallel_homology:  \t" << stats.parallel_persistence 
