@@ -152,13 +152,17 @@ void run_persistence( Complex & complex,
    Complex_chain_map cascade_bd_property_map( complex_cascade_boundaries.begin(),
          				      offset_map);
    //serial persistence (complex)
-   timer.start();
-   ctl::persistence( complex_filtration.begin(), complex_filtration.end(),
-   		    filtration_boundary, cascade_bd_property_map);
-   timer.stop();
-   
-   double complex_persistence = timer.elapsed();
-   std::cout << "serial persistence: " << complex_persistence << std::endl;
+   auto times = ctl::persistence( complex_filtration.begin(), complex_filtration.end(),
+  		    filtration_boundary, cascade_bd_property_map);
+   double boundary_map_build = times.first;
+   double complex_persistence = times.second;
+  std::cout << "initialize_cascade_data (complex): " 
+            << boundary_map_build << std::endl;
+  std::cout << "serial persistence (complex): " 
+            << complex_persistence << std::endl;
+  std::cout << "total time : " << boundary_map_build +  complex_persistence 
+	   << std::endl;
+
    ctl::compute_barcodes( complex_filtration, 
 			  cascade_bd_property_map, 
 			  barcode, tag);

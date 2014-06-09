@@ -141,12 +141,13 @@ void compute_homology( Complex & complex,
 	Filtration_boundary filtration_boundary( filtration);
 
 	stats.timer.start();
-	ctl::parallel::persistence( ranges,
+	auto times = ctl::parallel::persistence( ranges,
 			           filtration_boundary,
 			           cascade_prop_map, 
 			           num_parts );
 	stats.timer.stop();
-	stats.parallel_persistence = stats.timer.elapsed();
+	stats.initialize_cascade_boundary = times.first;
+	stats.parallel_persistence = times.second;
 	#ifdef COMPUTE_BETTI
 	        //betti numbers
 	        Betti betti;
@@ -205,11 +206,10 @@ void do_blowup_homology( Blowup & blowup_complex,
 	Blowup_offset_map offset_map( blowup_filtration.begin());
 	Complex_chain_map cascade_prop_map( cascades.begin(), offset_map);
   	Blowup_boundary blowup_filtration_boundary( blowup_filtration); 
-  	std::cout << "calling parallel persistence: " << std::endl;
-	ctl::parallel::persistence( ranges, blowup_filtration_boundary, 
+	auto p = ctl::parallel::persistence( ranges, blowup_filtration_boundary, 
 				    cascade_prop_map, num_local_pieces );
-	stats.timer.stop();
-	stats.parallel_persistence = stats.timer.elapsed();
+	stats.parallel_persistence = p.second;
+	stats.initialize_cascade_boundary = p.first; 
 #ifdef COMPUTE_BETTI
 	typedef typename tbb::concurrent_vector< int> Betti;
         //betti numbers
