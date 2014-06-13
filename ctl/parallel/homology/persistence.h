@@ -139,21 +139,22 @@ persistence( Iterator_pairs & ranges,
 	Body body( complex_boundary, cascade_prop_map, time_vector);
 	Range range( ranges.begin(), parallel_end, 1);
 	tbb::parallel_for( range, body);
+	Time_pair result; 
 	if(parallel_end != ranges.end()){
 	        Filtration_iterator begin = parallel_end->first;
 		Filtration_iterator end = ranges.rbegin()->second;
-	        time_vector.push_back( ctl::persistence( begin, end, 
+	        result = ctl::persistence( begin, end, 
 				  complex_boundary, 
-				  cascade_prop_map));
+				  cascade_prop_map);
 	}
-	double first = time_vector.rbegin()->first, second = time_vector.rbegin()->second;
 	double first_max = 0, second_max = 0;
-	for( Vector::const_reverse_iterator i = (++time_vector.rbegin()); i != time_vector.rend(); ++i){
+	for( Vector::const_iterator i = time_vector.begin(); i != time_vector.end(); ++i){
 		if (i->first > first_max){ first_max = i->first; }
 		if (i->second > second_max){ second_max = i->second; }
 	}
-	return std::make_pair( first + first_max, second + second_max);
-	//double serial_time = timer.get();
+	result.first += first_max;
+	result.second += second_max;
+	return result; 
 }
 
 /*
