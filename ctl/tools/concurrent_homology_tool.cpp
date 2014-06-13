@@ -139,8 +139,7 @@ typedef ctl::Complex_boundary< Blowup, Blowup_iterator> Blowup_complex_boundary;
 typedef ctl::Product_first_less < Blowup_iterator> Parallel_id_less;
 typedef Blowup::Boundary Cell_boundary;
 
-typedef ctl::parallel::Filtration< Blowup, ctl::Id_less> Blowup_filtration;
-typedef Blowup_filtration::iterator Blowup_filtration_iterator;
+typedef ctl::Filtration< Blowup, ctl::Id_less> Blowup_filtration;
 typedef std::vector< int> Betti;
 
 
@@ -358,7 +357,7 @@ int main( int argc, char *argv[]){
 	   << " (" << (blowup_time/total_time)*100 << "%)" 
 	#endif
 	   << std::endl;
- std::cout << "parallel_initialize_cascade_boundary:  \t" << stats.initialize_cascade_boundary
+ std::cout << "initialize_cascade_boundary:  \t" << stats.initialize_cascade_boundary
 	#ifdef PERCENTAGES 
 	   << " (" << (stats.initialize_cascade_boundary/total_time)*100 << "%)" 
 	#endif

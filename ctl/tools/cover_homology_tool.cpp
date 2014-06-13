@@ -36,7 +36,7 @@
 //#define COMPUTE_BETTI
 //#define TESTS_ON
 #define CTL_USE_CITY
-//#define ZOOM_PROFILE
+#define ZOOM_PROFILE
 #ifdef ZOOM_PROFILE
 #include "zoom.h"
 #endif
@@ -215,7 +215,7 @@ int main( int argc, char *argv[]){
   std::cout << "compute parallel ranges: " << stats.get_iterators
             << " (" << (stats.get_iterators/total_time)*100 << "%)" 
 	    << std::endl;
-  std::cout << "parallel_initialize_cascade_boundary: " 
+  std::cout << "initialize_cascade_boundary: " 
             << stats.initialize_cascade_boundary << " (" 
             << (stats.initialize_cascade_boundary/total_time)*100 << "%)" << std::endl;
   std::cout << "parallel_homology: " 
