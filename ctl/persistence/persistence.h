@@ -47,20 +47,6 @@ class partner {};
 class partner_and_cascade {};
 
 template< typename Persistence_data>
-inline void 
-scaled_add( Persistence_data & data, 
-	    const typename Persistence_data::Chain& bd_cascade_tau_partner){
-   //Cell here is really a pointer into the complex
-   typedef typename Persistence_data::Chain Chain;
-   typedef typename Chain::value_type Term;
-   typedef typename Term::Coefficient Coefficient;
- 
-   const Coefficient& scalar = tau_partner_term.coefficient().inverse();
-   data.cascade_boundary.scaled_add( scalar, bd_cascade_tau_partner, 
-				     data.temporary_chain);	
-}
-
-template< typename Persistence_data>
 void eliminate_boundaries( Persistence_data & data){
    //Cell here is really a pointer into the complex
    typedef typename Persistence_data::Chain Chain;
@@ -75,7 +61,11 @@ void eliminate_boundaries( Persistence_data & data){
 	if( bd_cascade_tau.empty()){ return; }
 	//otherwise tau has a partner
 	const Term& tau_partner_term = bd_cascade_tau.youngest();
-	scaled_add( data, data.cascade_boundary_map[ tau_partner_term]);
+   	const Coefficient& scalar = tau_partner_term.coefficient().inverse();
+	const Chain& bd_cascade_tau_partner = 
+				data.cascade_boundary_map[ tau_partner_term];
+   	data.cascade_boundary.scaled_add( scalar, bd_cascade_tau_partner, 
+				     		   data.temporary_chain);
   }
 }
 
@@ -91,7 +81,7 @@ bool is_creator( const Term & term, Chain_map & cascade_boundary_map){
 template< typename Term, typename Chain_map>
 struct Is_not_creator{
    Is_not_creator( Chain_map & cbp): cascade_boundary_map( cbp) {}
-   bool operator()( const Term & term) const { 
+   inline bool operator()( const Term & term) const { 
 	return !is_creator( term, cascade_boundary_map);
    }
    Chain_map & cascade_boundary_map;
@@ -99,7 +89,8 @@ struct Is_not_creator{
 
 template< typename Filtration_iterator, 
 	  typename Persistence_data>
-void remove_destroyers( const Filtration_iterator sigma, Persistence_data & data){
+void remove_destroyers( const Filtration_iterator sigma, 
+			Persistence_data& data){
      typedef typename Persistence_data::Chain Chain;
      typedef typename Persistence_data::Cell_chain_map Chain_map;
      typedef typename Chain::value_type Term;
@@ -118,7 +109,7 @@ void initialize_cascade_data( const Filtration_iterator sigma,
 			      Persistence_data & data, partner){
      //typedef typename Filtration_iterator::value_type Cell;
      typedef typename Persistence_data::Chain Chain;
-     typedef typename Chain::value_type Term;
+     //typedef typename Chain::value_type Term;
      Chain& cascade_boundary = data.cascade_boundary;
      cascade_boundary.reserve( data.bd.length( sigma));
      for( auto i = data.bd.begin( sigma); i != data.bd.end( sigma); ++i){
