@@ -64,7 +64,8 @@ void eliminate_boundaries( Persistence_data & data){
    	const Coefficient& scalar = tau_partner_term.coefficient().inverse();
 	const Chain& bd_cascade_tau_partner = 
 				data.cascade_boundary_map[ tau_partner_term];
-   	data.cascade_boundary.scaled_add( scalar, bd_cascade_tau_partner, 
+   	data.cascade_boundary.scaled_add( scalar, bd_cascade_tau_partner,
+							data, 
 				     		   data.temporary_chain);
   }
 }
