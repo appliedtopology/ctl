@@ -36,7 +36,7 @@
 //#define COMPUTE_BETTI
 //#define TESTS_ON
 #define CTL_USE_CITY
-#define ZOOM_PROFILE
+//#define ZOOM_PROFILE
 #ifdef ZOOM_PROFILE
 #include "zoom.h"
 #endif

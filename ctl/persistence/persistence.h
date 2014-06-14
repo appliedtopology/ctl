@@ -79,31 +79,6 @@ bool is_creator( const Term & term, Chain_map & cascade_boundary_map){
 	return  bd.empty() || term_less( term, bd.youngest());
 }
 
-template< typename Term, typename Chain_map>
-struct Is_not_creator{
-   Is_not_creator( Chain_map & cbp): cascade_boundary_map( cbp) {}
-   inline bool operator()( const Term & term) const { 
-	return !is_creator( term, cascade_boundary_map);
-   }
-   Chain_map & cascade_boundary_map;
-}; //struct Is_not_creator
-
-template< typename Filtration_iterator, 
-	  typename Persistence_data>
-void remove_destroyers( const Filtration_iterator sigma, 
-			Persistence_data& data){
-     typedef typename Persistence_data::Chain Chain;
-     typedef typename Persistence_data::Cell_chain_map Chain_map;
-     typedef typename Chain::value_type Term;
-     typedef typename Chain::reverse_iterator reverse_iterator;
-     typedef Is_not_creator< Term, Chain_map> Is_not_creator;
-     Is_not_creator is_not_creator( data.cascade_boundary_map);
-     Chain& boundary = data.cascade_boundary;
-     reverse_iterator begin = std::remove_if( boundary.rbegin(), boundary.rend(), is_not_creator);
-     boundary.erase( begin, boundary.rend());
-}
-
-
 template< typename Filtration_iterator, 
 	  typename Persistence_data>
 void initialize_cascade_data( const Filtration_iterator sigma, 
@@ -114,10 +89,9 @@ void initialize_cascade_data( const Filtration_iterator sigma,
      Chain& cascade_boundary = data.cascade_boundary;
      cascade_boundary.reserve( data.bd.length( sigma));
      for( auto i = data.bd.begin( sigma); i != data.bd.end( sigma); ++i){
-         //if( is_creator( *i, data.cascade_boundary_map)){
-		//cascade_boundary.add( Term( i->cell(), i->coefficient()));
+         if( is_creator( *i, data.cascade_boundary_map)){
 		cascade_boundary.emplace( i->cell(), i->coefficient());
-	//}
+	}
      }
      cascade_boundary.sort();
 }
@@ -127,8 +101,6 @@ template< typename Filtration_iterator, typename Persistence_data>
 void initialize_cascade_data( const Filtration_iterator & cell, 
 			      Persistence_data & data, partner_and_cascade){
 	typedef typename Persistence_data::Chain::Term Term;
-	//TODO: Replace me!
-	//data.cascade.emplace( cell, Coefficient( 1));
 	data.cascade.add( Term( cell, 1)); 
 	initialize_cascade_data( cell, data, partner());
 }
@@ -170,30 +142,26 @@ pair_cells( Filtration_iterator begin, Filtration_iterator end,
 		 Output_policy output_policy){
 
 	typedef typename boost::property_traits< Chain_map>::value_type Chain;
+	//this should now operator on filtration pointers, so it should be fast.
 	typedef typename Chain::Less Term_less;
-	//this should now operator on filtration pointers, so it should be fast.	
 	typedef ctl::detail::Persistence_data< Term_less, Boundary_operator, 
 				  		Chain_map, Output_policy> 
 					            Persistence_data;
 	//typedef typename Filtration_iterator::value_type Cell_iterator; 
 	typedef typename Chain::Term Term;
+	double init_cascade_time = 0.0, persistence_algorithm=0.0;
 	ctl::parallel::Timer timer;
-	timer.start();
 	Term_less term_less; 
-	Persistence_data data( term_less, bd, cascade_boundary_map, cascade_map, 
+	Persistence_data data( term_less, bd, cascade_boundary_map, cascade_map,
 			       output_policy);
 	for(Filtration_iterator sigma = begin; sigma != end; ++sigma){
-		cascade_boundary_map[ sigma].swap( data.cascade_boundary);
-		initialize_cascade_data( sigma, data, output_policy);
-		cascade_boundary_map[ sigma].swap( data.cascade_boundary);
-	}
-	timer.stop();
-	double init_cascade_time = timer.elapsed();
-	timer.start();
-	for(Filtration_iterator sigma = begin; sigma != end; ++sigma){
+		timer.start();
 		//hand the column we want to operate on to our temporary.
 		cascade_boundary_map[ sigma].swap( data.cascade_boundary);
-		remove_destroyers( sigma, data); // since we didnt do this earlier.	
+		initialize_cascade_data( sigma, data, output_policy);
+		timer.stop();
+		init_cascade_time += timer.elapsed();
+		timer.start();
 		eliminate_boundaries( data);
 		if( !data.cascade_boundary.empty() ){
 		     //make tau sigma's partner
@@ -205,9 +173,9 @@ pair_cells( Filtration_iterator begin, Filtration_iterator end,
 		} else{
 		     store_cascade( data, sigma, output_policy); 
 		}
+		timer.stop();
+		persistence_algorithm += timer.elapsed();
 	}
-	timer.stop();
-	double persistence_algorithm = timer.elapsed();
 	return std::make_pair( init_cascade_time, persistence_algorithm);
 }
 
