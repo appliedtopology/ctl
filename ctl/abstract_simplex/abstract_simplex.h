@@ -72,9 +72,9 @@ class Abstract_simplex {
 	//! Default constructor
 	Abstract_simplex(): vertices(){};
 	//! Reserves space for at least d vertices.
-	Abstract_simplex( std::size_t d) { vertices.reserve( d); }
+	Abstract_simplex( size_t d) { vertices.reserve( d); }
 	//! Reserves space for at least d vertices and initializes them to t
-	Abstract_simplex( std::size_t d, const T & t): vertices( d, t){}
+	Abstract_simplex( size_t d, const T & t): vertices( d, t){}
 	//! Initializer list constructor
 	Abstract_simplex( const Init_list & il) : vertices( il) {
 		sort( vertices.begin(), vertices.end() );
@@ -86,9 +86,9 @@ class Abstract_simplex {
 	template< typename Iterator>
 	Abstract_simplex( const Iterator begin, 
 			  const Iterator end): vertices( begin,end){}
-	//! Copy constructor 
+	//! Copies the data from one simplex to another
 	Abstract_simplex( const Self & from): vertices( from.vertices){}
-	//! Move constructor 
+	//! Moves the data from one simplex to another
 	Abstract_simplex( Self && from): vertices( std::move( from.vertices)){}
 	//! returns an iterator to the first vertex in the simplex
 	iterator       begin()	        { return vertices.begin(); }
@@ -108,12 +108,16 @@ class Abstract_simplex {
 	 * Returns a reverse_iterator pointing to the theoretical element 
  	 * preceding the first element in the container 
 	 * (which is considered its reverse end).
+	 * @param None.
+	 * @return reverse_iterator
 	 */
 	reverse_iterator         rend()	        { return vertices.rend(); }
 	/**
 	 * Returns a const_reverse_iterator pointing to the theoretical element 
  	 * preceding the first element in the container 
 	 * (which is considered its reverse end).
+	 * @param None.
+	 * @return const_reverse_iterator
 	 */
 	const_reverse_iterator   rend()  const	{ return vertices.rend(); }
 	/** Returns the size of the simplex
@@ -126,17 +130,29 @@ class Abstract_simplex {
 	 * @return size_t
 	 */
 	size_t  dimension() const	{ return size()-1; 	  	}
-	//! Returns the capacity of the simplex
+
+	/** Returns the capacity of the simplex
+	* @param None.
+	* @return size_t
+	*/
 	size_t   capacity() const  { return vertices.capacity();   }
-		
+
+	/**
+	* Inserts the vertex v if it doesn't already exist
+	* @param const vertex_type & v
+	* @return iterator to the vertex v in the simplex
+	*/
 	iterator insert( const vertex_type & v){
 	      iterator pos = std::lower_bound( begin(), end(), v);
 	      if(pos != end() && *pos == v) { return pos; }
 	      return vertices.insert( pos, v);
 	}
 
-	//TODO: sort, merge, erase might be more efficient..
-	//Assumes il is sorted
+	/**
+	* Inserts the vertices in an initializer list 
+	* @param std::initalizer_list< T>
+	* @return None.
+	*/
 	void insert( const Init_list & il){
 	        std::size_t offset = vertices.size();
 		vertices.insert( vertices.end(), il.begin(), il.end());
@@ -146,6 +162,12 @@ class Abstract_simplex {
 				vertices.end() );
 	
 	}
+
+	/**
+	* Inserts the range [begin, end) into the simplex 
+	* @param Iterator begin, Iterator end
+	* @return None.
+	*/
 	template< typename Iterator>
 	void insert( Iterator first, Iterator last){
 	        std::size_t offset = vertices.size();
@@ -155,15 +177,18 @@ class Abstract_simplex {
 		vertices.erase( unique( vertices.begin(), vertices.end() ), 
 				vertices.end() );
 	}
+
 	iterator remove( const vertex_type v){
 		iterator pos = std::lower_bound( begin(), end(), v);
 		//element not in list
 		if (pos == end()){ return pos; }
 		return vertices.erase( pos);
 	}
+	
 	iterator remove( iterator first, iterator last){
 		return vertices.erase( first, last);
 	}
+
 	Self& operator=( const Self & b) { 
 		vertices = b.vertices; 
 		return *this;
@@ -225,6 +250,7 @@ class Abstract_simplex {
 	template< typename Term> 
 	friend class ctl::detail::const_simplex_boundary_iterator;
 }; //Abstract_simplex
+
 template< typename Stream, typename T>
 inline Stream& operator>>( Stream & in, ctl::Abstract_simplex< T> & simplex){ return simplex.read( in); }
 } // namespace ctl
