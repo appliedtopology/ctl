@@ -6,6 +6,7 @@ SOURCE_BROWSER        = YES
 INPUT = @CMAKE_SOURCE_DIR@/ctl
 OUTPUT_DIRECTORY=@CMAKE_SOURCE_DIR@/doc/doxygen
 FILE_PATTERNS         = *.cpp *.h 
+GENERATE_XML = YES
 RECURSIVE             = YES
 EXCLUDE_PATTERNS      = *.asc *.cov *.nrv 
 ALPHABETICAL_INDEX    = YES
