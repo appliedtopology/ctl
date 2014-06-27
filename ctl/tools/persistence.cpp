@@ -38,6 +38,7 @@
 //Utility 
 #include <ctl/io/io.h>
 #include <ctl/utility/timer.h>
+#include <ctl/parallel/utility/timer.h>
 
 //#define COMPUTE_BETTI
 //#define CTL_USE_MURMUR
@@ -65,10 +66,11 @@
 #include <ctl/weight_data/weight_data.h>
 #include <ctl/weight_data/weight_functor.h>
 
-//Chaim Complex
+//Chain Complex
 #include <ctl/chain_complex/chain_complex.h>
 #include <ctl/chain_complex/complex_boundary.h>
 #include <ctl/term/term.h>
+
 
 //Chains & Persistence 
 #include <ctl/chain/chain.h>
@@ -84,9 +86,6 @@
 //STL
 #include <sstream>
 
-
-//Timer
-typedef ctl::Timer Timer;
 
 //Simplex
 typedef ctl::Abstract_simplex< int> Simplex;
@@ -149,21 +148,27 @@ void run_persistence( Complex & complex,
    Complex_chains complex_cascade_boundaries( complex.size(), Complex_chain());
    
    Complex_offset_map offset_map( complex_filtration.begin());
-   //we hand persistence a property map for genericity!                                         
+   //we hand persistence a property map for genericity!                        
    Complex_chain_map cascade_bd_property_map( complex_cascade_boundaries.begin(),
-         				     offset_map);
+         				      offset_map);
    //serial persistence (complex)
    timer.start();
-   ctl::persistence( complex_filtration.begin(), complex_filtration.end(),
-   		    filtration_boundary, cascade_bd_property_map);
+   auto times = ctl::persistence( complex_filtration.begin(), complex_filtration.end(),
+  		    filtration_boundary, cascade_bd_property_map);
    timer.stop();
-   
-   double complex_persistence = timer.elapsed();
-   std::cout << "serial persistence: " << complex_persistence << std::endl;
+   double boundary_map_build = times.first;
+   double complex_persistence = times.second;
+  std::cout << "initialize_cascade_data (complex): " 
+            << boundary_map_build << std::endl;
+  std::cout << "serial persistence (complex): " 
+            << complex_persistence << std::endl;
+  std::cout << "total time : " << timer.elapsed() << std::endl;
+
    ctl::compute_barcodes( complex_filtration, 
 			  cascade_bd_property_map, 
 			  barcode, tag);
 }
+typedef ctl::parallel::Timer Timer;
 
 template<typename String>
 void process_args(int & argc, char *argv[], 
@@ -232,6 +237,5 @@ int main(int argc, char *argv[]){
   	run_persistence( complex, less, barcodes, timer, ctl::detail::non_weighted_tag());   
 	out << barcodes << std::endl;
   } 
-  
   return 0;
 }

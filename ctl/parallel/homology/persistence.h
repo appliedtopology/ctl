@@ -44,6 +44,7 @@
 
 #include <tbb/blocked_range.h>
 #include <tbb/parallel_for.h>
+#include <tbb/concurrent_vector.h>
 #include <boost/functional/hash.hpp>
 
 namespace ctl {
@@ -52,6 +53,7 @@ template<typename Timer>
 struct Parallel_stats{
 	Timer timer;
 	double parallel_persistence;
+	double initialize_cascade_boundary;
 	double filtration_time;
 	double get_iterators;
 };
@@ -78,20 +80,22 @@ std::size_t hash_value( const typename Blowup::iterator& cell)
 namespace ctl {
 namespace parallel{
 template<typename Boundary,
-         typename Cascade_map>
+         typename Cascade_map,
+	 typename Vector>
 class Persistence_body{
         private:
         typedef Persistence_body< Boundary,
-                                  Cascade_map> Self;
+                                  Cascade_map, Vector> Self;
         public:
         Persistence_body( Boundary & boundary,
-                          Cascade_map & cascade_prop_map ):
+                          Cascade_map & cascade_prop_map, Vector & v ):
                         _boundary( boundary),
-                        _cascade_prop_map( cascade_prop_map){}
+                        _cascade_prop_map( cascade_prop_map), times( v){}
 
         Persistence_body( const Self & _self):
                         _boundary( _self._boundary),
-                        _cascade_prop_map( _self._cascade_prop_map){}
+                        _cascade_prop_map( _self._cascade_prop_map), 
+			times( _self.times){}
 
         template< typename Range>
         void operator()( const Range & r ) const{
@@ -100,46 +104,57 @@ class Persistence_body{
                              current != r.end();
                            ++current){
 		
-		ctl::persistence( current->first,
+		times.push_back( ctl::persistence( current->first,
 				  current->second,
 				  _boundary,
-		 		  _cascade_prop_map);
+		 		  _cascade_prop_map));
 		}
         }
 
         private:
         Boundary & _boundary;
         Cascade_map & _cascade_prop_map;
+	Vector& times;
 }; //Persistence_body
 
 template< typename Iterator_pairs, 
 	  typename Boundary, 
 	  typename Cascade_map>
-void persistence( Iterator_pairs & ranges, 
-		  Boundary & complex_boundary,
-		  Cascade_map & cascade_prop_map,
-		  size_t & num_parallel_ranges){
+std::pair< double, double> 
+persistence( Iterator_pairs & ranges, 
+ 	     Boundary & complex_boundary,
+ 	     Cascade_map & cascade_prop_map,
+ 	     size_t & num_parallel_ranges){
 	typedef typename Iterator_pairs::iterator Iterator;
 	typedef typename Iterator_pairs::value_type Pair;
 	typedef typename Pair::first_type Filtration_iterator;
 
 	typedef typename tbb::blocked_range< Iterator > Range;
-	typedef 	 Persistence_body< Boundary, Cascade_map> Body;
-	ctl::parallel::Timer timer;
-
+	typedef std::pair< double, double> Time_pair;
+	typedef tbb::concurrent_vector< Time_pair>  Vector;
+	typedef 	 Persistence_body< Boundary, Cascade_map, Vector> Body;
 	Iterator parallel_end = ranges.begin()+num_parallel_ranges;
-	Body body( complex_boundary, cascade_prop_map);
+	Vector time_vector;
+	time_vector.reserve( ranges.size());
+	Body body( complex_boundary, cascade_prop_map, time_vector);
 	Range range( ranges.begin(), parallel_end, 1);
 	tbb::parallel_for( range, body);
-	std::cout << "parallel for complete" << std::endl;
+	Time_pair result; 
 	if(parallel_end != ranges.end()){
 	        Filtration_iterator begin = parallel_end->first;
 		Filtration_iterator end = ranges.rbegin()->second;
-	        ctl::persistence( begin, end, 
+	        result = ctl::persistence( begin, end, 
 				  complex_boundary, 
 				  cascade_prop_map);
 	}
-	//double serial_time = timer.get();
+	double first_max = 0, second_max = 0;
+	for( Vector::const_iterator i = time_vector.begin(); i != time_vector.end(); ++i){
+		if (i->first > first_max){ first_max = i->first; }
+		if (i->second > second_max){ second_max = i->second; }
+	}
+	result.first += first_max;
+	result.second += second_max;
+	return result; 
 }
 
 /*

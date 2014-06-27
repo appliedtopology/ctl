@@ -120,18 +120,6 @@ void compute_homology( Complex & complex,
 		ranges[ i].first += offset;
 		ranges[ i].second += offset;
 	}
-	/*
-	Iterator_pairs correct_ranges;
-	ctl::parallel::get_cover_iterators( filtration.begin(), 
-		  			      filtration.end(), correct_ranges, true);
-	auto begin = filtration.begin();
-	for(auto i = ranges.begin(), j = correct_ranges.begin(); i != ranges.end(); ++i, ++j){
-		std::cout << "(" << std::distance( begin, i->first) 
-			  << "," << std::distance( begin, i->second) << ")" 
-			  << " VS. correct " << "(" << std::distance( begin, j->first) 
-			  << "," << std::distance( begin, j->second) << ")";
-		std::cout << std::endl; 
-	}*/	
 	stats.timer.stop();
 	stats.get_iterators = stats.timer.elapsed();
 
@@ -140,13 +128,12 @@ void compute_homology( Complex & complex,
 				Complex_offset_map( filtration.begin()));
 	Filtration_boundary filtration_boundary( filtration);
 
-	stats.timer.start();
-	ctl::parallel::persistence( ranges,
+	auto times = ctl::parallel::persistence( ranges,
 			           filtration_boundary,
 			           cascade_prop_map, 
-			           num_parts );
-	stats.timer.stop();
-	stats.parallel_persistence = stats.timer.elapsed();
+			           num_parts);
+	stats.initialize_cascade_boundary = times.first;
+	stats.parallel_persistence = times.second;
 	#ifdef COMPUTE_BETTI
 	        //betti numbers
 	        Betti betti;
@@ -205,11 +192,10 @@ void do_blowup_homology( Blowup & blowup_complex,
 	Blowup_offset_map offset_map( blowup_filtration.begin());
 	Complex_chain_map cascade_prop_map( cascades.begin(), offset_map);
   	Blowup_boundary blowup_filtration_boundary( blowup_filtration); 
-  	std::cout << "calling parallel persistence: " << std::endl;
-	ctl::parallel::persistence( ranges, blowup_filtration_boundary, 
-				    cascade_prop_map, num_local_pieces );
-	stats.timer.stop();
-	stats.parallel_persistence = stats.timer.elapsed();
+	auto p = ctl::parallel::persistence( ranges, blowup_filtration_boundary, 
+				    	     cascade_prop_map, num_local_pieces );
+	stats.initialize_cascade_boundary = p.first; 
+	stats.parallel_persistence = p.second;
 #ifdef COMPUTE_BETTI
 	typedef typename tbb::concurrent_vector< int> Betti;
         //betti numbers

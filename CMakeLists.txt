@@ -10,7 +10,6 @@ if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" VERSION_GREATER 2.6)
 endif()
 option(USE_CLANG "build application with clang" ON) # OFF is the default
 option(USE_MPI "build distributed codes" OFF) #OFF is default
-
 if( USE_CLANG)
    SET (CMAKE_C_COMPILER             "/usr/bin/clang")
    SET (CMAKE_C_FLAGS                "-Wall -std=c99")

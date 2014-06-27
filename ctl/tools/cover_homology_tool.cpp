@@ -202,8 +202,8 @@ int main( int argc, char *argv[]){
    std::cout << "Disconnect" <<  ZMDisconnect() << std::endl;
   #endif
   double total_time = cover_time + stats.filtration_time + stats.get_iterators +
-         	     stats.parallel_persistence;
-                                                                                
+         	     stats.parallel_persistence + stats.initialize_cascade_boundary;
+                  
   std::cout << std::setprecision( 2) << std::fixed;
                                                                                 
   std::cout << "build cover: " << cover_time 
@@ -215,7 +215,10 @@ int main( int argc, char *argv[]){
   std::cout << "compute parallel ranges: " << stats.get_iterators
             << " (" << (stats.get_iterators/total_time)*100 << "%)" 
 	    << std::endl;
-  std::cout << "time for parallel_homology: " 
+  std::cout << "initialize_cascade_boundary: " 
+            << stats.initialize_cascade_boundary << " (" 
+            << (stats.initialize_cascade_boundary/total_time)*100 << "%)" << std::endl;
+  std::cout << "parallel_homology: " 
             << stats.parallel_persistence << " (" 
             << (stats.parallel_persistence/total_time)*100 << "%)" << std::endl;
   std::cout << "total time: " << total_time << " (100%)" << std::endl;

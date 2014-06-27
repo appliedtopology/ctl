@@ -35,9 +35,10 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 *******************************************************************************/
-//Project
+//STL
 #include <algorithm>
 #include <functional>
+#include <memory>
 
 //CTL
 #include <ctl/chain/chain_add.h>
@@ -104,6 +105,11 @@ public:
 
 	template< class... Args>	
 	void emplace( Args&&... args){ _chain.emplace_back( std::forward< Args>( args)...); }
+	reverse_iterator erase( reverse_iterator b, reverse_iterator e){
+		//since we are lying in this datastructure and reverse
+		//iterators really are iterators we can erase from begin --> erase
+		return _chain.erase( b, e);
+	}
 	void swap( Chain & from){ _chain.swap( from._chain); }
 	template< typename Compare = Less>
  	void sort( Compare c = Less()){
@@ -134,16 +140,82 @@ public:
 		Chain result;
 		return scaled_add( a, rhs, result, c);
 	}
-	
+	private:
+	template< typename Iterator, typename Persistence_data, 
+					typename Compare>
+	inline void mismatch_prefetch( Iterator& f1, Iterator& e1,
+			      Iterator& f2, Iterator& e2,
+			      Compare & c,
+			      Persistence_data & d,
+			      std::size_t& n, 
+			      ctl::detail::term_non_z2_tag t) const {}
+		
+	template< typename Iterator, typename Persistence_data, 
+		  typename Compare>
+	inline void 
+	mismatch_prefetch( Iterator& f1, Iterator& e1, 
+			   Iterator& f2, Iterator& e2,
+			   Compare & c,
+			   Persistence_data & d,
+			   std::size_t& n, ctl::detail::term_z2_tag t) const {
+		while( f1 != e1 && f2 != e2){ 
+		if( c(*f1, *f2)){
+		    const auto i = d.cascade_boundary_map[ f1->cell()].rbegin();
+		    __builtin_prefetch( std::addressof( *i));
+		    break;
+		}
+		if( c( *f2, *f1)){
+		    const auto i = d.cascade_boundary_map[ f2->cell()].rbegin();
+		     __builtin_prefetch( std::addressof( *i));
+		     break;
+		}
+                   ++f1, ++f2;
+		   n -= 2;
+                }
+	} 
+		
+	public:
+	template< typename Chain, 
+		  typename Persistence_data, 
+		  typename Compare = Less>
+	Chain& scaled_add( const Coefficient & a, const Chain& rhs,
+			   Persistence_data & data, 
+			   Chain & result, Compare c = Compare()){
+		typedef typename Chain::const_reverse_iterator Iterator_;
+		Iterator_ first = crbegin();
+		Iterator_ rhs_first = rhs.crbegin();
+		Iterator_ end =   crend();
+		Iterator_ rhs_end = rhs.crend();
+		std::size_t n = size() + rhs.size();
+		//Z2 only:
+		//Walk up the chain from bottom to top looking for 
+		//the first mismatch. 
+		//If it exists the younger of the two is the next 
+		//youngest element.
+		mismatch_prefetch( first, end, rhs_first, rhs_end, c, 
+				   data, n, coeff_tag());
+		if( result._chain.size() < n){ result._chain.resize( n); }
+		auto _end = 
+		ctl::detail::chain_add( first, end, a, rhs_first, rhs_end, 
+				 	result.rbegin(), 
+					std::bind(c, std::placeholders::_2, 
+						     std::placeholders::_1), 
+				 	coeff_tag());
+		result._chain.erase( _end, result.rend());
+		_chain.swap( result._chain);
+		return *this;
+	}
 	template< typename Chain, typename Compare = Less>
 	Chain& scaled_add( const Coefficient & a, const Chain& rhs, 
 			   Chain & result, Compare c = Compare()){
-		const std::size_t n = size() + rhs.size();	
+		const std::size_t n = size() + rhs.size();
 		if( result._chain.size() < n){ result._chain.resize( n); }
-		auto _end = ctl::detail::chain_add( _chain.cbegin(), 
-						    _chain.cend(),
-				 	a, rhs.crbegin(), rhs.crend(), 
-				 	result.rbegin(), std::bind(c, std::placeholders::_2, std::placeholders::_1), 
+		auto _end = 
+		ctl::detail::chain_add( _chain.cbegin(), _chain.cend(), a, 
+					rhs.crbegin(), rhs.crend(),
+				 	result.rbegin(), 
+					std::bind(c, std::placeholders::_2, 
+						     std::placeholders::_1), 
 				 	coeff_tag());
 		result._chain.erase( _end, result.rend());
 		_chain.swap( result._chain);
@@ -158,14 +230,17 @@ public:
 	
 	Chain& operator+=( const Term & b){
 		ctl::detail::chain_term_add( _chain, b, 
-			std::bind(Less(), std::placeholders::_2, std::placeholders::_1), coeff_tag());
+			std::bind(Less(), std::placeholders::_2, 
+				  std::placeholders::_1), coeff_tag());
 		return *this;
 	}
 
 	Chain operator+( const Term & b){
 		Chain result( *this);
 		ctl::detail::chain_term_add( result._chain, b,
-					     std::bind(Less(), std::placeholders::_2, std::placeholders::_1), 
+					     std::bind(Less(), 
+					     std::placeholders::_2, 
+					     std::placeholders::_1), 
 					     coeff_tag());
 		return result;
 	}
@@ -175,7 +250,9 @@ public:
 	   auto leftover = ctl::detail::chain_add( rbegin(), rend(), 
 	   			            b.rbegin(), b.rend(),
 	   			            result.rbegin(),
-	   			            std::bind(Less(), std::placeholders::_2, std::placeholders::_1),
+	   			            std::bind(Less(), 
+						      std::placeholders::_2, 
+						      std::placeholders::_1),
 	   			            Chain::coeff_tag());
 	   result._chain.erase( leftover, result.rend());
 	   return result;

@@ -37,6 +37,7 @@
 *******************************************************************************/
 #include <ctl/persistence/persistence_data.h>
 #include <ctl/io/io.h>
+#include <ctl/parallel/utility/timer.h>
 
 //exported functionality
 namespace ctl{
@@ -60,11 +61,12 @@ void eliminate_boundaries( Persistence_data & data){
 	if( bd_cascade_tau.empty()){ return; }
 	//otherwise tau has a partner
 	const Term& tau_partner_term = bd_cascade_tau.youngest();
+   	const Coefficient& scalar = tau_partner_term.coefficient().inverse();
 	const Chain& bd_cascade_tau_partner = 
 				data.cascade_boundary_map[ tau_partner_term];
-	const Coefficient scalar = tau_partner_term.coefficient().inverse();
-  	data.cascade_boundary.scaled_add( scalar, bd_cascade_tau_partner,
-					  data.temporary_chain);
+   	data.cascade_boundary.scaled_add( scalar, bd_cascade_tau_partner,
+							data, 
+				     		   data.temporary_chain);
   }
 }
 
@@ -83,6 +85,7 @@ void initialize_cascade_data( const Filtration_iterator sigma,
 			      Persistence_data & data, partner){
      //typedef typename Filtration_iterator::value_type Cell;
      typedef typename Persistence_data::Chain Chain;
+     //typedef typename Chain::value_type Term;
      Chain& cascade_boundary = data.cascade_boundary;
      cascade_boundary.reserve( data.bd.length( sigma));
      for( auto i = data.bd.begin( sigma); i != data.bd.end( sigma); ++i){
@@ -98,8 +101,6 @@ template< typename Filtration_iterator, typename Persistence_data>
 void initialize_cascade_data( const Filtration_iterator & cell, 
 			      Persistence_data & data, partner_and_cascade){
 	typedef typename Persistence_data::Chain::Term Term;
-	//TODO: Replace me!
-	//data.cascade.emplace( cell, Coefficient( 1));
 	data.cascade.add( Term( cell, 1)); 
 	initialize_cascade_data( cell, data, partner());
 }
@@ -134,24 +135,33 @@ template< typename Filtration_iterator,
 	  typename Boundary_operator,
 	  typename Chain_map,
 	  typename Output_policy>
-void pair_cells( Filtration_iterator begin, Filtration_iterator end,
+std::pair< double, double> 
+pair_cells( Filtration_iterator begin, Filtration_iterator end,
 		 Boundary_operator & bd, 
 		 Chain_map & cascade_boundary_map, Chain_map & cascade_map,
 		 Output_policy output_policy){
 
 	typedef typename boost::property_traits< Chain_map>::value_type Chain;
+	//this should now operator on filtration pointers, so it should be fast.
 	typedef typename Chain::Less Term_less;
-	//this should now operator on filtration pointers, so it should be fast.	
 	typedef ctl::detail::Persistence_data< Term_less, Boundary_operator, 
 				  		Chain_map, Output_policy> 
 					            Persistence_data;
 	//typedef typename Filtration_iterator::value_type Cell_iterator; 
 	typedef typename Chain::Term Term;
+	double init_cascade_time = 0.0, persistence_algorithm=0.0;
+	ctl::parallel::Timer timer;
 	Term_less term_less; 
-	Persistence_data data( term_less, bd, cascade_boundary_map, cascade_map, 
+	Persistence_data data( term_less, bd, cascade_boundary_map, cascade_map,
 			       output_policy);
 	for(Filtration_iterator sigma = begin; sigma != end; ++sigma){
+		timer.start();
+		//hand the column we want to operate on to our temporary.
+		cascade_boundary_map[ sigma].swap( data.cascade_boundary);
 		initialize_cascade_data( sigma, data, output_policy);
+		timer.stop();
+		init_cascade_time += timer.elapsed();
+		timer.start();
 		eliminate_boundaries( data);
 		if( !data.cascade_boundary.empty() ){
 		     //make tau sigma's partner
@@ -163,29 +173,34 @@ void pair_cells( Filtration_iterator begin, Filtration_iterator end,
 		} else{
 		     store_cascade( data, sigma, output_policy); 
 		}
+		timer.stop();
+		persistence_algorithm += timer.elapsed();
 	}
+	return std::make_pair( init_cascade_time, persistence_algorithm);
 }
 
 template< typename Filtration_iterator, 
 	  typename Boundary_operator,
 	  typename Chain_map>
-void persistence( Filtration_iterator begin,
+std::pair< double,double> 
+persistence( Filtration_iterator begin,
 		  Filtration_iterator end,
 		  Boundary_operator & bd,
 		  Chain_map & cascade_boundary_map,
 		  Chain_map & cascade_map){
-	ctl::pair_cells( begin, end, bd, cascade_boundary_map, 
+	return ctl::pair_cells( begin, end, bd, cascade_boundary_map, 
 			 cascade_map, partner_and_cascade());
 }
 template< typename Filtration_iterator, 
 	  typename Boundary_operator,
 	  typename Chain_map>
-void persistence( Filtration_iterator begin,
-		  Filtration_iterator end,
-		  Boundary_operator & bd,
-		  Chain_map & cascade_boundary_map){
+std::pair< double, double> 
+persistence( Filtration_iterator begin,
+	     Filtration_iterator end,
+	     Boundary_operator & bd,
+	     Chain_map & cascade_boundary_map){
 	Chain_map not_going_to_be_used = cascade_boundary_map; 
-	ctl::pair_cells( begin, end, bd, cascade_boundary_map, 
+	return ctl::pair_cells( begin, end, bd, cascade_boundary_map, 
 			 not_going_to_be_used, partner());
 }		  
 } //namespace ctl
