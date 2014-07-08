@@ -9,39 +9,18 @@ if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" VERSION_GREATER 2.6)
   endif()
 endif()
 
-option(USE_GCC "build application with gcc" ON) # ON is the default
-if( USE_GCC)
-   SET (CMAKE_C_COMPILER             "/usr/local/bin/gcc")
-   SET (CMAKE_C_FLAGS                "-Wall -std=c99")
-   SET (CMAKE_C_FLAGS_DEBUG          "-g")
-   SET (CMAKE_C_FLAGS_MINSIZEREL     "-Os -DNDEBUG")
-   SET (CMAKE_C_FLAGS_RELEASE        "-O3 -DNDEBUG")
-   SET (CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -g")
 
-   SET (CMAKE_CXX_COMPILER             "/usr/bin/clang++")
-   SET (CMAKE_CXX_FLAGS                "-Wall")
-   SET (CMAKE_CXX_FLAGS_DEBUG          "-g")
-   SET (CMAKE_CXX_FLAGS_MINSIZEREL     "-Os -DNDEBUG")
-   SET (CMAKE_CXX_FLAGS_RELEASE        "-O3 -DNDEBUG")
-   SET (CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g -fno-omit-frame-pointer")
-endif( USE_GCC)
-option(USE_CLANG "build application with clang" OFF) # OFF is the default
+message(STATUS "Checking for C++11 compiler")
+if((MSVC AND (MSVC10 OR MSVC11 OR MSVC12)) OR
+   (CMAKE_COMPILER_IS_GNUCXX AND NOT ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 4.6) OR
+   (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND NOT ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 3.1))
+    message(STATUS "Checking for C++11 compiler - available")
+    message(STATUS "Compiler is: " ${CMAKE_CXX_COMPILER_ID} " " ${CMAKE_CXX_COMPILER_VERSION})
+else()
+    message(FATAL_ERROR "Checking for C++11 compiler - unavailable")
+endif()
+
 option(USE_MPI "build distributed codes" OFF) #OFF is default
-if( USE_CLANG)
-   SET (CMAKE_C_COMPILER             "/usr/bin/clang")
-   SET (CMAKE_C_FLAGS                "-Wall -std=c99")
-   SET (CMAKE_C_FLAGS_DEBUG          "-g")
-   SET (CMAKE_C_FLAGS_MINSIZEREL     "-Os -DNDEBUG")
-   SET (CMAKE_C_FLAGS_RELEASE        "-O3 -DNDEBUG")
-   SET (CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -g")
-
-   SET (CMAKE_CXX_COMPILER             "/usr/bin/clang++")
-   SET (CMAKE_CXX_FLAGS                "-Wall")
-   SET (CMAKE_CXX_FLAGS_DEBUG          "-g")
-   SET (CMAKE_CXX_FLAGS_MINSIZEREL     "-Os -DNDEBUG")
-   SET (CMAKE_CXX_FLAGS_RELEASE        "-O3 -DNDEBUG")
-   SET (CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g -fno-omit-frame-pointer")
-endif( USE_CLANG)
 
 set(CMAKE_BUILD_TYPE RELWITHDEBINFO)
 
@@ -50,6 +29,7 @@ set(CTL_DOC_INSTALL_DIR ${CMAKE_SOURCE_DIR}/doc)
 set(CTL_BIN_INSTALL_DIR ${CMAKE_SOURCE_DIR}/bin)
 set(CTL_EXAMPLES_INSTALL_DIR ${CMAKE_SOURCE_DIR}/examples)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules")
+set(DSO_FIXES rt)
 
 if(NOT USE_MPI)
   find_package(Boost COMPONENTS program_options serialization REQUIRED)
@@ -68,12 +48,15 @@ add_definitions(" -fno-omit-frame-pointer -Wall -ansi -std=c++11")
 
 find_package(TBB REQUIRED) 
 find_package(METIS REQUIRED) 
+<<<<<<< HEAD
 include_directories(${CMAKE_SOURCE_DIR})
 include_directories( ${MPI_INCLUDE_PATH} ${METIS_INCLUDE_DIR} ${Boost_INCLUDE_DIR} ${TBB_INCLUDE_DIR})
 link_directories(/usr/local/lib ${Boost_LIBRARY_DIR} ${METIS_LIBRARY_DIR} ${TBB_LIBRARY_DIR} ${MPI_LIBRARY_DIRS})
 add_definitions(" -fno-omit-frame-pointer -ftemplate-backtrace-limit=0 -Wall -ansi -std=c++11")
 set(CMAKE_BUILD_TYPE RELEASE)
 
+=======
+>>>>>>> cmake dso fixes for older glibc/gcc toolchain. removed clang build option and added compiler version check
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
 configure_file(${CMAKE_SOURCE_DIR}/doc/Doxyfile.in ${CMAKE_BINARY_DIR}/Doxyfile @ONLY)
