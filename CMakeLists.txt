@@ -33,14 +33,11 @@ set(DSO_FIXES rt)
 
 if(NOT USE_MPI)
   find_package(Boost COMPONENTS program_options serialization REQUIRED)
-  link_directories(/usr/local/lib ${Boost_LIBRARY_DIR})
 endif(NOT USE_MPI)
 if( USE_MPI)
   find_package(MPI REQUIRED)
   set(MPI_CXX_COMPILER mpic++)
   find_package(Boost COMPONENTS program_options mpi serialization REQUIRED)
-  include_directories(${MPI_INCLUDE_PATH})
-  link_directories(${MPI_LIBRARY_DIRS})
 endif(  USE_MPI)
 
 set(Boost_USE_MULTITHREADED ON)
@@ -48,15 +45,10 @@ add_definitions(" -fno-omit-frame-pointer -Wall -ansi -std=c++11")
 
 find_package(TBB REQUIRED) 
 find_package(METIS REQUIRED) 
-<<<<<<< HEAD
 include_directories(${CMAKE_SOURCE_DIR})
 include_directories( ${MPI_INCLUDE_PATH} ${METIS_INCLUDE_DIR} ${Boost_INCLUDE_DIR} ${TBB_INCLUDE_DIR})
 link_directories(/usr/local/lib ${Boost_LIBRARY_DIR} ${METIS_LIBRARY_DIR} ${TBB_LIBRARY_DIR} ${MPI_LIBRARY_DIRS})
-add_definitions(" -fno-omit-frame-pointer -ftemplate-backtrace-limit=0 -Wall -ansi -std=c++11")
-set(CMAKE_BUILD_TYPE RELEASE)
 
-=======
->>>>>>> cmake dso fixes for older glibc/gcc toolchain. removed clang build option and added compiler version check
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
 configure_file(${CMAKE_SOURCE_DIR}/doc/Doxyfile.in ${CMAKE_BINARY_DIR}/Doxyfile @ONLY)
@@ -67,14 +59,6 @@ COMMENT "Generating API documentation with Doxygen" VERBATIM
 )
 endif(DOXYGEN_FOUND)
 
-
-include_directories(${CMAKE_SOURCE_DIR} ${Boost_INCLUDE_DIR})
-include_directories(${METIS_INCLUDE_DIR} ${TBB_INCLUDE_DIR})
-
-link_directories(/usr/local/lib ${Boost_LIBRARY_DIR})
-link_directories(${METIS_LIBRARY_DIR} ${TBB_LIBRARY_DIR})
-
->>>>>>> working on barcodes.
 add_subdirectory( ctl)
 
 install( DIRECTORY ${CMAKE_SOURCE_DIR}/ctl 
