@@ -39,7 +39,7 @@ if( USE_MPI)
   find_package(Boost COMPONENTS program_options mpi serialization REQUIRED)
 endif(  USE_MPI)
 
-set(Boost_USE_MULTITHREADED ON)
+#set(Boost_USE_MULTITHREADED ON)
 add_definitions(" -fno-omit-frame-pointer -Wall -ansi -std=c++11")
 
 find_package(TBB REQUIRED) 

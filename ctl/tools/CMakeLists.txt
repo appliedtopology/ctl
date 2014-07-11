@@ -36,7 +36,7 @@ target_link_libraries( gpcover ${METIS_LIBRARIES} ${Boost_LIBRARIES} ${TBB_LIBRA
 install( TARGETS gpcover RUNTIME DESTINATION bin)
 
 add_executable (ctl2phat phat_tool.cpp)
-target_link_libraries( ctl2phat boost_program_options)
+target_link_libraries( ctl2phat ${Boost_LIBRARIES})
 install( TARGETS ctl2phat RUNTIME DESTINATION bin)
 
 add_executable (concurrent_homology   concurrent_homology_tool)

@@ -90,11 +90,12 @@ template< typename Data_>
 class Data_wrapper : public Data_ {
    private:
    typedef Data_wrapper< Data_> Self;
+   typedef std::size_t Id;
    public:
    //default
    Data_wrapper(): id_( 0) {}
    //copy
-   Data_wrapper( const std::size_t & tid):
+   Data_wrapper( const Id & tid):
    Data_(), id_( tid){}
 
    Data_wrapper( const Data_wrapper & from) : id_( from.id_){}
@@ -115,10 +116,10 @@ class Data_wrapper : public Data_ {
    }
 
 
-   std::size_t id() const { return id_; }
-   void id( std::size_t n){ id_ = n; }
+   Id id() const { return id_; }
+   void id( Id n){ id_ = n; }
    private:
-   std::size_t id_;
+   Id id_;
    //(to be read in Millhouse Van Houten's voice)
    //This lets the chain_complex & boundary touch my privates ;)
    template< typename C, typename B, typename D, typename H>
@@ -298,13 +299,15 @@ public:
 	return in;
    }
    template< typename Stream, typename Functor>
-   Stream& read( Stream & in, Functor & f){
+   Stream& read_data( Stream & in, Functor & f){
 	typedef typename Data::Id Id;
 	typedef typename Functor::result_type Value;
 	typedef std::unordered_map< Id, Value> Value_map; 
 	std::string line;
 	std::size_t line_num = 0;
 	Value_map values( size());
+	Id id;
+	Value value;
 	while( ctl::get_line( in, line, line_num)){
 		std::istringstream ss( line);
 		ss >> id;
@@ -312,7 +315,7 @@ public:
 		values[ id] = value;
 	}
 	for (auto & sigma: cells) { 
-		f( sigma.second) = values[ i->second.id()]; 
+		f( sigma.second) = values[ sigma.second.id()]; 
 	}
 	return in;
    }
@@ -361,19 +364,29 @@ Stream& operator>>( Stream& in,
 		    Chain_complex< Cell, Boundary, Data_, Hash> & c){  return c.read( in); }
 
 template<typename String, typename Complex, typename Functor>
-void read_complex(String & complex_name, Complex & complex, Functor & f){
+void read_complex_and_data(String & complex_name, String & data_file, 
+			   Complex & complex, Functor & f){
 	std::ifstream in;
 	std::cout << "File IO ..." << std::flush;
+	//first read the complex in
 	ctl::open_file( in, complex_name.c_str());
-	complex.read( in, f);
+	complex.read( in);
+	ctl::close_file( in);
+	//then read the data file in, e.g. weights, cover, etc..
+	ctl::open_file( in, data_file.c_str());
+	complex.read_data( in, f);	
 	ctl::close_file( in);
 	std::cout << "completed!" << std::endl;
 }
 
 template<typename String, typename Complex>
 void read_complex(String & complex_name, Complex & complex){
-	ctl::identity ident;
-	read_complex( complex_name, complex, ident);
+	std::ifstream in;
+	std::cout << "File IO ..." << std::flush;
+	ctl::open_file( in, complex_name.c_str());
+	complex.read( in);
+	ctl::close_file( in);
+	std::cout << "completed!" << std::endl;
 }
 
 
