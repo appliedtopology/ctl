@@ -1,5 +1,6 @@
 project(ctl CXX)
 set( CMAKE_VERBOSE_MAKEFILE  false)
+option(USE_MPI "build distributed codes" OFF) #OFF is default
 cmake_minimum_required(VERSION 2.6.2)
 if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" VERSION_GREATER 2.6)
   if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION}" VERSION_GREATER 2.8.3)
@@ -8,7 +9,6 @@ if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" VERSION_GREATER 2.6)
     cmake_policy(VERSION 2.6)
   endif()
 endif()
-
 
 message(STATUS "Checking for C++11 compiler")
 if((MSVC AND (MSVC10 OR MSVC11 OR MSVC12)) OR
@@ -20,7 +20,6 @@ else()
     message(FATAL_ERROR "Checking for C++11 compiler - unavailable")
 endif()
 
-option(USE_MPI "build distributed codes" OFF) #OFF is default
 
 set(CMAKE_BUILD_TYPE RELWITHDEBINFO)
 
@@ -55,8 +54,7 @@ configure_file(${CMAKE_SOURCE_DIR}/doc/Doxyfile.in ${CMAKE_BINARY_DIR}/Doxyfile 
 add_custom_target(doc
 ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/Doxyfile
 WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-COMMENT "Generating API documentation with Doxygen" VERBATIM
-)
+COMMENT "Generating API documentation with Doxygen" VERBATIM)
 endif(DOXYGEN_FOUND)
 
 add_subdirectory( ctl)

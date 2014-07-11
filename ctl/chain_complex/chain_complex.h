@@ -52,15 +52,16 @@
 * original begin() and end() iterators concatenated together.
 * This is somewhat frustrating because the naive implementation will require a
 * 5x space bloat for each iterator, so less iterators fit on a cache line.
-* A massive sort might have 5x more cache misses, for example, and
-* the chains we store for persistence will have more stuff in them.
+* A massive sort might have 5x more cache misses, for example.
 * We would save space by forcing a single hash table to hash cells of different
-* dimensions to different places.
+* dimensions to different places, but, this seems overly optimistic.
 * This also makes iterators
 * invalid less often then they were before.
 * In particular, iterators are only invalidated in one dimension at a time,
 * AND rehashing will be marginally less expensive.
 * begin()/end() would be overloaded to take a dimension as well.
+* in particular this means that a filtration sorting could be implemented
+* to avoid this craziness of pointers..  
 **********************/
 
 //STL
@@ -250,70 +251,71 @@ public:
    	  out << cell.first.size() << " " << std::flush;
 	  cell.first.write( out);
 	  out << std::flush;
-   	  out << f( cell.second) << " " << std::flush;
+   	  out << f( cell.second)  << std::flush;
    	  out << std::endl;
    	}
 	return out;
    }
 
    template< typename Stream>
-   Stream& write( Stream& out) const { 
+   inline Stream& write( Stream& out) const { 
 	ctl::identity i;
 	return write( out, i);
    }
    
-   template< typename Stream, typename Functor>
-   Stream& read( Stream & in, Functor & f){ 
+   template< typename Stream> 
+   Stream& read( Stream & in){
 	std::size_t line_num = 0;
 	std::string line;
 	std::size_t id=0;
         char the_first_character = in.peek();
 	const bool headers_enabled = (the_first_character == 's');
-	if( headers_enabled) {
-                ctl::get_line( in, line, line_num);
-                std::istringstream ss( line);
-                std::string the_word_size;
-                ss >> the_word_size;
-                std::size_t the_number_of_cells;
-                ss >> the_number_of_cells;
-		reserve( the_number_of_cells);
+	if( !headers_enabled) { 
+		std::cerr << "Error: reading a file without appropriate header."
+			  << "Bailing out." << std::endl;
 	}
-	if( headers_enabled){
-	   std::size_t size;
-	   while( ctl::get_line(in, line, line_num)){
-	   	std::istringstream ss( line);
-	   	Cell cell;
-	   	ss >> size;
-	   	cell.read( ss, size);
-	   	ss >> id;
-		//should be optimized away for standard reads.
-		if( f( cell, id, true)){
-	   	   Data d( id);
-		   //apply f
-	   	   insert_open_cell( cell, f(cell, d));
-		}
-	   }
-	} else{
-	    while( ctl::get_line(in, line, line_num)){
-	    	std::istringstream ss( line);
-	    	Cell cell;
-	    	ss >> id;
-	   	ss >> cell; 
-		//should be optimized away for standard reads.
-		if( f( cell, id, true)){
-	    	  Data d(  id);
-		  //apply f
-	    	  insert_open_cell( cell, f(cell, d));
-		}
-	    }
+	//Read the header and reserve appropriately
+        ctl::get_line( in, line, line_num);
+        std::istringstream ss( line);
+        std::string the_word_size;
+        ss >> the_word_size;
+        std::size_t the_number_of_cells;
+        ss >> the_number_of_cells;
+	reserve( the_number_of_cells);
+	std::size_t size;
+	while( ctl::get_line(in, line, line_num)){
+	     std::istringstream ss( line);
+	     Cell cell;
+	     //header enabled so read size first
+	     ss >> size;
+	     //then get the cell
+	     cell.read( ss, size);
+	     //and it's id
+	     ss >> id;
+	     Data d( id);
+	     insert_open_cell( cell, d);
 	}
 	return in;
    }
-   template< typename Stream>
-   Stream& read( Stream & in){
-	ctl::identity i; 
-	return read( in, i); 
-   }	
+   template< typename Stream, typename Functor>
+   Stream& read( Stream & in, Functor & f){
+	typedef typename Data::Id Id;
+	typedef typename Functor::result_type Value;
+	typedef std::unordered_map< Id, Value> Value_map; 
+	std::string line;
+	std::size_t line_num = 0;
+	Value_map values( size());
+	while( ctl::get_line( in, line, line_num)){
+		std::istringstream ss( line);
+		ss >> id;
+		ss >> value;
+		values[ id] = value;
+	}
+	for (auto & sigma: cells) { 
+		f( sigma.second) = values[ i->second.id()]; 
+	}
+	return in;
+   }
    void reserve( const std::size_t n) { cells.reserve( n); }
    const std::size_t dimension() const { return max_dim; }
    const std::size_t size() const { return cells.size(); }
