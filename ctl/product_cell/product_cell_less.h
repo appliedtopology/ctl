@@ -49,13 +49,12 @@ struct Product_first_less  {
   typedef         bool result_type;
   bool operator()( const Cell_iterator& c1,
 		   const Cell_iterator& c2) const {
-
-    const std::size_t nerve_id_1 = c1->first.first->second.id();
-    const std::size_t nerve_id_2 = c2->first.first->second.id();
-
-    //assumes the nerve has been built closed. 
-    return (nerve_id_1 < nerve_id_2) || (!(nerve_id_1 > nerve_id_2) && 
-	   (c1->first.second_cell() < c2->first.second_cell()));
+    const auto&  c1_first = c1->first.first_cell();
+    const auto&  c1_second = c1->first.second_cell();
+   
+    const auto&  c2_first = c2->first.first_cell();
+    const auto&  c2_second = c2->first.second_cell();
+    return (c1_first < c2_first) || ((c2_first == c1_first) && (c1_second < c2_second));
   }
 }; // class Product_first_less
 
@@ -72,15 +71,14 @@ struct Product_second_less  {
   bool operator()( const Cell_iterator& c1,
 		   const Cell_iterator& c2) const {
 
-    const std::size_t nerve_id_1 = c1->first.first->second.id();
-    const std::size_t nerve_id_2 = c2->first.first->second.id();
-    //assumes the nerve has been built closed.
-    //also it assumes pointer arithmetic fancyness in or statement to avoid
-    //second cell < other_cell comparison 
-    return (c1->first.second_cell() < c2->first.second_cell()) || 
-		((c1->first.second == c2->first.second) &&  
-			nerve_id_1 < nerve_id_2);
+    const auto&  c1_first = c1->first.first_cell();
+    const auto&  c1_second = c1->first.second_cell();
+   
+    const auto&  c2_first = c2->first.first_cell();
+    const auto&  c2_second = c2->first.second_cell();
+    return (c1_second < c2_second) || ((c2_second == c1_second) && (c1_first < c2_first));
   }
+
 }; // class Product_second_less
 } //end namespace ctl
 #endif //product_cell_less
