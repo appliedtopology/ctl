@@ -150,6 +150,9 @@ class Abstract_simplex {
 	* @return size_t
 	*/
 	size_t   capacity() const  { return vertices.capacity();   }
+	/*! Removes all vertices (which are destroyed), 
+	 * leaving the cell with a size of 0.*/
+	void clear() { vertices.clear(); }
 
 	/*!
 	* @brief Inserts the vertex v if it doesn't already exist
