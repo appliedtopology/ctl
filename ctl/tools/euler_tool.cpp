@@ -37,7 +37,6 @@
 #include <ctl/abstract_simplex/abstract_simplex.h>
 #include <ctl/abstract_simplex/simplex_boundary.h>
 #include <ctl/chain_complex/chain_complex.h>
-#include <ctl/chain_complex/chain_complex_io.h>
 #include <ctl/io/io.h> 
 #include <ctl/utility/timer.h>
 

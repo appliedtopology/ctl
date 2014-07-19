@@ -188,12 +188,10 @@ void process_args(int & argc, char *argv[],
 
 }
 
-template< typename String, typename Weight_functor>
-bool read_weights( const String & filename, Weight_functor & f){
-	std::ifstream in;
-	if( !ctl::open_file( in, filename.c_str())){ return false; }
-	in >> f;
-	return true;
+template< typename String>
+bool can_read_weights( const String & filename){ 
+	 std::ifstream infile(filename.c_str());
+	return infile.good();
 }
 
 int main(int argc, char *argv[]){
@@ -209,13 +207,14 @@ int main(int argc, char *argv[]){
   ctl::open_file( out, barcode_file_name.c_str());
   //Create some data structures 
   Timer timer;
-  ctl::Weight_data_functor< Weighted_complex> weight_functor;
   timer.start();
-  if( read_weights( filtration_file, weight_functor) ){
+  if( can_read_weights( filtration_file)){
+  	ctl::Weight_data_functor< Weighted_complex> weight_functor;
 	typedef typename ctl::Barcodes< double> Barcodes;
 	Barcodes barcodes;
   	Weighted_complex complex;
-  	ctl::read_complex( full_complex_name, complex, weight_functor); 
+  	ctl::read_complex_and_data( full_complex_name, filtration_file, 
+				    complex, weight_functor); 
   	timer.stop();
   	std::cout << "I/O Time: " << timer.elapsed() << std::endl;
   	std::cout << "complex size: " << complex.size() << std::endl; 

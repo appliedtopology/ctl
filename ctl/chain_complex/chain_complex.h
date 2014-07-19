@@ -138,6 +138,17 @@ Stream& operator<<( Stream & out, const ctl::detail::Default_data & d){
 //exported functionality
 namespace ctl{
 
+/**
+* @brief \class Chain_complex
+* A structure which stores the standard cell basis for a Chain_complex
+* Presently the internal data structure is a hash table. The keys are the
+* cells themselves and the values are any data associated to a cell.
+* We wrap the Data parameter transparently to associate a unique id to each cell.
+* @tparam Cell
+* @tparam Boundary
+* @tparam Data
+* @tparam Hash
+*/
 template< typename Cell_,
 	  typename Boundary_,
 	  typename Data_ = ctl::detail::Default_data,

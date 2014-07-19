@@ -47,6 +47,9 @@ add_executable (cover_homology   cover_homology_tool)
 target_link_libraries (cover_homology ${Boost_LIBRARIES} ${METIS_LIBRARIES} ${TBB_LIBRARIES} ${DSO_FIX})
 install( TARGETS cover_homology RUNTIME DESTINATION bin)
 
+add_executable (convert_asc_format add_header_to_complex.cpp)
+target_link_libraries( convert_asc_format ${Boost_LIBRARIES} ${DSO_FIX})
+
 add_executable (write_filtration write_filtration_tool.cpp)
 target_link_libraries( write_filtration ${Boost_LIBRARIES} ${DSO_FIX})
 install( TARGETS write_filtration RUNTIME DESTINATION bin)
