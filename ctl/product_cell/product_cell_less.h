@@ -64,18 +64,15 @@ struct Product_second_less  {
   typedef Cell_iterator second_argument_type;
   typedef         bool result_type;
   private:
-  typedef typename Cell_iterator::value_type::first_type Product_cell;
-  typedef typename Product_cell::Cell_iterator1 First_cell_iterator;
-  typedef typename Product_cell::Cell_iterator2 Second_cell_iterator;
   public:
   bool operator()( const Cell_iterator& c1,
 		   const Cell_iterator& c2) const {
 
-    const auto&  c1_first = c1->first.first_cell();
-    const auto&  c1_second = c1->first.second_cell();
+    const auto&  c1_first = (c1)->first.first_cell();
+    const auto&  c1_second = (c1)->first.second_cell();
    
-    const auto&  c2_first = c2->first.first_cell();
-    const auto&  c2_second = c2->first.second_cell();
+    const auto&  c2_first = (c2)->first.first_cell();
+    const auto&  c2_second = (c2)->first.second_cell();
     return (c1_second < c2_second) || ((c2_second == c1_second) && (c1_first < c2_first));
   }
 

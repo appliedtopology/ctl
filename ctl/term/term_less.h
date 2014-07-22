@@ -50,18 +50,18 @@ struct Term_cell_less{
    Cell_less less;
 }; //struct Term_less
 
-
-
-/*
-//we mirror pos_() from l.cell()->second.pos() in the term
-//so that we avoid a dereference.
-struct Term_pos_less{
+template< typename Cell_less>
+struct Filtration_term_cell_less{
+   Filtration_term_cell_less(){}
+   Filtration_term_cell_less( const Cell_less & l): less( l){} 
    template< typename Term>
-   bool operator()( const Term & l, const Term & r) const { 
-   	return l.pos() < r.pos();
-   }
-};// struct Term_pos_less
-*/
+   inline bool operator()( const Term & l, const Term & r) const { 
+       return less( *(l.cell()), *(r.cell())); 
+   } 
+   Cell_less less;
+}; //struct Term_less
+
+
 } //namespace ctl
 
 #endif //CTLIB_TERM_LESS_H

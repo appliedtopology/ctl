@@ -57,14 +57,34 @@ typename Pos_offset_map< Filtration_iterator>::value_type
 get( const Pos_offset_map< Filtration_iterator>& map, const std::size_t pos) { 
 	return pos; 
 }*/
+template< typename Filtration_iterator>
+struct Permutation_offset_map {
+  // types
+  typedef Filtration_iterator              key_type;
+  typedef std::size_t                      value_type;
+  typedef std::size_t&                     reference;
+  typedef boost::readable_property_map_tag category; 
+  Permutation_offset_map() {}
+};
 
 template< typename Filtration_iterator, typename Index_type_iterator>
-typename Pos_offset_map< Filtration_iterator>::value_type 
-get( const Pos_offset_map< Filtration_iterator>& map , 
+typename Permutation_offset_map< Filtration_iterator>::value_type 
+get( const Permutation_offset_map< Filtration_iterator> & map , 
      const boost::permutation_iterator< Filtration_iterator, 
 				        Index_type_iterator> p){
 	return *(p.base());
 }
+
+template< typename Filtration_iterator, typename Index_type_iterator>
+typename Pos_offset_map< Filtration_iterator>::value_type 
+get( const Pos_offset_map< Filtration_iterator> & map , 
+     const boost::permutation_iterator< Filtration_iterator, 
+				        Index_type_iterator> p){
+	return *(p.base());
+}
+
+
+
 
 template< typename Filtration_iterator>
 typename Pos_offset_map< Filtration_iterator>::value_type 

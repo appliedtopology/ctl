@@ -166,6 +166,16 @@ class Complex_boundary{
 							Term, 
 							Cell_boundary> 
 							const_iterator;
+	//This is an abstraction for the persistence algorithm.
+	//This way a boundary operator knows how to take a Filtration_iterator
+	//and convert it into something which the boundary operator can be 
+	//applied to						
+	struct Filtration_map{
+	   template< typename Iterator>
+	   typename Iterator::value_type& 
+	   operator[]( const Iterator & c) const { return *c; }
+	}; //end Filtration_map
+
 	//copy constructor
 	Complex_boundary( Complex_boundary & f): _complex( f._complex) {};
 	//move constructor, we don't care since we store references

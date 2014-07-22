@@ -46,11 +46,14 @@ constexpr char tau[] = "\u1D6D5";
 
 struct identity {
     template<typename U>
-    constexpr auto operator()(U&& v) const noexcept
+    inline constexpr auto operator()(U&& v) const noexcept
         -> decltype(std::forward<U>(v))
     {
         return std::forward<U>(v);
     }
+    template<typename U>
+    inline constexpr U& operator[](U& v) const noexcept { return v; }
+
     template<typename X, typename U>
     constexpr auto operator()(X && y, U&& v) const noexcept
         -> decltype(std::forward<U>(v))
