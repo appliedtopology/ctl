@@ -137,9 +137,52 @@ template< typename Filtration_iterator,
 	  typename Output_policy>
 std::pair< double, double> 
 pair_cells( Filtration_iterator begin, Filtration_iterator end,
-		 Boundary_operator & bd, 
-		 Chain_map & cascade_boundary_map, Chain_map & cascade_map,
-		 Output_policy output_policy){
+	    Boundary_operator & bd, 
+	    Chain_map & cascade_boundary_map, Chain_map & cascade_map,
+	    Output_policy output_policy, 
+	    bool boundaries_initialized){
+
+	typedef typename boost::property_traits< Chain_map>::value_type Chain;
+	//this should now operator on filtration pointers, so it should be fast.
+	typedef typename Chain::Less Term_less;
+	typedef ctl::detail::Persistence_data< Term_less, Boundary_operator, 
+				  		Chain_map, Output_policy> 
+					            Persistence_data;
+	//typedef typename Filtration_iterator::value_type Cell_iterator; 
+	typedef typename Chain::Term Term;
+	double init_cascade_time = 0.0, persistence_algorithm=0.0;
+	ctl::parallel::Timer timer;
+	Term_less term_less; 
+	Persistence_data data( term_less, bd, cascade_boundary_map, cascade_map,
+			       output_policy);
+	for(Filtration_iterator sigma = begin; sigma != end; ++sigma){
+		timer.start();
+		eliminate_boundaries( data);
+		if( !data.cascade_boundary.empty() ){
+		     //make tau sigma's partner
+		     const Term& tau = data.cascade_boundary.youngest();
+		     cascade_boundary_map[ sigma].swap( data.cascade_boundary);
+		     store_scaled_cascade( data, sigma, output_policy);  
+		     //make sigma tau's partner
+		     cascade_boundary_map[ tau].emplace( sigma, 1); 
+		} else{
+		     store_cascade( data, sigma, output_policy); 
+		}
+		timer.stop();
+		persistence_algorithm += timer.elapsed();
+	}
+	return std::make_pair( init_cascade_time, persistence_algorithm);
+}
+
+template< typename Filtration_iterator,
+	  typename Boundary_operator,
+	  typename Chain_map,
+	  typename Output_policy>
+std::pair< double, double> 
+pair_cells( Filtration_iterator begin, Filtration_iterator end,
+            Boundary_operator & bd, 
+            Chain_map & cascade_boundary_map, Chain_map & cascade_map,
+            Output_policy output_policy){
 
 	typedef typename boost::property_traits< Chain_map>::value_type Chain;
 	//this should now operator on filtration pointers, so it should be fast.
@@ -184,10 +227,10 @@ template< typename Filtration_iterator,
 	  typename Chain_map>
 std::pair< double,double> 
 persistence( Filtration_iterator begin,
-		  Filtration_iterator end,
-		  Boundary_operator & bd,
-		  Chain_map & cascade_boundary_map,
-		  Chain_map & cascade_map){
+	     Filtration_iterator end,
+	     Boundary_operator & bd,
+	     Chain_map & cascade_boundary_map,
+	     Chain_map & cascade_map){
 	return ctl::pair_cells( begin, end, bd, cascade_boundary_map, 
 			 cascade_map, partner_and_cascade());
 }
@@ -201,7 +244,7 @@ persistence( Filtration_iterator begin,
 	     Chain_map & cascade_boundary_map){
 	Chain_map not_going_to_be_used = cascade_boundary_map; 
 	return ctl::pair_cells( begin, end, bd, cascade_boundary_map, 
-			 not_going_to_be_used, partner());
+			         not_going_to_be_used, partner());
 }		  
 } //namespace ctl
 
