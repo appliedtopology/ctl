@@ -47,7 +47,8 @@ class partner {};
 class partner_and_cascade {};
 
 template< typename Persistence_data>
-void eliminate_boundaries( Persistence_data & data){
+void eliminate_boundaries( Persistence_data & data, 
+			   std::size_t & num_collisions){
    //Cell here is really a pointer into the complex
    typedef typename Persistence_data::Chain Chain;
    typedef typename Chain::value_type Term;
@@ -69,6 +70,12 @@ void eliminate_boundaries( Persistence_data & data){
 				     		   data.temporary_chain);
   }
 }
+template< typename Persistence_data>
+void eliminate_boundaries( Persistence_data & data){
+	std::size_t n =0;
+	eliminate_boundaries( data, n);
+} 
+
 
 template< typename Term, typename Chain_map>
 bool is_creator( const Term & term, Chain_map & cascade_boundary_map){
@@ -138,14 +145,16 @@ template< typename Filtration_iterator,
 	  typename Boundary_operator,
 	  typename Chain_map,
 	  typename Output_policy, 
-	  typename Filtration_map>
+	  typename Filtration_map, 
+	  typename Collision_iterator>
 std::pair< double, double> 
 pair_cells( Filtration_iterator begin, Filtration_iterator end,
 	    Boundary_operator & bd, 
 	    Chain_map & cascade_boundary_map, Chain_map & cascade_map,
 	    Filtration_map & fm,
 	    Output_policy output_policy,
-	    bool boundaries_initialized){
+	    bool boundaries_initialized, 
+	    Collision_iterator v){
 
 	typedef typename boost::property_traits< Chain_map>::value_type Chain;
 	//this should now operator on filtration pointers, so it should be fast.
@@ -160,11 +169,11 @@ pair_cells( Filtration_iterator begin, Filtration_iterator end,
 	Term_less term_less; 
 	Persistence_data data( term_less, bd, cascade_boundary_map, cascade_map,
 			       output_policy);
-	for(Filtration_iterator sigma = begin; sigma != end; ++sigma){
+	for(Filtration_iterator sigma = begin; sigma != end; ++sigma, ++v){
 		timer.start();
 		//hand the column we want to operate on to our temporary.
 		cascade_boundary_map[ sigma ].swap( data.cascade_boundary);
-		eliminate_boundaries( data);
+		eliminate_boundaries( data, *v);
 		if( !data.cascade_boundary.empty() ){
 		 //make tau sigma's partner
 		 const Term& tau = data.cascade_boundary.youngest();
@@ -174,6 +183,7 @@ pair_cells( Filtration_iterator begin, Filtration_iterator end,
 		 cascade_boundary_map[ tau ].emplace( fm[sigma], 1); 
 		} else{
 		 store_cascade( data, sigma, output_policy); 
+		 cascade_boundary_map[ sigma ].swap( data.cascade_boundary);
 		}
 		timer.stop();
 		persistence_algorithm += timer.elapsed();
@@ -223,6 +233,7 @@ pair_cells( Filtration_iterator begin, Filtration_iterator end,
 		 cascade_boundary_map[ tau ].emplace( fm[ sigma], 1); 
 		} else{
 		 store_cascade( data, sigma, output_policy); 
+		 cascade_boundary_map[ sigma ].swap( data.cascade_boundary);
 		}
 		timer.stop();
 		persistence_algorithm += timer.elapsed();

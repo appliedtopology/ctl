@@ -123,6 +123,7 @@ public:
 	std::size_t   size() const   	   { return _chain.size(); }	
 	void reserve( const std::size_t n) { _chain.reserve( n); } 
 	bool operator==( const Chain & from) const { return std::equal( rbegin(), rend(), from.rbegin()); }
+	bool operator!=( const Chain & from) const { return !std::equal( rbegin(), rend(), from.rbegin()); }
 	Chain& operator=( const Chain& from){ 
 		_chain = from._chain; 
 		return *this;
