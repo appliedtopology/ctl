@@ -39,8 +39,9 @@
 //exported functionality
 namespace ctl{
 
-template< typename Cell_less>
+template< typename Cell_less_>
 struct Term_cell_less{
+   typedef Cell_less_ Cell_less;
    Term_cell_less(){}
    Term_cell_less( const Cell_less & l): less( l){} 
    template< typename Term>

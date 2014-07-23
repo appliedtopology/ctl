@@ -56,15 +56,15 @@ void compute_barcodes( Filtration & filtration,
        typedef typename Data::Weight Weight;
        typedef typename Cell_chain_map::value_type Chain;
        typedef typename Barcodes::value_type Barcode;
+       Cell_less less;
        barcodes.resize( filtration.complex().dimension()+1);
-       for(Filtration_iterator sigma = filtration.begin(); 
+       for(Filtration_iterator sigma = filtration.begin();
 			       sigma != filtration.end(); ++sigma){
                const Chain& bd = cascade_boundary_map[ sigma];
 	       if( bd.empty()){
-		std::cout << "Infinity is: " << std::numeric_limits< Weight>::infinity() << std::endl;
 	        Barcode & barcode = barcodes[ (*sigma)->first.dimension()];
 	      	barcode.emplace( (*sigma)->second.weight(), 
-				 std::numeric_limits< Weight>::infinity() );	 
+				 std::numeric_limits< Weight>::infinity() );
 	       }else if( sigma < bd.youngest().cell()){
 	          Barcode & barcode = barcodes[ (*sigma)->first.dimension()];
 	 	  const Filtration_iterator & destroyer = bd.youngest().cell();
@@ -87,14 +87,16 @@ void compute_barcodes( Filtration & filtration,
        //typedef typename Filtration::Complex Complex;
        typedef typename Cell_chain_map::value_type Chain;
        typedef typename Barcodes::value_type Barcode;
+       typedef typename Barcode::value_type Bar;
+       typedef typename Bar::first_type T;
        barcodes.resize( filtration.complex().dimension()+1);
        std::size_t pos=0;
        for(Filtration_iterator sigma = filtration.begin(); 
 			       sigma != filtration.end(); ++sigma, ++pos){
                const Chain& bd = cascade_boundary_map[ sigma];
 	       if( bd.empty()){
-	        Barcode & barcode = barcodes[ (*sigma)->first.dimension()];
-	      	barcode.emplace( pos, std::numeric_limits< std::size_t>::infinity());	 
+	       Barcode & barcode = barcodes[ (*sigma)->first.dimension()];
+	       barcode.emplace( pos, std::numeric_limits< T>::infinity());
 	       }else if( sigma < bd.youngest().cell()){
 	          Barcode & barcode = barcodes[ (*sigma)->first.dimension()];
 	 	  const Filtration_iterator & destroyer = bd.youngest().cell();

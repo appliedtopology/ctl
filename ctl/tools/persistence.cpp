@@ -228,7 +228,7 @@ int main(int argc, char *argv[]){
 
   }else{
 	std::cout << "not reading weights.." << std::endl; 
-	typedef typename ctl::Barcodes< std::size_t> Barcodes;
+	typedef typename ctl::Barcodes< double> Barcodes;
 	Barcodes barcodes;
   	Complex complex;
   	ctl::read_complex( full_complex_name, complex);
