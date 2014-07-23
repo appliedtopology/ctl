@@ -178,10 +178,9 @@ class Finite_field{
 	std::size_t x;	
 }; //class Finite_field
 
-} //namespace ctl
 
 template< typename Stream, std::size_t N>
-Stream& operator<<( Stream & out, const ctl::Finite_field< N> & x ){
+Stream& operator<<( Stream & out, const Finite_field< N> & x ){
 	int value = x.value();
 	if( x.prime()>2 && value >= x.prime()/2.0){ 
 		value = -1*(x.prime() -value);  
@@ -189,6 +188,12 @@ Stream& operator<<( Stream & out, const ctl::Finite_field< N> & x ){
 	out << std::showpos << value << std::noshowpos;
 	return out;
 }
+template< typename Stream, std::size_t N>
+Stream& operator<<( Stream & out, const Finite_field< N> && x ){
+	out << x;
+	return out;
+}
+} //namespace ctl
 
 template<typename T, std::size_t N> 
 ctl::Finite_field< N> operator* (T k, const ctl::Finite_field< N> &m) { 

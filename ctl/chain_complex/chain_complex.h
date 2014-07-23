@@ -369,6 +369,26 @@ private:
 }; //chain_complex
 
 
+template< typename Stream, typename C, typename B, 
+	   typename D, typename H>
+Stream& operator<<( Stream& out, 
+		    const typename Chain_complex< C, B, D, H>::iterator c){ 
+	out << c->first;
+	return out;	
+}
+
+
+template< typename Stream, typename C, typename B, 
+	   typename D, typename H>
+Stream& operator<<( Stream& out, 
+		    const typename Chain_complex< C, B, D, H>::const_iterator c){ 
+	out << c->first;
+	return out;	
+}
+
+
+
+
 template< typename Stream, typename Cell, typename Boundary, 
 	   typename Data, typename Hash>
 Stream& operator<<( Stream& out, 

@@ -43,6 +43,8 @@ namespace ctl{
 constexpr char delta[] = "\u2202";
 constexpr char sigma[] = "\u03C3";
 constexpr char tau[] = "\u1D6D5";
+constexpr char otimes[] = "\u2297";
+constexpr char oplus[] = "\u2295";
 
 struct identity {
     template<typename U>

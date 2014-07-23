@@ -47,8 +47,7 @@ class partner {};
 class partner_and_cascade {};
 
 template< typename Persistence_data>
-void eliminate_boundaries( Persistence_data & data, 
-			   std::size_t & num_collisions){
+void eliminate_boundaries( Persistence_data & data){ 
    //Cell here is really a pointer into the complex
    typedef typename Persistence_data::Chain Chain;
    typedef typename Chain::value_type Term;
@@ -70,12 +69,6 @@ void eliminate_boundaries( Persistence_data & data,
 				     		   data.temporary_chain);
   }
 }
-template< typename Persistence_data>
-void eliminate_boundaries( Persistence_data & data){
-	std::size_t n =0;
-	eliminate_boundaries( data, n);
-} 
-
 
 template< typename Term, typename Chain_map>
 bool is_creator( const Term & term, Chain_map & cascade_boundary_map){
@@ -92,14 +85,12 @@ void initialize_cascade_data( const Filtration_iterator sigma,
 			      Persistence_data & data, partner){
      //typedef typename Filtration_iterator::value_type Cell;
      typedef typename Persistence_data::Chain Chain;
-     typedef typename Chain::value_type Term;
      //typedef typename Chain::value_type Term;
      Chain& cascade_boundary = data.cascade_boundary;
 
      cascade_boundary.reserve( data.bd.length( sigma));
      for( auto i = data.bd.begin( sigma); i != data.bd.end( sigma); ++i){
-	 const Term& t = *i;
-         if( is_creator( t, data.cascade_boundary_map)){
+         if( is_creator( *i, data.cascade_boundary_map)){
 		cascade_boundary.emplace( i->cell(), i->coefficient());
 	}
      }
@@ -145,16 +136,14 @@ template< typename Filtration_iterator,
 	  typename Boundary_operator,
 	  typename Chain_map,
 	  typename Output_policy, 
-	  typename Filtration_map, 
-	  typename Collision_iterator>
+	  typename Filtration_map> 
 std::pair< double, double> 
 pair_cells( Filtration_iterator begin, Filtration_iterator end,
 	    Boundary_operator & bd, 
 	    Chain_map & cascade_boundary_map, Chain_map & cascade_map,
 	    Filtration_map & fm,
 	    Output_policy output_policy,
-	    bool boundaries_initialized, 
-	    Collision_iterator v){
+	    bool boundaries_initialized){
 
 	typedef typename boost::property_traits< Chain_map>::value_type Chain;
 	//this should now operator on filtration pointers, so it should be fast.
@@ -173,7 +162,7 @@ pair_cells( Filtration_iterator begin, Filtration_iterator end,
 		timer.start();
 		//hand the column we want to operate on to our temporary.
 		cascade_boundary_map[ sigma ].swap( data.cascade_boundary);
-		eliminate_boundaries( data, *v);
+		eliminate_boundaries( data);
 		if( !data.cascade_boundary.empty() ){
 		 //make tau sigma's partner
 		 const Term& tau = data.cascade_boundary.youngest();

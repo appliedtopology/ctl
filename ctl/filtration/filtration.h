@@ -153,6 +153,34 @@ template< typename Stream, typename Complex, typename L>
 Stream& operator<<( Stream& out, const Filtration< Complex, L>&& f){
 	out << f;
 	return out;
-}	
+}
+
+template< typename Stream, typename Complex, typename L>
+Stream& operator<<( Stream& out, 
+		    const typename Filtration< Complex, L>::const_reverse_iterator f){
+	out << (*f)->first;
+	return out;
+}
+template< typename Stream, typename Complex, typename L>
+Stream& operator<<( Stream& out, 
+		    const typename Filtration< Complex, L>::reverse_iterator f){
+	out << (*f)->first;
+	return out;
+}
+
+template< typename Stream, typename Complex, typename L>
+Stream& operator<<( Stream& out, 
+		    const typename Filtration< Complex, L>::iterator f){
+	out << (*f)->first;
+	return out;
+}
+
+template< typename Stream, typename Complex, typename L>
+Stream& operator<<( Stream& out, 
+		    const typename Filtration< Complex, L>::const_iterator f){
+	out << (*f)->first;
+	return out;
+}
+
 } //namespace ctl
 #endif //CTLIB_FILTRATION_H

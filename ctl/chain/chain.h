@@ -284,14 +284,29 @@ private:
 }; //class Chain
 
 //allow term+Chain = Chain+term
-template< typename Chain>
-Chain& operator+( const typename Chain::Term & b, Chain & a){ return a+b; }
+template< typename T, typename L>
+Chain< T, L>& operator+( const typename Chain< T, L>::Term & b, 
+				Chain< T, L> & a){ return a+b; }
 
 } //namespace ctl
 
 //\alpha*[chain] = [chain]*\alpha
 template< typename T, typename L>
-inline typename ctl::Chain< T, L>& operator*( const typename T::Coefficient & s, 
-			      ctl::Chain< T, L>& c){ return c*s; }
+inline ctl::Chain< T, L>& operator*( const typename T::Coefficient & s, 
+			   	ctl::Chain< T, L>& c){ return c*s; }
+namespace ctl{
+template< typename Stream, typename T, typename L>
+Stream& operator<<( Stream& out, const Chain< T, L> & c){
+	if( c.empty()){
+		out << "0";
+		return out;
+	}
+	for( auto i = c.rbegin(); i != c.rend(); ++i){
+		out << i->coefficient() << (*(i->cell()))->first;
+		if( (i+1) != c.rend()){ out << " " << ctl::oplus << " " ; }
+	}
+	return out;
+}
+} //namespace ctl
 
 #endif //CTL_CHAIN_H
