@@ -61,6 +61,7 @@ void compute_barcodes( Filtration & filtration,
 			       sigma != filtration.end(); ++sigma){
                const Chain& bd = cascade_boundary_map[ sigma];
 	       if( bd.empty()){
+		std::cout << "Infinity is: " << std::numeric_limits< Weight>::infinity() << std::endl;
 	        Barcode & barcode = barcodes[ (*sigma)->first.dimension()];
 	      	barcode.emplace( (*sigma)->second.weight(), 
 				 std::numeric_limits< Weight>::infinity() );	 

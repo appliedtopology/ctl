@@ -318,12 +318,12 @@ class Abstract_simplex {
 	template< typename Stream>
 	Stream& read( Stream & in, std::size_t size) {
 		vertices.reserve( size);
-		T vertex;
-		while( in.good()){
-			in >> vertex;
-			insert( vertex);	
-		}
-		return in;
+                T vertex;
+                for( std::size_t i = 0; in.good() && i < size; ++i){
+                        in >> vertex;
+                        insert( vertex);    
+                }   
+                return in; 
 	}
 
 	private:
@@ -333,6 +333,7 @@ class Abstract_simplex {
 	template< typename Term> 
 	friend class ctl::detail::const_simplex_boundary_iterator;
 }; //Abstract_simplex
+
 
 /**
 * @brief Input stream operator for a simplex
@@ -345,8 +346,7 @@ class Abstract_simplex {
 * @return in
 */
 template< typename Stream, typename T>
-inline Stream& operator>>( Stream & in, ctl::Abstract_simplex< T> & simplex){ return simplex.read( in); }
-} // namespace ctl
+Stream& operator>>( Stream & in, ctl::Abstract_simplex< T> & simplex){ return simplex.read( in); }
 	
 /**
 * @brief Output stream operator for a simplex
@@ -359,7 +359,7 @@ inline Stream& operator>>( Stream & in, ctl::Abstract_simplex< T> & simplex){ re
 * @return Stream&
 */
 template< typename Stream, typename T>
-inline Stream& operator<<(Stream& out, const ctl::Abstract_simplex< T>& simplex){
+Stream& operator<<(Stream& out, const ctl::Abstract_simplex< T>& simplex){
 	typedef typename ctl::Abstract_simplex< T>::const_iterator iterator;
 	out << "[";
 	for(iterator i = simplex.begin(); i != simplex.end(); ++i){
@@ -379,5 +379,7 @@ inline Stream& operator<<(Stream& out, const ctl::Abstract_simplex< T>& simplex)
 */
 template< typename Stream, typename T>
 Stream& operator<<(Stream& out, const ctl::Abstract_simplex< T>&& simplex){ out << simplex; }
+
+} // namespace ctl
 
 #endif // ABSTRACT_SIMPLEX_H

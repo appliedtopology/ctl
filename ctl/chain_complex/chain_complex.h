@@ -127,13 +127,18 @@ class Data_wrapper : public Data_ {
 }; // class Data_wrapper
 
 struct Default_data {}; //class Default_data for complex.
+
+template< typename Stream>
+Stream& operator<<( Stream & out, const Default_data & d){ 
+	return out; 
+}
+template< typename Stream>
+Stream& operator<<( Stream & out, const Default_data && d){ 
+	return out; 
+}
 } //detail
 } //ctl namespace
 
-template< typename Stream>
-Stream& operator<<( Stream & out, const ctl::detail::Default_data & d){ 
-	return out; 
-}
 
 //exported functionality
 namespace ctl{
@@ -271,6 +276,17 @@ public:
 
    template< typename Stream>
    inline Stream& write( Stream& out) const { 
+	out << "size " << cells.size() << std::endl;
+   	for( const auto & cell: cells){
+   	  out << cell.first.size() << " " << std::flush;
+	  cell.first.write( out);
+	  out << std::flush;
+   	  out << cell.second.id()  << std::flush;
+	  out << std::endl;  
+ 	}
+	return out;
+ 
+
 	ctl::identity i;
 	return write( out, i);
    }
@@ -350,22 +366,31 @@ private:
    Boundary bd;
    std::size_t max_id;
    std::size_t max_dim;
-}; //cell_map
+}; //chain_complex
 
-} //namespace ctl
 
 template< typename Stream, typename Cell, typename Boundary, 
 	   typename Data, typename Hash>
 Stream& operator<<( Stream& out, 
-		    const ctl::Chain_complex< Cell, Boundary, Data, Hash> & c){ 
+		    const Chain_complex< Cell, Boundary, Data, Hash> & c){ 
 	for(auto i = c.begin(); i != c.end(); ++i){
 		      const std::size_t id = i->second.id();
 		      out << id; 
 		      out << ": ";
-		      out << i->first; 
+		      out << i->first << std::endl; 
 	}
 	return out;
 }
+
+template< typename Stream, typename Cell, typename Boundary, 
+	   typename Data, typename Hash>
+Stream& operator<<( Stream& out, 
+		    const Chain_complex< Cell, Boundary, Data, Hash> && c){ 
+	out << c;
+	return out;
+}
+
+} //namespace ctl
 
 namespace ctl{
 

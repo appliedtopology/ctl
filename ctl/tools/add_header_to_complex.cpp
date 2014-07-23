@@ -115,6 +115,7 @@ Stream& read_old_format( Complex & complex, Stream & in){
 	     cell.read( ss);
 	     //and it's id
 	     Data d( id);
+	     //std::cout << "Cell: " << cell << " Id: " << id << std::endl;
 	     complex.insert_open_cell( cell, d);
 	}
 	return in;
