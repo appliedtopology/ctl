@@ -52,13 +52,13 @@ class bd_init {};
 
 //Nothing to do, no cascades stored
 template< typename Persistence_data, typename Term, typename Scalar>
-void update_cascade( Data& data, const Term & tau, Scalar & scalar, partner){}
+void update_cascade( Persistence_data& data, const Term & tau, Scalar & scalar, partner){}
 
 template< typename Persistence_data, typename Term, typename Scalar>
 void update_cascade( Persistence_data& data, const Term & tau, 
 		     Scalar & scalar, partner_and_cascade){
    typedef typename Persistence_data::Chain Chain;
-   Chain& tau_cascade = data.cascade[ tau_partner]; 
+   Chain& tau_cascade = data.cascade[ tau]; 
    data.cascade.scaled_add( scalar,  tau_cascade, data.temporary_chain);
 }
 
@@ -145,8 +145,8 @@ void initialize_cascade_data( const Filtration_iterator sigma,
      data.cascade.swap( data.cascade_map[ sigma]);
      Chain& cascade = data.cascade;
      auto i=std::remove_if( cascade.rbegin(), cascade.rend(), is_not_creator);
-     cascade_boundary.erase( i, cascade_boundary.rend());
-     initialize_cascade_data( sigma, data, partner_and_bd_init);
+     cascade.erase( i, cascade.rend());
+     initialize_cascade_data( sigma, data, bd_init(), partner());
 }
 
 template< typename Filtration_iterator, 
@@ -279,7 +279,7 @@ persistence( Filtration_iterator begin,
 	     Filtration_map map = Filtration_map()){
 	if( chain_data_initialized){
 	return ctl::pair_cells( begin, end, bd, cascade_boundary_map, 
-				cascade_map, map, bd_init, 
+				cascade_map, map, bd_init(), 
 				partner_and_cascade());
 	}
 	return ctl::pair_cells( begin, end, bd, cascade_boundary_map, 
@@ -305,7 +305,7 @@ persistence( Filtration_iterator begin,
 				partner());
 	}
 	return ctl::pair_cells( begin, end, bd, cascade_boundary_map, 
-				cascade_map, map, empty_bd(), 
+				not_going_to_be_used, map, empty_bd(), 
 				partner());
 }		  
 } //namespace ctl
