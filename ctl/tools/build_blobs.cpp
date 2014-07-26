@@ -51,33 +51,33 @@ typedef ctl::Finite_field< 2> Z2;
 typedef ctl::Simplex_boundary< Simplex, Z2> Simplex_Boundary;
 typedef ctl::Chain_complex< Simplex, Simplex_Boundary> Complex;
 
-int main(int argc, char *argv[]) {
-  std::size_t num=2;
-
-  if( argc < 2) {
+void usage( const char* argv){
     std::cerr << "Usage:  " 
-	      << argv[ 0] << " input_name num_duplicates (=2)" << std::endl;
+	      << argv << " input_name num_duplicates (=2) is_disjoint=[false(default)|true]" << std::endl;
     std::exit(1);
-  }
+} 
 
-  if(argc==3){
+int main(int argc, char *argv[]) {
+  if( argc < 2) { usage( argv[ 0]); }
+  std::size_t num=2;
+  if(argc==3 || argc == 4){
 	num=atoi(argv[ 2]);
-	if (num < 2){
-	 std::cerr << "Usage:  " 
-		   << argv[ 0] 
-		   << " input_name num_duplicates (=2)" 
-		   << std::endl;
-	 std::exit(-1);
-	}
+	if (num < 2){ usage( argv[ 0]); }
   }
-  
+  bool flag = false;
+  if( argc == 4){
+	std::string s( argv[ 3]);
+	std::string t( "true");
+	flag = (s == t);
+  }
   //initial stuff
   Complex input_complex, output_complex;
   std::ifstream in;
   std::string basename( argv[ 1]);
   ctl::open_file(in, basename.c_str());
   in >> input_complex;
-  std::cout << "original complex size: " << input_complex.size() << std::endl; 
+  std::cout << "original complex size: " 
+	    << input_complex.size() << std::endl; 
   output_complex = input_complex;
   size_t found = basename.rfind('.');
   if (found != std::string::npos){
@@ -88,25 +88,34 @@ int main(int argc, char *argv[]) {
   typedef typename Cell::value_type Value;
   //compute num_vertices
   output_complex.reserve( (num-1)*input_complex.size());
-  Value max_vertex_name= *(input_complex.begin()->first.begin());
+  Value max_vertex_name= *(input_complex.begin()->first.rbegin());
   for(auto cell: input_complex){
 	//simplices are stored sorted
 	typename Complex::Cell::value_type cur = *(cell.first.rbegin()); 
-	if(cell.first.dimension() == 0 && 
-		max_vertex_name < cur){ max_vertex_name = cur; }
+	if(cell.first.dimension() == 0 && max_vertex_name < cur){ 
+		max_vertex_name = cur; 
+	}
   }
+  max_vertex_name++;
   for ( auto i : input_complex){  
 	for(std::size_t j = 1; j < num; ++j){
 	    Cell cell = i.first;
-	    for( auto vertex_name : cell){ vertex_name+=max_vertex_name*j; }
+	    for( auto& vertex_name : cell){ vertex_name+=max_vertex_name*j; }
 	    output_complex.insert_open_cell( cell);
+	}
+  }
+  if (flag) { 
+	for( int i=0; i < (int)num-1; ++i){
+		Cell cell = { i*max_vertex_name , (i+1)*max_vertex_name};
+	        output_complex.insert_open_cell( cell);
 	}
   }
   std::string name( basename);
   std::stringstream ss;
   ss << "." << num << ".asc";
   name.append(ss.str());
-
+  std::cout << "writing complex: " << name;
+  std::cout << " of size: " << output_complex.size() << std::endl;
   std::ofstream out;
   ctl::open_file( out, name.c_str());
   output_complex.write( out);

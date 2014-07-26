@@ -185,7 +185,7 @@ Stream& operator<<( Stream & out, const Finite_field< N> & x ){
 	if( x.prime()>2 && value >= x.prime()/2.0){ 
 		value = -1*(x.prime() -value);  
 	}
-	out << std::showpos << value << std::noshowpos;
+	out << value; 
 	return out;
 }
 template< typename Stream, std::size_t N>

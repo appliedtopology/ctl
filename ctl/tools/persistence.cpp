@@ -223,7 +223,8 @@ int main(int argc, char *argv[]){
   	std::cout << "complex size: " << complex.size() << std::endl; 
   	std::cout << "complex dimension: " << complex.dimension() << std::endl;
 	Complex_weight_less less;
-	run_persistence( complex, less, barcodes, timer, ctl::detail::weighted_tag());
+	run_persistence( complex, less, barcodes, timer, 
+			 ctl::detail::weighted_tag());
 	out << barcodes << std::endl;
 
   }else{
@@ -237,7 +238,8 @@ int main(int argc, char *argv[]){
 	std::cout << "complex size: " << complex.size() << std::endl; 
   	std::cout << "complex dimension: " << complex.dimension() << std::endl;
 	Complex_cell_less less;
-  	run_persistence( complex, less, barcodes, timer, ctl::detail::non_weighted_tag());   
+  	run_persistence( complex, less, barcodes, timer, 
+			 ctl::detail::non_weighted_tag());   
 	out << barcodes << std::endl;
   } 
   return 0;
