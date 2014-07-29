@@ -51,8 +51,9 @@ struct Term_cell_less{
    Cell_less less;
 }; //struct Term_less
 
-template< typename Cell_less>
+template< typename Cell_less_>
 struct Filtration_term_cell_less{
+   typedef Cell_less_ Cell_less;
    Filtration_term_cell_less(){}
    Filtration_term_cell_less( const Cell_less & l): less( l){} 
    template< typename Term>

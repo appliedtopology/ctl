@@ -110,6 +110,9 @@ public:
 		//iterators really are iterators we can erase from begin --> erase
 		return _chain.erase( b, e);
 	}
+	reverse_iterator erase( reverse_iterator b){
+		return _chain.erase( b);
+	}
 	void swap( Chain & from){ _chain.swap( from._chain); }
 	void clear(){ _chain.clear(); }
 
@@ -122,6 +125,7 @@ public:
 
 	std::size_t   size() const   	   { return _chain.size(); }	
 	void reserve( const std::size_t n) { _chain.reserve( n); } 
+	void resize( const std::size_t n) { _chain.resize( n); } 
 	bool operator==( const Chain & from) const { return std::equal( rbegin(), rend(), from.rbegin()); }
 	bool operator!=( const Chain & from) const { return !std::equal( rbegin(), rend(), from.rbegin()); }
 	Chain& operator=( const Chain& from){ 

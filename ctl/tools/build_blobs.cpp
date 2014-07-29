@@ -53,7 +53,7 @@ typedef ctl::Chain_complex< Simplex, Simplex_Boundary> Complex;
 
 void usage( const char* argv){
     std::cerr << "Usage:  " 
-	      << argv << " input_name num_duplicates (=2) is_disjoint=[false(default)|true]" << std::endl;
+	      << argv << " input_name num_duplicates (=2) dim_of_connection=[no connection = default, 1..d specifies a cell of that dimension] " << std::endl;
     std::exit(1);
 } 
 
@@ -64,11 +64,9 @@ int main(int argc, char *argv[]) {
 	num=atoi(argv[ 2]);
 	if (num < 2){ usage( argv[ 0]); }
   }
-  bool flag = false;
+  int flag = -1;
   if( argc == 4){
-	std::string s( argv[ 3]);
-	std::string t( "true");
-	flag = (s == t);
+	flag = atoi( argv[ 3]);
   }
   //initial stuff
   Complex input_complex, output_complex;
@@ -89,13 +87,19 @@ int main(int argc, char *argv[]) {
   //compute num_vertices
   output_complex.reserve( (num-1)*input_complex.size());
   Value max_vertex_name= *(input_complex.begin()->first.rbegin());
+  std::size_t num_vertices=0;
   for(auto cell: input_complex){
 	//simplices are stored sorted
 	typename Complex::Cell::value_type cur = *(cell.first.rbegin()); 
-	if(cell.first.dimension() == 0 && max_vertex_name < cur){ 
-		max_vertex_name = cur; 
+	if(cell.first.dimension() == 0){ 
+		if( max_vertex_name < cur){ 
+			max_vertex_name = cur; 
+		}
+		++num_vertices;
 	}
   }
+  std::cout << "flag: " << flag << std::endl;
+  std::cout << "num_vertices: " << num_vertices << std::endl;
   max_vertex_name++;
   for ( auto i : input_complex){  
 	for(std::size_t j = 1; j < num; ++j){
@@ -104,10 +108,14 @@ int main(int argc, char *argv[]) {
 	    output_complex.insert_open_cell( cell);
 	}
   }
-  if (flag) { 
+  if (flag > 0 && flag <= num_vertices) { 
 	for( int i=0; i < (int)num-1; ++i){
-		Cell cell = { i*max_vertex_name , (i+1)*max_vertex_name};
-	        output_complex.insert_open_cell( cell);
+		Cell cell = { i*max_vertex_name, (i+1)*max_vertex_name};
+		for (int j = 2; j < flag+1; ++j){
+			cell.insert( (i+1)*max_vertex_name + (j-1) );
+		}
+		std::cout << "inserting: " << cell << std::endl;
+	        output_complex.insert_closed_cell( cell);
 	}
   }
   std::string name( basename);
