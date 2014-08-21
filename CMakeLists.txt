@@ -31,13 +31,6 @@ message(STATUS "Checking for C++11 compiler")
         message(FATAL_ERROR "Checking for C++11 compiler - unavailable")
     endif()
 
-
-
-
-
-
-
-
 if(NOT USE_MPI)
   find_package(Boost COMPONENTS program_options serialization REQUIRED)
   link_directories(/usr/local/lib ${Boost_LIBRARY_DIR})
