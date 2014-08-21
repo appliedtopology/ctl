@@ -85,7 +85,6 @@ struct Weight_less {
   }
 }; // struct Weight_less
 
-
 } //namespace ctl
 
 

@@ -38,7 +38,6 @@
 #include <ctl/term/term.h>
 #include <ctl/finite_field/finite_field.h>
 #include <cassert>
-//non-exported functionality
 namespace ctl {
 namespace detail {
 template< typename Term_>
@@ -153,23 +152,64 @@ class const_simplex_boundary_iterator :
 } //END detail namespace
 } //end ctl namespace
 
+/*! \namespace ctl
+Namespace where all library functionality resides
+*/
 namespace ctl { 
+
+/**
+* @brief Simplex boundary operator
+* Defines a boundary operator on a simplex.
+* The ctl::Complex_boundary is the generic linear extension of this operator
+* @tparam Simplex_
+* @tparam Coefficient_
+*/
 template< typename Simplex_, typename Coefficient_>
 class Simplex_boundary {
 public:
+	//! Underlying simplex type
 	typedef Simplex_ Simplex;
+	//! Underlying Coefficient type
 	typedef Coefficient_ Coefficient;
+	//! A term of the boundary operator
 	typedef ctl::Term< Simplex, Coefficient> Term;
+	//! const_iterator type
 	typedef detail::const_simplex_boundary_iterator< Term> const_iterator;
-	//default constructor
+		
+	/**
+	* @brief Default constructor
+	*/
 	Simplex_boundary(){};	
 
-	Simplex_boundary& operator=( const Simplex_boundary& from){ 
-		return *this;
-	}
-	//It only makes sense for const iterators
+	/**
+	* @brief Equality assignment operator 
+	* Does nothing.
+	* @param Simplex_boundary& from
+	* @return reference to this.
+	*/
+	Simplex_boundary& operator=( const Simplex_boundary& from){ return *this; }
+	
+	/**
+	* @brief boundary begin
+	* Returns an iterator to the first element of the boundary
+	* @param const Simplex & s
+	* @return const_iterator
+	*/
 	const_iterator begin( const Simplex & s) const { return const_iterator( s); }
+
+	/**
+	* @brief  boundary end
+	* Returns an iterator to the past the end element of the boundary
+	* @param const Simplex & s
+	* @return const_iterator 
+	*/
 	const_iterator end( const Simplex & s) const   { return const_iterator(); }
+	
+	/**
+	* @brief length of a boundary  
+	* @param const Simplex & s
+	* @return returns the number of elements in the boundary.
+	*/
 	std::size_t length( const Simplex & s) const { 
 		return (s.size()>1)? s.size():0;
 	}

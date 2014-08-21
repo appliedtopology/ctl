@@ -44,6 +44,7 @@
 *******************************************************************************/
 //STL
 #include <iterator>     // std::iterator, std::input_iterator_tag
+#include <ctl/io/io.h> //ctl::identity
 
 //non exported functionality 
 namespace ctl{
@@ -172,6 +173,11 @@ class Filtration_boundary{
 							Term, 
 							Cell_boundary> 
 							const_iterator;
+	//This is an abstraction used in persistence algorithm.
+	//This way an iterator over a filtration can be handed to algorithm
+	//or iterator to complex, or permutation iterator over filtration, etc.
+	typedef ctl::identity Filtration_map;
+
 	//copy constructor
 	Filtration_boundary( Filtration_boundary & f): 
 	_filtration( f._filtration) {};

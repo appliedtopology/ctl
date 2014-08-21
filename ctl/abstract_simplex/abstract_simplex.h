@@ -40,12 +40,20 @@
 #include <iostream> //cout (debug only)
 #include <algorithm> //sort, unique
 #include <ctl/abstract_simplex/simplex_boundary.h>
-//! \namespace ctl
+/*! \namespace ctl
+Namespace where all library functionality resides
+*/
 namespace ctl {
 
 /**
 * \class Abstract_simplex< T>
-* @brief 
+* This class describes an abstract simplex for a simplicial chain complex.
+* It is implemeneted as a sorted std::vector< T> since 
+* maintaining a sorted vector is faster than a std::set 
+* for a fixed large number.
+*
+* This object does not itself have the facility for a boundary, this is handled
+* by a separate boundary operator.
 */
 template< typename T>
 class Abstract_simplex {
@@ -95,50 +103,59 @@ class Abstract_simplex {
 	//! returns a const_iterator to the first vertex in the simplex
 	const_iterator begin()  const	{ return vertices.begin(); }
 	
-	//! returns an iterator to the past-the-end vertex in the simplex
+	/*!
+	* @brief  returns an iterator to the past-the-end vertex in the simplex
+	* @return iterator
+	*/
 	iterator         end()	  	{ return vertices.end();   }
-	//! returns a const_iterator to the past-the-end vertex in the simplex
-	const_iterator   end()  const	{ return vertices.end();   }
-	
-	//! returns a reverse_iterator to the last element in the simplex
-	reverse_iterator        rbegin()	{ return vertices.rbegin(); }
-	//! returns a const_reverse_iterator to the last element in the simplex
-	const_reverse_iterator  rbegin()  const	{ return vertices.rbegin(); }
 	/**
-	 * Returns a reverse_iterator pointing to the theoretical element 
+	* @brief returns a const_iterator to the past-the-end vertex in the simplex
+	* @return const_iterator
+	*/
+	const_iterator   end()  const	{ return vertices.end();   }
+	/*!
+	* @brief returns a reverse_iterator to the last vertex in the simplex
+	* @return reverse_iterator
+	*/
+	reverse_iterator        rbegin()	{ return vertices.rbegin(); }
+	/*!
+	* @brief returns a const_reverse_iterator to the last vertex in the simplex
+	* @return const_reverse_iterator
+	*/
+	const_reverse_iterator  rbegin()  const	{ return vertices.rbegin(); }
+	/*!
+	 * @brief Returns a reverse_iterator pointing to the theoretical element 
  	 * preceding the first element in the container 
 	 * (which is considered its reverse end).
-	 * @param None.
 	 * @return reverse_iterator
 	 */
 	reverse_iterator         rend()	        { return vertices.rend(); }
-	/**
-	 * Returns a const_reverse_iterator pointing to the theoretical element 
+	/*!
+	 * @brief Returns a const_reverse_iterator pointing to the theoretical element 
  	 * preceding the first element in the container 
 	 * (which is considered its reverse end).
-	 * @param None.
 	 * @return const_reverse_iterator
 	 */
 	const_reverse_iterator   rend()  const	{ return vertices.rend(); }
-	/** Returns the size of the simplex
-	 * @param None.
+	/*! Returns the size of the simplex
 	 * @return size_t
 	 */
 	size_t       size() const	{ return vertices.size(); 	}
-	/** Returns the dimension of the simplex
-	 * @param None.
+	/*! Returns the dimension of the simplex
 	 * @return size_t
 	 */
 	size_t  dimension() const	{ return size()-1; 	  	}
 
-	/** Returns the capacity of the simplex
-	* @param None.
+	/*! Returns the capacity of the simplex
 	* @return size_t
 	*/
 	size_t   capacity() const  { return vertices.capacity();   }
+	/*! Removes all vertices (which are destroyed), 
+	 * leaving the cell with a size of 0.*/
+	void clear() { vertices.clear(); }
 
-	/**
-	* Inserts the vertex v if it doesn't already exist
+	/*!
+	* @brief Inserts the vertex v if it doesn't already exist
 	* @param const vertex_type & v
 	* @return iterator to the vertex v in the simplex
 	*/
@@ -148,8 +165,8 @@ class Abstract_simplex {
 	      return vertices.insert( pos, v);
 	}
 
-	/**
-	* Inserts the vertices in an initializer list 
+	/*!
+	* @brief Inserts the vertices in an initializer list 
 	* @param std::initalizer_list< T>
 	* @return None.
 	*/
@@ -177,26 +194,56 @@ class Abstract_simplex {
 		vertices.erase( unique( vertices.begin(), vertices.end() ), 
 				vertices.end() );
 	}
-
+	
+	/**
+	* @brief Removes the vertex v from the simplex
+	* @param v
+	* @return An iterator to the new location of the 
+		  element that followed the element erased 
+	*/
 	iterator remove( const vertex_type v){
 		iterator pos = std::lower_bound( begin(), end(), v);
 		//element not in list
 		if (pos == end()){ return pos; }
 		return vertices.erase( pos);
 	}
-	
+	/**
+	* @brief Removes the range [first, last) from the simplex
+	* @param v
+	* @return An iterator to the new location of the 
+		  element that followed the last element erased 
+	*/
+
 	iterator remove( iterator first, iterator last){
 		return vertices.erase( first, last);
 	}
 
+	/**
+	* @brief Copy assignment operator
+	* @param Simplex & b
+	* @return Reference to the assigned to simplex
+	*/
 	Self& operator=( const Self & b) { 
 		vertices = b.vertices; 
 		return *this;
 	}
+
+	/**
+	* @brief Move assignment operator 
+	* @param Simplex && b
+	* @return Reference to the assigned to simplex
+	*/
 	Self& operator=( Self && b) {
 		vertices = std::move( b.vertices); 
 		return *this;
 	}
+
+	/**
+	* @brief Comparator
+	* Compares two simplices first by size, breaking ties lexicographically.
+	* @param const Simplex & b
+	* @return true if a < b, false otherwise. 
+	*/
 	bool operator<( const Self & b) const {
 		
 		return (size() < b.size()) || 
@@ -204,15 +251,34 @@ class Abstract_simplex {
 		std::lexicographical_compare( begin(), end(), 
 					      b.begin(), b.end()));
 	}
+
+	/**
+	* @brief Equality operator
+	* @param const Simplex & b
+	* @return is equivalent to !(a < b) && !(b < a)
+	*/
 	bool operator==( const Self & b) const { 
 		const bool equal_size = (b.size() == size());
-		return equal_size && std::equal( begin(), end(), b.begin()); 	    
+		return equal_size && std::equal( begin(), end(), b.begin()); 
 	}
+	
+	/**
+	* @brief Non equality operator
+	* @param const Simplex & b
+	* @return true iff (*this) == b is false
+	*/
 	bool operator!=( const Self & b) const{ 
 		const bool equal_size = (b.size() == size());
 		return !equal_size || !std::equal( begin(), end(), b.begin());
 	}
 
+	/**
+	* @brief write function
+	* writes the simplex to this output stream
+	* @tparam Stream
+	* @param out
+	* @return Stream&
+	*/
 	template< typename Stream>
 	Stream& write( Stream & out) const {
 		for( auto i : vertices){ 
@@ -222,6 +288,13 @@ class Abstract_simplex {
 		return out;
 	}
 
+	/**
+	* @brief read function
+	* Reads the simplex from an output stream
+	* @tparam Stream
+	* @param out
+	* @return Stream&
+	*/
 	template< typename Stream>
 	Stream& read( Stream & in)  {
 		T vertex;
@@ -232,15 +305,25 @@ class Abstract_simplex {
 		return in;
 	}
 
+	/**
+	* @brief read function
+	* Reads the simplex from an output stream
+	* assumes 
+	* @pre size of the resulting simplex is given by the size parameter
+	* @tparam Stream
+	* @param std::size_t
+	* @param out
+	* @return Stream&
+	*/
 	template< typename Stream>
 	Stream& read( Stream & in, std::size_t size) {
 		vertices.reserve( size);
-		T vertex;
-		while( in.good()){
-			in >> vertex;
-			insert( vertex);	
-		}
-		return in;
+                T vertex;
+                for( std::size_t i = 0; in.good() && i < size; ++i){
+                        in >> vertex;
+                        insert( vertex);    
+                }   
+                return in; 
 	}
 
 	private:
@@ -251,12 +334,32 @@ class Abstract_simplex {
 	friend class ctl::detail::const_simplex_boundary_iterator;
 }; //Abstract_simplex
 
+
+/**
+* @brief Input stream operator for a simplex
+*
+* @tparam Stream
+* @tparam T
+* @param in
+* @param simplex
+*  Reads a simplex from the input stream
+* @return in
+*/
 template< typename Stream, typename T>
-inline Stream& operator>>( Stream & in, ctl::Abstract_simplex< T> & simplex){ return simplex.read( in); }
-} // namespace ctl
+Stream& operator>>( Stream & in, ctl::Abstract_simplex< T> & simplex){ return simplex.read( in); }
 	
+/**
+* @brief Output stream operator for a simplex
+*
+* @tparam Stream
+* @tparam T
+* @param out
+* @param simplex
+* Writes a simplex to this output stream
+* @return Stream&
+*/
 template< typename Stream, typename T>
-inline Stream& operator<<(Stream& out, const ctl::Abstract_simplex< T>& simplex){
+Stream& operator<<(Stream& out, const ctl::Abstract_simplex< T>& simplex){
 	typedef typename ctl::Abstract_simplex< T>::const_iterator iterator;
 	out << "[";
 	for(iterator i = simplex.begin(); i != simplex.end(); ++i){
@@ -265,6 +368,15 @@ inline Stream& operator<<(Stream& out, const ctl::Abstract_simplex< T>& simplex)
 	}
 	return out;
 }
+/**
+* @brief Output stream operator for an x-value simplex
+* @tparam Stream
+* @tparam T
+* @param out
+* @param simplex
+* Writes a simplex to this output stream
+* @return Stream&
+*/
 template< typename Stream, typename T>
 Stream& operator<<(Stream& out, const ctl::Abstract_simplex< T>&& simplex){ out << simplex; }
 

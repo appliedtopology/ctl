@@ -152,6 +152,8 @@ void run_persistence( Complex & complex,
    Complex_chain_map cascade_bd_property_map( complex_cascade_boundaries.begin(),
          				      offset_map);
    //serial persistence (complex)
+   std::cout << complex_filtration.complex() << std::endl;
+   std::cout << complex_filtration << std::endl;
    timer.start();
    auto times = ctl::persistence( complex_filtration.begin(), complex_filtration.end(),
   		    filtration_boundary, cascade_bd_property_map);
@@ -166,7 +168,7 @@ void run_persistence( Complex & complex,
 
    ctl::compute_barcodes( complex_filtration, 
 			  cascade_bd_property_map, 
-			  barcode, tag);
+			  barcode, tag, true);
 }
 typedef ctl::parallel::Timer Timer;
 
@@ -188,12 +190,10 @@ void process_args(int & argc, char *argv[],
 
 }
 
-template< typename String, typename Weight_functor>
-bool read_weights( const String & filename, Weight_functor & f){
-	std::ifstream in;
-	if( !ctl::open_file( in, filename.c_str())){ return false; }
-	in >> f;
-	return true;
+template< typename String>
+bool can_read_weights( const String & filename){ 
+	 std::ifstream infile(filename.c_str());
+	return infile.good();
 }
 
 int main(int argc, char *argv[]){
@@ -209,23 +209,27 @@ int main(int argc, char *argv[]){
   ctl::open_file( out, barcode_file_name.c_str());
   //Create some data structures 
   Timer timer;
-  ctl::Weight_data_functor< Weighted_complex> weight_functor;
   timer.start();
-  if( read_weights( filtration_file, weight_functor) ){
+  if( can_read_weights( filtration_file)){
+	std::cout << "wtf?" << std::endl; 
+ 	ctl::Weight_data_functor< Weighted_complex> weight_functor;
 	typedef typename ctl::Barcodes< double> Barcodes;
 	Barcodes barcodes;
   	Weighted_complex complex;
-  	ctl::read_complex( full_complex_name, complex, weight_functor); 
+  	ctl::read_complex_and_data( full_complex_name, filtration_file, 
+				    complex, weight_functor); 
   	timer.stop();
   	std::cout << "I/O Time: " << timer.elapsed() << std::endl;
   	std::cout << "complex size: " << complex.size() << std::endl; 
   	std::cout << "complex dimension: " << complex.dimension() << std::endl;
 	Complex_weight_less less;
-	run_persistence( complex, less, barcodes, timer, ctl::detail::weighted_tag());
+	run_persistence( complex, less, barcodes, timer, 
+			 ctl::detail::weighted_tag());
 	out << barcodes << std::endl;
 
   }else{
-	typedef typename ctl::Barcodes< std::size_t> Barcodes;
+	std::cout << "not reading weights.." << std::endl; 
+	typedef typename ctl::Barcodes< double> Barcodes;
 	Barcodes barcodes;
   	Complex complex;
   	ctl::read_complex( full_complex_name, complex);
@@ -234,7 +238,8 @@ int main(int argc, char *argv[]){
 	std::cout << "complex size: " << complex.size() << std::endl; 
   	std::cout << "complex dimension: " << complex.dimension() << std::endl;
 	Complex_cell_less less;
-  	run_persistence( complex, less, barcodes, timer, ctl::detail::non_weighted_tag());   
+  	run_persistence( complex, less, barcodes, timer, 
+			 ctl::detail::non_weighted_tag());   
 	out << barcodes << std::endl;
   } 
   return 0;

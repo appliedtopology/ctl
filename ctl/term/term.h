@@ -93,6 +93,11 @@ class Term {
 			coeff_+=a;
 			return *this;	
 		}
+
+		template< typename T>
+		inline Self operator*( T k) const{
+			return Self( cell_, k*coeff_);
+		} 
 		
 	private:
 		Cell cell_;
@@ -128,7 +133,7 @@ class Term< Cell_, ctl::Finite_field< 2> > {
 		void coefficient( const C & n) const {}
 
 		template< typename T>
-		bool operator< ( const T & t) const { return cell_ < t.cell(); } 
+		bool operator< ( const T & t) const { return cell_ < t.cell(); }
 	
 		Self& operator=( const Self & from) { 
 			cell_=from.cell_;
@@ -139,6 +144,11 @@ class Term< Cell_, ctl::Finite_field< 2> > {
 			return *this; 
 		}
 
+		template< typename T>
+		inline Self operator*( T k) const{
+			return *this;
+		}
+ 
 		//we ignore coefficients for correctness of
 		//sentinal values in the boundary operator
 		//otherwise we might not know we need to end
@@ -156,5 +166,9 @@ class Term< Cell_, ctl::Finite_field< 2> > {
 
 }; //Class Term specialization for Z2
 } //namespace ctl
+
+template< typename Cell, typename Coefficient, typename T>
+ctl::Term< Cell, Coefficient> 
+operator*( T k, const ctl::Term< Cell, Coefficient> & m){ return m*k; }
 
 #endif //CTLIB_TERM_H

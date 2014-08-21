@@ -35,14 +35,20 @@ add_executable (gpcover gpcover_tool.cpp)
 target_link_libraries( gpcover ${METIS_LIBRARIES} ${Boost_LIBRARIES} ${TBB_LIBRARIES} ${DSO_FIX})
 install( TARGETS gpcover RUNTIME DESTINATION bin)
 
+add_executable (ctl2phat phat_tool.cpp)
+target_link_libraries( ctl2phat ${Boost_LIBRARIES})
+install( TARGETS ctl2phat RUNTIME DESTINATION bin)
+
 add_executable (concurrent_homology   concurrent_homology_tool)
 target_link_libraries (concurrent_homology ${Boost_LIBRARIES} ${TBB_LIBRARIES} ${METIS_LIBRARIES} ${DSO_FIX})
 install( TARGETS concurrent_homology RUNTIME DESTINATION bin)
 
 add_executable (cover_homology   cover_homology_tool)
 target_link_libraries (cover_homology ${Boost_LIBRARIES} ${METIS_LIBRARIES} ${TBB_LIBRARIES} ${DSO_FIX})
-
 install( TARGETS cover_homology RUNTIME DESTINATION bin)
+
+add_executable (convert_asc_format add_header_to_complex.cpp)
+target_link_libraries( convert_asc_format ${Boost_LIBRARIES} ${DSO_FIX})
 
 add_executable (write_filtration write_filtration_tool.cpp)
 target_link_libraries( write_filtration ${Boost_LIBRARIES} ${DSO_FIX})

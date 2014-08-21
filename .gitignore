@@ -1,6 +1,9 @@
 tools/convert_asc_format
 tools/ctl2phat
 doc/doxygen/*
+ctl/tools/convert_asc_format
+ctl/tools/ctl2phat
+doc/doxygen/*
 ctl/distributed/distributed_persistence
 Doxyfile
 ctl/tools/distributed_persistence

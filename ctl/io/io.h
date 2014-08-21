@@ -43,14 +43,19 @@ namespace ctl{
 constexpr char delta[] = "\u2202";
 constexpr char sigma[] = "\u03C3";
 constexpr char tau[] = "\u1D6D5";
+constexpr char otimes[] = "\u2297";
+constexpr char oplus[] = "\u2295";
 
 struct identity {
     template<typename U>
-    constexpr auto operator()(U&& v) const noexcept
+    inline constexpr auto operator()(U&& v) const noexcept
         -> decltype(std::forward<U>(v))
     {
         return std::forward<U>(v);
     }
+    template<typename U>
+    inline constexpr U& operator[](U& v) const noexcept { return v; }
+
     template<typename X, typename U>
     constexpr auto operator()(X && y, U&& v) const noexcept
         -> decltype(std::forward<U>(v))

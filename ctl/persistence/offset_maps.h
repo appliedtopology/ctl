@@ -36,7 +36,7 @@
 *******************************************************************************
 *******************************************************************************/
 #include <boost/property_map/property_map.hpp>
-
+#include <boost/iterator/permutation_iterator.hpp>
 //code here modeled after:
 
 namespace ctl {
@@ -57,6 +57,34 @@ typename Pos_offset_map< Filtration_iterator>::value_type
 get( const Pos_offset_map< Filtration_iterator>& map, const std::size_t pos) { 
 	return pos; 
 }*/
+template< typename Filtration_iterator>
+struct Permutation_offset_map {
+  // types
+  typedef Filtration_iterator              key_type;
+  typedef std::size_t                      value_type;
+  typedef std::size_t&                     reference;
+  typedef boost::readable_property_map_tag category; 
+  Permutation_offset_map() {}
+};
+
+template< typename Filtration_iterator, typename Index_type_iterator>
+typename Permutation_offset_map< Filtration_iterator>::value_type 
+get( const Permutation_offset_map< Filtration_iterator> & map , 
+     const boost::permutation_iterator< Filtration_iterator, 
+				        Index_type_iterator> p){
+	return *(p.base());
+}
+
+template< typename Filtration_iterator, typename Index_type_iterator>
+typename Pos_offset_map< Filtration_iterator>::value_type 
+get( const Pos_offset_map< Filtration_iterator> & map , 
+     const boost::permutation_iterator< Filtration_iterator, 
+				        Index_type_iterator> p){
+	return *(p.base());
+}
+
+
+
 
 template< typename Filtration_iterator>
 typename Pos_offset_map< Filtration_iterator>::value_type 
@@ -71,11 +99,12 @@ get( const Pos_offset_map< Filtration_iterator>& map,
      const ctl::Term< Filtration_iterator, Coefficient> & term) { 
 	return std::distance(map.begin, term.cell());
 }
-/*
-template< typename Cell>
+
+//Necessary for oldschool boundary operator
+template< typename Filtration_iterator> 
 struct Id_offset_map {
   // types
-  typedef Cell                             key_type;
+  typedef Filtration_iterator                key_type;
   typedef std::size_t                      value_type;
   typedef std::size_t&                     reference;
   typedef boost::readable_property_map_tag category; 
@@ -84,7 +113,16 @@ struct Id_offset_map {
 
 template< typename Cell>
 typename Id_offset_map< Cell>::value_type 
-get( Id_offset_map< Cell>, const Cell& cell) { return cell->second.id(); }
-*/
+get( Id_offset_map< Cell>, const Cell& cell) { return (*cell)->second.id(); }
+
+template< typename Cell>
+typename Id_offset_map< Cell>::value_type 
+get( Id_offset_map< Cell>, const typename Cell::value_type& cell) { 
+	return cell->second.id(); 
+}
+
+
+
+
 } //end namespace ctl
 #endif //CTLIB_OFFSET_MAPS_H

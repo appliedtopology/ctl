@@ -52,15 +52,16 @@
 * original begin() and end() iterators concatenated together.
 * This is somewhat frustrating because the naive implementation will require a
 * 5x space bloat for each iterator, so less iterators fit on a cache line.
-* A massive sort might have 5x more cache misses, for example, and
-* the chains we store for persistence will have more stuff in them.
+* A massive sort might have 5x more cache misses, for example.
 * We would save space by forcing a single hash table to hash cells of different
-* dimensions to different places.
+* dimensions to different places, but, this seems overly optimistic.
 * This also makes iterators
 * invalid less often then they were before.
 * In particular, iterators are only invalidated in one dimension at a time,
 * AND rehashing will be marginally less expensive.
 * begin()/end() would be overloaded to take a dimension as well.
+* in particular this means that a filtration sorting could be implemented
+* to avoid this craziness of pointers..  
 **********************/
 
 //STL
@@ -89,11 +90,12 @@ template< typename Data_>
 class Data_wrapper : public Data_ {
    private:
    typedef Data_wrapper< Data_> Self;
+   typedef std::size_t Id;
    public:
    //default
    Data_wrapper(): id_( 0) {}
    //copy
-   Data_wrapper( const std::size_t & tid):
+   Data_wrapper( const Id & tid):
    Data_(), id_( tid){}
 
    Data_wrapper( const Data_wrapper & from) : id_( from.id_){}
@@ -114,10 +116,10 @@ class Data_wrapper : public Data_ {
    }
 
 
-   std::size_t id() const { return id_; }
-   void id( std::size_t n){ id_ = n; }
+   Id id() const { return id_; }
+   void id( Id n){ id_ = n; }
    private:
-   std::size_t id_;
+   Id id_;
    //(to be read in Millhouse Van Houten's voice)
    //This lets the chain_complex & boundary touch my privates ;)
    template< typename C, typename B, typename D, typename H>
@@ -125,17 +127,33 @@ class Data_wrapper : public Data_ {
 }; // class Data_wrapper
 
 struct Default_data {}; //class Default_data for complex.
+
+template< typename Stream>
+Stream& operator<<( Stream & out, const Default_data & d){ 
+	return out; 
+}
+template< typename Stream>
+Stream& operator<<( Stream & out, const Default_data && d){ 
+	return out; 
+}
 } //detail
 } //ctl namespace
 
-template< typename Stream>
-Stream& operator<<( Stream & out, const ctl::detail::Default_data & d){ 
-	return out; 
-}
 
 //exported functionality
 namespace ctl{
 
+/**
+* @brief \class Chain_complex
+* A structure which stores the standard cell basis for a Chain_complex
+* Presently the internal data structure is a hash table. The keys are the
+* cells themselves and the values are any data associated to a cell.
+* We wrap the Data parameter transparently to associate a unique id to each cell.
+* @tparam Cell
+* @tparam Boundary
+* @tparam Data
+* @tparam Hash
+*/
 template< typename Cell_,
 	  typename Boundary_,
 	  typename Data_ = ctl::detail::Default_data,
@@ -250,70 +268,84 @@ public:
    	  out << cell.first.size() << " " << std::flush;
 	  cell.first.write( out);
 	  out << std::flush;
-   	  out << f( cell.second) << " " << std::flush;
+   	  out << f( cell.second)  << std::flush;
    	  out << std::endl;
    	}
 	return out;
    }
 
    template< typename Stream>
-   Stream& write( Stream& out) const { 
+   inline Stream& write( Stream& out) const { 
+	out << "size " << cells.size() << std::endl;
+   	for( const auto & cell: cells){
+   	  out << cell.first.size() << " " << std::flush;
+	  cell.first.write( out);
+	  out << std::flush;
+   	  out << cell.second.id()  << std::flush;
+	  out << std::endl;  
+ 	}
+	return out;
+ 
+
 	ctl::identity i;
 	return write( out, i);
    }
    
-   template< typename Stream, typename Functor>
-   Stream& read( Stream & in, Functor & f){ 
+   template< typename Stream> 
+   Stream& read( Stream & in){
 	std::size_t line_num = 0;
 	std::string line;
 	std::size_t id=0;
         char the_first_character = in.peek();
 	const bool headers_enabled = (the_first_character == 's');
-	if( headers_enabled) {
-                ctl::get_line( in, line, line_num);
-                std::istringstream ss( line);
-                std::string the_word_size;
-                ss >> the_word_size;
-                std::size_t the_number_of_cells;
-                ss >> the_number_of_cells;
-		reserve( the_number_of_cells);
+	if( !headers_enabled) { 
+		std::cerr << "Error: reading a file without appropriate header."
+			  << "Bailing out." << std::endl;
 	}
-	if( headers_enabled){
-	   std::size_t size;
-	   while( ctl::get_line(in, line, line_num)){
-	   	std::istringstream ss( line);
-	   	Cell cell;
-	   	ss >> size;
-	   	cell.read( ss, size);
-	   	ss >> id;
-		//should be optimized away for standard reads.
-		if( f( cell, id, true)){
-	   	   Data d( id);
-		   //apply f
-	   	   insert_open_cell( cell, f(cell, d));
-		}
-	   }
-	} else{
-	    while( ctl::get_line(in, line, line_num)){
-	    	std::istringstream ss( line);
-	    	Cell cell;
-	    	ss >> id;
-	   	ss >> cell; 
-		//should be optimized away for standard reads.
-		if( f( cell, id, true)){
-	    	  Data d(  id);
-		  //apply f
-	    	  insert_open_cell( cell, f(cell, d));
-		}
-	    }
+	//Read the header and reserve appropriately
+        ctl::get_line( in, line, line_num);
+        std::istringstream ss( line);
+        std::string the_word_size;
+        ss >> the_word_size;
+        std::size_t the_number_of_cells;
+        ss >> the_number_of_cells;
+	reserve( the_number_of_cells);
+	std::size_t size;
+	while( ctl::get_line(in, line, line_num)){
+	     std::istringstream ss( line);
+	     Cell cell;
+	     //header enabled so read size first
+	     ss >> size;
+	     //then get the cell
+	     cell.read( ss, size);
+	     //and it's id
+	     ss >> id;
+	     Data d( id);
+	     insert_open_cell( cell, d);
 	}
 	return in;
    }
-   template< typename Stream>
-   Stream& read( Stream & in){
-	ctl::identity i; 
-	return read( in, i); 
-   }	
+   template< typename Stream, typename Functor>
+   Stream& read_data( Stream & in, Functor & f){
+	typedef typename Data::Id Id;
+	typedef typename Functor::result_type Value;
+	typedef std::unordered_map< Id, Value> Value_map; 
+	std::string line;
+	std::size_t line_num = 0;
+	Value_map values( size());
+	Id id;
+	Value value;
+	while( ctl::get_line( in, line, line_num)){
+		std::istringstream ss( line);
+		ss >> id;
+		ss >> value;
+		values[ id] = value;
+	}
+	for (auto & sigma: cells) { 
+		f( sigma.second) = values[ sigma.second.id()]; 
+	}
+	return in;
+   }
    void reserve( const std::size_t n) { cells.reserve( n); }
    const std::size_t dimension() const { return max_dim; }
    const std::size_t size() const { return cells.size(); }
@@ -334,22 +366,51 @@ private:
    Boundary bd;
    std::size_t max_id;
    std::size_t max_dim;
-}; //cell_map
+}; //chain_complex
 
-} //namespace ctl
+
+template< typename Stream, typename C, typename B, 
+	   typename D, typename H>
+Stream& operator<<( Stream& out, 
+		    const typename Chain_complex< C, B, D, H>::iterator c){ 
+	out << c->first;
+	return out;	
+}
+
+
+template< typename Stream, typename C, typename B, 
+	   typename D, typename H>
+Stream& operator<<( Stream& out, 
+		    const typename Chain_complex< C, B, D, H>::const_iterator c){ 
+	out << c->first;
+	return out;	
+}
+
+
+
 
 template< typename Stream, typename Cell, typename Boundary, 
 	   typename Data, typename Hash>
 Stream& operator<<( Stream& out, 
-		    const ctl::Chain_complex< Cell, Boundary, Data, Hash> & c){ 
+		    const Chain_complex< Cell, Boundary, Data, Hash> & c){ 
 	for(auto i = c.begin(); i != c.end(); ++i){
 		      const std::size_t id = i->second.id();
 		      out << id; 
 		      out << ": ";
-		      out << i->first; 
+		      out << i->first << std::endl; 
 	}
 	return out;
 }
+
+template< typename Stream, typename Cell, typename Boundary, 
+	   typename Data, typename Hash>
+Stream& operator<<( Stream& out, 
+		    const Chain_complex< Cell, Boundary, Data, Hash> && c){ 
+	out << c;
+	return out;
+}
+
+} //namespace ctl
 
 namespace ctl{
 
@@ -359,19 +420,29 @@ Stream& operator>>( Stream& in,
 		    Chain_complex< Cell, Boundary, Data_, Hash> & c){  return c.read( in); }
 
 template<typename String, typename Complex, typename Functor>
-void read_complex(String & complex_name, Complex & complex, Functor & f){
+void read_complex_and_data(String & complex_name, String & data_file, 
+			   Complex & complex, Functor & f){
 	std::ifstream in;
 	std::cout << "File IO ..." << std::flush;
+	//first read the complex in
 	ctl::open_file( in, complex_name.c_str());
-	complex.read( in, f);
+	complex.read( in);
+	ctl::close_file( in);
+	//then read the data file in, e.g. weights, cover, etc..
+	ctl::open_file( in, data_file.c_str());
+	complex.read_data( in, f);	
 	ctl::close_file( in);
 	std::cout << "completed!" << std::endl;
 }
 
 template<typename String, typename Complex>
 void read_complex(String & complex_name, Complex & complex){
-	ctl::identity ident;
-	read_complex( complex_name, complex, ident);
+	std::ifstream in;
+	std::cout << "File IO ..." << std::flush;
+	ctl::open_file( in, complex_name.c_str());
+	complex.read( in);
+	ctl::close_file( in);
+	std::cout << "completed!" << std::endl;
 }
 
 

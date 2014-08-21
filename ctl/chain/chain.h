@@ -68,7 +68,7 @@ class Chain {
 	typedef typename Term::coeff_tag coeff_tag; 
 public:
 	Chain(){}
-	Chain( const std::size_t n): _chain( n) {}
+	Chain( const std::size_t n, Term t = Term()): _chain( n, t) {}
 	Chain( const Chain & c): _chain( c._chain) {}
 	Chain( const Chain && c): _chain( std::move( c._chain)) {}
 	Chain( const Term & t): _chain( 1, t) {}
@@ -105,12 +105,26 @@ public:
 
 	template< class... Args>	
 	void emplace( Args&&... args){ _chain.emplace_back( std::forward< Args>( args)...); }
+<<<<<<< HEAD
 	reverse_iterator erase( reverse_iterator b, reverse_iterator e){
 		//since we are lying in this datastructure and reverse
 		//iterators really are iterators we can erase from begin --> erase
 		return _chain.erase( b, e);
 	}
+||||||| merged common ancestors
+=======
+	reverse_iterator erase( reverse_iterator b, reverse_iterator e){
+		//since we are lying in this datastructure and reverse
+		//iterators really are iterators we can erase from begin --> erase
+		return _chain.erase( b, e);
+	}
+	reverse_iterator erase( reverse_iterator b){
+		return _chain.erase( b);
+	}
+>>>>>>> distributed_persistence
 	void swap( Chain & from){ _chain.swap( from._chain); }
+	void clear(){ _chain.clear(); }
+
 	template< typename Compare = Less>
  	void sort( Compare c = Less()){
 		std::sort( _chain.begin(), _chain.end(), 
@@ -120,6 +134,9 @@ public:
 
 	std::size_t   size() const   	   { return _chain.size(); }	
 	void reserve( const std::size_t n) { _chain.reserve( n); } 
+	void resize( const std::size_t n) { _chain.resize( n); } 
+	bool operator==( const Chain & from) const { return std::equal( rbegin(), rend(), from.rbegin()); }
+	bool operator!=( const Chain & from) const { return !std::equal( rbegin(), rend(), from.rbegin()); }
 	Chain& operator=( const Chain& from){ 
 		_chain = from._chain; 
 		return *this;
@@ -224,7 +241,8 @@ public:
 
 	template< typename Term, typename Compare = Less>
 	Chain& add( const Term& rhs, Compare c = Compare() ){
-		ctl::detail::chain_term_add( _chain, rhs, c, coeff_tag());
+		ctl::detail::chain_term_add( _chain, rhs, std::bind(c, std::placeholders::_2, std::placeholders::_1), 
+					      coeff_tag());
 		return *this;
 	}
 	
@@ -279,14 +297,29 @@ private:
 }; //class Chain
 
 //allow term+Chain = Chain+term
-template< typename Chain>
-Chain& operator+( const typename Chain::Term & b, Chain & a){ return a+b; }
+template< typename T, typename L>
+Chain< T, L>& operator+( const typename Chain< T, L>::Term & b, 
+				Chain< T, L> & a){ return a+b; }
 
 } //namespace ctl
 
 //\alpha*[chain] = [chain]*\alpha
 template< typename T, typename L>
-inline typename ctl::Chain< T, L>& operator*( const typename T::Coefficient & s, 
-			      ctl::Chain< T, L>& c){ return c*s; }
+inline ctl::Chain< T, L>& operator*( const typename T::Coefficient & s, 
+			   	ctl::Chain< T, L>& c){ return c*s; }
+namespace ctl{
+template< typename Stream, typename T, typename L>
+Stream& operator<<( Stream& out, const Chain< T, L> & c){
+	if( c.empty()){
+		out << "0";
+		return out;
+	}
+	for( auto i = c.rbegin(); i != c.rend(); ++i){
+		out << i->coefficient() << (*(i->cell()))->first;
+		if( (i+1) != c.rend()){ out << " " << ctl::oplus << " " ; }
+	}
+	return out;
+}
+} //namespace ctl
 
 #endif //CTL_CHAIN_H

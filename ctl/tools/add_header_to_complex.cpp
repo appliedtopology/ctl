@@ -10,7 +10,7 @@
 * that for any [academic] use of this source code one should cite one the 
 * following works:
 * 
-* \cite{hatcher, z-ct-10}
+* \cite{hatcher, z-fcv-10a}
 * 
 * See ct.bib for the corresponding bibtex entries. 
 * !!! DO NOT CITE THE USER MANUAL !!!
@@ -33,30 +33,45 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 *******************************************************************************/
+#define COMPUTE_BETTI
+//#define TESTS_ON
+
 // Global Project Deps
+#include <ctl/finite_field/finite_field.h>
 #include <ctl/abstract_simplex/abstract_simplex.h>
 #include <ctl/abstract_simplex/simplex_boundary.h>
+#include <ctl/chain_complex/complex_boundary.h>
 #include <ctl/chain_complex/chain_complex.h>
+#include <ctl/filtration/filtration.h>
 #include <ctl/io/io.h> 
 #include <ctl/utility/timer.h>
 
-//boost
+//BOOST
 #include <boost/program_options.hpp>
+
+//STL
+#include <sstream>
+#include <vector>
+//TODO: tool should generically handle _any_ cell type
+//TODO: should have a weighted complex type like in the VR paper 
+// Should be a mechanism for arbitrary filtrations. 
 namespace po = boost::program_options;
 
 // Complex type
-typedef ctl::Abstract_simplex< int> Simplex;
-typedef ctl::Finite_field< 2> Z2; 
-typedef ctl::Simplex_boundary< Simplex, Z2> Simplex_boundary;
-typedef ctl::Chain_complex< Simplex, Simplex_boundary> Complex;
+typedef ctl::Abstract_simplex<int> Cell;
+typedef ctl::Finite_field< 2> Z2;
+typedef ctl::Simplex_boundary< Cell, Z2> Simplex_boundary;
+typedef ctl::Chain_complex< Cell, Simplex_boundary> Complex;
 typedef Complex::iterator Complex_iterator;
-typedef ctl::Timer Timer;
+typedef ctl::Cell_less Cell_less;
+typedef ctl::Filtration< Complex, Cell_less> Complex_filtration;
+typedef Complex_filtration::iterator Complex_filtration_iterator;
 
 
 template<typename Variable_map>
 void process_args( int & argc, char *argv[],Variable_map & vm){
   //parse command line options
-  po::options_description desc( "Usage: tp [options] input-file");
+  po::options_description desc( "Usage: write_filtration [options] input-file");
   desc.add_options()
   ( "help", "Display this message")
   ( "input-file", "input .asc file to parse");
@@ -78,28 +93,63 @@ void process_args( int & argc, char *argv[],Variable_map & vm){
   }
 }
 
+template< typename Complex, typename Stream> 
+Stream& read_old_format( Complex & complex, Stream & in){
+	typedef typename Complex::Cell Cell;
+	typedef typename Complex::Data Data;
+	std::size_t line_num = 0;
+	std::string line;
+	std::size_t id=0;
+        char the_first_character = in.peek();
+	const bool headers_enabled = (the_first_character == 's');
+	if( headers_enabled) { 
+		std::cerr << "Error: reading a file with an appropriate header."
+			  << "Bailing out." << std::endl;
+		return in;
+	}
+	while( ctl::get_line(in, line, line_num)){
+	     std::istringstream ss( line);
+	     Cell cell;
+	     ss >> id;
+	     //then get the cell
+	     cell.read( ss);
+	     //and it's id
+	     Data d( id);
+	     //std::cout << "Cell: " << cell << " Id: " << id << std::endl;
+	     complex.insert_open_cell( cell, d);
+	}
+	return in;
+   }
+
+
+
+
+
 int main( int argc, char *argv[]){
   po::variables_map vm;
   process_args( argc, argv, vm);
+
   //setup some variables
   std::string full_complex_name = vm[ "input-file"].as< std::string>();
   std::string complex_name( full_complex_name);
   std::string binary_name( argv[ 0]);
-
+  std::string base_name( full_complex_name);
+  std::string output_name;
   size_t found = complex_name.rfind( '/');
   if ( found != std::string::npos){
         complex_name.replace( 0, found+1, "");
   }
+  found = full_complex_name.rfind('.');
+   if ( found != std::string::npos){
+        base_name.replace(found,full_complex_name.length(), "");
+  	output_name = base_name + ".new.asc";
+  }
   
   Complex complex;
-  Timer timer;
-  // Read the cell_set in
-  ctl::read_complex( full_complex_name, complex);
-  int euler=0;
-  timer.start();
-  for(auto cell : complex){ euler += 2*(cell.first.dimension()%2)-1; }
-  timer.stop();
-  std::cout << "Euler characteristic: " << euler << " : " 
-            << timer.elapsed() << " secs" << std::endl;
+  std::ifstream in( full_complex_name.c_str());
+  read_old_format( complex, in);
+   
+  std::ofstream out(output_name.c_str());
+  complex.write( out);
   return 0;
 }

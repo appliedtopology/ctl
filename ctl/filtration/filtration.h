@@ -1,5 +1,6 @@
 #ifndef CTLIB_FILTRATION_H
 #define CTLIB_FILTRATION_H
+#include <iostream>
 /*******************************************************************************
 * -Academic Honesty-
 * Plagarism: The unauthorized use or close imitation of the language and 
@@ -140,5 +141,46 @@ public:
 	Complex& complex_;
 }; //class Filtration
 
-} //namespace ct
+template< typename Stream, typename Complex, typename L>
+Stream& operator<<( Stream& out, const Filtration< Complex, L>& f){
+	for ( auto & i : f){
+		out << i->second.id() << ": " << i->first << std::endl;
+	}
+	return out;
+}
+
+template< typename Stream, typename Complex, typename L>
+Stream& operator<<( Stream& out, const Filtration< Complex, L>&& f){
+	out << f;
+	return out;
+}
+
+template< typename Stream, typename Complex, typename L>
+Stream& operator<<( Stream& out, 
+		    const typename Filtration< Complex, L>::const_reverse_iterator f){
+	out << (*f)->first;
+	return out;
+}
+template< typename Stream, typename Complex, typename L>
+Stream& operator<<( Stream& out, 
+		    const typename Filtration< Complex, L>::reverse_iterator f){
+	out << (*f)->first;
+	return out;
+}
+
+template< typename Stream, typename Complex, typename L>
+Stream& operator<<( Stream& out, 
+		    const typename Filtration< Complex, L>::iterator f){
+	out << (*f)->first;
+	return out;
+}
+
+template< typename Stream, typename Complex, typename L>
+Stream& operator<<( Stream& out, 
+		    const typename Filtration< Complex, L>::const_iterator f){
+	out << (*f)->first;
+	return out;
+}
+
+} //namespace ctl
 #endif //CTLIB_FILTRATION_H
