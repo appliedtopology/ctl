@@ -379,5 +379,6 @@ Stream& operator<<(Stream& out, const ctl::Abstract_simplex< T>& simplex){
 */
 template< typename Stream, typename T>
 Stream& operator<<(Stream& out, const ctl::Abstract_simplex< T>&& simplex){ out << simplex; }
+} //namespace ctl
 
 #endif // ABSTRACT_SIMPLEX_H

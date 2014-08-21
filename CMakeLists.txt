@@ -21,16 +21,6 @@ if (NOT APPLE)
 	set(DSO_FIXES rt)
 endif (NOT APPLE)
 
-message(STATUS "Checking for C++11 compiler")
-    if((MSVC AND (MSVC10 OR MSVC11 OR MSVC12)) OR
-       (CMAKE_COMPILER_IS_GNUCXX AND NOT ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 4.6) OR
-       (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND NOT ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 3.1))
-        message(STATUS "Checking for C++11 compiler - available")
-	message(STATUS "Compiler is: " ${CMAKE_CXX_COMPILER_ID} " " ${CMAKE_CXX_COMPILER_VERSION})
-    else()
-        message(FATAL_ERROR "Checking for C++11 compiler - unavailable")
-    endif()
-
 if(NOT USE_MPI)
   find_package(Boost COMPONENTS program_options serialization REQUIRED)
   link_directories(/usr/local/lib ${Boost_LIBRARY_DIR})

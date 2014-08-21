@@ -367,12 +367,13 @@ private:
    std::size_t max_id;
    std::size_t max_dim;
 }; //chain_complex
+} //namespace ctl
 
 
 template< typename Stream, typename C, typename B, 
 	   typename D, typename H>
 Stream& operator<<( Stream& out, 
-		    const typename Chain_complex< C, B, D, H>::iterator c){ 
+		    const typename ctl::Chain_complex< C, B, D, H>::iterator c){ 
 	out << c->first;
 	return out;	
 }
@@ -381,18 +382,15 @@ Stream& operator<<( Stream& out,
 template< typename Stream, typename C, typename B, 
 	   typename D, typename H>
 Stream& operator<<( Stream& out, 
-		    const typename Chain_complex< C, B, D, H>::const_iterator c){ 
+		    const typename ctl::Chain_complex< C, B, D, H>::const_iterator c){ 
 	out << c->first;
 	return out;	
 }
-
-
-
 
 template< typename Stream, typename Cell, typename Boundary, 
 	   typename Data, typename Hash>
 Stream& operator<<( Stream& out, 
-		    const Chain_complex< Cell, Boundary, Data, Hash> & c){ 
+		    const ctl::Chain_complex< Cell, Boundary, Data, Hash> & c){ 
 	for(auto i = c.begin(); i != c.end(); ++i){
 		      const std::size_t id = i->second.id();
 		      out << id; 
@@ -405,20 +403,17 @@ Stream& operator<<( Stream& out,
 template< typename Stream, typename Cell, typename Boundary, 
 	   typename Data, typename Hash>
 Stream& operator<<( Stream& out, 
-		    const Chain_complex< Cell, Boundary, Data, Hash> && c){ 
+		    const ctl::Chain_complex< Cell, Boundary, Data, Hash> && c){ 
 	out << c;
 	return out;
 }
 
-} //namespace ctl
-
-namespace ctl{
-
 template< typename Stream, typename Cell, 
 	  typename Boundary, typename Data_, typename Hash>
 Stream& operator>>( Stream& in, 
-		    Chain_complex< Cell, Boundary, Data_, Hash> & c){  return c.read( in); }
+		    ctl::Chain_complex< Cell, Boundary, Data_, Hash> & c){  return c.read( in); }
 
+namespace ctl{
 template<typename String, typename Complex, typename Functor>
 void read_complex_and_data(String & complex_name, String & data_file, 
 			   Complex & complex, Functor & f){
