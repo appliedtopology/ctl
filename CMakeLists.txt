@@ -9,7 +9,6 @@ if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" VERSION_GREATER 2.6)
   endif()
 endif()
 
-option(USE_MPI "build distributed codes" OFF) #OFF is default
 set(CMAKE_BUILD_TYPE RELWITHDEBINFO)
 
 set(CTL_INCLUDE_INSTALL_DIR ${CMAKE_SOURCE_DIR}/include)
@@ -21,17 +20,8 @@ if (NOT APPLE)
 	set(DSO_FIXES rt)
 endif (NOT APPLE)
 
-if(NOT USE_MPI)
-  find_package(Boost COMPONENTS program_options serialization REQUIRED)
-  link_directories(/usr/local/lib ${Boost_LIBRARY_DIR})
-endif(NOT USE_MPI)
-if( USE_MPI)
-  set(MPI_CXX_COMPILER mpic++)
-  find_package(MPI REQUIRED)
-  find_package(Boost COMPONENTS program_options mpi serialization REQUIRED)
-  include_directories(${MPI_INCLUDE_PATH})
-  link_directories(${MPI_LIBRARY_DIRS})
-endif(  USE_MPI)
+find_package(Boost COMPONENTS program_options serialization REQUIRED)
+link_directories(/usr/local/lib ${Boost_LIBRARY_DIR})
 
 set(Boost_USE_MULTITHREADED ON)
 add_definitions(" -fno-omit-frame-pointer -Wall -ansi -std=c++11")

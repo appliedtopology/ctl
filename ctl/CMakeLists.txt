@@ -1,7 +1,4 @@
 add_subdirectory( term)
-if( USE_MPI)
-	add_subdirectory( distributed)
-endif( USE_MPI)
 add_subdirectory( abstract_simplex)
 add_subdirectory( chain)
 add_subdirectory( chain_complex)
