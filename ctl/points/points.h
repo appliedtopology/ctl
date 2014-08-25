@@ -39,15 +39,9 @@
 //exported functionality
 namespace ctl{
 
-template< Point>
-class Points{
-
-}
+using Point = std::vector< double>;
+using Points = std::vector< Point>; 
 
 } //namespace ctl
-
-//non-exported functionality
-namespace {
-} //anonymous namespace
 
 #endif //CTLIB_POINTS_H
