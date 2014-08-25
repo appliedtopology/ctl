@@ -151,9 +151,6 @@ void run_persistence( Complex & complex,
    //we hand persistence a property map for genericity!                        
    Complex_chain_map cascade_bd_property_map( complex_cascade_boundaries.begin(),
          				      offset_map);
-   //serial persistence (complex)
-   std::cout << complex_filtration.complex() << std::endl;
-   std::cout << complex_filtration << std::endl;
    timer.start();
    auto times = ctl::persistence( complex_filtration.begin(), complex_filtration.end(),
   		    filtration_boundary, cascade_bd_property_map);
@@ -211,7 +208,6 @@ int main(int argc, char *argv[]){
   Timer timer;
   timer.start();
   if( can_read_weights( filtration_file)){
-	std::cout << "wtf?" << std::endl; 
  	ctl::Weight_data_functor< Weighted_complex> weight_functor;
 	typedef typename ctl::Barcodes< double> Barcodes;
 	Barcodes barcodes;
@@ -228,7 +224,6 @@ int main(int argc, char *argv[]){
 	out << barcodes << std::endl;
 
   }else{
-	std::cout << "not reading weights.." << std::endl; 
 	typedef typename ctl::Barcodes< double> Barcodes;
 	Barcodes barcodes;
   	Complex complex;

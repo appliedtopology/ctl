@@ -3,20 +3,20 @@ Thanks for downloading The Computational Topology library!
 
 This C++11 library provides a set of generic tools for:
 	1) Generating point sets (coming soon)
-	2) Building Graphs (coming soon)
+	2) Building Neighborhood Graphs (coming soon)
 	3) Building Cellular Complexes (coming soon)
 	4) Computing [persistent] homology over finite fields
-	5) Parallel/Distributed algorithm(s) for (4) (coming soon)
+	5) Parallel algorithm(s) for (4)
 
 === LICENSE ===
-CTL is GPLv2+ (or later at your discretion). See LICENSE for more info. 
+CTL is GPLv2+ (e.g. or later at your discretion). See LICENSE for more info. 
 
 === DEPENDENCIES ==
 C++11 compiler (clang or gcc)
 Boost
 Intel's TBB
 METIS (graph partitioning)
-ANN (in the next release)
+ANN (soon)
 
 === BUILDING ====
 To build the library type:
@@ -49,12 +49,7 @@ OS/X
 brew install ctl (coming soon)
 
 === INSTALL (from source) ===
-
-	make install
-then move the contents of :
-/bin ---> /usr/local/bin (or appropriate other location)
-/include/ctl ----> /usr/local/include/ctl
-/doc -->  /usr/share/doc/ctl
+make install
 
 There are no shared libraries!
 
@@ -63,24 +58,12 @@ See /usr/share/doc/examples for a number of examples of using the library. (comi
 See tutorial/ for a tutorial (coming soon)
 
 ==== SUBMITTING PATCHES ====
-Please Do! 
-We have not yet developed a formal method for handling such requests.
-
-I ask that you follow the generic programming paradigm. 
-
-See examples/ for template headers, and 
-study the existing code for examples of what we consider good style.
-
-Email ctal@appliedtopology.org if there are any questions on this.
+Please Do! Accepting Pull Requests via github.
 
 Necessary, but not sufficient conditions for patch acceptance:
 1) Your code compiles.
-2) Your code is meets a style format similar to the rest of the library
-3) You have tested and optimized your code.
-4) Other library maintainers accept the code.
-5) Any new dependencies are reasonable and you have taken the 
-   necessary steps to ensure that the user experience will not be 
-   affected.
+2) You have tested and possibly optimized your code.
+3) Your code is meets a style format similar to the rest of the library
 
 === BECOMING A MAINTAINER ===
 First show some interest in the project, and submit some patches.
@@ -96,6 +79,3 @@ In the future we hope to add support for:
 	5) Persistent Landscapes
 	6) OpenGL Visualizations
 	7) Bindings to other languages such as Python, MATLAB, and R
-
-Please email: ctal@appliedtopology.org if you have any questions on 
-using the library.
