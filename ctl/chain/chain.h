@@ -125,6 +125,11 @@ public:
 	reverse_iterator erase( reverse_iterator b){
 		return _chain.erase( b);
 	}
+
+	iterator erase( iterator b){
+		return iterator(  _chain.erase( std::next( b).base() ));
+	}
+
 	void swap( Chain & from){ _chain.swap( from._chain); }
 	void clear(){ _chain.clear(); }
 

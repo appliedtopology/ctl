@@ -109,7 +109,7 @@ void eliminate_boundaries( Persistence_data & data){
 }
 
 template< typename Term, typename Chain_map>
-bool is_creator( const Term & term, Chain_map & cascade_boundary_map){
+inline bool is_creator( const Term & term, const Chain_map & cascade_boundary_map){
 	typedef typename boost::property_traits< Chain_map>::value_type Chain;
 	typedef typename Chain::Less Term_less;
 	const Chain& bd = cascade_boundary_map[ term];
@@ -121,8 +121,8 @@ template< typename Chain_map>
 struct Remove_destroyers{
 	Remove_destroyers( Chain_map & _m): chain_map( _m) {}
 	template< typename Term>
-	bool operator()( Term & t){ return !is_creator( t, chain_map); }
-	Chain_map & chain_map;
+	inline bool operator()( Term & t) const { return !is_creator( t, chain_map); }
+	const Chain_map & chain_map;
 }; //Remove_destroyers
 
 
@@ -137,6 +137,8 @@ void initialize_cascade_data( const Filtration_iterator sigma,
      //typedef typename Chain::value_type Term;
      Remove_destroyers is_not_creator( data.cascade_boundary_map);
      Chain& cascade_boundary = data.cascade_boundary;
+     //here we are using the fact that rbegin() is really the begin of the underlying vector
+     //cascade_boundary.rend() so [i, rend()) is really [i, end())
      auto i=std::remove_if( cascade_boundary.rbegin(), cascade_boundary.rend(), 
 		     is_not_creator);
      cascade_boundary.erase( i, cascade_boundary.rend());
