@@ -236,6 +236,7 @@ template< bool Remove_destroyers,
 	  typename Persistence_data>
 void initialize_cascade_data( const Filtration_iterator sigma, 
 			      Persistence_data & data,
+			      constexpr bool remove_destroyers,
 			      bd_init, partner_and_cascade){ 
   //typedef typename Filtration_iterator::value_type Cell;
   typedef typename Persistence_data::Chain Chain;
@@ -268,6 +269,7 @@ template< bool Remove_destroyers,
           typename Filtration_iterator, 
 	  typename Persistence_data>
 void initialize_cascade_data( const Filtration_iterator sigma, 
+			      constexpr bool remove_destroyers,
 			      Persistence_data & data, empty_bd, partner){
      //typedef typename Filtration_iterator::value_type Cell;
      typedef typename Persistence_data::Chain Chain;
@@ -393,6 +395,7 @@ pair_cells( Filtration_iterator begin, Filtration_iterator end,
             Chain_map & cascade_boundary_map, 
 	    Chain_map & cascade_map,
 	    Filtration_map & fm,
+	    constexpr bool remove_destroyers,
 	    Input_policy input_policy,
 	    Output_policy output_policy){ 
 	typedef typename boost::property_traits< Chain_map>::value_type Chain;
@@ -465,6 +468,7 @@ template< bool Remove_destroyers=true,
 	  typename Filtration_iterator, 
 	  typename Boundary_operator,
 	  typename Chain_map, 
+	  bool Remove_destroyers=false, 
 	  typename Filtration_map = typename Boundary_operator::Filtration_map>
 std::pair< double,double> 
 persistence( Filtration_iterator begin,
@@ -472,7 +476,8 @@ persistence( Filtration_iterator begin,
 	     Boundary_operator & bd,
 	     Chain_map & cascade_boundary_map,
 	     Chain_map & cascade_map,
-	     bool chain_data_initialized=false, 
+	     constexpr bool chain_data_initialized=false,
+	     constexpr bool remove_destroyers=false, 
 	     Filtration_map map = Filtration_map()){
 	if( chain_data_initialized){
 	return detail::pair_cells< Remove_destroyers>( begin, end, bd, 
@@ -503,14 +508,15 @@ persistence( Filtration_iterator begin,
 template< bool Remove_destroyers=true,
 	  typename Filtration_iterator, 
 	  typename Boundary_operator,
-	  typename Chain_map, 
+	  typename Chain_map,
 	  typename Filtration_map = ctl::identity>
 std::pair< double, double> 
 persistence( Filtration_iterator begin,
 	     Filtration_iterator end,
 	     Boundary_operator & bd,
 	     Chain_map & cascade_boundary_map,
-	     bool chain_data_initialized=false, 
+	     constexpr bool chain_data_initialized=false,
+	     constexpr bool remove_destroyers=false, 
 	     Filtration_map  map = Filtration_map()){
 	Chain_map not_going_to_be_used = cascade_boundary_map; 
 	if( chain_data_initialized){
