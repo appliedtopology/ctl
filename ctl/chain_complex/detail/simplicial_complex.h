@@ -1,5 +1,5 @@
-#ifndef CTLIB_CELL_MAP_H
-#define CTLIB_CELL_MAP_H
+#ifndef CTL_SIMPLICIAL_COMPLEX_H
+#define CTL_SIMPLICIAL_COMPLEX_H
 /*******************************************************************************
 * -Academic Honesty-
 * Plagarism: The unauthorized use or close imitation of the language and
@@ -66,105 +66,29 @@
 
 //STL
 #include <unordered_map>
+#include <ctl/abstract_simplex/abstract_simplex.h>
 #include <vector>
 #include <sstream>
 #include <fstream>
 
-//CTL
-#include <ctl/hash/hash.h>
-#include <ctl/io/io.h>
-#include <ctl/abstract_simplex/abstract_simplex.h>
-
-//forward declaration
-namespace ctl{
-template< typename Cell_, typename Boundary_,
-	  typename Data_, typename Hash_>
-class Chain_complex;
-} //namespace ct
-
-//non-exported functionality
 namespace ctl {
 namespace detail {
 
-template< typename Data_>
-class Data_wrapper : public Data_ {
-   private:
-   typedef Data_wrapper< Data_> Self;
-   typedef std::size_t Id;
-   public:
-   //default
-   Data_wrapper(): id_( 0) {}
-   //copy
-   Data_wrapper( const Id & tid):
-   Data_(), id_( tid){}
-
-   Data_wrapper( const Data_wrapper & from) : id_( from.id_){}
-   //move
-   Data_wrapper( const Data_wrapper && from):
-   	id_( std::move( from.id_)){}
-
-   Self& operator=( const Self & from){
-   	Data_::operator=( from);
-   	id_ = from.id_;
-   	return *this;
-   }
-
-   Self& operator=( Self && from){
-   	Data_::operator=( from);
-   	id_ = std::move( from.id_);
-   	return *this;
-   }
-
-
-   Id id() const { return id_; }
-   void id( Id n){ id_ = n; }
-   private:
-   Id id_;
-   //(to be read in Millhouse Van Houten's voice)
-   //This lets the chain_complex & boundary touch my privates ;)
-   template< typename C, typename B, typename D, typename H>
-   friend class ctl::Chain_complex;
-}; // class Data_wrapper
-
-struct Default_data {}; //class Default_data for complex.
-template< typename Stream>
-Stream& operator<<( Stream & out, const Default_data & d){ return out; }
-template< typename Stream>
-Stream& operator<<( Stream & out, const Default_data && d){ return out; }
-} //detail
-} //ctl namespace
-
-
-//exported functionality
-namespace ctl{
-
-/**
-* @brief \class Chain_complex
-* A structure which stores the standard cell basis for a Chain_complex
-* Presently the internal data structure is a hash table. The keys are the
-* cells themselves and the values are any data associated to a cell.
-* We wrap the Data parameter transparently to associate a unique id to each cell.
-* @tparam Cell
-* @tparam Boundary
-* @tparam Data
-* @tparam Hash
-*/
 template< typename Cell_,
 	  typename Boundary_,
-	  typename Data_ = ctl::detail::Default_data,
-	  typename Hash_ = ctl::Hash< Cell_> >
-class Chain_complex{
+	  typename Data_,
+	  typename Hash_> 
+class Simplicial_complex{
 public:
    typedef Cell_ Cell; //Describes a fundamental object,
 		       //e.g. Simplex, Cube, Polygon, etc..
-   //Deprecated
-   typedef Boundary_ Boundary; //Describes how to take Cell boundary
+
    typedef Boundary_ Cell_boundary; //Describes how to take Cell boundary
    //Arbitrary data associated to space.
-   typedef ctl::detail::Data_wrapper< Data_> Data; 
+   typedef Data_ Data;
    typedef Hash_ Hash;
 private:
-   //typedef std::unordered_map< Cell, Data, Hash>  Map;
+   typedef std::unordered_map< Cell, Data, Hash>  Map;
    
 public:
    typedef typename Map::size_type size_type;
@@ -175,25 +99,35 @@ public:
 public:
    //Constructors
    //Default
-   Chain_complex(): max_id( 0), max_dim( 0) { cells.max_load_factor( 1); }
-   Chain_complex( Boundary & bd_, const std::size_t num_cells=1): 
+   Simplicial_complex(): max_id( 0), max_dim( 0) { cells.max_load_factor( 1); }
+
+   Simplicial_complex( Cell_boundary & bd_, const std::size_t num_cells): 
    cells( num_cells), bd( bd_), max_id( 0), max_dim( 0) {
 	cells.max_load_factor( 1); 
    }
 
+   //TODO: Expand complex structure to store cells of a fixed dimension
+   //in different containers. glue together objects with a crazy iterator
+   template< typename Size_by_dimension>
+   Simplicial_complex( Cell_boundary & bd_, const Size_by_dimension d): 
+    cells( std::accumulate( d.begin(), d.end(), 0)),
+    bd( bd_), max_id( 0), max_dim( 0) {
+	cells.max_load_factor( 1); 
+   }
+
    //Copy
-   Chain_complex( const Chain_complex & b): cells( b.cells), bd( b.bd),
+   Simplicial_complex( const Simplicial_complex & b): cells( b.cells), bd( b.bd),
    				 max_id( b.max_id), max_dim( b.max_dim)
    { cells.max_load_factor( 1); }
 
    //Move
-   Chain_complex( Chain_complex && b): cells( std::move( b.cells)),
+   Simplicial_complex( Simplicial_complex && b): cells( std::move( b.cells)),
    			  bd( std::move( b.bd)),
    			  max_id( std::move(b.max_id)),
    			  max_dim( std::move( b.max_dim)) {}
 
    // assignment operator
-   Chain_complex& operator=( const Chain_complex& b){
+   Simplicial_complex& operator=( const Simplicial_complex& b){
    	bd = b.bd;
    	max_id = b.max_id;
    	max_dim = b.max_dim;
@@ -202,7 +136,7 @@ public:
    }
 
    // move assignment operator
-   Chain_complex& operator=( Chain_complex&& b){
+   Simplicial_complex& operator=( Simplicial_complex&& b){
    	bd      = std::move( b.bd);
    	max_id  = std::move( b.max_id);
    	max_dim = std::move( b.max_dim);
@@ -255,7 +189,7 @@ public:
    	 num_faces_inserted+=p.second;
    	}
 
-   	//ugly, but then you add yourself.
+  	//ugly, but then you add yourself.
    	const std::pair< iterator, bool> p(insert_open_cell( s, data));
    	return std::make_pair( p.first, p.second+num_faces_inserted);
    }
@@ -348,7 +282,7 @@ public:
    void reserve( const std::size_t n) { cells.reserve( n); }
    const std::size_t dimension() const { return max_dim; }
    const std::size_t size() const { return cells.size(); }
-   Boundary& boundary() { return bd; }
+   Cell_boundary& cell_boundary() { return bd; }
    bool is_closed() const{
    	for( auto sigma : cells){
    		for( auto tau = bd.begin( sigma.first);
@@ -362,7 +296,7 @@ public:
    }
 private:
    Map cells;
-   Boundary bd;
+   Cell_boundary bd;
    std::size_t max_id;
    std::size_t max_dim;
 }; //chain_complex
@@ -372,7 +306,7 @@ private:
 template< typename Stream, typename C, typename B, 
 	   typename D, typename H>
 Stream& operator<<( Stream& out, 
-		    const typename ctl::Chain_complex< C, B, D, H>::iterator c){ 
+		    const typename ctl::detail::Simplicial_complex< C, B, D, H>::iterator c){ 
 	out << c->first;
 	return out;	
 }
@@ -381,7 +315,7 @@ Stream& operator<<( Stream& out,
 template< typename Stream, typename C, typename B, 
 	   typename D, typename H>
 Stream& operator<<( Stream& out, 
-		    const typename ctl::Chain_complex< C, B, D, H>::const_iterator c){ 
+		    const typename ctl::detail::Simplicial_complex< C, B, D, H>::const_iterator c){ 
 	out << c->first;
 	return out;	
 }
@@ -389,7 +323,7 @@ Stream& operator<<( Stream& out,
 template< typename Stream, typename Cell, typename Boundary, 
 	   typename Data, typename Hash>
 Stream& operator<<( Stream& out, 
-		    const ctl::Chain_complex< Cell, Boundary, Data, Hash> & c){ 
+		    const ctl::detail::Simplicial_complex< Cell, Boundary, Data, Hash> & c){ 
 	for(auto i = c.begin(); i != c.end(); ++i){
 		      const std::size_t id = i->second.id();
 		      out << id; 
@@ -402,7 +336,7 @@ Stream& operator<<( Stream& out,
 template< typename Stream, typename Cell, typename Boundary, 
 	   typename Data, typename Hash>
 Stream& operator<<( Stream& out, 
-		    const ctl::Chain_complex< Cell, Boundary, Data, Hash> && c){ 
+		    const ctl::detail::Simplicial_complex< Cell, Boundary, Data, Hash> && c){ 
 	out << c;
 	return out;
 }
@@ -410,36 +344,7 @@ Stream& operator<<( Stream& out,
 template< typename Stream, typename Cell, 
 	  typename Boundary, typename Data_, typename Hash>
 Stream& operator>>( Stream& in, 
-		    ctl::Chain_complex< Cell, Boundary, Data_, Hash> & c){  return c.read( in); }
-
-namespace ctl{
-template<typename String, typename Complex, typename Functor>
-void read_complex_and_data(String & complex_name, String & data_file, 
-			   Complex & complex, Functor & f){
-	std::ifstream in;
-	std::cout << "File IO ..." << std::flush;
-	//first read the complex in
-	ctl::open_file( in, complex_name.c_str());
-	complex.read( in);
-	ctl::close_file( in);
-	//then read the data file in, e.g. weights, cover, etc..
-	ctl::open_file( in, data_file.c_str());
-	complex.read_data( in, f);	
-	ctl::close_file( in);
-	std::cout << "completed!" << std::endl;
-}
-
-template<typename String, typename Complex>
-void read_complex(String & complex_name, Complex & complex){
-	std::ifstream in;
-	std::cout << "File IO ..." << std::flush;
-	ctl::open_file( in, complex_name.c_str());
-	complex.read( in);
-	ctl::close_file( in);
-	std::cout << "completed!" << std::endl;
-}
-
-
+		    ctl::detail::Simplicial_complex< Cell, Boundary, Data_, Hash> & c){  return c.read( in); }
 
 } //namespace ctl
 

@@ -179,4 +179,4 @@ void read_complex(String & complex_name, Complex & complex){
 
 } //namespace ctl
 
-#endif //CTL_CHAIN_COMPLEX_MAP_H
+#endif //CTL_CHAIN_COMPLEX_H
