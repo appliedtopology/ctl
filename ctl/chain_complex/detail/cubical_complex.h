@@ -1,5 +1,5 @@
-#ifndef CTL_SIMPLICIAL_COMPLEX_H
-#define CTL_SIMPLICIAL_COMPLEX_H
+#ifndef CTL_CUBICAL_COMPLEX_H
+#define CTL_CUBICAL_COMPLEX_H
 /*******************************************************************************
 * -Academic Honesty-
 * Plagarism: The unauthorized use or close imitation of the language and
@@ -34,40 +34,15 @@
 * Free Software Foundation, Inc.,
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
+* August 29, 2014
+* Initial implementation of cubical complexes. 
+* Based on PHAT/Hubert Wagners work.
 *******************************************************************************/
-/*********************
-* April 5th, 2014
-* Notes: presently we wrap the std::unordered_map a.k.a Map type.
-* We fail to have perfect hashing, and we have collisions between
-* cells of various different dimensions.
-* A relatively easy optimization to explore is to  have something like
-* vector< Map> where array element i stores cells of dimension i.
-* Aside from certainly having less collisions,
-* this has the benefit that the skeletal filtration will now be available with
-* zero extra work after complex construction.
-* We don't even need to worry about resizing time, since, copying a map is done
-* via a swap of ~4 pointers, and in c++11 they are moves.
-* Also this only happens at most O(log(d)) or something..
-* the only thing to be careful of is the begin() and end() needs to be the
-* original begin() and end() iterators concatenated together.
-* This is somewhat frustrating because the naive implementation will require a
-* 5x space bloat for each iterator, so less iterators fit on a cache line.
-* A massive sort might have 5x more cache misses, for example.
-* We would save space by forcing a single hash table to hash cells of different
-* dimensions to different places, but, this seems overly optimistic.
-* This also makes iterators
-* invalid less often then they were before.
-* In particular, iterators are only invalidated in one dimension at a time,
-* AND rehashing will be marginally less expensive.
-* begin()/end() would be overloaded to take a dimension as well.
-* in particular this means that a filtration sorting could be implemented
-* to avoid this craziness of pointers..  
-**********************/
 
 //STL
-#include <unordered_map>
-#include <ctl/abstract_simplex/abstract_simplex.h>
 #include <vector>
+#include <ctl/cube/cube.h>
+#include <numeric>
 #include <sstream>
 #include <fstream>
 
@@ -78,8 +53,8 @@ template< typename Cell_,
 	  typename Boundary_,
 	  typename Data_,
 	  typename Hash_> 
-class Simplicial_complex{
-public:
+class Cubical_complex{
+public: //Public types
    typedef Cell_ Cell; //Describes a fundamental object,
 		       //e.g. Simplex, Cube, Polygon, etc..
 
@@ -87,47 +62,45 @@ public:
    //Arbitrary data associated to space.
    typedef Data_ Data;
    typedef Hash_ Hash;
-private:
-   typedef std::unordered_map< Cell, Data, Hash>  Map;
-   
-public:
+
+private: //Private types
+   typedef std::vector< Data>  Map;
+   typedef std::vector< std::size_t>  Vector;
+    
+public: //Public Types
    typedef typename Map::size_type size_type;
    typedef typename Map::iterator iterator;
    typedef typename Map::const_iterator const_iterator;
-   typedef typename Map::value_type value_type;
+   typedef typename std::pair< Cell, Data> value_type;
 
 public:
    //Constructors
    //Default
-   Simplicial_complex(): max_id( 0), max_dim( 0) { cells.max_load_factor( 1); }
+   Cubical_complex(): max_id( 0), max_dim( 0) {}
 
-   Simplicial_complex( Cell_boundary & bd_, const std::size_t num_cells): 
-   cells( num_cells), bd( bd_), max_id( 0), max_dim( 0) {
-	cells.max_load_factor( 1); 
-   }
+   Cubical_complex( Cell_boundary & bd_, const std::size_t num_cells): 
+   cells( num_cells), bd( bd_), max_id( 0), max_dim( 0) {}
 
    //TODO: Expand complex structure to store cells of a fixed dimension
    //in different containers. glue together objects with a crazy iterator
    template< typename Size_by_dimension>
-   Simplicial_complex( Cell_boundary & bd_, const Size_by_dimension d): 
+   Cubical_complex( Cell_boundary & bd_, const Size_by_dimension d): 
     cells( std::accumulate( d.begin(), d.end(), 0)),
     bd( bd_), max_id( 0), max_dim( 0) {
-	cells.max_load_factor( 1); 
    }
 
    //Copy
-   Simplicial_complex( const Simplicial_complex & b): cells( b.cells), bd( b.bd),
-   				 max_id( b.max_id), max_dim( b.max_dim)
-   { cells.max_load_factor( 1); }
+   Cubical_complex( const Cubical_complex & b): cells( b.cells), bd( b.bd),
+   				 max_id( b.max_id), max_dim( b.max_dim) {}
 
    //Move
-   Simplicial_complex( Simplicial_complex && b): cells( std::move( b.cells)),
+   Cubical_complex( Cubical_complex && b): cells( std::move( b.cells)),
    			  bd( std::move( b.bd)),
    			  max_id( std::move(b.max_id)),
    			  max_dim( std::move( b.max_dim)) {}
 
    // assignment operator
-   Simplicial_complex& operator=( const Simplicial_complex& b){
+   Cubical_complex& operator=( const Cubical_complex& b){
    	bd = b.bd;
    	max_id = b.max_id;
    	max_dim = b.max_dim;
@@ -136,7 +109,7 @@ public:
    }
 
    // move assignment operator
-   Simplicial_complex& operator=( Simplicial_complex&& b){
+   Cubical_complex& operator=( Cubical_complex&& b){
    	bd      = std::move( b.bd);
    	max_id  = std::move( b.max_id);
    	max_dim = std::move( b.max_dim);
@@ -144,8 +117,17 @@ public:
    	return *this;
    }
 
-   iterator       find_cell( const Cell & s)       { return cells.find( s); }
-   const_iterator find_cell( const Cell & s) const { return cells.find( s); }
+   iterator       find_cell( const Cell & s) {
+	std::size_t linear_index = cell_to_word( s);
+        if( cells.size() <= linear_index) { return cells.end(); }
+	return cells.begin()+linear_index;
+   }
+
+   const_iterator find_cell( const Cell & s) const { 
+	std::size_t linear_index = cell_to_word( s);
+        if( cells.size() <= linear_index) { return cells.end(); }
+	return cells.begin()+linear_index;
+   }
 
    iterator       begin()       { return cells.begin(); }
    iterator         end()       { return cells.end();   }
@@ -154,17 +136,17 @@ public:
    const_iterator   end() const { return cells.end();   }
 
    std::pair< iterator, bool> insert_open_cell( const Cell & s,
-   					     const Data& data=Data()){
-     std::pair< iterator, bool> c =  cells.emplace( s, data);
-     if( c.second) { //this outer if is probably unnecessary
-       max_dim = std::max( max_dim, s.dimension());
-       if( c.first->second.id_ == 0){
-        c.first->second.id_ = ++max_id;
-       } else{
-        max_id=std::max( max_id, c.first->second.id_);
-       }
+   					        const Data& data){
+     std::size_t linear_index = cell_to_word( s);
+     if( cells.size() <= linear_index) { cells.resize( linear_index); }
+     bool inserted_now = (cells[ linear_index].id_ == 0);
+     if( inserted_now){ 
+        cells[ linear_index] = data;  
+        max_dim = std::max( max_dim, s.dimension());
+        if( data.id_ == 0){ cells[ linear_index].id_ = ++max_id; } 
+        else{ max_id=std::max( max_id, cells[ linear_index].id_); }
      }
-     return c;
+     return std::make_pair( begin()+linear_index, inserted_now);
    }
 
    std::pair< iterator, std::size_t>
@@ -218,10 +200,6 @@ public:
 	  out << std::endl;  
  	}
 	return out;
- 
-
-	ctl::identity i;
-	return write( out, i);
    }
    
    template< typename Stream> 
@@ -294,8 +272,51 @@ public:
    	}
    	return true;
    }
+//Private functions
+private:
+/*
+int64_t tuple_to_index( const std::vector< int64_t >& tuple ) const
+{
+    int64_t index = tuple[ get_max_dim() - 1 ];
+    for( int64_t cur_dim = get_max_dim() - 2; cur_dim >= 0; cur_dim-- ) {
+        index *= cubical_complex_resolution[ cur_dim ];
+        index += tuple[ cur_dim ];
+    }
+    return index;
+}
+
+int64_t vertex_tuple_to_lattice_index( const std::vector< int64_t >& tuple ) const
+{
+    int64_t index = tuple[ get_max_dim() - 1 ] / 2;
+    for( int64_t cur_dim = get_max_dim() - 2; cur_dim >= 0; cur_dim-- ) {
+        index *= lattice_resolution[ cur_dim ];
+        index += tuple[ cur_dim ] / 2;
+    }
+    return index;
+}
+
+void index_to_tuple( int64_t idx, std::vector< int64_t >& tuple ) const
+{
+    tuple.resize( get_max_dim() );
+    for( int64_t cur_dim = get_max_dim() - 1; cur_dim > 0; cur_dim-- ) {
+        tuple[ cur_dim ] = idx / cum_resolution_product[ cur_dim - 1 ];
+        idx -= tuple[ cur_dim ] * cum_resolution_product[ cur_dim - 1 ];
+    }
+    tuple[ 0 ] = idx;
+}
+*/
+std::size_t cell_to_word( const Cell & cell) const {
+	std::size_t index = 0;
+	//TODO: implement this.
+	return index;
+}
+void word_to_cell( const std::size_t word, Cell & cell){
+	//TODO: implement this.
+}
+//Private members
 private:
    Map cells;
+  
    Cell_boundary bd;
    std::size_t max_id;
    std::size_t max_dim;
@@ -306,7 +327,7 @@ private:
 template< typename Stream, typename C, typename B, 
 	   typename D, typename H>
 Stream& operator<<( Stream& out, 
-		    const typename ctl::detail::Simplicial_complex< C, B, D, H>::iterator c){ 
+		    const typename ctl::detail::Cubical_complex< C, B, D, H>::iterator c){ 
 	out << c->first;
 	return out;	
 }
@@ -315,7 +336,7 @@ Stream& operator<<( Stream& out,
 template< typename Stream, typename C, typename B, 
 	   typename D, typename H>
 Stream& operator<<( Stream& out, 
-		    const typename ctl::detail::Simplicial_complex< C, B, D, H>::const_iterator c){ 
+		    const typename ctl::detail::Cubical_complex< C, B, D, H>::const_iterator c){ 
 	out << c->first;
 	return out;	
 }
@@ -323,7 +344,7 @@ Stream& operator<<( Stream& out,
 template< typename Stream, typename Cell, typename Boundary, 
 	   typename Data, typename Hash>
 Stream& operator<<( Stream& out, 
-		    const ctl::detail::Simplicial_complex< Cell, Boundary, Data, Hash> & c){ 
+		    const ctl::detail::Cubical_complex< Cell, Boundary, Data, Hash> & c){ 
 	for(auto i = c.begin(); i != c.end(); ++i){
 		      const std::size_t id = i->second.id();
 		      out << id; 
@@ -336,7 +357,7 @@ Stream& operator<<( Stream& out,
 template< typename Stream, typename Cell, typename Boundary, 
 	   typename Data, typename Hash>
 Stream& operator<<( Stream& out, 
-		    const ctl::detail::Simplicial_complex< Cell, Boundary, Data, Hash> && c){ 
+		    const ctl::detail::Cubical_complex< Cell, Boundary, Data, Hash> && c){ 
 	out << c;
 	return out;
 }
@@ -344,7 +365,7 @@ Stream& operator<<( Stream& out,
 template< typename Stream, typename Cell, 
 	  typename Boundary, typename Data_, typename Hash>
 Stream& operator>>( Stream& in, 
-		    ctl::detail::Simplicial_complex< Cell, Boundary, Data_, Hash> & c){  return c.read( in); }
+		    ctl::detail::Cubical_complex< Cell, Boundary, Data_, Hash> & c){  return c.read( in); }
 
 } //namespace ctl
 

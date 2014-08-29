@@ -1,5 +1,5 @@
-#ifndef CTLIB_CELL_MAP_H
-#define CTLIB_CELL_MAP_H
+#ifndef CTL_CHAIN_COMPLEX_H
+#define CTL_CHAIN_COMPLEX_H
 /*******************************************************************************
 * -Academic Honesty-
 * Plagarism: The unauthorized use or close imitation of the language and
@@ -55,9 +55,10 @@
 #include <fstream>
 
 //CTL
-#include <ctl/hash/hash.h>
 #include <ctl/io/io.h>
-#include <ctl/abstract_simplex/abstract_simplex.h>
+#include <ctl/chain_complex/detail/complex_storage.h>
+#include <ctl/hash/hash.h>
+
 
 //forward declaration
 namespace ctl{
@@ -126,7 +127,7 @@ namespace ctl{
 * A structure which stores the standard cell basis for a Chain_complex
 * Presently the internal data structure depends on the Cell type. 
 * At a high level this structure should be thought of as a map where 
-* the keys are the cells themselves and the 
+* the keys are the complex themselves and the 
 * values are any data associated to a cell.
 * 
 * We wrap the Data parameter transparently to 
@@ -152,215 +153,157 @@ public:
    //! Describes how to take Cell boundary
    typedef Boundary_ Cell_boundary; 
    //! Arbitrary data associated to space.
-   typedef ctl::detail::Data_wrapper< Data_> Data;
+   typedef detail::Data_wrapper< Data_> Data;
  
-   typedef Hash_ Hash;
 private:
-    typedef ctl::detail::complex_storage< Cell, Data, Hash> Map;
+    //! Internal complex storage
+    typedef detail::Complex_storage< Cell, Data, Hash> Complex;
    
 public:
-   typedef typename Map::size_type size_type;
-   typedef typename Map::iterator iterator;
-   typedef typename Map::const_iterator const_iterator;
-   typedef typename Map::value_type value_type;
+   //!Internal hash function used by underlying storage container
+   typedef typename Complex::Hash Hash;
+   //! size_type used to store complex
+   typedef typename Complex::size_type size_type;
+   //! iterator type
+   typedef typename Complex::iterator iterator;
+   //! const iterator type
+   typedef typename Complex::const_iterator const_iterator;
+   //! Value type
+   typedef typename Complex::value_type value_type;
 
 public:
    //Constructors
    //! Default constructor
-   Chain_complex(): max_id( 0), max_dim( 0) { cells.max_load_factor( 1); }
-   Chain_complex( Boundary & bd_, const std::size_t num_cells=1): 
-   cells( num_cells), bd( bd_), max_id( 0), max_dim( 0) {
-	cells.max_load_factor( 1); 
-   }
+   Chain_complex()  {}
 
-   //Copy
-   Chain_complex( const Chain_complex & b): cells( b.cells), bd( b.bd),
-   				 max_id( b.max_id), max_dim( b.max_dim)
-   { cells.max_load_factor( 1); }
+ /*! Cell_boundary constructor 
+   * You may optionally provide a container hint as to the total number of 
+   * complex. The underlying container can choose to preallocate this much memory.
+   */
+   Chain_complex( Cell_boundary & bd_, const std::size_t num_complex=1): 
+	complex( bd_, num_complex){}
+ 
+ /*! Cell_boundary constructor 
+   * You may optionally provide a container hint as to the total number of 
+   * complex in each dimension
+   * The functionality of the hint depends on the underlying container
+   * For example if the underlying Cell type is Simplicial then   
+   * The underlying container can choose to preallocate this much memory.
+   * However if the underlying Cell type is Cubical then this is used to
+   * inform the container of the number of vertices in each dimension. 
+   */
+   template< typename Size_by_dimension>
+   Chain_complex( Cell_boundary & bd_, const Size_by_dimension& d): 
+   complex( bd_, dimensions) {} 
 
-   //Move
-   Chain_complex( Chain_complex && b): cells( std::move( b.cells)),
-   			  bd( std::move( b.bd)),
-   			  max_id( std::move(b.max_id)),
-   			  max_dim( std::move( b.max_dim)) {}
+   //! Copy constructor
+   Chain_complex( const Chain_complex & b): complex( b.complex){} 
 
-   // assignment operator
+   //! Move constructor
+   Chain_complex( Chain_complex && b): complex( std::move( b.complex)){}
+
+   //! Assignment operator
    Chain_complex& operator=( const Chain_complex& b){
-   	bd = b.bd;
-   	max_id = b.max_id;
-   	max_dim = b.max_dim;
-   	cells = b.cells;
+   	complex = b.complex;
    	return *this;
    }
 
    // move assignment operator
    Chain_complex& operator=( Chain_complex&& b){
-   	bd      = std::move( b.bd);
-   	max_id  = std::move( b.max_id);
-   	max_dim = std::move( b.max_dim);
-   	cells   = std::move( b.cells);
+   	complex   = std::move( b.complex);
    	return *this;
    }
 
-   iterator       find_cell( const Cell & s)       { return cells.find( s); }
-   const_iterator find_cell( const Cell & s) const { return cells.find( s); }
+   //! given a Cell s return an iterator to that cell in the complex. 
+   iterator       find_cell( const Cell & s)       { return complex.find( s); }
 
-   iterator       begin()       { return cells.begin(); }
-   iterator         end()       { return cells.end();   }
+   //! given a Cell s return a const_iterator to that cell in the complex
+   const_iterator find_cell( const Cell & s) const { return complex.find( s); }
 
-   const_iterator begin() const { return cells.begin(); }
-   const_iterator   end() const { return cells.end();   }
+   //! Begin iterator over complex
+   iterator       begin()       { return complex.begin(); }
+   //! End iterator over complex
+   iterator         end()       { return complex.end();   }
 
+   //! Begin const_iterator over complex
+   const_iterator begin() const { return complex.begin(); }
+
+   //! End const_iterator over complex
+   const_iterator   end() const { return complex.end();   }
+
+   /*! Inserts the cell s into the complex with associated data d
+    */
    std::pair< iterator, bool> insert_open_cell( const Cell & s,
-   					     const Data& data=Data()){
-     std::pair< iterator, bool> c =  cells.emplace( s, data);
-     if( c.second) { //this outer if is probably unnecessary
-       max_dim = std::max( max_dim, s.dimension());
-       if( c.first->second.id_ == 0){
-        c.first->second.id_ = ++max_id;
-       } else{
-        max_id=std::max( max_id, c.first->second.id_);
-       }
-     }
-     return c;
+   					        const Data& data=Data()){
+	return complex.insert_open_cell( s, data);
    }
 
+   /*! Inserts Closure(s) into the complex such that
+   *  Internal id respects filtration property
+   *  setting closed_construction = true 
+   *  is a hint to the structure that the complex has 
+   *  been constructed closed. For example if only calls to 
+   *  insert_closed_cell() have been used to built the complex. 
+   */  
    std::pair< iterator, std::size_t>
    insert_closed_cell( const Cell & s, 
-		       const bool closed=false,
+		       const bool closed_construction=false,
    		       const Data&  data = Data()){
-   	typedef typename std::pair< iterator, std::size_t> Pair;
-   	iterator iter = cells.find( s);
-   	std::size_t num_faces_inserted=0;
-   	//if cell exists, and we assume
-   	//we are closed then we are done.
-   	if( closed && iter != cells.end()){
-   	 return std::make_pair( iter, num_faces_inserted);
-   	}
-
-   	//first you add the boundary
-   	Data face_data( data);
-   	face_data.id_ = 0;
-   	for( auto face = bd.begin( s); face != bd.end( s); ++face){
-   	 const Pair & p = insert_closed_cell( face->cell(),
-   					      closed, face_data);
-   	 num_faces_inserted+=p.second;
-   	}
-
-   	//ugly, but then you add yourself.
-   	const std::pair< iterator, bool> p(insert_open_cell( s, data));
-   	return std::make_pair( p.first, p.second+num_faces_inserted);
+   	return complex.insert_closed_cell( s, closed_construction, data);
    }
 
+   //! write complex out to stream applying functor
    template< typename Stream, typename Functor>
-   Stream& write( Stream& out, const Functor & f) const {
-   	out << "size " << cells.size() << std::endl;
-   	for( const auto & cell: cells){
-   	  out << cell.first.size() << " " << std::flush;
-	  cell.first.write( out);
-	  out << std::flush;
-   	  out << f( cell.second)  << std::flush;
-   	  out << std::endl;
-   	}
-	return out;
+   Stream& write( Stream& out, const Functor & f) const { 
+	return complex.write( out, f);
    }
 
+   //! write complex out to stream
    template< typename Stream>
    inline Stream& write( Stream& out) const { 
-	out << "size " << cells.size() << std::endl;
-   	for( const auto & cell: cells){
-   	  out << cell.first.size() << " " << std::flush;
-	  cell.first.write( out);
-	  out << std::flush;
-   	  out << cell.second.id()  << std::flush;
-	  out << std::endl;  
- 	}
-	return out;
- 
+	return complex.write( out);
+   }
 
-	ctl::identity i;
-	return write( out, i);
-   }
-   
+   //! read complex in from stream   
    template< typename Stream> 
-   Stream& read( Stream & in){
-	std::size_t line_num = 0;
-	std::string line;
-	std::size_t id=0;
-        char the_first_character = in.peek();
-	const bool headers_enabled = (the_first_character == 's');
-	if( !headers_enabled) { 
-		std::cerr << "Error: reading a file without appropriate header."
-			  << "Bailing out." << std::endl;
-	}
-	//Read the header and reserve appropriately
-        ctl::get_line( in, line, line_num);
-        std::istringstream ss( line);
-        std::string the_word_size;
-        ss >> the_word_size;
-        std::size_t the_number_of_cells;
-        ss >> the_number_of_cells;
-	reserve( the_number_of_cells);
-	std::size_t size;
-	while( ctl::get_line(in, line, line_num)){
-	     std::istringstream ss( line);
-	     Cell cell;
-	     //header enabled so read size first
-	     ss >> size;
-	     //then get the cell
-	     cell.read( ss, size);
-	     //and it's id
-	     ss >> id;
-	     Data d( id);
-	     insert_open_cell( cell, d);
-	}
-	return in;
-   }
+   Stream& read( Stream & in){ return complex.read( in); }
+
+   //! read in data associated to the complex
    template< typename Stream, typename Functor>
-   Stream& read_data( Stream & in, Functor & f){
-	typedef typename Data::Id Id;
-	typedef typename Functor::result_type Value;
-	typedef std::unordered_map< Id, Value> Value_map; 
-	std::string line;
-	std::size_t line_num = 0;
-	Value_map values( size());
-	Id id;
-	Value value;
-	while( ctl::get_line( in, line, line_num)){
-		std::istringstream ss( line);
-		ss >> id;
-		ss >> value;
-		values[ id] = value;
-	}
-	for (auto & sigma: cells) { 
-		f( sigma.second) = values[ sigma.second.id()]; 
-	}
-	return in;
+   Stream& read_data( Stream & in, Functor & f){ complex.read_data( in, f); }
+
+   //! Reserves space for n complex in dimension d
+   void reserve( const std::size_t n, const std::size_t dim) { 
+	complex.reserve( n, d); 
    }
-   void reserve( const std::size_t n) { cells.reserve( n); }
-   const std::size_t dimension() const { return max_dim; }
-   const std::size_t size() const { return cells.size(); }
-   Boundary& boundary() { return bd; }
-   bool is_closed() const{
-   	for( auto sigma : cells){
-   		for( auto tau = bd.begin( sigma.first);
-   			  tau != bd.end( sigma.first); ++tau){
-   			if( find_cell( tau->cell()) == end()){
-   				return false;
-   			}
-   		}
-   	}
-   	return true;
-   }
+
+   //! Reserves space for n complex 
+   void reserve( const std::size_t n) { complex.reserve( n); }
+
+   //! Returns the dimension of the complex
+   const std::size_t dimension() const { return complex.dimension(); }
+
+   //! Return the number of complex in the complex
+   const std::size_t size() const { return complex.size(); }
+
+   //! Returns the number of complex in dimension i 
+   const std::size_t size( std::size_t i) const { return complex.size( i); }
+
+
+   //! Returns the cell boundary operator
+   Cell_boundary& cell_boundary() { return complex.cell_boundary(); }
+   
+   //! Deprecated, returns the cell boundary operator
+   Cell_boundary& boundary() { return cell_boundary(); } 
+
+   //! Returns true if the complex is closed under the subset relation
+   bool is_closed() const{ return complex.is_closed(); }
 private:
-   Map cells;
-   Boundary bd;
-   std::size_t max_id;
-   std::size_t max_dim;
+   Complex complex;
 }; //chain_complex
 } //namespace ctl
 
-
+//! Output stream operator for a Chain_complex iterator
 template< typename Stream, typename C, typename B, 
 	   typename D, typename H>
 Stream& operator<<( Stream& out, 
@@ -369,15 +312,16 @@ Stream& operator<<( Stream& out,
 	return out;	
 }
 
-
+//! Output stream operator for a Chain_complex const_iterator
 template< typename Stream, typename C, typename B, 
 	   typename D, typename H>
 Stream& operator<<( Stream& out, 
-		    const typename ctl::Chain_complex< C, B, D, H>::const_iterator c){ 
+              const typename ctl::Chain_complex< C, B, D, H>::const_iterator c){ 
 	out << c->first;
 	return out;	
 }
 
+//! Output stream operator for a Chain complex 
 template< typename Stream, typename Cell, typename Boundary, 
 	   typename Data, typename Hash>
 Stream& operator<<( Stream& out, 
@@ -391,6 +335,7 @@ Stream& operator<<( Stream& out,
 	return out;
 }
 
+//! Output stream operator for a Chain complex x-value
 template< typename Stream, typename Cell, typename Boundary, 
 	   typename Data, typename Hash>
 Stream& operator<<( Stream& out, 
@@ -399,12 +344,17 @@ Stream& operator<<( Stream& out,
 	return out;
 }
 
+//! Input stream operator for a Chain complex 
 template< typename Stream, typename Cell, 
 	  typename Boundary, typename Data_, typename Hash>
 Stream& operator>>( Stream& in, 
-		    ctl::Chain_complex< Cell, Boundary, Data_, Hash> & c){  return c.read( in); }
+		    ctl::Chain_complex< Cell, Boundary, Data_, Hash> & c){  
+	return c.read( in); 
+}
 
 namespace ctl{
+
+//! Utility to read a complex and any associated data 
 template<typename String, typename Complex, typename Functor>
 void read_complex_and_data(String & complex_name, String & data_file, 
 			   Complex & complex, Functor & f){
@@ -421,6 +371,7 @@ void read_complex_and_data(String & complex_name, String & data_file,
 	std::cout << "completed!" << std::endl;
 }
 
+//! Utility to read a complex 
 template<typename String, typename Complex>
 void read_complex(String & complex_name, Complex & complex){
 	std::ifstream in;
@@ -431,8 +382,6 @@ void read_complex(String & complex_name, Complex & complex){
 	std::cout << "completed!" << std::endl;
 }
 
-
-
 } //namespace ctl
 
-#endif //CTL_CHAIN_COMPLEX_MAP_H
+#endif //CTL_CHAIN_COMPLEX_H

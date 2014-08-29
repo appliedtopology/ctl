@@ -60,11 +60,10 @@ namespace detail{
 
 /**
 * \class Cube< T>
-* This class describes an abstract cube for a simplicial chain complex.
-* It is implemeneted as a sorted std::vector< T> since 
-* maintaining a sorted vector is faster than a std::set 
-* for a fixed large number.
-*
+* This class describes an cube for a cubical chain complex.
+* While a cube is defined as a product of intervals, a cubical complex
+* does not store a vector of these. A cube is infact stored implicitly
+* as an address to its data, and we provide the mirage of the definition.
 * This object does not itself have the facility for a boundary, this is handled
 * by a separate boundary operator.
 */
@@ -82,7 +81,7 @@ class Cube {
 	//! \typedef synonomous with vertex_type  
 	typedef typename Vector::value_type value_type;
 	//! \typedef The vertex type of the cube  
-	typedef typename T vertex_type;
+	typedef T vertex_type;
 	//! \typedef const_iterator to the cube
 	typedef typename Vector::const_iterator const_iterator;
 	//! \typedef const_reverse_iterator to the cube
