@@ -18,35 +18,51 @@
 * !!! DO NOT CITE THE USER MANUAL !!!
 *******************************************************************************
 * Copyright (C) Ryan H. Lewis 2014 <me@ryanlewis.net>
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public License
+* as published by the Free Software Foundation; either version 2
+* of the License, or (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program in a file entitled COPYING; if not, write to the
+* Free Software Foundation, Inc.,
+* 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
-* ********** BSD-3 License ****************
-* Redistribution and use in source and binary forms, with or without 
-* modification, are permitted provided that the following conditions are met:
-* 
-* 1. Redistributions of source code must retain the above copyright notice, 
-* this list of conditions and the following disclaimer.
-* 
-* 2. Redistributions in binary form must reproduce the above copyright notice, 
-* this list of conditions and the following disclaimer in the documentation 
-* and/or other materials provided with the distribution.
-* 
-* 3. Neither the name of the copyright holder nor the names of its contributors 
-* may be used to endorse or promote products derived from this software without 
-* specific prior written permission.
-* 
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
-* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
-* POSSIBILITY OF SUCH DAMAGE.
-********************************************************************************
 *******************************************************************************/
+/*********************
+* April 5th, 2014
+* Notes: presently we wrap the std::unordered_map a.k.a Map type.
+* We fail to have perfect hashing, and we have collisions between
+* cells of various different dimensions.
+* A relatively easy optimization to explore is to  have something like
+* vector< Map> where array element i stores cells of dimension i.
+* Aside from certainly having less collisions,
+* this has the benefit that the skeletal filtration will now be available with
+* zero extra work after complex construction.
+* We don't even need to worry about resizing time, since, copying a map is done
+* via a swap of ~4 pointers, and in c++11 they are moves.
+* Also this only happens at most O(log(d)) or something..
+* the only thing to be careful of is the begin() and end() needs to be the
+* original begin() and end() iterators concatenated together.
+* This is somewhat frustrating because the naive implementation will require a
+* 5x space bloat for each iterator, so less iterators fit on a cache line.
+* A massive sort might have 5x more cache misses, for example.
+* We would save space by forcing a single hash table to hash cells of different
+* dimensions to different places, but, this seems overly optimistic.
+* This also makes iterators
+* invalid less often then they were before.
+* In particular, iterators are only invalidated in one dimension at a time,
+* AND rehashing will be marginally less expensive.
+* begin()/end() would be overloaded to take a dimension as well.
+* in particular this means that a filtration sorting could be implemented
+* to avoid this craziness of pointers..  
+**********************/
 
 //STL
 #include <unordered_map>
@@ -121,17 +137,13 @@ Stream& operator<<( Stream & out, const Default_data && d){ return out; }
 
 //exported functionality
 namespace ctl{
+
 /**
 * @brief \class Chain_complex
 * A structure which stores the standard cell basis for a Chain_complex
-* Presently the internal data structure depends on the Cell type. 
-* At a high level this structure should be thought of as a map where 
-* the keys are the cells themselves and the 
-* values are any data associated to a cell.
-* 
-* We wrap the Data parameter transparently to 
-* associate a unique id to each cell. 
-* 
+* Presently the internal data structure is a hash table. The keys are the
+* cells themselves and the values are any data associated to a cell.
+* We wrap the Data parameter transparently to associate a unique id to each cell.
 * @tparam Cell
 * @tparam Boundary
 * @tparam Data
@@ -143,20 +155,16 @@ template< typename Cell_,
 	  typename Hash_ = ctl::Hash< Cell_> >
 class Chain_complex{
 public:
-   /*!Describes a fundamental object,
-    * e.g. Simplex, Cube, Polygon, etc.. */
-   typedef Cell_ Cell; 
-   //! Deprecated: Describes how to take Cell boundary
-   typedef Boundary_ Boundary; 
-
-   //! Describes how to take Cell boundary
-   typedef Boundary_ Cell_boundary; 
-   //! Arbitrary data associated to space.
-   typedef ctl::detail::Data_wrapper< Data_> Data;
- 
+   typedef Cell_ Cell; //Describes a fundamental object,
+		       //e.g. Simplex, Cube, Polygon, etc..
+   //Deprecated
+   typedef Boundary_ Boundary; //Describes how to take Cell boundary
+   typedef Boundary_ Cell_boundary; //Describes how to take Cell boundary
+   //Arbitrary data associated to space.
+   typedef ctl::detail::Data_wrapper< Data_> Data; 
    typedef Hash_ Hash;
 private:
-    typedef ctl::detail::complex_storage< Cell, Data, Hash> Map;
+   //typedef std::unordered_map< Cell, Data, Hash>  Map;
    
 public:
    typedef typename Map::size_type size_type;
@@ -166,7 +174,7 @@ public:
 
 public:
    //Constructors
-   //! Default constructor
+   //Default
    Chain_complex(): max_id( 0), max_dim( 0) { cells.max_load_factor( 1); }
    Chain_complex( Boundary & bd_, const std::size_t num_cells=1): 
    cells( num_cells), bd( bd_), max_id( 0), max_dim( 0) {
