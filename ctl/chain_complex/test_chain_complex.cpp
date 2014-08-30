@@ -39,6 +39,7 @@
 //CTL
 //abstract_simplex
 #include <ctl/abstract_simplex/abstract_simplex.h>
+#include <ctl/cube/cube.h>
 #include <ctl/abstract_simplex/simplex_boundary.h>
 
 //chain_complex
@@ -48,13 +49,15 @@
 //We build a simplicial chain complex with Z2 coefficients
 typedef ctl::Abstract_simplex< int> Simplex;
 typedef ctl::Finite_field< 3> Z2;
-typedef ctl::Simplex_boundary< Simplex, Z2 > Cell_boundary;
-typedef ctl::Chain_complex< Simplex, Cell_boundary> Complex;
-typedef Complex::Cell Cell;
-typedef ctl::Complex_boundary< Complex> Complex_boundary;
+typedef ctl::Simplex_boundary< Simplex, Z2 > Simplex_boundary;
+typedef ctl::Chain_complex< Simplex, Simplex_boundary> Simplicial_complex;
+typedef Simplicial_complex::Cell Cell;
+typedef ctl::Cube< int> Cube;
+typedef ctl::Chain_complex< Cube, Simplex_boundary> Cubical_complex;
+typedef ctl::Complex_boundary< Simplicial_complex> Complex_boundary;
 typedef Complex_boundary::const_iterator boundary_iterator;
 int main( int argc, char** argv){
-	Complex complex;
+	Simplicial_complex complex;
 	Cell s( {1,2,3,4} );
 	auto pair = complex.insert_closed_cell( s);
 	std::cout << pair.second << " cells inserted!" << std::endl;
@@ -75,5 +78,7 @@ int main( int argc, char** argv){
 	}
 	std::ofstream out( "test.asc");
 	complex.write( out); 
+
+	Cubical_complex complex1;
 	return 0;
 }

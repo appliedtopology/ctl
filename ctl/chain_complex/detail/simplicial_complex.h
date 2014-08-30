@@ -144,8 +144,8 @@ public:
    	return *this;
    }
 
-   iterator       find_cell( const Cell & s)       { return cells.find( s); }
-   const_iterator find_cell( const Cell & s) const { return cells.find( s); }
+   iterator       find( const Cell & s)       { return cells.find( s); }
+   const_iterator find( const Cell & s) const { return cells.find( s); }
 
    iterator       begin()       { return cells.begin(); }
    iterator         end()       { return cells.end();   }
@@ -158,10 +158,10 @@ public:
      std::pair< iterator, bool> c =  cells.emplace( s, data);
      if( c.second) { //this outer if is probably unnecessary
        max_dim = std::max( max_dim, s.dimension());
-       if( c.first->second.id_ == 0){
-        c.first->second.id_ = ++max_id;
+       if( c.first->second.id() == 0){
+        c.first->second.id( ++max_id);
        } else{
-        max_id=std::max( max_id, c.first->second.id_);
+        max_id=std::max( max_id, c.first->second.id());
        }
      }
      return c;
@@ -182,7 +182,7 @@ public:
 
    	//first you add the boundary
    	Data face_data( data);
-   	face_data.id_ = 0;
+   	face_data.id(  0);
    	for( auto face = bd.begin( s); face != bd.end( s); ++face){
    	 const Pair & p = insert_closed_cell( face->cell(),
    					      closed, face_data);
@@ -283,11 +283,12 @@ public:
    const std::size_t dimension() const { return max_dim; }
    const std::size_t size() const { return cells.size(); }
    Cell_boundary& cell_boundary() { return bd; }
+
    bool is_closed() const{
    	for( auto sigma : cells){
    		for( auto tau = bd.begin( sigma.first);
    			  tau != bd.end( sigma.first); ++tau){
-   			if( find_cell( tau->cell()) == end()){
+   			if( find( tau->cell()) == end()){
    				return false;
    			}
    		}

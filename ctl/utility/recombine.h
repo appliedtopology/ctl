@@ -1,5 +1,5 @@
-#ifndef CTL_COMPLEX_STORAGE_H
-#define CTL_COMPLEX_STORAGE_H
+#ifndef CTL_RECOMBINE_H
+#define CTL_RECOMBINE_H
 /*******************************************************************************
 * -Academic Honesty-
 * Plagarism: The unauthorized use or close imitation of the language and
@@ -35,39 +35,33 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 * NOTES:
-* August 29, 2014 -- We are refactoring our Chain_complex so that the underlying
-* Storage is divorced from the interface. This way we can use different types 
-* for different types of Cells. 
-*
-* We use Metaprogramming instead of inheritence so that the appropriate 
-* structures are determined at compile time.
-* 
-* This type dispatching is done here.
+* File contains some metaprogramming utilities that are used in places.
 *******************************************************************************/
 
-//STL
-#include <type_traits>
 
-//CTL
-#include <ctl/chain_complex/detail/cubical_complex.h>
-#include <ctl/chain_complex/detail/simplicial_complex.h>
-#include <ctl/utility/recombine.h>
 
-namespace ctl {
-namespace detail {
+namespace ctl{
 
-struct Dummy;
+namespace detail{
+/**
+* Flex your meta-muscles
+* Understand why
+* recombine< int, int>::type is int
+* recombine< int, T>::type is T
+* recombine< any_type_without_angle_brackets, T> is T
+* recombine< Foo< Bar>, T> is Foo< T> 
+*/
+template <typename T, typename R> 
+struct recombine{ using type = T; }; //recombine struct
+ 
+template < template <typename ...> class TT, 
+	   typename ...Ts, typename T> 
+struct recombine<TT<Ts...>,T> { using type = TT<T>; }; 
+//recombine struct specialization
 
-template< typename Cell, typename Boundary, typename Data, typename Hash>
-using Complex_storage = 
-typename std::conditional< 
- std::is_same< 
- typename recombine< Cell, Dummy>::type, ctl::Cube< Dummy> >::value, 
- ctl::detail::Cubical_complex< Cell, Boundary, Data, Hash>,
- ctl::detail::Simplicial_complex< Cell, Boundary, Data, Hash> 
->::type;
-								   
-} //namespace detail
-} //namespace ctl
 
-#endif //CTL_CHAIN_COMPLEX_MAP_H
+} //end namespace detail 
+} //end namespace ctl
+
+#endif
+

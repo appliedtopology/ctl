@@ -63,7 +63,8 @@
 //forward declaration
 namespace ctl{
 template< typename Cell_, typename Boundary_,
-	  typename Data_, typename Hash_>
+	  typename Data_, typename Hash_, 
+	  template <typename...> class Storage_>
 class Chain_complex;
 } //namespace ct
 
@@ -105,10 +106,6 @@ class Data_wrapper : public Data_ {
    void id( Id n){ id_ = n; }
    private:
    Id id_;
-   //(to be read in Millhouse Van Houten's voice)
-   //This lets the chain_complex & boundary touch my privates ;)
-   template< typename C, typename B, typename D, typename H>
-   friend class ctl::Chain_complex;
 }; // class Data_wrapper
 
 struct Default_data {}; //class Default_data for complex.
@@ -125,23 +122,52 @@ namespace ctl{
 /**
 * @brief \class Chain_complex
 * A structure which stores the standard cell basis for a Chain_complex
-* Presently the internal data structure depends on the Cell type. 
-* At a high level this structure should be thought of as a map where 
-* the keys are the complex themselves and the 
-* values are any data associated to a cell.
+* The Cell type is specified via the template parameter Cell
+* One must provide an operator which allows the boundary of a cell to be 
+* enumerated.
 * 
-* We wrap the Data parameter transparently to 
-* associate a unique id to each cell. 
+* The library currently provides two cell types, ctl::Abstract_simplex< T> 
+* and ctl::Cube< T>.
+*
+* The Data type can be anything, and is used to associate Data to a Cell.
+*
+* Presently, we wrap the Data parameter transparently to associate a unique id 
+* to each cell. If the cells of the complex are inserted in a filtration order 
+* Then sorting the cells of the complex according to these id's produces a 
+* filtration ordering. 
+*
+* You may optionally provide a Hash function which might be used by an internal 
+* container. The Hash function hashes Cells to a std::size_t. By default we use
+* ctl::Hash.
+*  
+* The Storage parameter controls the internal data structure used for 
+* storing the complex.
+* This structure depends on the Cell type.
+* At the time of writing, if Cell == ctl::Cube< T> we use 
+* a std::vector< Data> the cube is stored implicitly as an offset into this
+* structure. If a cell is not a cube, 
+* then we use a std::unordered_map< Cell, Boundary, Data, Hash>
 * 
+* For those power users out there, one can roll their own internal
+* storage container. The container must have the Following signature:
+*   Your_container< Cell, Boundary, Data, Hash>  
+* In lieu of writing down the other requirements on the structure,
+* we refer the reader to the implementation of the Chain_complex.
+* Essentially you must export similar types and functionality.
+* The authors have tried our best to minimize the number of requirements on such
+* a data structure.
+
 * @tparam Cell
 * @tparam Boundary
 * @tparam Data
 * @tparam Hash
+* @tparam Storage
 */
 template< typename Cell_,
 	  typename Boundary_,
 	  typename Data_ = ctl::detail::Default_data,
-	  typename Hash_ = ctl::Hash< Cell_> >
+	  typename Hash_ = ctl::Hash< Cell_>, 
+	  template <typename...> class Storage_ = detail::Complex_storage> 
 class Chain_complex{
 public:
    /*!Describes a fundamental object,
@@ -154,10 +180,9 @@ public:
    typedef Boundary_ Cell_boundary; 
    //! Arbitrary data associated to space.
    typedef detail::Data_wrapper< Data_> Data;
- 
 private:
     //! Internal complex storage
-    typedef detail::Complex_storage< Cell, Data, Hash> Complex;
+    typedef Storage_< Cell, Boundary, Data, Hash_> Complex;
    
 public:
    //!Internal hash function used by underlying storage container
@@ -178,7 +203,8 @@ public:
 
  /*! Cell_boundary constructor 
    * You may optionally provide a container hint as to the total number of 
-   * complex. The underlying container can choose to preallocate this much memory.
+   * complex. 
+   * The underlying container can choose to preallocate this much memory.
    */
    Chain_complex( Cell_boundary & bd_, const std::size_t num_complex=1): 
 	complex( bd_, num_complex){}
@@ -194,7 +220,7 @@ public:
    */
    template< typename Size_by_dimension>
    Chain_complex( Cell_boundary & bd_, const Size_by_dimension& d): 
-   complex( bd_, dimensions) {} 
+   complex( bd_, d) {} 
 
    //! Copy constructor
    Chain_complex( const Chain_complex & b): complex( b.complex){} 
@@ -274,7 +300,7 @@ public:
 
    //! Reserves space for n complex in dimension d
    void reserve( const std::size_t n, const std::size_t dim) { 
-	complex.reserve( n, d); 
+	complex.reserve( n, dim); 
    }
 
    //! Reserves space for n complex 
