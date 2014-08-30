@@ -40,7 +40,9 @@
 * for different types of Cells. 
 *
 * We use Metaprogramming instead of inheritence so that the appropriate 
-* structures are determined at compile time. 
+* structures are determined at compile time.
+* 
+* This type dispatching is done here.
 *******************************************************************************/
 
 //STL
@@ -49,19 +51,23 @@
 //CTL
 #include <ctl/chain_complex/detail/cubical_complex.h>
 #include <ctl/chain_complex/detail/simplicial_complex.h>
+#include <ctl/utility/recombine.h>
 
 namespace ctl {
 namespace detail {
 
-template< typename Cell, typename Data, typename Hash>
+struct Dummy;
+
+template< typename Cell, typename Boundary, typename Data, typename Hash>
 using Complex_storage = 
-std::conditional< 
- std::is_same< Cell, template< typename T> ctl::Cube< T> >::value, 
- ctl::detail::Cubical_complex< Cell, Data, Hash>,
- ctl::detail::Simplicial_complex< Cell, Data, Hash> 
+typename std::conditional< 
+ std::is_same< 
+ typename recombine< Cell, Dummy>::type, ctl::Cube< Dummy> >::value, 
+ ctl::detail::Cubical_complex< Cell, Boundary, Data, Hash>,
+ ctl::detail::Simplicial_complex< Cell, Boundary, Data, Hash> 
 >::type;
 								   
-
+} //namespace detail
 } //namespace ctl
 
 #endif //CTL_CHAIN_COMPLEX_MAP_H
