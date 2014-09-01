@@ -99,7 +99,7 @@ public:
    			  max_id( std::move(b.max_id)),
    			  max_dim( std::move( b.max_dim)) {}
 
-   // assignment operator
+   //Assignment operator
    Cubical_complex& operator=( const Cubical_complex& b){
    	bd = b.bd;
    	max_id = b.max_id;
@@ -108,7 +108,7 @@ public:
    	return *this;
    }
 
-   // move assignment operator
+   //Move assignment operator
    Cubical_complex& operator=( Cubical_complex&& b){
    	bd      = std::move( b.bd);
    	max_id  = std::move( b.max_id);
@@ -272,6 +272,7 @@ public:
    	}
    	return true;
    }
+
 //Private functions
 private:
 /*
@@ -327,7 +328,8 @@ private:
 template< typename Stream, typename C, typename B, 
 	   typename D, typename H>
 Stream& operator<<( Stream& out, 
-		    const typename ctl::detail::Cubical_complex< C, B, D, H>::iterator c){ 
+		    const typename ctl::detail::Cubical_complex< C, B, D, H>::
+					iterator c){ 
 	out << c->first;
 	return out;	
 }
@@ -336,7 +338,8 @@ Stream& operator<<( Stream& out,
 template< typename Stream, typename C, typename B, 
 	   typename D, typename H>
 Stream& operator<<( Stream& out, 
-		    const typename ctl::detail::Cubical_complex< C, B, D, H>::const_iterator c){ 
+		    const typename ctl::detail::Cubical_complex< C, B, D, H>::
+					const_iterator c){ 
 	out << c->first;
 	return out;	
 }
@@ -344,7 +347,10 @@ Stream& operator<<( Stream& out,
 template< typename Stream, typename Cell, typename Boundary, 
 	   typename Data, typename Hash>
 Stream& operator<<( Stream& out, 
-		    const ctl::detail::Cubical_complex< Cell, Boundary, Data, Hash> & c){ 
+		    const ctl::detail::Cubical_complex< Cell, 
+							Boundary, 
+							Data, 
+							Hash> & c){ 
 	for(auto i = c.begin(); i != c.end(); ++i){
 		      const std::size_t id = i->second.id();
 		      out << id; 
@@ -357,15 +363,20 @@ Stream& operator<<( Stream& out,
 template< typename Stream, typename Cell, typename Boundary, 
 	   typename Data, typename Hash>
 Stream& operator<<( Stream& out, 
-		    const ctl::detail::Cubical_complex< Cell, Boundary, Data, Hash> && c){ 
+   const ctl::detail::Cubical_complex< Cell, Boundary, Data, Hash> && c){ 
 	out << c;
 	return out;
 }
 
 template< typename Stream, typename Cell, 
-	  typename Boundary, typename Data_, typename Hash>
+	  typename Boundary, typename Data, typename Hash>
 Stream& operator>>( Stream& in, 
-		    ctl::detail::Cubical_complex< Cell, Boundary, Data_, Hash> & c){  return c.read( in); }
+		    ctl::detail::Cubical_complex< Cell, 
+						  Boundary, 
+						  Data, 
+						  Hash> & c){  
+return c.read( in); 
+}
 
 } //namespace ctl
 

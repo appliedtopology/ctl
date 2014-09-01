@@ -102,7 +102,6 @@ class Cube {
 		sort( intervals.begin(), intervals.end() );
 		intervals.erase( unique( intervals.begin(), intervals.end() ), 
 				intervals.end() );
-
 	}
 	//!  Range constructor 
 	template< typename Iterator>
@@ -234,7 +233,7 @@ class Cube {
 
 	/**
 	* @brief Copy assignment operator
-	* @param Simplex & b
+	* @param Cube & b
 	* @return Reference to the assigned to cube
 	*/
 	Self& operator=( const Self & b) { 
@@ -244,7 +243,7 @@ class Cube {
 
 	/**
 	* @brief Move assignment operator 
-	* @param Simplex && b
+	* @param Cube && b
 	* @return Reference to the assigned to cube
 	*/
 	Self& operator=( Self && b) {
@@ -255,7 +254,7 @@ class Cube {
 	/**
 	* @brief Comparator
 	* Compares two simplices first by size, breaking ties lexicographically.
-	* @param const Simplex & b
+	* @param const Cube & b
 	* @return true if a < b, false otherwise. 
 	*/
 	bool operator<( const Self & b) const {
@@ -267,7 +266,7 @@ class Cube {
 
 	/**
 	* @brief Equality operator
-	* @param const Simplex & b
+	* @param const Cube & b
 	* @return is equivalent to !(a < b) && !(b < a)
 	*/
 	bool operator==( const Self & b) const { 
@@ -277,7 +276,7 @@ class Cube {
 	
 	/**
 	* @brief Non equality operator
-	* @param const Simplex & b
+	* @param const Cube & b
 	* @return true iff (*this) == b is false
 	*/
 	bool operator!=( const Self & b) const{ 
@@ -290,4 +289,4 @@ class Cube {
 }; //Cube
 } //namespace ctl
 
-#endif // ABSTRACT_SIMPLEX_H
+#endif //CUBE_H
