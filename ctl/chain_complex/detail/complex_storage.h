@@ -62,7 +62,8 @@ template< typename Cell, typename Boundary, typename Data, typename Hash>
 using Complex_storage = 
 typename std::conditional< 
  std::is_same< 
- typename recombine< Cell, Dummy>::type, ctl::Cube< Dummy> >::value, 
+ typename recombine< Cell, Dummy>::type, ctl::Cube< Dummy> 
+ >::value, 
  ctl::detail::Cubical_complex< Cell, Boundary, Data, Hash>,
  ctl::detail::Simplicial_complex< Cell, Boundary, Data, Hash> 
 >::type;

@@ -76,8 +76,8 @@ template< typename Data_>
 class Data_wrapper : public Data_ {
    private:
    typedef Data_wrapper< Data_> Self;
-   typedef std::size_t Id;
    public:
+   typedef std::size_t Id;
    //default
    Data_wrapper(): id_( 0) {}
    //copy
@@ -296,7 +296,7 @@ public:
 
    //! read in data associated to the complex
    template< typename Stream, typename Functor>
-   Stream& read_data( Stream & in, Functor & f){ complex.read_data( in, f); }
+   Stream& read_data( Stream & in, Functor & f){ return complex.read_data( in, f); }
 
    //! Reserves space for n complex in dimension d
    void reserve( const std::size_t n, const std::size_t dim) { 

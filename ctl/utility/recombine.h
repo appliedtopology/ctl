@@ -38,10 +38,7 @@
 * File contains some metaprogramming utilities that are used in places.
 *******************************************************************************/
 
-
-
 namespace ctl{
-
 namespace detail{
 /**
 * Flex your meta-muscles
@@ -50,18 +47,16 @@ namespace detail{
 * recombine< int, T>::type is T
 * recombine< any_type_without_angle_brackets, T> is T
 * recombine< Foo< Bar>, T> is Foo< T> 
+* recombine< pair< Foo, Bar, baz>, T> is T
 */
-template <typename T, typename R> 
+template <typename T, typename R>  
 struct recombine{ using type = T; }; //recombine struct
  
-template < template <typename ...> class TT, 
-	   typename ...Ts, typename T> 
-struct recombine<TT<Ts...>,T> { using type = TT<T>; }; 
-//recombine struct specialization
-
+template < template <typename> class TT, 
+           typename T, typename R>  
+struct recombine<TT<T>,R> { using type = TT<R>; }; 
 
 } //end namespace detail 
 } //end namespace ctl
 
 #endif
-
