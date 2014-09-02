@@ -20,9 +20,8 @@ if (NOT APPLE)
 	set(DSO_FIXES rt)
 endif (NOT APPLE)
 
-find_package(Boost COMPONENTS program_options serialization REQUIRED)
-find_package(MPI)
-find_package( Boost COMPONENTS MPI)
+find_package(Boost COMPONENTS program_options serialization MPI REQUIRED)
+message( "Boost_LIBRARIES = " ${Boost_LIBRARIES}) 
 link_directories(/usr/local/lib ${Boost_LIBRARY_DIR})
 
 set(Boost_USE_MULTITHREADED ON)
