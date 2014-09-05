@@ -1,5 +1,5 @@
-#ifndef CTL_SIMPLICIAL_COMPLEX_H
-#define CTL_SIMPLICIAL_COMPLEX_H
+#ifndef CTL_GENERIC_COMPLEX_H
+#define CTL_GENERIC_COMPLEX_H
 /*******************************************************************************
 * -Academic Honesty-
 * Plagarism: The unauthorized use or close imitation of the language and
@@ -37,11 +37,11 @@
 *******************************************************************************/
 /*********************
 * April 5th, 2014
-* Notes: presently we wrap the std::unordered_map a.k.a Map type.
+* Notes: presently we wrap the std::unordered_map a.k.a Storage type.
 * We fail to have perfect hashing, and we have collisions between
 * cells of various different dimensions.
 * A relatively easy optimization to explore is to  have something like
-* vector< Map> where array element i stores cells of dimension i.
+* vector< Storage> where array element i stores cells of dimension i.
 * Aside from certainly having less collisions,
 * this has the benefit that the skeletal filtration will now be available with
 * zero extra work after complex construction.
@@ -66,7 +66,7 @@
 
 //STL
 #include <unordered_map>
-#include <ctl/abstract_simplex/abstract_simplex.h>
+//#include <ctl/abstract_simplex/abstract_simplex.h>
 #include <vector>
 #include <sstream>
 #include <fstream>
@@ -77,8 +77,9 @@ namespace detail {
 template< typename Cell_,
 	  typename Boundary_,
 	  typename Data_,
-	  typename Hash_> 
-class Simplicial_complex{
+	  typename Hash_, 
+	  template< typename C, typename D, typename H> class Storage_> 
+class Generic_complex{
 public:
    typedef Cell_ Cell; //Describes a fundamental object,
 		       //e.g. Simplex, Cube, Polygon, etc..
@@ -88,20 +89,20 @@ public:
    typedef Data_ Data;
    typedef Hash_ Hash;
 private:
-   typedef std::unordered_map< Cell, Data, Hash>  Map;
+   typedef Storage_< Cell, Data, Hash> Storage;
    
 public:
-   typedef typename Map::size_type size_type;
-   typedef typename Map::iterator iterator;
-   typedef typename Map::const_iterator const_iterator;
-   typedef typename Map::value_type value_type;
+   typedef typename Storage::size_type size_type;
+   typedef typename Storage::iterator iterator;
+   typedef typename Storage::const_iterator const_iterator;
+   typedef typename Storage::value_type value_type;
 
 public:
    //Constructors
    //Default
-   Simplicial_complex(): max_id( 0), max_dim( 0) { cells.max_load_factor( 1); }
+   Generic_complex(): max_id( 0), max_dim( 0) { cells.max_load_factor( 1); }
 
-   Simplicial_complex( Cell_boundary & bd_, const std::size_t num_cells): 
+   Generic_complex( Cell_boundary & bd_, const std::size_t num_cells): 
    cells( num_cells), bd( bd_), max_id( 0), max_dim( 0) {
 	cells.max_load_factor( 1); 
    }
@@ -109,25 +110,25 @@ public:
    //TODO: Expand complex structure to store cells of a fixed dimension
    //in different containers. glue together objects with a crazy iterator
    template< typename Size_by_dimension>
-   Simplicial_complex( Cell_boundary & bd_, const Size_by_dimension d): 
+   Generic_complex( Cell_boundary & bd_, const Size_by_dimension d): 
     cells( std::accumulate( d.begin(), d.end(), 0)),
     bd( bd_), max_id( 0), max_dim( 0) {
 	cells.max_load_factor( 1); 
    }
 
    //Copy
-   Simplicial_complex( const Simplicial_complex & b): cells( b.cells), bd( b.bd),
+   Generic_complex( const Generic_complex & b): cells( b.cells), bd( b.bd),
    				 max_id( b.max_id), max_dim( b.max_dim)
    { cells.max_load_factor( 1); }
 
    //Move
-   Simplicial_complex( Simplicial_complex && b): cells( std::move( b.cells)),
+   Generic_complex( Generic_complex && b): cells( std::move( b.cells)),
    			  bd( std::move( b.bd)),
    			  max_id( std::move(b.max_id)),
    			  max_dim( std::move( b.max_dim)) {}
 
    // assignment operator
-   Simplicial_complex& operator=( const Simplicial_complex& b){
+   Generic_complex& operator=( const Generic_complex& b){
    	bd = b.bd;
    	max_id = b.max_id;
    	max_dim = b.max_dim;
@@ -136,7 +137,7 @@ public:
    }
 
    // move assignment operator
-   Simplicial_complex& operator=( Simplicial_complex&& b){
+   Generic_complex& operator=( Generic_complex&& b){
    	bd      = std::move( b.bd);
    	max_id  = std::move( b.max_id);
    	max_dim = std::move( b.max_dim);
@@ -144,8 +145,8 @@ public:
    	return *this;
    }
 
-   iterator       find( const Cell & s)       { return cells.find( s); }
-   const_iterator find( const Cell & s) const { return cells.find( s); }
+   iterator       find_cell( const Cell & s)       { return cells.find( s); }
+   const_iterator find_cell( const Cell & s) const { return cells.find( s); }
 
    iterator       begin()       { return cells.begin(); }
    iterator         end()       { return cells.end();   }
@@ -288,7 +289,7 @@ public:
    	for( auto sigma : cells){
    		for( auto tau = bd.begin( sigma.first);
    			  tau != bd.end( sigma.first); ++tau){
-   			if( find( tau->cell()) == end()){
+   			if( find_cell( tau->cell()) == end()){
    				return false;
    			}
    		}
@@ -296,35 +297,32 @@ public:
    	return true;
    }
 private:
-   Map cells;
+   Storage cells;
    Cell_boundary bd;
    std::size_t max_id;
    std::size_t max_dim;
-}; //chain_complex
+}; //end class Generic_complex
 } //namespace ctl
 
-
-template< typename Stream, typename C, typename B, 
-	   typename D, typename H>
+template< typename Stream, typename ...Args>
 Stream& operator<<( Stream& out, 
-		    const typename ctl::detail::Simplicial_complex< C, B, D, H>::iterator c){ 
+   const typename ctl::detail::Generic_complex< Args...>::iterator c){ 
 	out << c->first;
 	return out;	
 }
 
 
-template< typename Stream, typename C, typename B, 
-	   typename D, typename H>
+template< typename Stream, typename ...Args>
 Stream& operator<<( Stream& out, 
-		    const typename ctl::detail::Simplicial_complex< C, B, D, H>::const_iterator c){ 
+   const typename ctl::detail::Generic_complex< Args...>::const_iterator c){ 
 	out << c->first;
 	return out;	
 }
 
-template< typename Stream, typename Cell, typename Boundary, 
-	   typename Data, typename Hash>
+
+template< typename Stream, typename ...Args>
 Stream& operator<<( Stream& out, 
-		    const ctl::detail::Simplicial_complex< Cell, Boundary, Data, Hash> & c){ 
+   const ctl::detail::Generic_complex< Args...> & c){ 
 	for(auto i = c.begin(); i != c.end(); ++i){
 		      const std::size_t id = i->second.id();
 		      out << id; 
@@ -334,18 +332,17 @@ Stream& operator<<( Stream& out,
 	return out;
 }
 
-template< typename Stream, typename Cell, typename Boundary, 
-	   typename Data, typename Hash>
+template< typename Stream, typename ...Args>
 Stream& operator<<( Stream& out, 
-		    const ctl::detail::Simplicial_complex< Cell, Boundary, Data, Hash> && c){ 
+		    const ctl::detail::Generic_complex< Args...>&& c){
 	out << c;
 	return out;
 }
 
-template< typename Stream, typename Cell, 
-	  typename Boundary, typename Data_, typename Hash>
-Stream& operator>>( Stream& in, 
-		    ctl::detail::Simplicial_complex< Cell, Boundary, Data_, Hash> & c){  return c.read( in); }
+template< typename Stream, typename ...Args>
+Stream& operator>>( Stream& in, ctl::detail::Generic_complex< Args...> & c){  
+	return c.read( in); 
+}
 
 } //namespace ctl
 

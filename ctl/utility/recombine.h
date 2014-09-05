@@ -40,6 +40,7 @@
 
 namespace ctl{
 namespace detail{
+ struct Dummy{};
 /**
 * Flex your meta-muscles
 * Understand why

@@ -47,28 +47,34 @@
 
 //STL
 #include <type_traits>
+#include <unordered_map>
+
+//BOOST
+#include <boost/multi_array.hpp>
 
 //CTL
-#include <ctl/chain_complex/detail/cubical_complex.h>
-#include <ctl/chain_complex/detail/simplicial_complex.h>
 #include <ctl/utility/recombine.h>
+#include <ctl/cube/cube.h>
 
 namespace ctl {
 namespace detail {
 
-struct Dummy;
+template< typename Data>
+using multi_array = boost::multi_array< Data, 3>;
 
-template< typename Cell, typename Boundary, typename Data, typename Hash>
-using Complex_storage = 
-typename std::conditional< 
- std::is_same< 
- typename recombine< Cell, Dummy>::type, ctl::Cube< Dummy> 
- >::value, 
- ctl::detail::Cubical_complex< Cell, Boundary, Data, Hash>,
- ctl::detail::Simplicial_complex< Cell, Boundary, Data, Hash> 
->::type;
-								   
-} //namespace detail
+template< typename Cell, 
+	  typename Data, 
+	  typename Hash 
+        >
+using Default_complex_storage = 
+typename std::conditional<
+//If C is a type of the form ctl::Cube< T> for any T, 
+std::is_same< typename recombine< Cell, Dummy>::type, 
+	      ctl::Cube< Dummy> >::value, 
+	      multi_array< Data>,
+	      std::unordered_map< Cell, Data, Hash>
+	    >::type;
+} //namespace detail								   
 } //namespace ctl
 
 #endif //CTL_CHAIN_COMPLEX_MAP_H
