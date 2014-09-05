@@ -1,5 +1,5 @@
-#ifndef CTL_DEFAULT_COMPLEX_STORAGE_H
-#define CTL_DEFAULT_COMPLEX_STORAGE_H
+#ifndef CTL_COMPLEX_STORAGE_H
+#define CTL_COMPLEX_STORAGE_H
 /*******************************************************************************
 * -Academic Honesty-
 * Plagarism: The unauthorized use or close imitation of the language and
@@ -49,26 +49,32 @@
 #include <type_traits>
 #include <unordered_map>
 
+//BOOST
+#include <boost/multi_array.hpp>
+
 //CTL
 #include <ctl/utility/recombine.h>
-#include <ctl/chain_complex/detail/multi_array.h>
 #include <ctl/cube/cube.h>
 
 namespace ctl {
 namespace detail {
 
+template< typename Data>
+using multi_array = boost::multi_array< Data, 3>;
+
 template< typename Cell, 
 	  typename Data, 
-	  typename Hash>
+	  typename Hash 
+        >
 using Default_complex_storage = 
 typename std::conditional<
 //If C is a type of the form ctl::Cube< T> for any T, 
 std::is_same< typename recombine< Cell, Dummy>::type, 
 	      ctl::Cube< Dummy> >::value, 
-	      multi_array< std::pair< std::size_t, Data> >,
+	      multi_array< Data>,
 	      std::unordered_map< Cell, Data, Hash>
 	    >::type;
-} //namespace detail  
+} //namespace detail								   
 } //namespace ctl
 
 #endif //CTL_CHAIN_COMPLEX_MAP_H

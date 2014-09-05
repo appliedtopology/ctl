@@ -78,7 +78,7 @@ template< typename Cell_,
 	  typename Boundary_,
 	  typename Data_,
 	  typename Hash_, 
-	  template< typename ...> class Storage_> 
+	  template< typename C, typename D, typename H> class Storage_> 
 class Generic_complex{
 public:
    typedef Cell_ Cell; //Describes a fundamental object,
@@ -302,35 +302,27 @@ private:
    std::size_t max_id;
    std::size_t max_dim;
 }; //end class Generic_complex
+} //namespace ctl
 
-template< typename Stream, typename Cell_,
-          typename Boundary_,
-          typename Data_,
-          typename Hash_, 
-          template< typename ...> class Storage_> 
+template< typename Stream, typename ...Args>
 Stream& operator<<( Stream& out, 
-   const typename ctl::detail::Generic_complex< Cell_, Boundary_, Data_, Hash_, Storage_>::iterator c){ 
-	out << c->first;
-	return out;	
-}
-template< typename Stream, typename Cell_,
-          typename Boundary_,
-          typename Data_,
-          typename Hash_, 
-          template< typename ...> class Storage_> 
-Stream& operator<<( Stream& out, 
-   const typename ctl::detail::Generic_complex< Cell_, Boundary_, Data_, Hash_, Storage_>::const_iterator c){ 
+   const typename ctl::detail::Generic_complex< Args...>::iterator c){ 
 	out << c->first;
 	return out;	
 }
 
-template< typename Stream, typename Cell_,
-          typename Boundary_,
-          typename Data_,
-          typename Hash_, 
-          template< typename ...> class Storage_> 
+
+template< typename Stream, typename ...Args>
 Stream& operator<<( Stream& out, 
-   const ctl::detail::Generic_complex< Cell_, Boundary_, Data_, Hash_, Storage_> & c){ 
+   const typename ctl::detail::Generic_complex< Args...>::const_iterator c){ 
+	out << c->first;
+	return out;	
+}
+
+
+template< typename Stream, typename ...Args>
+Stream& operator<<( Stream& out, 
+   const ctl::detail::Generic_complex< Args...> & c){ 
 	for(auto i = c.begin(); i != c.end(); ++i){
 		      const std::size_t id = i->second.id();
 		      out << id; 
@@ -339,26 +331,19 @@ Stream& operator<<( Stream& out,
 	}
 	return out;
 }
-template< typename Stream, typename Cell_,
-          typename Boundary_,
-          typename Data_,
-          typename Hash_, 
-          template< typename ...> class Storage_> 
+
+template< typename Stream, typename ...Args>
 Stream& operator<<( Stream& out, 
-		    const ctl::detail::Generic_complex< Cell_, Boundary_, Data_, Hash_, Storage_>&& c){
+		    const ctl::detail::Generic_complex< Args...>&& c){
 	out << c;
 	return out;
 }
-template< typename Stream, typename Cell_,
-          typename Boundary_,
-          typename Data_,
-          typename Hash_, 
-          template< typename ...> class Storage_> 
-Stream& operator>>( Stream& in, ctl::detail::Generic_complex< Cell_, Boundary_, Data_, Hash_, Storage_> & c){  
+
+template< typename Stream, typename ...Args>
+Stream& operator>>( Stream& in, ctl::detail::Generic_complex< Args...> & c){  
 	return c.read( in); 
 }
 
-} //namespace detail
 } //namespace ctl
 
 #endif //CTL_CHAIN_COMPLEX_MAP_H

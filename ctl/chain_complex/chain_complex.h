@@ -1,5 +1,5 @@
-#ifndef CTL_CHAIN_COMPLEX_H
-#define CTL_CHAIN_COMPLEX_H
+#ifndef CTL_COMPLEX_STORAGE_H
+#define CTL_COMPLEX_STORAGE_H
 /*******************************************************************************
 * -Academic Honesty-
 * Plagarism: The unauthorized use or close imitation of the language and
@@ -179,4 +179,4 @@ void read_complex(String & complex_name, Complex & complex){
 
 } //namespace ctl
 
-#endif //CTL_CHAIN_COMPLEX_H
+#endif //CTL_CHAIN_COMPLEX_MAP_H
