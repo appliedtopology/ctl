@@ -1,5 +1,5 @@
-#ifndef CTL_DEFAULT_COMPLEX_STORAGE_H
-#define CTL_DEFAULT_COMPLEX_STORAGE_H
+#ifndef CTL_DATA_WRAPPER_H
+#define CTL_DATA_WRAPPER_H
 /*******************************************************************************
 * -Academic Honesty-
 * Plagarism: The unauthorized use or close imitation of the language and
@@ -35,46 +35,58 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 * NOTES:
-* August 29, 2014 -- We are refactoring our Chain_complex so that the underlying
-* Storage is divorced from the interface. This way we can use different types 
-* for different types of Cells. 
-*
-* We use Metaprogramming instead of inheritence so that the appropriate 
-* structures are determined at compile time.
-* 
-* This type dispatching is done here.
+* We use this to associate a single number to every cell opaquely.
 *******************************************************************************/
-
-//STL
-#include <type_traits>
-#include <unordered_map>
-
-//BLITZ
-#include <blitz/array.h>
-
-//CTL
-#include <ctl/utility/recombine.h>
-#include <ctl/cube/cube.h>
 
 namespace ctl {
 namespace detail {
 
-template< typename Data>
-using multi_array = blitz::Array< Data, 3>;
+template< typename Data_>
+class Data_wrapper : public Data_ {
+   private:
+   typedef Data_wrapper< Data_> Self;
+   public:
+   typedef std::size_t Id;
+   //default
+   Data_wrapper(): Data_(), id_( 0) {}
+   //id 
+   Data_wrapper( const Id & tid): Data_(), id_( tid){}
+   //copy
+   Data_wrapper( const Data_wrapper & from) : Data_( from), id_( from.id_){}
+   //move
+   Data_wrapper( const Data_wrapper && from): Data_( std::forward( from)),
+   	id_( std::move( from.id_)){
+   }
 
-template< typename Cell, 
-	  typename Data, 
-	  typename Hash 
-        >
-using Default_complex_storage = 
-typename std::conditional<
-//If C is a type of the form ctl::Cube< T> for any T, 
-std::is_same< typename recombine< Cell, Dummy>::type, 
-	      ctl::Cube< Dummy> >::value, 
-	      multi_array< Data>,
-	      std::unordered_map< Cell, Data, Hash>
-	    >::type;
-} //namespace detail								   
+   Self& operator=( const Self & from){
+   	Data_::operator=( from);
+   	id_ = from.id_;
+   	return *this;
+   }
+
+   Self& operator=( Self && from){
+   	Data_::operator=( from);
+   	id_ = std::move( from.id_);
+   	return *this;
+   }
+
+   bool operator==( const Self & b) const {
+	return (id_ == b.id_) && Data_::operator==( b);
+   }
+   bool operator!= (const Self & b) const { return !((*this)==b); }
+   Id id() const { return id_; }
+   void id( Id n){ id_ = n; }
+   private:
+   Id id_;
+}; // class Data_wrapper
+
+struct Default_data {}; //class Default_data for complex.
+template< typename Stream>
+Stream& operator<<( Stream & out, const Default_data & d){ return out; }
+template< typename Stream>
+Stream& operator<<( Stream & out, const Default_data && d){ return out; }
+} //namespace detail
+
 } //namespace ctl
 
-#endif //CTL_CHAIN_COMPLEX_MAP_H
+#endif //CTL_DEFAULT_WRAPPER

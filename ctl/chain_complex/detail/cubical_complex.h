@@ -56,7 +56,7 @@ template< typename Cell_,
 	  typename Boundary_,
 	  typename Data_,
 	  typename Hash_, 
-	  template< typename C, typename D, typename H_> class Storage_> 
+	  template< typename ...> class Storage_> 
 class Cubical_complex  {
 public: //Public types
    typedef Cell_ Cell; //Describes a fundamental object,
@@ -72,7 +72,7 @@ private: //Private types
    typedef std::vector< std::size_t>  Vector;
     
 public: //Public Types
-   typedef typename Storage::size_type size_type;
+   typedef typename std::size_t size_type;
    typedef typename Storage::iterator iterator;
    typedef typename Storage::const_iterator const_iterator;
    typedef typename std::pair< Cell, Data> value_type;
@@ -82,7 +82,8 @@ public:
    //Default
    Cubical_complex():  max_dim( 0) {}
 
-   Cubical_complex( Cell_boundary & bd_, const Vector& d_):
+   template< typename Range>
+   Cubical_complex( Cell_boundary & bd_, Range r1, Range r2, Range r3):
     cells(), bd( bd_), max_dim( d_.size()), dimensions( d_), 
     offsets( d_.size(), 0) {
 	Vector d( d_);
@@ -232,34 +233,6 @@ public:
 
 //Private functions
 private:
-
-/**
-* @brief Converts a multidimensional array index into a linear one.
-* @param cell_as_lattice_positions
-* @return index 
-*/
-std::size_t lattice_to_word( const Vector & cell_as_lattice_positions) const {
-	std::size_t index = 0;
-	return index;
-}
-
-/**
-* @brief Converts a linear index of an array into a multidimensional one.
-*
-* @param word
-* @param cell_as_lattice_positions
-*
-* @return 
-*/
-Vector& word_to_lattice( std::size_t word, Vector & cell_as_lattice_positions){	
-	return cell_as_lattice_positions;
-}
-
-void cell_to_word( const Cell & cell){
-}
-
-void word_to_cell( const std::size_t word, Cell & cell){
-}
 
 //Private members
 private:

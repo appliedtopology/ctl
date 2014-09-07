@@ -160,7 +160,7 @@ protected:
 namespace ctl{
 
 template< typename Complex_,
-	  typename Cell_boundary_ = typename Complex_::Boundary,
+	  typename Cell_boundary_ = typename Complex_::Cell_boundary,
 	  typename Iterator_ = typename Complex_::iterator >
 class Complex_boundary{
 	typedef Complex_boundary< Complex_> Self;
@@ -196,13 +196,13 @@ class Complex_boundary{
 	Complex_boundary( Complex & complex): _complex( complex) {};
 	
 	const_iterator begin( const typename Term::Cell & c) const {
-		return const_iterator( _complex, _complex.boundary(), c->first);
+		return const_iterator( _complex, _complex.cell_boundary(), c->first);
 	}
 	const_iterator end( const typename Term::Cell & c) const {
 		return const_iterator( _complex);
 	}
 	size_type length( const typename Term::Cell & c) const {
-		return _complex.boundary().length( c->first);
+		return _complex.cell_boundary().length( c->first);
 	}
 		
 	private:		

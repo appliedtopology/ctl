@@ -1,5 +1,5 @@
-#ifndef CTL_COMPLEX_STORAGE_H
-#define CTL_COMPLEX_STORAGE_H
+#ifndef CTL_CHAIN_COMPLEX_H
+#define CTL_CHAIN_COMPLEX_H
 /*******************************************************************************
 * -Academic Honesty-
 * Plagarism: The unauthorized use or close imitation of the language and
@@ -125,9 +125,8 @@ template< typename Cell,
 	  typename Boundary, 
 	  typename Data = detail::Default_data, 
 	  typename Hash = ctl::Hash< Cell>, 
-	  template< typename, typename, typename> 
-	  class Storage = detail::Default_complex_storage, 
-       >
+	  template<class ...> 
+	  class Storage = ctl::detail::Default_complex_storage >
 //meta code for the Chain_complex type.
 //This metacode creates a type, Chain_complex< C, B, D, H, S>
 using Chain_complex = 
