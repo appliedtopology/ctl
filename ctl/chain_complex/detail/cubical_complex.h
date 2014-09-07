@@ -54,6 +54,9 @@
 #include <ctl/cube/cube.h>
 #include <ctl/chain_complex/detail/cube_boundary_wrapper.h>
 
+//BOOST
+#include <boost/iterator/transform_iterator.hpp>
+
 //CTL
 #include <ctl/io/io.h>
 #include <ctl/cube/cube.h>
@@ -446,6 +449,18 @@ private:
   Coordinate& vertex_id_to_coordinate( std::size_t index, Coordinate & c){
     c.resize( index_data.size()-1, 0);
     for( auto i = index_data.size()-1; i>1;  --i){ 
+        c[ i] = index/ index_data[ i-1];
+        index -= c[ i]*(index_data[ i-1]);
+	c[ i] = 2*c[ i] + cells.base( i);
+    }
+    c[ 0] = 2*index + cells.base( 0);
+    return c;
+  }
+
+  template< typename Coordinate>
+  void vertex_id_to_position( std::size_t index, Coordinate & c){
+    c.resize( index_data.size(), 0);
+    for( auto i = index_data.size()-1; i>0;  --i){ 
         c[ i] = index/ index_data[ i-1];
         index -= c[ i]*(index_data[ i-1]);
 	c[ i] = 2*c[ i] + cells.base( i);

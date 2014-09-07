@@ -140,6 +140,7 @@ class multi_array {
 
 
 
+
    
   /**
   * @brief Reindexes the array to be "rooted" at position given by c 
