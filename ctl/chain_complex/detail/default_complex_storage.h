@@ -1,5 +1,5 @@
-#ifndef CTL_COMPLEX_STORAGE_H
-#define CTL_COMPLEX_STORAGE_H
+#ifndef CTL_DEFAULT_COMPLEX_STORAGE_H
+#define CTL_DEFAULT_COMPLEX_STORAGE_H
 /*******************************************************************************
 * -Academic Honesty-
 * Plagarism: The unauthorized use or close imitation of the language and
@@ -49,8 +49,8 @@
 #include <type_traits>
 #include <unordered_map>
 
-//BOOST
-#include <boost/multi_array.hpp>
+//BLITZ
+#include <blitz/array.h>
 
 //CTL
 #include <ctl/utility/recombine.h>
@@ -60,7 +60,7 @@ namespace ctl {
 namespace detail {
 
 template< typename Data>
-using multi_array = boost::multi_array< Data, 3>;
+using multi_array = blitz::Array< Data, 3>;
 
 template< typename Cell, 
 	  typename Data, 
