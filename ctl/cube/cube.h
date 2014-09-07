@@ -47,6 +47,7 @@
 #include <initializer_list>  // std::initializer_list
 #include <iostream> //cout (debug only)
 #include <algorithm> //sort, unique
+#include <ctl/cube/cube_boundary.h>
 
 /*! \namespace ctl
 Namespace where all library functionality resides
@@ -63,7 +64,11 @@ namespace detail{
 * This class describes an cube for a cubical chain complex.
 * While a cube is defined as a product of intervals, a cubical complex
 * does not store a vector of these. A cube is infact stored implicitly
-* as an address to its data, and we provide the mirage of the definition.
+* as an address to its data. This class exists as a mirage.  
+* It can be used for "by hand" computations and examples. The cubical complex
+* produces a "cube," for example when deferencing an iterator over the range
+* of stored cubes, however, it is generated on the fly.
+*
 * This object does not itself have the facility for a boundary, this is handled
 * by a separate boundary operator.
 */
@@ -92,26 +97,35 @@ class Cube {
 	typedef typename Vector::reverse_iterator reverse_iterator;
 	public:
 	//! Default constructor
-	Cube(): intervals(){};
+	Cube(): intervals(), dimension_( 0){};
 	//! Reserves space for at least d intervals.
-	Cube( size_t d) { intervals.reserve( d); }
-	//! Reserves space for at least d intervals and initializes them to t
-	Cube( size_t d, const T & t): intervals( d, t){}
+	Cube( size_t d) : dimension_(0){ intervals.reserve( d); }
+	//! Creates a vertex [t,t]
+	Cube( size_t d, const T & t): intervals( 1, Interval( t, t)), dimension_( 0){}
 	//! Initializer list constructor
-	Cube( const Init_list & il) : intervals( il) {
+	Cube( const Init_list & il) : intervals( il), dimension_( 0) {
 		sort( intervals.begin(), intervals.end() );
 		intervals.erase( unique( intervals.begin(), intervals.end() ), 
 				intervals.end() );
+		for( auto& i: intervals){ dimension_ += (i.first == i.second); }
 	}
+
 	//!  Range constructor 
 	template< typename Iterator>
-	Cube( const Iterator begin, const Iterator end): intervals( begin,end){}
+	Cube( const Iterator begin, const Iterator end): 
+	intervals( begin,end), dimension_( 0){
+		for( auto& i: intervals){ dimension_ += (i.first == i.second); }
+	}
+
 	//! Copies the data from one cube to another
-	Cube( const Self & from): intervals( from.intervals){}
+	Cube( const Self & from): intervals( from.intervals), dimension_( from.dimension_){}
+
 	//! Moves the data from one cube to another
 	Cube( Self && from): intervals( std::move( from.intervals)){}
+
 	//! returns an iterator to the first vertex in the cube
 	iterator       begin()	        { return intervals.begin(); }
+
 	//! returns a const_iterator to the first vertex in the cube
 	const_iterator begin()  const	{ return intervals.begin(); }
 	
@@ -120,21 +134,25 @@ class Cube {
 	* @return iterator
 	*/
 	iterator         end()	  	{ return intervals.end();   }
+
 	/**
 	* @brief returns a const_iterator to the past-the-end vertex in the cube
 	* @return const_iterator
 	*/
 	const_iterator   end()  const	{ return intervals.end();   }
+
 	/*!
 	* @brief returns a reverse_iterator to the last vertex in the cube
 	* @return reverse_iterator
 	*/
 	reverse_iterator        rbegin()	{ return intervals.rbegin(); }
+
 	/*!
 	* @brief returns a const_reverse_iterator to the last vertex in the cube
 	* @return const_reverse_iterator
 	*/
 	const_reverse_iterator  rbegin()  const	{ return intervals.rbegin(); }
+
 	/*!
 	 * @brief Returns a reverse_iterator pointing to the theoretical element 
  	 * preceding the first element in the container 
@@ -142,6 +160,7 @@ class Cube {
 	 * @return reverse_iterator
 	 */
 	reverse_iterator         rend()	        { return intervals.rend(); }
+
 	/*!
 	 * @brief Returns a const_reverse_iterator 
 	 * pointing to the theoretical element 
@@ -150,14 +169,16 @@ class Cube {
 	 * @return const_reverse_iterator
 	 */
 	const_reverse_iterator   rend()  const	{ return intervals.rend(); }
-	/*! Returns the size of the cube
-	 * @return size_t
-	 */
-	size_t       size() const	{ return intervals.size(); 	}
+
+	/*! 
+	* Returns the total number of elements in the cube.
+	* @return size_t 
+	*/
+	size_t  size() const	{ return intervals.size(); 	  	}
 	/*! Returns the dimension of the cube
 	 * @return size_t
 	 */
-	size_t  dimension() const	{ return size()-1; 	  	}
+	size_t  dimension() const	{ return dimension_; 	  	}
 
 	/*! Returns the capacity of the cube
 	* @return size_t
@@ -168,13 +189,14 @@ class Cube {
 	void clear() { intervals.clear(); }
 
 	/*!
-	* @brief Inserts the vertex v if it doesn't already exist
+	* @brief Inserts the interval v if it doesn't already exist
 	* @param const vertex_type & v
 	* @return iterator to the vertex v in the cube
 	*/
-	iterator insert( const vertex_type & v){
+	iterator insert( const value_type & v){
 	      iterator pos = std::lower_bound( begin(), end(), v);
 	      if(pos != end() && *pos == v) { return pos; }
+	      dimension_ += (v.first == v.second);
 	      return intervals.insert( pos, v);
 	}
 
@@ -190,7 +212,8 @@ class Cube {
 				    intervals.begin()+offset, intervals.end());
 		intervals.erase( unique( intervals.begin(), intervals.end() ), 
 				intervals.end() );
-	
+		dimension_ = 0;
+		for( auto&i: intervals){ dimension_ += (i.first == i.second); }	
 	}
 
 	/**
@@ -206,6 +229,9 @@ class Cube {
 				    intervals.begin()+offset, intervals.end());
 		intervals.erase( unique( intervals.begin(), intervals.end() ), 
 				intervals.end() );
+		dimension_ = 0;
+		for( auto&i: intervals){ dimension_ += (i.first == i.second); }	
+	
 	}
 	
 	/**
@@ -214,10 +240,11 @@ class Cube {
 	* @return An iterator to the new location of the 
 		  element that followed the element erased 
 	*/
-	iterator remove( const vertex_type v){
+	iterator remove( const value_type v){
 		iterator pos = std::lower_bound( begin(), end(), v);
 		//element not in list
 		if (pos == end()){ return pos; }
+		dimension_ -= (pos->first == pos->second);
 		return intervals.erase( pos);
 	}
 	/**
@@ -228,7 +255,10 @@ class Cube {
 	*/
 
 	iterator remove( iterator first, iterator last){
-		return intervals.erase( first, last);
+		auto r= intervals.erase( first, last);
+		dimension_ = 0;
+		for( auto&i: intervals){ dimension_ += (i.first != i.second); }	
+		return r;	
 	}
 
 	/**
@@ -237,7 +267,8 @@ class Cube {
 	* @return Reference to the assigned to cube
 	*/
 	Self& operator=( const Self & b) { 
-		intervals = b.intervals; 
+		intervals = b.intervals;
+		dimension_ = b.dimension_; 
 		return *this;
 	}
 
@@ -248,6 +279,7 @@ class Cube {
 	*/
 	Self& operator=( Self && b) {
 		intervals = std::move( b.intervals); 
+		dimension_ = std::move( b.dimension_); 
 		return *this;
 	}
 
@@ -263,7 +295,8 @@ class Cube {
 		std::lexicographical_compare( begin(), end(), 
 					      b.begin(), b.end()));
 	}
-
+	void reserve( std::size_t n){ intervals.reserve( n); }
+	void resize( std::size_t n){ intervals.resize( n); }
 	/**
 	* @brief Equality operator
 	* @param const Cube & b
@@ -286,7 +319,20 @@ class Cube {
 
 	private:
 	Vector intervals;
+	size_t dimension_;
+
+	//typename Self since the compiler complains
+	template< typename Term> 
+	friend class ctl::detail::const_cube_boundary_iterator;
 }; //Cube
+template< typename Stream, typename T>
+Stream& operator<<( Stream & out, const ctl::Cube< T> & c){
+    for( auto i = c.begin(); i != c.end(); ++i){
+    	out << "[" << i->first << "," << i->second << "]";  
+    	if( i+1 != c.end()){ out << " x "; }		
+    }
+	return out;
+} 
 } //namespace ctl
 
 #endif //CUBE_H
