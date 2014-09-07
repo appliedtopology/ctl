@@ -122,8 +122,23 @@ class multi_array {
    data( begin1, end1), d_( begin, end), extents_( begin, end), base_( base__){ 
    assert( base_.size() == d_.size());
    for( auto i = ++d_.begin(); i != d_.end(); ++i){ *i *= *(i-1); }
-   data.resize( *(d_.rbegin())); 
   }
+  /**
+  * @brief Complete constructor, specifies extents_, data, 
+  * and optionally, base coordinate
+  * @tparam Extents_iterator
+  * @param begin
+  * @param end
+  */
+  template< typename Extents_iterator, typename Coordinate>
+  multi_array( Extents_iterator begin, Extents_iterator end, 
+	       Coordinate & base__): 
+   d_( begin, end), extents_( begin, end), base_( base__){ 
+   assert( base_.size() == d_.size());
+   for( auto i = ++d_.begin(); i != d_.end(); ++i){ *i *= *(i-1); }
+   data.resize( *(d_.rbegin()));
+  }
+
 
 
    
@@ -252,6 +267,8 @@ class multi_array {
   */
   Index_data extents() const { return extents_; }
   Index_data base() const    { return base_; } 
+  std::size_t base( std::size_t i) const    { return base_[ i]; }
+  std::size_t dimension() const { return extents_.size(); } 
   /**
   * @brief Coverts linear index into coordinate vector c
   *
@@ -288,6 +305,29 @@ class multi_array {
      for( auto i = 1; i != d_.size(); ++i){ index += (c[ i]-base_[ i])*d_[ i-1];}
      return index;
   }
+  bool operator==( const multi_array & o) const {
+	return (data == o.data) && (d_ == o.d_) && (extents_ == o.extents_) &&
+		(base_ == o.base_);
+  }
+  bool operator!= ( const multi_array & o) const {
+	return !((*this)==o);
+  }
+  multi_array& operator=( const multi_array&& o) {
+	data = std::move( o.data);
+	d_ = std::move( o.d_);
+	extents_ = std::move( o.extents_);
+	base_ = std::move( o.base_);
+	return *this;	
+  }
+ 
+  multi_array& operator=( const multi_array& o) {
+	data = o.data;
+	d_ =  o.d_;
+	extents_ = o.extents_;
+	base_ = o.base_;
+	return *this;	
+  } 
+
   private:
   Vector data; //the actual data
   //TODO: Optimize this with libdivide.

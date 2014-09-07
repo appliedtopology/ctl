@@ -45,6 +45,9 @@
 #include <sstream>
 #include <fstream>
 
+//BOOST
+#include <boost/iterator/transform_iterator.hpp>
+
 //CTL
 #include <ctl/io/io.h>
 #include <ctl/cube/cube.h>
@@ -80,67 +83,63 @@ public: //Public Types
 public:
    //Constructors
    //Default
-   Cubical_complex():  max_dim( 0) {}
+   Cubical_complex() {}
 
-   template< typename Range>
-   Cubical_complex( Cell_boundary & bd_, Range r1, Range r2, Range r3):
-    cells(), bd( bd_), max_dim( d_.size()), dimensions( d_), 
-    offsets( d_.size(), 0) {
-	Vector d( d_);
-	for( auto & i: d) { i = 2*i-1; }
- 	cells.resize( d);
-    }
+   template< typename Vertex_extents>
+   Cubical_complex( Cell_boundary & bd_, Vertex_extents & d_):
+    cells( boost::make_transform_iterator( d_.begin(), 
+					  [](const std::size_t & i){ return 2*i-1; }), 
+	   boost::make_transform_iterator( d_.end(), 
+					  [](const std::size_t & i){ return 2*i-1; })), 
+	   bd( bd_), index_data( d_) {
+   	   for( auto i = ++index_data.begin(); 
+		     i != index_data.end(); ++i){ 
+		     *i *= *(i-1); 
+		}
+	}
 
+   template< typename Vertex_extents> 
    Cubical_complex( Cell_boundary & bd_, 
-		    const Vector& d_,
-		    const Vector& offsets_): 
-    cells( d_), bd( bd_), max_dim( d_.size()), 
-    dimensions( d_), offsets( offsets_) {
-    cells.reserve( std::accumulate( d_.begin(), d_.end(), 0));
-   }
+		    const Vertex_extents& d_,
+		    const Vertex_extents& offsets_): 
+     cells( boost::make_transform_iterator( d_.begin(), 
+					  [](const std::size_t & i){ return 2*i-1; }), 
+	   boost::make_transform_iterator( d_.end(), 
+					  [](const std::size_t & i){ return 2*i-1; })), 
+    bd( bd_), index_data( d_){}
 
    //Copy
-   Cubical_complex( const Cubical_complex & b): cells( b.cells), bd( b.bd),
-   		    max_dim( b.max_dim), 
-		    dimensions( b.dimensions),
-		    offsets( b.offsets) {}
+   Cubical_complex( const Cubical_complex & b): 
+   cells( b.cells), bd( b.bd), index_data( b.index_data) {}
 
    //Move
-   Cubical_complex( Cubical_complex && b): cells( std::move( b.cells)),
-   			  bd( std::move( b.bd)),
-   			  max_dim( std::move( b.max_dim)), 
-			  dimensions( std::move( b.dimensions)), 
-			  offsets( std::move( b.offsets)) {}
+   Cubical_complex( Cubical_complex && b): 
+   cells( std::move( b.cells)), bd( std::move( b.bd)),
+   index_data( std::move( b.index_data)) {}
 
    //Assignment operator
    Cubical_complex& operator=( const Cubical_complex& b){
    	bd = b.bd;
-   	max_dim = b.max_dim;
    	cells = b.cells;
-	dimensions = b.dimensions;
-        offsets = b.offsets;
+	index_data = b.index_data;
    	return *this;
    }
 
    //Move assignment operator
    Cubical_complex& operator=( Cubical_complex&& b){
    	bd      = std::move( b.bd);
-   	max_dim = std::move( b.max_dim);
    	cells   = std::move( b.cells);
-	dimensions = std::move( b.dimensions);
-        offsets = std::move( b.offsets);
+	index_data = std::move( b.index_data);
    	return *this;
    }
 
    iterator       find_cell( const Cell & s) {
 	std::size_t linear_index = cell_to_word( s);
-        if( cells.size() <= linear_index) { return cells.end(); }
 	return cells.begin()+linear_index;
    }
 
    const_iterator find_cell( const Cell & s) const { 
 	std::size_t linear_index = cell_to_word( s);
-        if( cells.size() <= linear_index) { return cells.end(); }
 	return cells.begin()+linear_index;
    }
 
@@ -177,7 +176,6 @@ public:
    Stream& read( Stream & in){
 	std::size_t line_num = 0;
 	std::string line;
-	std::size_t id=0;
         char the_first_character = in.peek();
 	const bool headers_enabled = (the_first_character == 's');
 	if( !headers_enabled) { 
@@ -189,35 +187,41 @@ public:
         ctl::get_line( in, line, line_num);
         std::istringstream ss( line);
         std::string the_word_size;
+	std::size_t max_dim;  
         ss >> the_word_size;
         ss >> max_dim; 
-	//keep track of the number of dimensions.
-	dimensions.resize( max_dim);
+	//keep track of the number of index_data.
+	index_data.resize( max_dim);
 	std::size_t length;
 	for( std::size_t i = 0; i < max_dim; ++i){
 		ss >> length;
-		//we think of a grid which is the 
-		//cartesian product like this:
-		//*-*-*-*-* x *-*-*-*
-		dimensions[ i] =  2*length-1;
+		index_data[ i] =  length; 
 	}
-	//we create an array with this number of entries
-	cells.resize( dimensions);
+
+	//we think of a grid which is the 
+	//cartesian product like this:
+	//*-*-*-*-* x *-*-*-*
+	
+	cells.resize( boost::make_transform_iterator( index_data.begin(), 
+		      [](const std::size_t & i){ return 2*i-1; }), 
+	   	      boost::make_transform_iterator( index_data.end(), 
+		      [](const std::size_t & i){ return 2*i-1; }));
+ 
+	for( auto i = ++(index_data.begin()); 
+		  i != index_data.end(); ++i){ *i *= *(i-1); }
 	std::size_t vertex_id_number=0;
 	while( ctl::get_line(in, line, line_num)){
 	     std::istringstream ss( line);
 	     //and it's id
-	     ss >> id;
-	     Data d( id);
-	     //TODO: vertex_id_number --> vertex_position
-	     //insert_open_cell( cell, d);
-	     ++vertex_id_number;
+	     Data d( vertex_id_number);
+	     insert_open_cell( Cell( 1, vertex_id_number), d);
 	}
 	return in;
    }
    void reserve( const std::size_t n) { cells.reserve( n); }
-   const std::size_t dimension() const { return max_dim; }
+   const std::size_t dimension() const { return cells.dimension(); }
    const std::size_t size() const { return cells.size(); }
+   const std::size_t size( std::size_t i) const { return cells.extents( i); }
    Cell_boundary& cell_boundary() { return bd; }
    bool is_closed() const{
    	for( auto sigma : cells){
@@ -234,13 +238,23 @@ public:
 //Private functions
 private:
 
+  template< typename Coordinate>
+  void vertex_id_to_position( std::size_t index, Coordinate & c){
+    c.resize( index_data.size(), 0);
+    for( auto i = index_data.size()-1; i>0;  --i){ 
+        c[ i] = index/ index_data[ i-1];
+        index -= c[ i]*(index_data[ i-1]);
+	c[ i] = 2*c[ i] + cells.base( i);
+    }
+    c[ 0] = 2*index + cells.base( 0);
+    return c;
+  }
+
 //Private members
 private:
    Storage cells;
-   Vector dimensions;
-   Vector offsets;
+   Vector index_data;
    Cell_boundary bd;
-   std::size_t max_dim;
 }; //chain_complex
 } //namespace ctl
 

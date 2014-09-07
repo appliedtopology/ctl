@@ -148,6 +148,35 @@ std::is_same< typename detail::recombine< Cell, detail::Dummy>::type,
 			       Hash, 
 			       Storage> 
 	    >::type;
+
+//! Utility to read a complex and any associated data 
+template<typename String, typename Complex, typename Functor>
+void read_complex_and_data(String & complex_name, String & data_file, 
+			   Complex & complex, Functor & f){
+	std::ifstream in;
+	std::cout << "File IO ..." << std::flush;
+	//first read the complex in
+	ctl::open_file( in, complex_name.c_str());
+	complex.read( in);
+	ctl::close_file( in);
+	//then read the data file in, e.g. weights, cover, etc..
+	ctl::open_file( in, data_file.c_str());
+	complex.read_data( in, f);	
+	ctl::close_file( in);
+	std::cout << "completed!" << std::endl;
+}
+
+//! Utility to read a complex 
+template<typename String, typename Complex>
+void read_complex(String & complex_name, Complex & complex){
+	std::ifstream in;
+	std::cout << "File IO ..." << std::flush;
+	ctl::open_file( in, complex_name.c_str());
+	complex.read( in);
+	ctl::close_file( in);
+	std::cout << "completed!" << std::endl;
+}
+
 } //namespace ctl
 
 #endif //CTL_CHAIN_COMPLEX_MAP_H
