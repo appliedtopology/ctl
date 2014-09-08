@@ -70,6 +70,8 @@ class multi_array {
   typedef typename Vector::size_type size_type;
   typedef typename Vector::iterator iterator;
   typedef typename Vector::const_iterator const_iterator;
+  typedef typename Vector::reverse_iterator reverse_iterator;
+  typedef typename Vector::const_reverse_iterator const_reverse_iterator;
   
   /**
   * @brief Default constructor
@@ -118,7 +120,7 @@ class multi_array {
 	    typename Coordinate, typename Data_iterator>
   multi_array( Extents_iterator begin, Extents_iterator end,
 	       Data_iterator begin1, Data_iterator end1, 
-	       Coordinate & base__): 
+	       const Coordinate & base__): 
    data( begin1, end1), d_( begin, end), extents_( begin, end), base_( base__){ 
    assert( base_.size() == d_.size());
    for( auto i = ++d_.begin(); i != d_.end(); ++i){ *i *= *(i-1); }
@@ -132,7 +134,7 @@ class multi_array {
   */
   template< typename Extents_iterator, typename Coordinate>
   multi_array( Extents_iterator begin, Extents_iterator end, 
-	       Coordinate & base__): 
+	       const Coordinate & base__): 
    d_( begin, end), extents_( begin, end), base_( base__){ 
    assert( base_.size() == d_.size());
    for( auto i = ++d_.begin(); i != d_.end(); ++i){ *i *= *(i-1); }
@@ -289,7 +291,22 @@ class multi_array {
     c[ 0] = index + base_[ 0];
     return c;
   }
-
+  template< typename Coordinate>
+  Coordinate& iterator_to_coordinate( iterator i, Coordinate & c) const {
+	return index_to_coordinate( std::distance( begin(), i), c);
+  }
+  template< typename Coordinate>
+  Coordinate& iterator_to_coordinate( const_iterator i, Coordinate & c) const {
+	return index_to_coordinate( std::distance( begin(), i), c);
+  }
+  template< typename Coordinate>
+  Coordinate& iterator_to_coordinate( reverse_iterator i, Coordinate & c) const {
+	return index_to_coordinate( std::distance( rbegin(), i), c);
+  }
+  template< typename Coordinate>
+  Coordinate& iterator_to_coordinate( const_reverse_iterator i, Coordinate & c) const {
+	return index_to_coordinate( std::distance( rbegin(), i), c);
+  }
   /**
   * @brief Converts a coordinate vector into a linear index 
   *

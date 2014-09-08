@@ -1,5 +1,5 @@
-#ifndef CTLIB_COMPLEX_BOUNDARY_H
-#define CTLIB_COMPLEX_BOUNDARY_H
+#ifndef CTL_COMPLEX_BOUNDARY_H
+#define CTL_COMPLEX_BOUNDARY_H
 /*******************************************************************************
 * -Academic Honesty-
 * Plagarism: The unauthorized use or close imitation of the language and 
@@ -131,11 +131,7 @@ public:
 protected:
   void _next_term(){
 	if( next_term != end_term){
-		//#ifdef NDEBUG
-		//__builtin_prefetch( complex->_get_bucket_address( future_term->cell()));
-		//#endif
 		term.cell() = complex->find_cell( next_term->cell());
-		//++future_term;
 		term.coefficient( next_term->coefficient());
 		++next_term;
 		return;
@@ -196,13 +192,13 @@ class Complex_boundary{
 	Complex_boundary( Complex & complex): _complex( complex) {};
 	
 	const_iterator begin( const typename Term::Cell & c) const {
-		return const_iterator( _complex, _complex.cell_boundary(), c->first);
+	  return const_iterator( _complex, _complex.cell_boundary(), c->first);
 	}
 	const_iterator end( const typename Term::Cell & c) const {
-		return const_iterator( _complex);
+	  return const_iterator( _complex);
 	}
 	size_type length( const typename Term::Cell & c) const {
-		return _complex.cell_boundary().length( c->first);
+	  return _complex.cell_boundary().length( c->first);
 	}
 		
 	private:		

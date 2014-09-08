@@ -39,8 +39,10 @@
 //CTL
 //abstract_simplex
 #include <ctl/abstract_simplex/abstract_simplex.h>
-#include <ctl/cube/cube.h>
 #include <ctl/abstract_simplex/simplex_boundary.h>
+//cube
+#include <ctl/cube/cube.h>
+#include <ctl/cube/cube_boundary.h>
 
 //chain_complex
 #include <ctl/chain_complex/chain_complex.h>
@@ -52,10 +54,17 @@ typedef ctl::Finite_field< 3> Z2;
 typedef ctl::Simplex_boundary< Simplex, Z2 > Simplex_boundary;
 typedef ctl::Chain_complex< Simplex, Simplex_boundary> Simplicial_complex;
 typedef Simplicial_complex::Cell Cell;
+
 typedef ctl::Cube< int> Cube;
-typedef ctl::Chain_complex< Cube, Simplex_boundary> Cubical_complex;
-typedef ctl::Complex_boundary< Simplicial_complex> Complex_boundary;
-typedef Complex_boundary::const_iterator boundary_iterator;
+typedef ctl::Cube_boundary< Cube, Z2 > Cube_boundary;
+typedef ctl::Chain_complex< Cube, Cube_boundary> Cubical_complex;
+
+typedef ctl::Complex_boundary< Simplicial_complex> Simplicial_complex_boundary;
+typedef Simplicial_complex_boundary::const_iterator simplicial_boundary_iterator;
+
+typedef ctl::Complex_boundary< Cubical_complex> Cubical_complex_boundary;
+typedef Cubical_complex_boundary::const_iterator cubical_boundary_iterator;
+
 int main( int argc, char** argv){
 	Simplicial_complex complex;
 	Cell s( {1,2,3,4} );
@@ -64,14 +73,14 @@ int main( int argc, char** argv){
 	std::cout << "complex is " << ((complex.is_closed())? "closed":"not closed") << std::endl; 
 	std::cout << complex << std::endl;
 
-	Complex_boundary b( complex);
-	Complex_boundary copyd( b);
-	Complex_boundary moved( std::move( copyd));
+	Simplicial_complex_boundary b( complex);
+	Simplicial_complex_boundary copyd( b);
+	Simplicial_complex_boundary moved( std::move( copyd));
 	for( auto i = complex.begin(); i != complex.end(); ++i){
 	std::cout << "boundary test: " << ctl::delta << "("  
 		  << i->first << ")" << std::endl;
 	std::cout << "boundary length: " << b.length( i) << std::endl;
-	for( boundary_iterator j = b.begin( i); j != b.end( i); ++j){
+	for( simplicial_boundary_iterator j = b.begin( i); j != b.end( i); ++j){
 		std::cout << j->cell()->first << " ";
 	}
 	std::cout << std::endl;
@@ -79,6 +88,8 @@ int main( int argc, char** argv){
 	std::ofstream out( "test.asc");
 	complex.write( out); 
 
-	Cubical_complex complex1;
+	std::vector< std::size_t> sizes{100,200};
+	std::vector< std::size_t> start{3,97};
+	Cubical_complex complex1( sizes, start);
 	return 0;
 }

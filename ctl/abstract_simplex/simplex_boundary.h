@@ -88,7 +88,7 @@ class const_simplex_boundary_iterator :
 	face( std::move(from.face)), 
 	removed( std::move(from.removed)){ from.cellptr = 0; }	
 	//equality
-	const_simplex_boundary_iterator& operator==( const Self & b) const { 
+	bool operator==( const Self & b) const { 
 		return (b.cellptr == cellptr) && (b.pos == pos); 
 	} 
 	const_simplex_boundary_iterator& operator=(const Self & b){

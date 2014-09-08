@@ -51,6 +51,8 @@
 //CTL
 #include <ctl/io/io.h>
 #include <ctl/cube/cube.h>
+#include <ctl/chain_complex/detail/cube_boundary_wrapper.h>
+#include <ctl/chain_complex/detail/cubical_iterator.h>
 
 namespace ctl {
 namespace detail {
@@ -65,20 +67,36 @@ public: //Public types
    typedef Cell_ Cell; //Describes a fundamental object,
 		       //e.g. Simplex, Cube, Polygon, etc..
 
-   typedef Boundary_ Cell_boundary; //Describes how to take Cell boundary
    //Arbitrary data associated to space.
    typedef Data_ Data;
    typedef Hash_ Hash;
 
 private: //Private types
+   //Usually this is multi_array< Data> 
    typedef Storage_< Cell, Data, Hash> Storage;
    typedef std::vector< std::size_t>  Vector;
-    
 public: //Public Types
    typedef typename std::size_t size_type;
-   typedef typename Storage::iterator iterator;
-   typedef typename Storage::const_iterator const_iterator;
-   typedef typename std::pair< Cell, Data> value_type;
+
+   typedef cubical_iterator< Storage, Vector, 
+			     typename Storage::iterator> 
+			     iterator;
+   typedef cubical_iterator< Storage, Vector, 
+			     typename Storage::const_iterator> 
+			     const_iterator;
+   typedef cubical_iterator< Storage, Vector, 
+			     typename Storage::reverse_iterator> 
+			     reverse_iterator;
+   typedef cubical_iterator< Storage, Vector, 
+			     typename Storage::const_reverse_iterator> 
+			     const_reverse_iterator;
+
+   //Describes how to take Cell boundary
+   //we overload the normal cubical boundary to make begin() and end() 
+   //take as input lattice coordinates and return lattice coordinates
+   typedef Cube_boundary_wrapper< Boundary_, 
+			          typename iterator::value_type::first_type> 
+				  Cell_boundary; 
 
 public:
    //Constructors
@@ -96,7 +114,29 @@ public:
 		     i != index_data.end(); ++i){ 
 		     *i *= *(i-1); 
 		}
+	   
 	}
+
+   template< typename Vertex_extents> 
+   Cubical_complex( const Vertex_extents& d_): 
+     cells( boost::make_transform_iterator( d_.begin(), 
+					  [](const std::size_t & i){ return 2*i-1; }), 
+	   boost::make_transform_iterator( d_.end(), 
+					  [](const std::size_t & i){ return 2*i-1; })), 
+    index_data( d_){}
+
+
+
+   template< typename Vertex_extents> 
+   Cubical_complex( const Vertex_extents& d_,
+		    const Vertex_extents& offsets_): 
+     cells( boost::make_transform_iterator( d_.begin(), 
+					  [](const std::size_t & i){ return 2*i-1; }), 
+	   boost::make_transform_iterator( d_.end(), 
+					  [](const std::size_t & i){ return 2*i-1; }), 
+	   offsets_.begin(), offsets_.end()), 
+    index_data( d_){}
+
 
    template< typename Vertex_extents> 
    Cubical_complex( Cell_boundary & bd_, 
@@ -143,11 +183,23 @@ public:
 	return cells.begin()+linear_index;
    }
 
-   iterator       begin()       { return cells.begin(); }
-   iterator         end()       { return cells.end();   }
+   template< typename Coordinate>
+   iterator       find_cell( const Coordinate & s) {
+	std::size_t linear_index = cells.coordinate_to_word( s);
+	return cells.begin()+linear_index;
+   }
 
-   const_iterator begin() const { return cells.begin(); }
-   const_iterator   end() const { return cells.end();   }
+   template< typename Coordinate>
+   const_iterator find_cell( const Coordinate & s) const { 
+	std::size_t linear_index = cells.coordinate_to_word( s);
+	return cells.begin()+linear_index;
+   }
+   
+   iterator       begin()       { return iterator( cells, cells.begin()); }
+   iterator         end()       { return iterator( cells.end());   }
+
+   const_iterator begin() const { return const_iterator( cells, cells.begin()); }
+   const_iterator   end() const { return const_iterator( cells.end());   }
 
    template< typename Stream, typename Functor>
    Stream& write( Stream& out, const Functor & f) const {
@@ -238,6 +290,10 @@ public:
 //Private functions
 private:
 
+  std::size_t cell_to_word( const Cell & cell){
+	std::cerr << "not yet implemented. todo: fix this." << std::endl;
+	return size();
+  }
   template< typename Coordinate>
   void vertex_id_to_position( std::size_t index, Coordinate & c){
     c.resize( index_data.size(), 0);
