@@ -49,18 +49,13 @@
 #include <type_traits>
 #include <unordered_map>
 
-//BLITZ
-#include <blitz/array.h>
-
 //CTL
 #include <ctl/utility/recombine.h>
+#include <ctl/chain_complex/detail/multi_array.h>
 #include <ctl/cube/cube.h>
 
 namespace ctl {
 namespace detail {
-
-template< typename Data>
-using multi_array = blitz::Array< Data, 3>;
 
 template< typename Cell, 
 	  typename Data, 

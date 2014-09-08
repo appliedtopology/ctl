@@ -39,7 +39,6 @@
 //CTL
 //abstract_simplex
 #include <ctl/abstract_simplex/abstract_simplex.h>
-#include <ctl/cube/cube.h>
 #include <ctl/abstract_simplex/simplex_boundary.h>
 //cube
 #include <ctl/cube/cube.h>

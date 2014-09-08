@@ -60,6 +60,8 @@
 //CTL
 #include <ctl/io/io.h>
 #include <ctl/cube/cube.h>
+#include <ctl/chain_complex/detail/cube_boundary_wrapper.h>
+#include <ctl/chain_complex/detail/cubical_iterator.h>
 
 namespace ctl {
 namespace detail {
@@ -176,6 +178,27 @@ public:
    * @param d_
    * @param offsets_
    */
+   template< typename Vertex_extents> 
+   Cubical_complex( const Vertex_extents& d_): 
+     cells( boost::make_transform_iterator( d_.begin(), 
+					  [](const std::size_t & i){ return 2*i-1; }), 
+	   boost::make_transform_iterator( d_.end(), 
+					  [](const std::size_t & i){ return 2*i-1; })), 
+    index_data( d_){}
+
+
+
+   template< typename Vertex_extents> 
+   Cubical_complex( const Vertex_extents& d_,
+		    const Vertex_extents& offsets_): 
+     cells( boost::make_transform_iterator( d_.begin(), 
+					  [](const std::size_t & i){ return 2*i-1; }), 
+	   boost::make_transform_iterator( d_.end(), 
+					  [](const std::size_t & i){ return 2*i-1; }), 
+	   offsets_.begin(), offsets_.end()), 
+    index_data( d_){}
+
+
    template< typename Vertex_extents> 
    Cubical_complex( Cell_boundary & bd_, 
 		    const Vertex_extents& d_,
@@ -457,6 +480,10 @@ private:
     return c;
   }
 
+  std::size_t cell_to_word( const Cell & cell){
+	std::cerr << "not yet implemented. todo: fix this." << std::endl;
+	return size();
+  }
   template< typename Coordinate>
   void vertex_id_to_position( std::size_t index, Coordinate & c){
     c.resize( index_data.size(), 0);
