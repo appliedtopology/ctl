@@ -44,6 +44,7 @@
 #include <numeric>
 #include <sstream>
 #include <fstream>
+#include <functional>
 
 //BOOST
 #include <boost/iterator/transform_iterator.hpp>
@@ -56,6 +57,11 @@
 
 namespace ctl {
 namespace detail {
+
+//2*n+1
+struct tnpo : public std::unary_function<std::size_t, std::size_t> {
+	std::size_t operator()( const std::size_t & i) const { return 2*i-1; }
+}; //end struct tnpo
 
 template< typename Cell_,
 	  typename Boundary_,
@@ -98,6 +104,7 @@ public: //Public Types
 			          typename iterator::value_type::first_type> 
 				  Cell_boundary; 
 
+   
 public:
    //Constructors
    //Default
@@ -105,10 +112,8 @@ public:
 
    template< typename Vertex_extents>
    Cubical_complex( Cell_boundary & bd_, Vertex_extents & d_):
-    cells( boost::make_transform_iterator( d_.begin(), 
-					  [](const std::size_t & i){ return 2*i-1; }), 
-	   boost::make_transform_iterator( d_.end(), 
-					  [](const std::size_t & i){ return 2*i-1; })), 
+    cells( boost::make_transform_iterator( d_.begin(), tnpo()),  
+	   boost::make_transform_iterator( d_.end(), tnpo())), 
 	   bd( bd_), index_data( d_) {
    	   for( auto i = ++index_data.begin(); 
 		     i != index_data.end(); ++i){ 
@@ -119,22 +124,16 @@ public:
 
    template< typename Vertex_extents> 
    Cubical_complex( const Vertex_extents& d_): 
-     cells( boost::make_transform_iterator( d_.begin(), 
-					  [](const std::size_t & i){ return 2*i-1; }), 
-	   boost::make_transform_iterator( d_.end(), 
-					  [](const std::size_t & i){ return 2*i-1; })), 
+     cells( boost::make_transform_iterator( d_.begin(), tnpo()), 
+	   boost::make_transform_iterator( d_.end(), tnpo())), 
     index_data( d_){}
-
-
 
    template< typename Vertex_extents> 
    Cubical_complex( const Vertex_extents& d_,
 		    const Vertex_extents& offsets_): 
-     cells( boost::make_transform_iterator( d_.begin(), 
-					  [](const std::size_t & i){ return 2*i-1; }), 
-	   boost::make_transform_iterator( d_.end(), 
-					  [](const std::size_t & i){ return 2*i-1; }), 
-	   offsets_.begin(), offsets_.end()), 
+     cells( boost::make_transform_iterator( d_.begin(), tnpo()), 
+	    boost::make_transform_iterator( d_.end(), tnpo()),
+	    offsets_), 
     index_data( d_){}
 
 
@@ -142,10 +141,8 @@ public:
    Cubical_complex( Cell_boundary & bd_, 
 		    const Vertex_extents& d_,
 		    const Vertex_extents& offsets_): 
-     cells( boost::make_transform_iterator( d_.begin(), 
-					  [](const std::size_t & i){ return 2*i-1; }), 
-	   boost::make_transform_iterator( d_.end(), 
-					  [](const std::size_t & i){ return 2*i-1; })), 
+     cells( boost::make_transform_iterator( d_.begin(), tnpo()), 
+	   boost::make_transform_iterator( d_.end(), tnpo())), 
     bd( bd_), index_data( d_){}
 
    //Copy
@@ -226,49 +223,47 @@ public:
    
    template< typename Stream> 
    Stream& read( Stream & in){
-	std::size_t line_num = 0;
-	std::string line;
-        char the_first_character = in.peek();
-	const bool headers_enabled = (the_first_character == 's');
-	if( !headers_enabled) { 
-		std::cerr << "Error: reading a file without appropriate header."
-			  << "Bailing out." << std::endl;
-		std::exit( -1);
-	}
-	//Read the header and reserve appropriately
-        ctl::get_line( in, line, line_num);
-        std::istringstream ss( line);
-        std::string the_word_size;
-	std::size_t max_dim;  
-        ss >> the_word_size;
-        ss >> max_dim; 
-	//keep track of the number of index_data.
-	index_data.resize( max_dim);
-	std::size_t length;
-	for( std::size_t i = 0; i < max_dim; ++i){
-		ss >> length;
-		index_data[ i] =  length; 
-	}
-
-	//we think of a grid which is the 
-	//cartesian product like this:
-	//*-*-*-*-* x *-*-*-*
-	
-	cells.resize( boost::make_transform_iterator( index_data.begin(), 
-		      [](const std::size_t & i){ return 2*i-1; }), 
-	   	      boost::make_transform_iterator( index_data.end(), 
-		      [](const std::size_t & i){ return 2*i-1; }));
- 
-	for( auto i = ++(index_data.begin()); 
-		  i != index_data.end(); ++i){ *i *= *(i-1); }
-	std::size_t vertex_id_number=0;
-	while( ctl::get_line(in, line, line_num)){
-	     std::istringstream ss( line);
-	     //and it's id
-	     Data d( vertex_id_number);
-	     insert_open_cell( Cell( 1, vertex_id_number), d);
-	}
-	return in;
+    std::size_t line_num = 0;
+    std::string line;
+    char the_first_character = in.peek();
+    const bool headers_enabled = (the_first_character == 's');
+    if( !headers_enabled) { 
+    	std::cerr << "Error: reading a file without appropriate header."
+    		  << "Bailing out." << std::endl;
+    	std::exit( -1);
+    }
+    //Read the header and reserve appropriately
+    ctl::get_line( in, line, line_num);
+    std::istringstream ss( line);
+    std::string the_word_size;
+    std::size_t max_dim;  
+    ss >> the_word_size;
+    ss >> max_dim; 
+    //keep track of the number of index_data.
+    index_data.resize( max_dim);
+    std::size_t length;
+    for( std::size_t i = 0; i < max_dim; ++i){
+    	ss >> length;
+    	index_data[ i] =  length; 
+    }
+    
+    //we think of a grid which is the 
+    //cartesian product like this:
+    //*-*-*-*-* x *-*-*-*
+    tnpo t;
+    cells.resize( boost::make_transform_iterator( index_data.begin(), t),
+       	          boost::make_transform_iterator( index_data.end(), t));
+    
+    for( auto i = ++(index_data.begin()); 
+    	  i != index_data.end(); ++i){ *i *= *(i-1); }
+    std::size_t vertex_id_number=0;
+    while( ctl::get_line(in, line, line_num)){
+         std::istringstream ss( line);
+         //and it's id
+         Data d( vertex_id_number);
+         insert_open_cell( Cell( 1, vertex_id_number), d);
+    }
+    return in;
    }
    void reserve( const std::size_t n) { cells.reserve( n); }
    const std::size_t dimension() const { return cells.dimension(); }

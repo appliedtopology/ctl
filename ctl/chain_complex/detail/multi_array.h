@@ -297,7 +297,7 @@ class multi_array {
   }
   template< typename Coordinate>
   Coordinate& iterator_to_coordinate( const_iterator i, Coordinate & c) const {
-	return index_to_coordinate( std::distance( begin(), i), c);
+	return index_to_coordinate( std::distance( data.cbegin(), i), c);
   }
   template< typename Coordinate>
   Coordinate& iterator_to_coordinate( reverse_iterator i, Coordinate & c) const {
@@ -305,7 +305,7 @@ class multi_array {
   }
   template< typename Coordinate>
   Coordinate& iterator_to_coordinate( const_reverse_iterator i, Coordinate & c) const {
-	return index_to_coordinate( std::distance( rbegin(), i), c);
+	return index_to_coordinate( std::distance( data.crbegin(), i), c);
   }
   /**
   * @brief Converts a coordinate vector into a linear index 

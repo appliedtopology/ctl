@@ -88,8 +88,11 @@ int main( int argc, char** argv){
 	std::ofstream out( "test.asc");
 	complex.write( out); 
 
-	std::vector< std::size_t> sizes{100,200};
+	std::vector< std::size_t> sizes{5,4};
 	std::vector< std::size_t> start{3,97};
 	Cubical_complex complex1( sizes, start);
+	std::size_t c=0;
+	for( auto& i : complex1){ c++; }
+	std::cout << c << std::endl;
 	return 0;
 }
