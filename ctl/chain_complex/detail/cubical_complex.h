@@ -180,22 +180,16 @@ public:
    */
    template< typename Vertex_extents> 
    Cubical_complex( const Vertex_extents& d_): 
-     cells( boost::make_transform_iterator( d_.begin(), 
-					  [](const std::size_t & i){ return 2*i-1; }), 
-	   boost::make_transform_iterator( d_.end(), 
-					  [](const std::size_t & i){ return 2*i-1; })), 
+     cells( boost::make_transform_iterator( d_.begin(), tnpo()), 
+	   boost::make_transform_iterator( d_.end(), tnpo())), 
     index_data( d_){}
-
-
 
    template< typename Vertex_extents> 
    Cubical_complex( const Vertex_extents& d_,
 		    const Vertex_extents& offsets_): 
-     cells( boost::make_transform_iterator( d_.begin(), 
-					  [](const std::size_t & i){ return 2*i-1; }), 
-	   boost::make_transform_iterator( d_.end(), 
-					  [](const std::size_t & i){ return 2*i-1; }), 
-	   offsets_.begin(), offsets_.end()), 
+     cells( boost::make_transform_iterator( d_.begin(), tnpo()), 
+	    boost::make_transform_iterator( d_.end(), tnpo()),
+	    offsets_), 
     index_data( d_){}
 
 
