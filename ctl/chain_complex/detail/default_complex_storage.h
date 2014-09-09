@@ -59,17 +59,16 @@ namespace detail {
 
 template< typename Cell, 
 	  typename Data, 
-	  typename Hash 
-        >
+	  typename Hash>
 using Default_complex_storage = 
 typename std::conditional<
 //If C is a type of the form ctl::Cube< T> for any T, 
 std::is_same< typename recombine< Cell, Dummy>::type, 
 	      ctl::Cube< Dummy> >::value, 
-	      multi_array< Data>,
+	      multi_array< std::pair< std::size_t, Data> >,
 	      std::unordered_map< Cell, Data, Hash>
 	    >::type;
-} //namespace detail								   
+} //namespace detail  
 } //namespace ctl
 
 #endif //CTL_CHAIN_COMPLEX_MAP_H
