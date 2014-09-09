@@ -54,7 +54,7 @@ namespace ctl {
 namespace detail {
 template< typename Term_>
 class const_simplex_boundary_iterator : 
-	public std::iterator< std::bidirectional_iterator_tag,
+	public std::iterator< std::input_iterator_tag,
 			      Term_,
 			      std::ptrdiff_t,
 			      const Term_*,

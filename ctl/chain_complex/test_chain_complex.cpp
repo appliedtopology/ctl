@@ -94,5 +94,6 @@ int main( int argc, char** argv){
 	std::size_t c=0;
 	for( auto& i : complex1){ c++; }
 	std::cout << c << std::endl;
+	std::cout << complex1.size() << std::endl;
 	return 0;
 }

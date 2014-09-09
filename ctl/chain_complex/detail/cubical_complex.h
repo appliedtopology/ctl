@@ -53,7 +53,6 @@
 #include <ctl/io/io.h>
 #include <ctl/cube/cube.h>
 #include <ctl/chain_complex/detail/cube_boundary_wrapper.h>
-#include <ctl/chain_complex/detail/cubical_iterator.h>
 
 namespace ctl {
 namespace detail {
@@ -80,30 +79,19 @@ public: //Public types
 private: //Private types
    //Usually this is multi_array< Data> 
    typedef Storage_< Cell, Data, Hash> Storage;
-   typedef std::vector< std::size_t>  Vector;
+   typedef typename Storage::Coordinate  Vector;
 public: //Public Types
    typedef typename std::size_t size_type;
 
-   typedef cubical_iterator< Storage, Vector, 
-			     typename Storage::iterator> 
-			     iterator;
-   typedef cubical_iterator< Storage, Vector, 
-			     typename Storage::const_iterator> 
-			     const_iterator;
-   typedef cubical_iterator< Storage, Vector, 
-			     typename Storage::reverse_iterator> 
-			     reverse_iterator;
-   typedef cubical_iterator< Storage, Vector, 
-			     typename Storage::const_reverse_iterator> 
-			     const_reverse_iterator;
+   typedef typename Storage::iterator iterator;
+   typedef typename Storage::const_iterator const_iterator;
+   typedef typename Storage::reverse_iterator reverse_iterator;
+   typedef typename Storage::const_reverse_iterator const_reverse_iterator;
 
    //Describes how to take Cell boundary
    //we overload the normal cubical boundary to make begin() and end() 
    //take as input lattice coordinates and return lattice coordinates
-   typedef Cube_boundary_wrapper< Boundary_, 
-			          typename iterator::value_type::first_type> 
-				  Cell_boundary; 
-
+   typedef Cube_boundary_wrapper< Boundary_, Vector> Cell_boundary; 
    
 public:
    //Constructors
@@ -120,7 +108,7 @@ public:
 		     *i *= *(i-1); 
 		}
 	   
-	}
+   }
 
    template< typename Vertex_extents> 
    Cubical_complex( const Vertex_extents& d_): 
@@ -192,11 +180,18 @@ public:
 	return cells.begin()+linear_index;
    }
    
-   iterator       begin()       { return iterator( cells, cells.begin()); }
-   iterator         end()       { return iterator( cells.end());   }
+   iterator       begin()       { return cells.begin(); } 
+   iterator         end()       { return cells.end();   }
+ 
+   const_iterator       begin() const { return cells.begin(); } 
+   const_iterator         end() const { return cells.end();   }
+  
+   reverse_iterator       rbegin()       { return cells.rbegin(); } 
+   reverse_iterator         rend()       { return cells.rend();   }
+ 
+   const_reverse_iterator       rbegin() const { return cells.rbegin(); } 
+   const_reverse_iterator        rend() const { return cells.rend();   }
 
-   const_iterator begin() const { return const_iterator( cells, cells.begin()); }
-   const_iterator   end() const { return const_iterator( cells.end());   }
 
    template< typename Stream, typename Functor>
    Stream& write( Stream& out, const Functor & f) const {
@@ -257,14 +252,19 @@ public:
     for( auto i = ++(index_data.begin()); 
     	  i != index_data.end(); ++i){ *i *= *(i-1); }
     std::size_t vertex_id_number=0;
+    Vector c;
     while( ctl::get_line(in, line, line_num)){
          std::istringstream ss( line);
          //and it's id
          Data d( vertex_id_number);
-         insert_open_cell( Cell( 1, vertex_id_number), d);
-    }
+	 ss >> d;
+	 auto& p = cells( vertex_id_to_coordinate( vertex_id_number, c) );
+	 p.first = vertex_id_number; 
+	 p.second = d;
+    } 
     return in;
    }
+
    void reserve( const std::size_t n) { cells.reserve( n); }
    const std::size_t dimension() const { return cells.dimension(); }
    const std::size_t size() const { return cells.size(); }

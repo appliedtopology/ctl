@@ -43,10 +43,8 @@
 #include <vector>
 #include <numeric>
 #include <functional>
-#include <cassert>
-
-//CTL
-//#include <ctl/.../...h>
+#include <cassert> //assert
+#include <iterator> //std::distance
 
 //non-exported functionality
 namespace ctl {
@@ -64,8 +62,8 @@ namespace detail{
 template< typename T>
 class multi_array {
   typedef std::vector< T> Vector;
-  typedef std::vector< std::size_t> Index_data;
   public:
+  typedef std::vector< std::size_t> Coordinate;
   typedef typename Vector::value_type value_type;
   typedef typename Vector::size_type size_type;
   typedef typename Vector::iterator iterator;
@@ -116,8 +114,7 @@ class multi_array {
   * @param begin
   * @param end
   */
-  template< typename Extents_iterator, 
-	    typename Coordinate, typename Data_iterator>
+  template< typename Extents_iterator, typename Data_iterator>
   multi_array( Extents_iterator begin, Extents_iterator end,
 	       Data_iterator begin1, Data_iterator end1, 
 	       const Coordinate & base__): 
@@ -132,7 +129,7 @@ class multi_array {
   * @param begin
   * @param end
   */
-  template< typename Extents_iterator, typename Coordinate>
+  template< typename Extents_iterator>
   multi_array( Extents_iterator begin, Extents_iterator end, 
 	       const Coordinate & base__): 
    d_( begin, end), extents_( begin, end), base_( base__){ 
@@ -150,7 +147,6 @@ class multi_array {
   * @tparam Coordinate
   * @param c
   */
-  template< typename Coordinate>
   void reindex( const Coordinate & c){ 
 	assert( c.size() == d_.size()); 
 	base_ = c; 
@@ -177,7 +173,6 @@ class multi_array {
   *
   * @return 
   */
-  template< typename Coordinate>
   const T& operator()( const Coordinate & c) const{ 
 	return data[ coordinate_to_index( c)]; 
   }
@@ -190,7 +185,6 @@ class multi_array {
   *
   * @return 
   */
-  template< typename Coordinate>
   T& operator()( const Coordinate & c) { 
 	return data[ coordinate_to_index( c)]; 
   }
@@ -267,8 +261,8 @@ class multi_array {
   /**
   * @brief Returns the length of the array in each dimension
   */
-  Index_data extents() const { return extents_; }
-  Index_data base() const    { return base_; } 
+  Coordinate extents() const { return extents_; }
+  Coordinate base() const    { return base_; } 
   std::size_t base( std::size_t i) const    { return base_[ i]; }
   std::size_t dimension() const { return extents_.size(); } 
   /**
@@ -280,7 +274,6 @@ class multi_array {
   *
   * @return 
   */
-  template< typename Coordinate>
   Coordinate& index_to_coordinate( std::size_t index, Coordinate & c) const {
     c.resize( d_.size(), 0);
     for( auto i = d_.size()-1; i>0;  --i){ 
@@ -291,20 +284,16 @@ class multi_array {
     c[ 0] = index + base_[ 0];
     return c;
   }
-  template< typename Coordinate>
-  Coordinate& iterator_to_coordinate( iterator i, Coordinate & c) const {
-	return index_to_coordinate( std::distance( begin(), i), c);
+  Coordinate& iterator_to_coordinate( const iterator i, Coordinate & c) const {
+	return index_to_coordinate( std::distance( data.begin(), i), c);
   }
-  template< typename Coordinate>
-  Coordinate& iterator_to_coordinate( const_iterator i, Coordinate & c) const {
+  Coordinate& iterator_to_coordinate( const const_iterator i, Coordinate & c) const {
 	return index_to_coordinate( std::distance( data.cbegin(), i), c);
   }
-  template< typename Coordinate>
-  Coordinate& iterator_to_coordinate( reverse_iterator i, Coordinate & c) const {
-	return index_to_coordinate( std::distance( rbegin(), i), c);
+  Coordinate& iterator_to_coordinate( const reverse_iterator i, Coordinate & c) const {
+	return index_to_coordinate( std::distance( data.rbegin(), i), c);
   }
-  template< typename Coordinate>
-  Coordinate& iterator_to_coordinate( const_reverse_iterator i, Coordinate & c) const {
+  Coordinate& iterator_to_coordinate( const const_reverse_iterator i, Coordinate & c) const {
 	return index_to_coordinate( std::distance( data.crbegin(), i), c);
   }
   /**
@@ -315,7 +304,6 @@ class multi_array {
   *
   * @return 
   */
-  template< typename Coordinate>
   std::size_t coordinate_to_index( Coordinate & c) const{
      assert( c.size() == d_.size());
      std::size_t index = (c[0]-base_[ 0]);
@@ -348,9 +336,9 @@ class multi_array {
   private:
   Vector data; //the actual data
   //TODO: Optimize this with libdivide.
-  Index_data d_; //entry i stores the product if extents_[ 0]*...*extents_[ i]
-  Index_data extents_; //length of the array
-  Index_data base_; //root the indices at places other than (0,0,0);
+  Coordinate d_; //entry i stores the product if extents_[ 0]*...*extents_[ i]
+  Coordinate extents_; //length of the array
+  Coordinate base_; //root the indices at places other than (0,0,0);
 }; //end class multi_array
 
 } // end namespace detail
