@@ -90,6 +90,7 @@ private: //Private types
    //Usually this is multi_array< Data> 
    typedef Storage_< Cell_, Data, Hash> Storage;
    typedef typename Storage::Coordinate  Vector;
+
 public: //Public Types
    typedef typename std::size_t size_type;
 
@@ -184,6 +185,13 @@ public:
 	   boost::make_transform_iterator( d_.end(), tnpo())), 
     index_data( d_){}
 
+  /**
+  * @brief 
+  *
+  * @tparam Vertex_extents
+  * @param d_
+  * @param offsets_
+  */
    template< typename Vertex_extents> 
    Cubical_complex( const Vertex_extents& d_,
 		    const Vertex_extents& offsets_): 
@@ -192,7 +200,13 @@ public:
 	    offsets_), 
     index_data( d_){}
 
-
+   /**
+   * @brief boundary, length, and starting vertex constructor 
+   * @tparam Vertex_extents
+   * @param bd_
+   * @param d_
+   * @param offsets_
+   */
    template< typename Vertex_extents> 
    Cubical_complex( Cell_boundary & bd_, 
 		    const Vertex_extents& d_,
@@ -475,7 +489,7 @@ private:
   }
 
   std::size_t cell_to_word( const Cell & cell){
-	std::cerr << "not yet implemented. todo: fix this." << std::endl;
+	std::cerr << "not yet implemented. TODO: fix this." << std::endl;
 	return size();
   }
   template< typename Coordinate>
