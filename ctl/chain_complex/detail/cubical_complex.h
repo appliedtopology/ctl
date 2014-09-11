@@ -80,6 +80,7 @@ private: //Private types
    //Usually this is multi_array< Data> 
    typedef Storage_< Cell, Data, Hash> Storage;
    typedef typename Storage::Coordinate  Vector;
+
 public: //Public Types
    typedef typename std::size_t size_type;
 
@@ -90,14 +91,22 @@ public: //Public Types
 
    //Describes how to take Cell boundary
    //we overload the normal cubical boundary to make begin() and end() 
-   //take as input lattice coordinates and return lattice coordinates
+   //take as input lattice coordinates and indices and 
+   //return lattice coordinates and indices.
    typedef Cube_boundary_wrapper< Boundary_, Vector> Cell_boundary; 
    
 public:
    //Constructors
-   //Default
+   //!Default
    Cubical_complex() {}
 
+  /**
+  * @brief 
+  *
+  * @tparam Vertex_extents
+  * @param bd_
+  * @param d_:
+  */
    template< typename Vertex_extents>
    Cubical_complex( Cell_boundary & bd_, Vertex_extents & d_):
     cells( boost::make_transform_iterator( d_.begin(), tnpo()),  
@@ -107,15 +116,27 @@ public:
 		     i != index_data.end(); ++i){ 
 		     *i *= *(i-1); 
 		}
-	   
    }
-
+   
+  /**
+  * @brief Vertex_extents
+  *
+  * @tparam Vertex_extents
+  * @param d_
+  */
    template< typename Vertex_extents> 
    Cubical_complex( const Vertex_extents& d_): 
      cells( boost::make_transform_iterator( d_.begin(), tnpo()), 
 	   boost::make_transform_iterator( d_.end(), tnpo())), 
     index_data( d_){}
 
+  /**
+  * @brief 
+  *
+  * @tparam Vertex_extents
+  * @param d_
+  * @param offsets_
+  */
    template< typename Vertex_extents> 
    Cubical_complex( const Vertex_extents& d_,
 		    const Vertex_extents& offsets_): 
@@ -124,7 +145,13 @@ public:
 	    offsets_), 
     index_data( d_){}
 
-
+   /**
+   * @brief boundary, length, and starting vertex constructor 
+   * @tparam Vertex_extents
+   * @param bd_
+   * @param d_
+   * @param offsets_
+   */
    template< typename Vertex_extents> 
    Cubical_complex( Cell_boundary & bd_, 
 		    const Vertex_extents& d_,
@@ -133,16 +160,16 @@ public:
 	   boost::make_transform_iterator( d_.end(), tnpo())), 
     bd( bd_), index_data( d_){}
 
-   //Copy
+   //! Copy
    Cubical_complex( const Cubical_complex & b): 
    cells( b.cells), bd( b.bd), index_data( b.index_data) {}
 
-   //Move
+   //! Move
    Cubical_complex( Cubical_complex && b): 
    cells( std::move( b.cells)), bd( std::move( b.bd)),
    index_data( std::move( b.index_data)) {}
 
-   //Assignment operator
+   //! Assignment operator
    Cubical_complex& operator=( const Cubical_complex& b){
    	bd = b.bd;
    	cells = b.cells;
@@ -150,7 +177,7 @@ public:
    	return *this;
    }
 
-   //Move assignment operator
+   //! Move assignment operator
    Cubical_complex& operator=( Cubical_complex&& b){
    	bd      = std::move( b.bd);
    	cells   = std::move( b.cells);
@@ -158,40 +185,86 @@ public:
    	return *this;
    }
 
+   /**
+   * @brief find  a cell described as a product of intervals 
+   *
+   * @param s
+   * @return 
+   */
    iterator       find_cell( const Cell & s) {
 	std::size_t linear_index = cell_to_word( s);
 	return cells.begin()+linear_index;
    }
 
+   /**
+   * @brief find a cell described as a product of intervals 
+   *
+   * @param s
+   * @return 
+   */
    const_iterator find_cell( const Cell & s) const { 
 	std::size_t linear_index = cell_to_word( s);
 	return cells.begin()+linear_index;
    }
 
+   /**
+   * @brief Look up cells based on a lattice indexing.  
+   * @tparam Coordinate
+   * @param s
+   *
+   * @return 
+   */
    template< typename Coordinate>
-   iterator       find_cell( const Coordinate & s) {
+   iterator find_cell( const Coordinate & s) {
 	std::size_t linear_index = cells.coordinate_to_word( s);
 	return cells.begin()+linear_index;
    }
-
+   /**
+   * @brief Look up cells based on a lattice indexing.
+   * 
+   * @tparam Coordinate
+   * @param s
+   * @return 
+   */
    template< typename Coordinate>
    const_iterator find_cell( const Coordinate & s) const { 
 	std::size_t linear_index = cells.coordinate_to_word( s);
 	return cells.begin()+linear_index;
    }
-   
-   iterator       begin()       { return cells.begin(); } 
-   iterator         end()       { return cells.end();   }
- 
-   const_iterator       begin() const { return cells.begin(); } 
-   const_iterator         end() const { return cells.end();   }
-  
-   reverse_iterator       rbegin()       { return cells.rbegin(); } 
-   reverse_iterator         rend()       { return cells.rend();   }
- 
-   const_reverse_iterator       rbegin() const { return cells.rbegin(); } 
-   const_reverse_iterator        rend() const { return cells.rend();   }
 
+   /**
+   * @brief turns the bits + vertex encoding into an iterator
+   * @param vertex_bits_index
+   * @return 
+   */
+   const_iterator find_cell( std::size_t vertex_bits_index) const {
+	Vector c;
+	return cells.begin()+cells.coordinate_to_word( 
+						id_and_bits_to_coordinate( c));
+   }
+
+   /**
+   * @brief turns the bits + vertex encoding into an iterator
+   * @param vertex_bits_index
+   * @return 
+   */
+   iterator find_cell( std::size_t vertex_bits_index) {
+	Vector c;
+	return cells.begin()+cells.coordinate_to_word( 
+						 id_and_bits_to_coordinate( c));
+   }
+   
+   iterator       		begin()       	{ return cells.begin(); } 
+   iterator         		  end()       	{ return cells.end();   }
+ 
+   const_iterator       	begin()  const 	{ return cells.begin(); } 
+   const_iterator         	  end()  const 	{ return cells.end();   }
+  
+   reverse_iterator            rbegin()       	{ return cells.rbegin(); } 
+   reverse_iterator         	 rend()       	{ return cells.rend();   }
+ 
+   const_reverse_iterator       rbegin() const  { return cells.rbegin(); } 
+   const_reverse_iterator        rend()  const  { return cells.rend();   }
 
    template< typename Stream, typename Functor>
    Stream& write( Stream& out, const Functor & f) const {
@@ -265,6 +338,18 @@ public:
     return in;
    }
 
+   template< typename Coordinate>
+   Coordinate& id_and_bits_to_coordinate( std::size_t index, 
+					  Coordinate & c){
+	std::size_t vertex_id = vertex_bits_index >> cells.dimension();
+	std::size_t mask = vertex_bits_index << cells.dimension();
+	vertex_id_to_coordinate( vertex_id, c);
+	std::size_t diff = vertex_id^mask;
+	std::size_t offset=1;
+	for( auto & i: c){ i += diff&offset; ++offset; }
+	return c;
+   }
+
    void reserve( const std::size_t n) { cells.reserve( n); }
    const std::size_t dimension() const { return cells.dimension(); }
    const std::size_t size() const { return cells.size(); }
@@ -286,7 +371,7 @@ public:
 private:
 
   std::size_t cell_to_word( const Cell & cell){
-	std::cerr << "not yet implemented. todo: fix this." << std::endl;
+	std::cerr << "not yet implemented. TODO: fix this." << std::endl;
 	return size();
   }
   template< typename Coordinate>
