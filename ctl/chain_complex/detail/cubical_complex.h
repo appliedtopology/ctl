@@ -495,7 +495,7 @@ private:
   template< typename Coordinate>
   void vertex_id_to_position( std::size_t index, Coordinate & c){
     c.resize( index_data.size(), 0);
-    for( auto i = index_data.size()-1; i>0;  --i){ 
+    for( auto i = index_data.size()-1; i>1;  --i){ 
         c[ i] = index/ index_data[ i-1];
         index -= c[ i]*(index_data[ i-1]);
 	c[ i] = 2*c[ i] + cells.base( i);
