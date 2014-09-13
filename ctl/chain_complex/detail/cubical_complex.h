@@ -91,10 +91,10 @@ public: //Public Types
 
    //Describes how to take Cell boundary
    //we overload the normal cubical boundary to make begin() and end() 
-   //take as input lattice coordinates and indices and 
-   //return lattice coordinates and indices.
-   typedef Cube_boundary_wrapper< Boundary_, Vector> Cell_boundary; 
-   
+   //take as input the word we use to represent as a key and 
+   //returns the word representation..
+   typedef Cube_boundary_wrapper< Boundary_, Complex> Cell_boundary; 
+   friend Cell_boundary;  
 public:
    //Constructors
    //!Default
@@ -115,7 +115,8 @@ public:
    	   for( auto i = ++index_data.begin(); 
 		     i != index_data.end(); ++i){ 
 		     *i *= *(i-1); 
-		}
+	  }
+	  index_data.insert( index_data.begin(), 1);
    }
    
   /**
@@ -308,11 +309,11 @@ public:
     ss >> the_word_size;
     ss >> max_dim; 
     //keep track of the number of index_data.
-    index_data.resize( max_dim);
+    index_data.resize( max_dim+1, 1);
     std::size_t length;
     for( std::size_t i = 0; i < max_dim; ++i){
     	ss >> length;
-    	index_data[ i] =  length; 
+    	index_data[ i+1] =  length; 
     }
     
     //we think of a grid which is the 
@@ -377,7 +378,7 @@ private:
   template< typename Coordinate>
   void vertex_id_to_position( std::size_t index, Coordinate & c){
     c.resize( index_data.size(), 0);
-    for( auto i = index_data.size()-1; i>0;  --i){ 
+    for( auto i = index_data.size()-1; i>1;  --i){ 
         c[ i] = index/ index_data[ i-1];
         index -= c[ i]*(index_data[ i-1]);
 	c[ i] = 2*c[ i] + cells.base( i);

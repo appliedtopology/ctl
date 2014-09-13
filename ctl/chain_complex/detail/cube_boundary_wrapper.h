@@ -60,39 +60,62 @@ class const_cube_boundary_wrapper_iterator:
     private:
       typedef const_cube_boundary_wrapper_iterator< Term_> Self;
       typedef Term_ Term;
-      typedef typename Term::Cell Coordinate;
+      typedef typename Term::Cell Cell;
 
      public:
      const_cube_boundary_wrapper_iterator(): 
-       c( nullptr), pos( 0), dim( 0), face() {}
+       c( nullptr), cellptr( nullptr), 
+       boundary_pos( 0), bit_index( 0), dim( 0), face() {}
+
      const_cube_boundary_wrapper_iterator( const Self & f): 
-       c( f.c), pos( f.pos), dim( f.dim), face( f.face) {}
+       c( f.c), cellptr( f.cellptr), 
+       boundary_pos( f.boundary_pos), bit_index( f.bit_index), 
+       dim( f.dim), face( f.face) {}
+
      const_cube_boundary_wrapper_iterator( const Self && f): 
-      c( std::move( f.c)), pos( std::move( f.pos)), dim( std::move( f.dim)), 
-      face( std::move( f.face)){ f.c = nullptr; }
-     const_cube_boundary_wrapper_iterator( const Coordinate & c_): 
-     c( nullptr), pos( 0), dim( dimension( c_)), face( c_){
+      c( std::move( f.c)), cellptr( f.cellptr), 
+      boundary_pos( std::move( f.boundary_pos)), 
+      bit_index( f.bit_index),
+      dim( std::move( f.dim)), face( std::move( f.face)) { f.c = nullptr; }
+
+     const_cube_boundary_wrapper_iterator( const Complex& c_, const Cell& cell): 
+     c( nullptr), cellptr( nullptr), boundary_pos( 0), bit_index( 0), 
+     dim( dimension( cell)), face( c_){
        if( dim){
        	c = &c_;
+	cellptr = &cell;
        	face.coefficient( 1);
-       	while( c_[ pos/2]%2 == 0){ pos+=2; }
-       	face[ pos/2]--;
-       	++pos;
-       }
+	bit_index = find_next_set_bit( cell, bit_index);
+	bit_index += (bit_index==0)+1;
+	face.cell() &= (1 << bit_index);
+	++boundary_pos;
+      }
      }
-     bool operator==(const Self&b) const{ return (b.c == c) && (b.pos == pos); }
-     bool operator!=(const Self&b) const{ return (b.c != c) || (b.pos != pos); }
+
+     bool operator==(const Self&b) const{ 
+	return (b.cellptr == cellptr) && (b.boundary_pos == boundary_pos); 
+     }
+
+     bool operator!=(const Self&b) const{ 
+	return (b.cellptr != cellptr) || (b.boundary_pos != boundary_pos); 
+     }
+
      Self& operator=( const Self&b){
        c = b.c;
-       pos = b.pos;
+       cellptr = b.cellptr;
+       boundary_pos = b.boundary_pos;
        dim = b.dim;
        face = b.face; 
        return *this;
      }
+
      Self& operator=( Self&&b){
        c = std::move( b.c);
+       cellptr = std::move( b.cellptr);
        b.c = nullptr;
-       pos = std::move( b.pos);
+       b.cellptr = nullptr;
+       boundary_pos = std::move( b.boundary_pos);
+       bit_index = std::move( b.bit_index);
        dim = std::move( b.dim);
        face = std::move( b.face); 
        return *this;
@@ -102,36 +125,38 @@ class const_cube_boundary_wrapper_iterator:
      	return face; 
      }
      const Term* operator->() const { return &face; }
+
      Self& operator++(){
-         while( pos < 2*dim && (*c)[ pos/2]%2 == 0){ pos +=2; }
-         if( pos == 2*dim){ 
+         if( boundary_pos == 2*dim){ 
          	c = nullptr;
-         	pos = 0;
+         	boundary_pos = 0;
          	return *this;
          }
-         face[ pos/2] += -1*((pos%2)==0) + 2*((pos%2)==1);
-         ++pos;
          face.coefficient( -1*face.coefficient());
+         ++boundary_pos;
+	 face.cell() &= (1 << bit_index); //set previous flipped bit
+	 bit_index *= (boundary_pos < dim);
+	 bit_index = find_next_set_bit( face.cell(), bit_index);
+	 face.cell() &= (1 << bit_index); //unset new bit.
+	 face.cell() += (boundary_pos >= dim)*
+		        ((c->index_data[ bit_index])*(1 << c->dimension()));
          return *this;	
      }
-
-     Self& operator--(){
-       while( pos>0 && (*c)[ pos/2]%2 == 0){ pos -=2; }
-     	if(pos == 0){
-     		c = nullptr;
-     		return *this;
-     	}
-       face[ pos/2] += -1*((pos%2)==0) + 2*((pos%2)==1);
-       --pos;
-     	face.coefficient( -1*face.coefficient());
-     	return *this;	
+     std::size_t find_next_bit_set( const Cell & c, std::size_t & bit_index){
+		c >> bit_index;
+		static const int MultiplyDeBruijnBitPosition[32] = 
+		{
+  		0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8, 
+  		31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9};
+    bit_index += MultiplyDeBruijnBitPosition[((uint32_t)((c & -c) * 0x077CB531U)) >> 27];
+	return bit_index;
      }
-     
      Self operator++( int){
       	Self tmp( *this); 
      	++(*this); //now call previous operator
      	return tmp;
      }
+
      Self operator--( int){
       	Self tmp( *this); 
      	--(*this); //now call previous operator
@@ -139,15 +164,17 @@ class const_cube_boundary_wrapper_iterator:
      }
 	
    private:
-	std::size_t dimension( const Coordinate & c) const{ 
-		std::size_t d = 0;
-		for( const auto&i : c){ d+= i%2; }
-		return d;
-	}
-	Coordinate* c;
-	std::size_t pos;
-	std::size_t dim;
-	Coordinate  face;
+     std::size_t dimension( const std::size_t c) const{ 
+     	std::size_t d = 0;
+     	for( const auto i = 0; i < c->dimension(); ++i; ){ d+= (c&(i+1)); }
+     	return d;
+     }
+
+     Complex* c;
+     Cell* celltpr;
+     std::size_t boundary_pos;
+     std::size_t bit_index;
+     std::size_t dim;
 }; //end const_cube_boundary_wrapper_iterator
 
 template< typename Cell_boundary_, typename Complex_>
@@ -171,15 +198,15 @@ class Cube_boundary_wrapper: Cell_boundary_{
     /**
     * @brief Default constructor
     */
-    Cube_boundary_wrapper(): Cell_boundary_() {};	
+    Cube_boundary_wrapper( const Complex & c_): Cell_boundary_() c( c_){};	
     
     /**
     * @brief Equality assignment operator 
-    * Does nothing.
     * @param Cube_boundary_wrapper& from
     * @return reference to this.
     */
     Cube_boundary_wrapper& operator=( const Cube_boundary_wrapper& from){ 
+	c = from.c;
 	Cell_boundary_::operator=( from);
 	return *this; 
     }
@@ -191,7 +218,7 @@ class Cube_boundary_wrapper: Cell_boundary_{
     * @return const_iterator
     */
     const_iterator begin( const std::size_t s) const { 
-	return const_iterator( s); 
+	return const_iterator( c, s); 
    }
     
     /**
@@ -217,13 +244,15 @@ class Cube_boundary_wrapper: Cell_boundary_{
     * @param const Coordinate & s
     * @return returns the number of elements in the boundary.
     */
-    std::size_t dimension( const std::size_t s) const { 
-	std::size_t d = 0;
-	for( const auto&i : s){ d += i%2; }
-	return d;
+
+    std::size_t dimension( const Coordinate & c) const{ 
+    	std::size_t d = 0;
+    	for( const auto&i : c){ d+= i%2; }
+    	return d;
     }
 
     private:
+    const Complex & c;
 }; //end class Cube_boundary_wrapper
 
 } // end namespace detail
