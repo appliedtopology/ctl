@@ -196,7 +196,9 @@ public:
 		    const Vertex_extents& offsets_): 
      cells( boost::make_transform_iterator( d_.begin(), tnpo()), 
 	    boost::make_transform_iterator( d_.end(), tnpo()),
-	    offsets_), index_data( d_), bd( *this) {}
+	    offsets_), index_data( d_), bd( *this){ 
+	  assign_key_values();
+   }
    /**
    * @brief boundary, length, and starting vertex constructor 
    * @tparam Vertex_extents
