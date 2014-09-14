@@ -90,7 +90,6 @@ private: //Private types
    //Usually this is multi_array< Data> 
    typedef Storage_< Cell_, Data, Hash> Storage;
    typedef typename Storage::Coordinate  Vector;
-
 public: //Public Types
    typedef typename std::size_t size_type;
 
@@ -197,9 +196,7 @@ public:
 		    const Vertex_extents& offsets_): 
      cells( boost::make_transform_iterator( d_.begin(), tnpo()), 
 	    boost::make_transform_iterator( d_.end(), tnpo()),
-	    offsets_), 
-    index_data( d_){}
-
+	    offsets_), index_data( d_), bd( *this) {}
    /**
    * @brief boundary, length, and starting vertex constructor 
    * @tparam Vertex_extents
@@ -493,7 +490,7 @@ private:
 	return size();
   }
   template< typename Coordinate>
-  void vertex_id_to_position( std::size_t index, Coordinate & c){
+  Coordinate& vertex_id_to_coordinate( std::size_t index, Coordinate & c){
     c.resize( index_data.size(), 0);
     for( auto i = index_data.size()-1; i>1;  --i){ 
         c[ i] = index/ index_data[ i-1];
