@@ -98,10 +98,13 @@ int main( int argc, char** argv){
 	Cubical_complex_boundary c( complex1);
 	std::size_t csize=0;
 	for( auto i = complex1.begin(); i != complex1.end(); ++i){ 
-		csize++;
+	  csize++;
+	  std::cout << "boundary test: " 
+		    << ctl::delta << "(" << i->first << ") = "; 
 	  for( cubical_boundary_iterator j = c.begin( i); j != c.end( i); ++j){
 		std::cout << j->cell()->first << " ";
 	  }
+	  std::cout << std::endl;
 	}
 
 	std::cout << csize << std::endl;

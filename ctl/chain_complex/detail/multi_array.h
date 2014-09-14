@@ -284,16 +284,16 @@ class multi_array {
     c[ 0] = index + base_[ 0];
     return c;
   }
-  Coordinate& iterator_to_coordinate( const iterator i, Coordinate & c) const {
+  Coordinate& iterator_to_coordinate( iterator i, Coordinate & c) const {
 	return index_to_coordinate( std::distance( data.begin(), i), c);
   }
-  Coordinate& iterator_to_coordinate( const const_iterator i, Coordinate & c) const {
+  Coordinate& iterator_to_coordinate( const_iterator i, Coordinate & c) const {
 	return index_to_coordinate( std::distance( data.cbegin(), i), c);
   }
-  Coordinate& iterator_to_coordinate( const reverse_iterator i, Coordinate & c) const {
+  Coordinate& iterator_to_coordinate( reverse_iterator i, Coordinate & c) const {
 	return index_to_coordinate( std::distance( data.rbegin(), i), c);
   }
-  Coordinate& iterator_to_coordinate( const const_reverse_iterator i, Coordinate & c) const {
+  Coordinate& iterator_to_coordinate( const_reverse_iterator i, Coordinate & c) const {
 	return index_to_coordinate( std::distance( data.crbegin(), i), c);
   }
   /**

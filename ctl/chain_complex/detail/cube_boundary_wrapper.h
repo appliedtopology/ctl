@@ -82,7 +82,7 @@ class const_cube_boundary_wrapper_iterator:
 
 
      const_cube_boundary_wrapper_iterator( const Complex& c_, const Cell& cell): 
-     c( nullptr), cellptr( nullptr), face(), boundary_pos( 0), bit_index( 0), 
+     c( &c_), cellptr( &cell), face(), boundary_pos( 0), bit_index( 0), 
      dim( dimension( cell)){
        if( dim){
        	c = &c_;
@@ -92,7 +92,7 @@ class const_cube_boundary_wrapper_iterator:
 	face.coefficient( 1);
 	++boundary_pos;
 	++bit_index;
-      }
+      } else{ cellptr = nullptr;  c = nullptr; }
      }
 
      bool operator==(const Self&b) const{ 
@@ -205,6 +205,7 @@ class Cube_boundary_wrapper: Cell_boundary_{
     */
     Cube_boundary_wrapper( const Complex & c_): Cell_boundary_(), c( c_){};	
     
+    Cube_boundary_wrapper( const Complex & c_, Cell_boundary_ & b): Cell_boundary_( b), c( c_){};	
     /**
     * @brief Equality assignment operator 
     * @param Cube_boundary_wrapper& from

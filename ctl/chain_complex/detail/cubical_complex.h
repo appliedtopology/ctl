@@ -108,15 +108,16 @@ public:
   * @param d_:
   */
    template< typename Vertex_extents>
-   Cubical_complex( Cell_boundary & bd_, Vertex_extents & d_):
+   Cubical_complex( Boundary_ & bd_, Vertex_extents & d_):
     cells( boost::make_transform_iterator( d_.begin(), tnpo()),  
 	   boost::make_transform_iterator( d_.end(), tnpo())), 
-	   bd( bd_), index_data( d_) {
+	   bd( *this, bd_), index_data( d_) { 
    	   for( auto i = ++index_data.begin(); 
 		     i != index_data.end(); ++i){ 
 		     *i *= *(i-1); 
 	  }
 	  index_data.insert( index_data.begin(), 1);
+	  assign_key_values();
    }
    
   /**
@@ -129,7 +130,10 @@ public:
    Cubical_complex( const Vertex_extents& d_): 
      cells( boost::make_transform_iterator( d_.begin(), tnpo()), 
 	   boost::make_transform_iterator( d_.end(), tnpo())), 
-    index_data( d_){}
+    bd( *this), 
+    index_data( d_){ 
+	  assign_key_values();
+   }
 
   /**
   * @brief 
@@ -143,7 +147,9 @@ public:
 		    const Vertex_extents& offsets_): 
      cells( boost::make_transform_iterator( d_.begin(), tnpo()), 
 	    boost::make_transform_iterator( d_.end(), tnpo()),
-	    offsets_), index_data( d_), bd( *this) {}
+	    offsets_), index_data( d_), bd( *this){ 
+	  assign_key_values();
+   }
    /**
    * @brief boundary, length, and starting vertex constructor 
    * @tparam Vertex_extents
@@ -157,7 +163,9 @@ public:
 		    const Vertex_extents& offsets_): 
      cells( boost::make_transform_iterator( d_.begin(), tnpo()), 
 	   boost::make_transform_iterator( d_.end(), tnpo())), 
-    bd( bd_), index_data( d_){}
+    bd( bd_), index_data( d_){ 
+	  assign_key_values();
+   }
 
    //! Copy
    Cubical_complex( const Cubical_complex & b): 
@@ -166,8 +174,7 @@ public:
    //! Move
    Cubical_complex( Cubical_complex && b): 
    cells( std::move( b.cells)), bd( std::move( b.bd)),
-   index_data( std::move( b.index_data)) {}
-
+   index_data( std::move( b.index_data)){}
    //! Assignment operator
    Cubical_complex& operator=( const Cubical_complex& b){
    	bd = b.bd;
@@ -320,7 +327,7 @@ public:
        	          boost::make_transform_iterator( index_data.end(), t));
     
     for( auto i = ++(index_data.begin()); 
-    	  i != index_data.end(); ++i){ *i *= *(i-1); }
+    	      i != index_data.end(); ++i){ *i *= *(i-1); }
     std::size_t vertex_id_number=0;
     Vector c;
     while( ctl::get_line(in, line, line_num)){
@@ -331,7 +338,8 @@ public:
 	 auto& p = cells( vertex_id_to_coordinate( vertex_id_number, c) );
 	 p.first = vertex_id_number; 
 	 p.second = d;
-    } 
+    }
+    assign_key_values(); 
     return in;
    }
 
@@ -339,12 +347,37 @@ public:
    Coordinate& id_and_bits_to_coordinate( std::size_t index, 
 					  Coordinate & c){
 	std::size_t vertex_id = index >> cells.dimension();
-	std::size_t mask = index << cells.dimension();
+	std::size_t bits = index^(vertex_id << cells.dimension());
 	vertex_id_to_coordinate( vertex_id, c);
-	std::size_t diff = vertex_id^mask;
-	std::size_t offset=1;
-	for( auto & i: c){ i += diff&offset; ++offset; }
+	std::size_t mask=1;
+	for( auto & i: c){ i += bits&mask; ++mask; }
 	return c;
+   }
+
+   template< typename Coordinate>
+   std::size_t coordinate_to_id_and_bits( const Coordinate & c){
+	Coordinate vertex_coords( c);
+	std::size_t pos=0;
+	//in 0 based systems go from coordinates to vertex coordinates
+	//by making each coordinate even.
+	//here we do
+	// i -= starting_index_in_this_dimension
+	// i -= i%2
+	// i += starting_index_in_this_dimension
+	//this is equivalent
+	std::size_t mask = 0;
+	for( auto & i : vertex_coords){ 
+		const std::size_t k = (i%2)^(cells.base( pos)%2);
+		i -= k; 
+		mask ^= (k << pos);
+		++pos;
+	}
+	std::cout << std::endl;
+	std::size_t t = cells.coordinate_to_index( vertex_coords);
+	typedef std::bitset< 8*sizeof( std::size_t) > bs;
+	t <<= c.size();
+	t ^= mask;
+	return t;
    }
 
    void reserve( const std::size_t n) { cells.reserve( n); }
@@ -367,6 +400,13 @@ public:
    std::size_t offset( std::size_t i) const { return index_data[ i]; }
 //Private functions
 private:
+  void assign_key_values(){
+    Vector c;
+    std::size_t p=0;
+    for( auto i = cells.begin(); i != cells.end(); ++i, ++p){
+      i->first = coordinate_to_id_and_bits( cells.index_to_coordinate( p, c));
+    }
+  }
 
   std::size_t cell_to_word( const Cell & cell){
 	std::cerr << "not yet implemented. TODO: fix this." << std::endl;
