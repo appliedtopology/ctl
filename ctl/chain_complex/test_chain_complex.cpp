@@ -49,18 +49,20 @@
 #include <ctl/chain_complex/complex_boundary.h>
 
 //We build a simplicial chain complex with Z2 coefficients
+
 typedef ctl::Abstract_simplex< int> Simplex;
-typedef ctl::Finite_field< 3> Z2;
-typedef ctl::Simplex_boundary< Simplex, Z2 > Simplex_boundary;
+typedef ctl::Finite_field< 3> Z3;
+typedef ctl::Simplex_boundary< Simplex, Z3 > Simplex_boundary;
 typedef ctl::Chain_complex< Simplex, Simplex_boundary> Simplicial_complex;
 typedef Simplicial_complex::Cell Cell;
+typedef ctl::Complex_boundary< Simplicial_complex> Simplicial_complex_boundary;
+typedef Simplicial_complex_boundary::const_iterator 
+						  simplicial_boundary_iterator;
+
 
 typedef ctl::Cube< int> Cube;
-typedef ctl::Cube_boundary< Cube, Z2 > Cube_boundary;
+typedef ctl::Cube_boundary< Cube, Z3 > Cube_boundary;
 typedef ctl::Chain_complex< Cube, Cube_boundary> Cubical_complex;
-
-typedef ctl::Complex_boundary< Simplicial_complex> Simplicial_complex_boundary;
-typedef Simplicial_complex_boundary::const_iterator simplicial_boundary_iterator;
 
 typedef ctl::Complex_boundary< Cubical_complex> Cubical_complex_boundary;
 typedef Cubical_complex_boundary::const_iterator cubical_boundary_iterator;
@@ -70,7 +72,8 @@ int main( int argc, char** argv){
 	Cell s( {1,2,3,4} );
 	auto pair = complex.insert_closed_cell( s);
 	std::cout << pair.second << " cells inserted!" << std::endl;
-	std::cout << "complex is " << ((complex.is_closed())? "closed":"not closed") << std::endl; 
+	std::cout << "complex is " << 
+		((complex.is_closed())? "closed":"not closed") << std::endl; 
 	std::cout << complex << std::endl;
 
 	Simplicial_complex_boundary b( complex);
@@ -88,12 +91,20 @@ int main( int argc, char** argv){
 	std::ofstream out( "test.asc");
 	complex.write( out); 
 
+	std::cout << " testing cubicalness. " << std::endl;
 	std::vector< std::size_t> sizes{5,4};
 	std::vector< std::size_t> start{3,97};
 	Cubical_complex complex1( sizes, start);
-	std::size_t c=0;
-	for( auto& i : complex1){ c++; }
-	std::cout << c << std::endl;
+	Cubical_complex_boundary c( complex1);
+	std::size_t csize=0;
+	for( auto i = complex1.begin(); i != complex1.end(); ++i){ 
+		csize++;
+	  for( cubical_boundary_iterator j = c.begin( i); j != c.end( i); ++j){
+		std::cout << j->cell()->first << " ";
+	  }
+	}
+
+	std::cout << csize << std::endl;
 	std::cout << complex1.size() << std::endl;
 	return 0;
 }

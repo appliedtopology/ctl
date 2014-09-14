@@ -165,7 +165,7 @@ protected:
 namespace ctl{
 
 template< typename Filtration_,
-	  typename Cell_boundary_ = typename Filtration_::Complex::Boundary,
+	  typename Cell_boundary_ = typename Filtration_::Complex::Cell_boundary,
 	  typename Iterator_ = typename Filtration_::iterator >
 class Filtration_boundary{
 	typedef Filtration_boundary< Filtration_, 
@@ -205,13 +205,13 @@ class Filtration_boundary{
 		const std::size_t pos = std::distance( _filtration.begin(), c);
 		(*c)->second.id( pos);
 		return const_iterator( _filtration, 
-				      _filtration.complex().boundary(), c);
+				      _filtration.complex().cell_boundary(), c);
 	}
 	const_iterator end( const typename Term::Cell & c) const {
 		return const_iterator( _filtration);
 	}
 	size_type length( const typename Term::Cell & c) const {
-		return _filtration.complex().boundary().length( (*c)->first);
+		return _filtration.complex().cell_boundary().length( (*c)->first);
 	}
 		
 	private:		

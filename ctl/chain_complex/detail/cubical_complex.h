@@ -69,7 +69,8 @@ template< typename Cell_,
 	  template< typename ...> class Storage_> 
 class Cubical_complex  {
 public: //Public types
-   typedef Cell_ Cell; //Describes a fundamental object,
+   typedef Cube_boundary_wrapper< Boundary_, Cubical_complex> Cell_boundary; 
+   typedef typename Cell_boundary::Cell Cell; //Describes a fundamental object,
 		       //e.g. Simplex, Cube, Polygon, etc..
 
    //Arbitrary data associated to space.
@@ -78,9 +79,8 @@ public: //Public types
 
 private: //Private types
    //Usually this is multi_array< Data> 
-   typedef Storage_< Cell, Data, Hash> Storage;
+   typedef Storage_< Cell_, Data, Hash> Storage;
    typedef typename Storage::Coordinate  Vector;
-
 public: //Public Types
    typedef typename std::size_t size_type;
 
@@ -93,8 +93,8 @@ public: //Public Types
    //we overload the normal cubical boundary to make begin() and end() 
    //take as input the word we use to represent as a key and 
    //returns the word representation..
-   typedef Cube_boundary_wrapper< Boundary_, Complex> Cell_boundary; 
-   friend Cell_boundary;  
+  template< typename X, typename Y>
+  friend class Cube_boundary_wrapper;
 public:
    //Constructors
    //!Default
@@ -143,9 +143,7 @@ public:
 		    const Vertex_extents& offsets_): 
      cells( boost::make_transform_iterator( d_.begin(), tnpo()), 
 	    boost::make_transform_iterator( d_.end(), tnpo()),
-	    offsets_), 
-    index_data( d_){}
-
+	    offsets_), index_data( d_), bd( *this) {}
    /**
    * @brief boundary, length, and starting vertex constructor 
    * @tparam Vertex_extents
@@ -192,7 +190,7 @@ public:
    * @param s
    * @return 
    */
-   iterator       find_cell( const Cell & s) {
+   iterator       find_cell( const Cell_ & s) {
 	std::size_t linear_index = cell_to_word( s);
 	return cells.begin()+linear_index;
    }
@@ -203,7 +201,7 @@ public:
    * @param s
    * @return 
    */
-   const_iterator find_cell( const Cell & s) const { 
+   const_iterator find_cell( const Cell_ & s) const { 
 	std::size_t linear_index = cell_to_word( s);
 	return cells.begin()+linear_index;
    }
@@ -215,9 +213,8 @@ public:
    *
    * @return 
    */
-   template< typename Coordinate>
-   iterator find_cell( const Coordinate & s) {
-	std::size_t linear_index = cells.coordinate_to_word( s);
+   iterator find_cell( const Vector & s) {
+	std::size_t linear_index = cells.coordinate_to_index( s);
 	return cells.begin()+linear_index;
    }
    /**
@@ -227,9 +224,8 @@ public:
    * @param s
    * @return 
    */
-   template< typename Coordinate>
-   const_iterator find_cell( const Coordinate & s) const { 
-	std::size_t linear_index = cells.coordinate_to_word( s);
+   const_iterator find_cell( const Vector & s) const { 
+	std::size_t linear_index = cells.coordinate_to_index( s);
 	return cells.begin()+linear_index;
    }
 
@@ -240,8 +236,8 @@ public:
    */
    const_iterator find_cell( std::size_t vertex_bits_index) const {
 	Vector c;
-	return cells.begin()+cells.coordinate_to_word( 
-						id_and_bits_to_coordinate( c));
+	id_and_bits_to_coordinate( vertex_bits_index, c);
+	return cells.begin()+cells.coordinate_to_index( c);
    }
 
    /**
@@ -251,8 +247,8 @@ public:
    */
    iterator find_cell( std::size_t vertex_bits_index) {
 	Vector c;
-	return cells.begin()+cells.coordinate_to_word( 
-						 id_and_bits_to_coordinate( c));
+	id_and_bits_to_coordinate( vertex_bits_index, c);
+	return cells.begin()+cells.coordinate_to_index( c); 
    }
    
    iterator       		begin()       	{ return cells.begin(); } 
@@ -342,8 +338,8 @@ public:
    template< typename Coordinate>
    Coordinate& id_and_bits_to_coordinate( std::size_t index, 
 					  Coordinate & c){
-	std::size_t vertex_id = vertex_bits_index >> cells.dimension();
-	std::size_t mask = vertex_bits_index << cells.dimension();
+	std::size_t vertex_id = index >> cells.dimension();
+	std::size_t mask = index << cells.dimension();
 	vertex_id_to_coordinate( vertex_id, c);
 	std::size_t diff = vertex_id^mask;
 	std::size_t offset=1;
@@ -368,6 +364,7 @@ public:
    	return true;
    }
 
+   std::size_t offset( std::size_t i) const { return index_data[ i]; }
 //Private functions
 private:
 
@@ -376,7 +373,7 @@ private:
 	return size();
   }
   template< typename Coordinate>
-  void vertex_id_to_position( std::size_t index, Coordinate & c){
+  Coordinate& vertex_id_to_coordinate( std::size_t index, Coordinate & c){
     c.resize( index_data.size(), 0);
     for( auto i = index_data.size()-1; i>1;  --i){ 
         c[ i] = index/ index_data[ i-1];

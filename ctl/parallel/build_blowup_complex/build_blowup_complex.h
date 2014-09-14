@@ -107,7 +107,7 @@ class Build_blowup_body{
 	typedef typename Nerve_filtration::Complex Nerve;
 	typedef typename Blowup::Cell Product;
 	typedef typename Blowup::Data Data;
-	typedef typename Blowup::Boundary::Boundary1 Nerve_boundary;
+	typedef typename Blowup::Cell_boundary::Boundary1 Nerve_boundary;
 	typedef typename Nerve_boundary::const_iterator Boundary_iterator;
 
 	public:
@@ -125,7 +125,7 @@ class Build_blowup_body{
 			blowup(_filtration.complex()),
 			nerve(_nerve_filtration.complex()),
 			impure_index( _impure_cell->second.id()),
-			boundary( _filtration.complex().boundary().boundary1()){}
+			boundary( _filtration.complex().cell_boundary().boundary1()){}
 
 	Build_blowup_body( const Self & _self, tbb::split):
 			get( _self.get),

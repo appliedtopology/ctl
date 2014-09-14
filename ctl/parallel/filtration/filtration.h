@@ -75,7 +75,7 @@ class Filtration {
 	typedef typename Vector::const_iterator _vciterator;
 	typedef typename Vector::reverse_iterator _vriterator;
 	typedef typename Vector::const_reverse_iterator _vcriterator;
- 	typedef typename Complex::Boundary Cell_boundary;
+ 	typedef typename Complex::Cell_boundary Cell_boundary;
 	typedef typename Cell_boundary::Term Cell_term;
 	typedef typename Cell_term::Coefficient Coefficient;
  
