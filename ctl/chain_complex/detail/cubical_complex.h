@@ -112,11 +112,11 @@ public:
     cells( boost::make_transform_iterator( d_.begin(), tnpo()),  
 	   boost::make_transform_iterator( d_.end(), tnpo())), 
 	   bd( *this, bd_), index_data( d_) { 
+	   index_data.insert( index_data.begin(), 1);
    	   for( auto i = ++index_data.begin(); 
 		     i != index_data.end(); ++i){ 
 		     *i *= *(i-1); 
 	  }
-	  index_data.insert( index_data.begin(), 1);
 	  assign_key_values();
    }
    
@@ -132,6 +132,11 @@ public:
 	   boost::make_transform_iterator( d_.end(), tnpo())), 
     bd( *this), 
     index_data( d_){ 
+	  index_data.insert( index_data.begin(), 1);
+   	   for( auto i = ++index_data.begin(); 
+		     i != index_data.end(); ++i){ 
+		     *i *= *(i-1); 
+	  }
 	  assign_key_values();
    }
 
@@ -148,6 +153,13 @@ public:
      cells( boost::make_transform_iterator( d_.begin(), tnpo()), 
 	    boost::make_transform_iterator( d_.end(), tnpo()),
 	    offsets_), index_data( d_), bd( *this){ 
+	  index_data.insert( index_data.begin(), 1);
+	  std::cout << "index_data: " << index_data[ 0] << " ";
+ 	   for( auto i = ++index_data.begin(); 
+		     i != index_data.end(); ++i){ 
+		     *i *= *(i-1); 
+		std::cout << *i << std::endl;
+	  }
 	  assign_key_values();
    }
    /**
@@ -164,6 +176,11 @@ public:
      cells( boost::make_transform_iterator( d_.begin(), tnpo()), 
 	   boost::make_transform_iterator( d_.end(), tnpo())), 
     bd( bd_), index_data( d_){ 
+	  index_data.insert( index_data.begin(), 1);
+ 	   for( auto i = ++index_data.begin(); 
+		     i != index_data.end(); ++i){ 
+		     *i *= *(i-1); 
+	  }
 	  assign_key_values();
    }
 
@@ -208,7 +225,7 @@ public:
    * @param s
    * @return 
    */
-   const_iterator find_cell( const Cell_ & s) const { 
+   const_iterator find_cell( const Cell_ & s) const {
 	std::size_t linear_index = cell_to_word( s);
 	return cells.begin()+linear_index;
    }
@@ -244,6 +261,10 @@ public:
    const_iterator find_cell( std::size_t vertex_bits_index) const {
 	Vector c;
 	id_and_bits_to_coordinate( vertex_bits_index, c);
+	std::cout << std::endl << " ---- "  << std::endl; 
+	std::cout << "size: " << c.size() << std::endl;
+	for( auto & i : c){ std::cout << i << " - ";}
+	std::cout << std::endl;
 	return cells.begin()+cells.coordinate_to_index( c);
    }
 
@@ -255,6 +276,10 @@ public:
    iterator find_cell( std::size_t vertex_bits_index) {
 	Vector c;
 	id_and_bits_to_coordinate( vertex_bits_index, c);
+	std::cout << std::endl << " ---- "  << std::endl; 
+	std::cout << "size: " << c.size() << std::endl;
+	for( auto & i : c){ std::cout << i << " - ";}
+	std::cout << std::endl;
 	return cells.begin()+cells.coordinate_to_index( c); 
    }
    
@@ -323,7 +348,7 @@ public:
     //cartesian product like this:
     //*-*-*-*-* x *-*-*-*
     tnpo t;
-    cells.resize( boost::make_transform_iterator( index_data.begin(), t),
+    cells.resize( boost::make_transform_iterator( ++index_data.begin(), t),
        	          boost::make_transform_iterator( index_data.end(), t));
     
     for( auto i = ++(index_data.begin()); 
@@ -346,8 +371,11 @@ public:
    template< typename Coordinate>
    Coordinate& id_and_bits_to_coordinate( std::size_t index, 
 					  Coordinate & c){
-	std::size_t vertex_id = index >> cells.dimension();
-	std::size_t bits = index^(vertex_id << cells.dimension());
+	std::size_t vertex_id = index >> (cells.dimension()+1);
+	std::cout << std::endl;
+	std::cout << "vertex_id = " << vertex_id << std::endl;
+	std::size_t bits = index^(vertex_id << (cells.dimension()+1));
+	std::cout << "bits = " << bits << std::endl;
 	vertex_id_to_coordinate( vertex_id, c);
 	std::size_t mask=1;
 	for( auto & i: c){ i += bits&mask; ++mask; }
@@ -372,9 +400,7 @@ public:
 		mask ^= (k << pos);
 		++pos;
 	}
-	std::cout << std::endl;
 	std::size_t t = cells.coordinate_to_index( vertex_coords);
-	typedef std::bitset< 8*sizeof( std::size_t) > bs;
 	t <<= c.size();
 	t ^= mask;
 	return t;
@@ -414,7 +440,7 @@ private:
   }
   template< typename Coordinate>
   Coordinate& vertex_id_to_coordinate( std::size_t index, Coordinate & c){
-    c.resize( index_data.size(), 0);
+    c.resize( index_data.size()-1, 0);
     for( auto i = index_data.size()-1; i>1;  --i){ 
         c[ i] = index/ index_data[ i-1];
         index -= c[ i]*(index_data[ i-1]);

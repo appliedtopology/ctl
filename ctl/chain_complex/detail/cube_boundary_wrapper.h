@@ -88,10 +88,9 @@ class const_cube_boundary_wrapper_iterator:
        	c = &c_;
 	cellptr = &cell;
 	bit_index = find_next_set_bit( cell, bit_index);
-	face.cell() = cell & (1 << bit_index);
+	face.cell() = cell ^ (1 << bit_index);
 	face.coefficient( 1);
 	++boundary_pos;
-	++bit_index;
       } else{ cellptr = nullptr;  c = nullptr; }
      }
 
@@ -124,30 +123,39 @@ class const_cube_boundary_wrapper_iterator:
        return *this;
      }
      Term& operator*() {
-       assert( c != nullptr); 
+        assert( c != nullptr); 
      	return face; 
      }
      const Term* operator->() const { return &face; }
 
      Self& operator++(){
          if( boundary_pos == 2*dim){ 
-         	c = nullptr;
+         	cellptr = nullptr;
          	boundary_pos = 0;
          	return *this;
          }
+	 //set previous flipped bit
+	 face.cell() ^= (1 << bit_index); 
+	 //flip coefficient 
          face.coefficient( -1*face.coefficient());
+	 //advance the indices
          ++boundary_pos;
-	 face.cell() &= (1 << bit_index); //set previous flipped bit
+	 ++bit_index;
+	 //when we get to dim iterations, we start over.
 	 bit_index *= (boundary_pos < dim);
 	 find_next_set_bit( face.cell(), bit_index);
-	 face.cell() &= (1 << bit_index); //unset new bit.
+	 face.cell() ^= (1 << bit_index); //unset new bit.
 	 //if we are in the second half of boundary computation
 	 //the vertex id which owns a cell changes.
 	 //we add an offset, given by the index of the bit we just turned
 	 //off.
-	 face.cell() += (boundary_pos >= dim)*
-		        ((c->offset( bit_index) << c->dimension()));
-	 ++bit_index;
+	 std::cout << "bit_index: " << bit_index << std::endl;
+	 for( auto i = 0; i < 2; ++i){
+		std::cout << c->offset( i) << std::endl;
+	 }
+	 std::cout << "offset: " << c->offset( bit_index) << std::endl;
+	 face.cell() += (boundary_pos >= dim)*((c->offset( bit_index) << (c->dimension())));
+	 std::cout << "face.cell is now: " << face.cell() << std::endl;
          return *this;	
      }
 
@@ -161,12 +169,6 @@ class const_cube_boundary_wrapper_iterator:
      	return tmp;
      }
 
-     Self operator--( int){
-      	Self tmp( *this); 
-     	--(*this); //now call previous operator
-     	return tmp;
-     }
-	
    private:
      std::size_t dimension( const std::size_t c_) const{ 
      	std::size_t d = 0;
@@ -263,9 +265,6 @@ class Cube_boundary_wrapper: Cell_boundary_{
 
 } // end namespace detail
 } //ctl namespace
-
-//exported functionality
-namespace ctl{} //namespace ctl
 
 
 #endif //CTL_CUBE_BOUNDARY_WRAPPER_H

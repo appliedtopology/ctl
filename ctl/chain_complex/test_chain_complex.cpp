@@ -96,13 +96,14 @@ int main( int argc, char** argv){
 	std::vector< std::size_t> start{3,97};
 	Cubical_complex complex1( sizes, start);
 	Cubical_complex_boundary c( complex1);
+	std::cout << "cubical_complex dimension: " << complex1.dimension() << std::endl;	
 	std::size_t csize=0;
 	for( auto i = complex1.begin(); i != complex1.end(); ++i){ 
 	  csize++;
 	  std::cout << "boundary test: " 
 		    << ctl::delta << "(" << i->first << ") = "; 
 	  for( cubical_boundary_iterator j = c.begin( i); j != c.end( i); ++j){
-		std::cout << j->cell()->first << " ";
+//		std::cout << j->cell()->first << " ";
 	  }
 	  std::cout << std::endl;
 	}

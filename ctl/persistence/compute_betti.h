@@ -90,7 +90,7 @@ void compute_betti( Filtration & filtration,
                const bool c = bd.empty() || (cell < bd.youngest().cell()); 
 	       betti[ (*cell)->first.dimension()-(!c)] += (2*c -1);
        }
-       ctl::write_betti( betti,std::cout);
+       ctl::write_betti( betti, std::cout);
 	_betti.swap( betti);
 }
 
