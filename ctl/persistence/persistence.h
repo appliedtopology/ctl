@@ -276,10 +276,9 @@ void initialize_cascade_data( const Filtration_iterator sigma,
      cascade_boundary.reserve( data.bd.length( sigma));
      for( auto i = data.bd.begin( sigma); i != data.bd.end( sigma); ++i){
          if( Remove_destroyers && is_creator( *i, data.cascade_boundary_map)){
-		cascade_boundary.emplace( i->cell(), i->coefficient());
+		cascade_boundary += *i; 
 	}
      }
-     cascade_boundary.sort();
 }
 
 /**
