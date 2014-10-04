@@ -56,18 +56,19 @@ template< typename Out, typename Vector>
 void print_vector( Out & out, const Vector & v){
 for( auto & i : v){ out << i << " ";}
 }
+
 // Given a node, we loop through all its neighbors and return a vector
 // of all the neighbors that have a lower ordering.
 template<typename Graph, typename Vertex, typename Points> 
 void get_lower_neighbors (const Graph& g,  
                  	  const Vertex& v,  
                  	  Points& lower_neighbors) {
- typedef typename boost::graph_traits<Graph>::adjacency_iterator Iterator;
- Iterator ai, ai_end;
- for( boost::tie(ai, ai_end) = boost::adjacent_vertices(v, g); 
-	ai != ai_end; ++ai){
-     if (*ai < v) { lower_neighbors.push_back( *ai); }
- }   
+    typedef typename boost::graph_traits<Graph>::adjacency_iterator Iterator;
+    Iterator ai, ai_end;
+    for( boost::tie(ai, ai_end) = boost::adjacent_vertices(v, g); 
+	 ai != ai_end; ++ai) {
+        if (*ai < v) { lower_neighbors.push_back( *ai); }
+    } 
 } 
  
 // At every level in this recursive function, we introduce a new node to our
@@ -77,20 +78,25 @@ void add_cofaces (const Graph& graph, Simplex& tau,
 		  const Neighbors& neighbors, 
 		  Complex& complex, const std::size_t dimension) {
     typedef typename Neighbors::const_iterator Neighbor_iterator;
+    std::cerr << "about to add: " << tau << std::endl;
     complex.insert_open_cell(tau);
-    if(tau.dimension() >= dimension) { return; } 
+    if(tau.dimension() >= dimension) { return; }
     Neighbors lower_neighbors; 
     Neighbors final_neighbors; 
     for(Neighbor_iterator i = neighbors.begin(); i != neighbors.end(); ++i){
       lower_neighbors.clear();
-      Simplex sigma(  tau);
+      Simplex sigma( tau);
       sigma.insert( *i);
-      get_lower_neighbors(graph, *i, lower_neighbors); 
+      std::cerr << "tau: " << tau << " and vertex: " << *i << std::endl;
+      std::cerr << "sigma: " << sigma << std:: endl;
+      get_lower_neighbors(graph, *i, lower_neighbors);
+      std::sort (lower_neighbors.begin(), lower_neighbors.end()); 
       final_neighbors.resize( std::min( lower_neighbors.size(), 
 					      neighbors.size()));
       std::set_intersection( lower_neighbors.begin(), lower_neighbors.end(),
 			     neighbors.begin(), neighbors.end(),
 			     final_neighbors.begin());
+      std::sort (final_neighbors.begin(), final_neighbors.end());
       add_cofaces(graph, sigma, final_neighbors, complex, dimension); 
     }
 } 
@@ -105,8 +111,9 @@ void incremental_vr (const Graph& g, Complex& complex, std::size_t dimension) {
     vertex_iterator vi, vlast;
     for ( std::tie( vi, vlast) = boost::vertices( g); vi != vlast; ++vi) {
         std::vector< Vertex> neighbors;
-        get_lower_neighbors(g, *vi, neighbors); 
-     	Simplex tau(1, *vi); 
+        get_lower_neighbors(g, *vi, neighbors);
+	std::sort (neighbors.begin(), neighbors.end());     	
+	Simplex tau(1, *vi); 
         add_cofaces( g, tau, neighbors, complex, dimension); 
     } 
 }
