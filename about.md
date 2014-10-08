@@ -5,7 +5,6 @@ permalink: /about/
 published: true
 ---
 
-## Contributing
 CTL is an open source project and contributions are always welcome. This page contains information for prospective CTL developers, including an overview of the organization of the current code base, how to write code and documentation, and how to use the tools like Git.
 
 Contributions are actively encouraged. Your first few contributions should ideally take the form of git-formatted changesets. After submitting several high-quality changesets, you may receive direct commit access to the [GitHub](github.com/appliedtopology/ctl) repositories.
