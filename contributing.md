@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Contributing
-permalink: /about/
+permalink: /contributing/
 published: true
 ---
 
