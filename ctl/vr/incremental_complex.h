@@ -51,12 +51,6 @@
 
 namespace ctl {
 
-
-template< typename Out, typename Vector>
-void print_vector( Out & out, const Vector & v){
-for( auto & i : v){ out << i << " ";}
-}
-
 // Given a node, we loop through all its neighbors and return a vector
 // of all the neighbors that have a lower ordering.
 template<typename Graph, typename Vertex, typename Points> 
@@ -70,7 +64,7 @@ void get_lower_neighbors (const Graph& g,
         if (*ai < v) { lower_neighbors.push_back( *ai); }
     } 
 } 
- 
+
 // At every level in this recursive function, we introduce a new node to our
 // simplicial complex and add the cofaces that arise from this new node.
 template<typename Graph, typename Simplex, typename Neighbors, typename Complex>
@@ -78,7 +72,6 @@ void add_cofaces (const Graph& graph, Simplex& tau,
 		  const Neighbors& neighbors, 
 		  Complex& complex, const std::size_t dimension) {
     typedef typename Neighbors::const_iterator Neighbor_iterator;
-    std::cerr << "about to add: " << tau << std::endl;
     complex.insert_open_cell(tau);
     if(tau.dimension() >= dimension) { return; }
     Neighbors lower_neighbors; 
@@ -87,16 +80,11 @@ void add_cofaces (const Graph& graph, Simplex& tau,
       lower_neighbors.clear();
       Simplex sigma( tau);
       sigma.insert( *i);
-      std::cerr << "tau: " << tau << " and vertex: " << *i << std::endl;
-      std::cerr << "sigma: " << sigma << std:: endl;
       get_lower_neighbors(graph, *i, lower_neighbors);
-      std::sort (lower_neighbors.begin(), lower_neighbors.end()); 
-      final_neighbors.resize( std::min( lower_neighbors.size(), 
-					      neighbors.size()));
-      std::set_intersection( lower_neighbors.begin(), lower_neighbors.end(),
-			     neighbors.begin(), neighbors.end(),
-			     final_neighbors.begin());
-      std::sort (final_neighbors.begin(), final_neighbors.end());
+      final_neighbors.clear();
+      set_intersection(lower_neighbors.begin(),lower_neighbors.end(),
+                       neighbors.begin(),neighbors.end(),
+                       back_inserter(final_neighbors));
       add_cofaces(graph, sigma, final_neighbors, complex, dimension); 
     }
 } 
@@ -112,7 +100,6 @@ void incremental_vr (const Graph& g, Complex& complex, std::size_t dimension) {
     for ( std::tie( vi, vlast) = boost::vertices( g); vi != vlast; ++vi) {
         std::vector< Vertex> neighbors;
         get_lower_neighbors(g, *vi, neighbors);
-	std::sort (neighbors.begin(), neighbors.end());     	
 	Simplex tau(1, *vi); 
         add_cofaces( g, tau, neighbors, complex, dimension); 
     } 

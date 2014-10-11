@@ -89,14 +89,7 @@ int main (int argc, char* argv[]) {
     std::cerr << "Incremental construction: " << clock.elapsed() << std::endl;
     std::cerr << "Number of simplices: " << complex.size() << std::endl;
     std::cerr << "dimension of complex: " << complex.dimension() << std::endl;
-    /*
-    std::ofstream out;
-    std::string output_name( argv[1]);
-    output_name += ".asc";
-    out.open( output_name.c_str());
-    complex.write( out);
-    out.close();
-    */
+//    std::cerr << "Complex: " << complex << std::endl;
     return 0;	
 }
 
