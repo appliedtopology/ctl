@@ -1,3 +1,5 @@
+ctl/vr/incremental_test
+ctl/vr/test
 tools/convert_asc_format
 tools/ctl2phat
 doc/doxygen/*
