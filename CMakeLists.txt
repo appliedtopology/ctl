@@ -21,6 +21,8 @@ if (NOT APPLE)
 endif (NOT APPLE)
 
 find_package(Boost COMPONENTS program_options serialization REQUIRED)
+find_package(MPI)
+find_package( Boost COMPONENTS MPI)
 link_directories(/usr/local/lib ${Boost_LIBRARY_DIR})
 
 set(Boost_USE_MULTITHREADED ON)
