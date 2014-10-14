@@ -197,6 +197,13 @@ public:
      cells( boost::make_transform_iterator( d_.begin(), tnpo()), 
 	    boost::make_transform_iterator( d_.end(), tnpo()),
 	    offsets_), index_data( d_), bd( *this){ 
+	  index_data.insert( index_data.begin(), 1);
+	  std::cout << "index_data: " << index_data[ 0] << " ";
+ 	   for( auto i = ++index_data.begin(); 
+		     i != index_data.end(); ++i){ 
+		     *i *= *(i-1); 
+		std::cout << *i << std::endl;
+	  }
 	  assign_key_values();
    }
    /**
