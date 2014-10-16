@@ -24,7 +24,7 @@
 
 //VR Construction
 #include <ctl/vr/construct_graph.h>
-#include <ctl/vr/incremental_complex.h> 
+#include <ctl/vr/inductive_complex.h> 
 
 //Graph
 typedef typename ctl::Nbhd_graph<> Graph;
@@ -80,11 +80,10 @@ int main (int argc, char* argv[]) {
     std::cerr << "Graph construction: " << clock.elapsed() << std::endl;
     clock.start();
     Complex complex; 
-    ctl::incremental_vr(graph, complex, dimension);
+    ctl::inductive_vr(graph, complex, dimension);
     clock.stop();
-    std::cerr << "Incremental construction: " << clock.elapsed() << std::endl;
+    std::cerr << "Inductive construction: " << clock.elapsed() << std::endl;
     std::cerr << "Number of simplices: " << complex.size() << std::endl;
     std::cerr << "dimension of complex: " << complex.dimension() << std::endl;
     return 0;	
 }
-
