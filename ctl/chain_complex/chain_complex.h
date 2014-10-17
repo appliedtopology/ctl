@@ -66,7 +66,7 @@ namespace ctl {
 * A structure which stores the standard cell basis for a Complex_interface
 * The Cell type is specified via the template parameter Cell
 * One must provide an operator which allows the boundary of a cell to be 
-* enumerated.
+* enumerated. The type of this operator is the Boundary template type.
 * 
 * The library currently provides two cell types, ctl::Abstract_simplex< T> 
 * and ctl::Cube< T>.

@@ -129,6 +129,7 @@ class const_cube_boundary_wrapper_iterator:
      const Term* operator->() const { return &face; }
 
      Self& operator++(){
+	 std::cout << "cube boundary wrapper ++" << std::endl;
          if( boundary_pos == 2*dim){ 
          	cellptr = nullptr;
          	boundary_pos = 0;

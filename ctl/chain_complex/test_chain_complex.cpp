@@ -91,7 +91,8 @@ int main( int argc, char** argv){
 	std::ofstream out( "test.asc");
 	complex.write( out); 
 
-	std::cout << " testing cubicalness. " << std::endl;
+	std::cout << " ---------------------- " << std::endl;
+	std::cout << " testing cubical complexes " << std::endl;
 	std::vector< std::size_t> sizes{5,4};
 	std::vector< std::size_t> start{3,97};
 	Cubical_complex complex1( sizes, start);
@@ -103,7 +104,8 @@ int main( int argc, char** argv){
 	  std::cout << "boundary test: " 
 		    << ctl::delta << "(" << i->first << ") = "; 
 	  for( cubical_boundary_iterator j = c.begin( i); j != c.end( i); ++j){
-//		std::cout << j->cell()->first << " ";
+		Cube temp_cube;
+		std::cout << complex1.key_to_cube( j->cell()->first, temp_cube) << " ";
 	  }
 	  std::cout << std::endl;
 	}

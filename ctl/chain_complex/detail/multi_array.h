@@ -258,11 +258,13 @@ class multi_array {
   * @return 
   */
   std::size_t extents( std::size_t i) const { return extents_[ i]; }
+  std::size_t offsets( std::size_t i) const { return d_[ i]; }
 
   /**
   * @brief Returns the length of the array in each dimension
   */
   Coordinate extents() const { return extents_; }
+  std::size_t offsets() const { return d_; }
   Coordinate base() const    { return base_; } 
   std::size_t base( std::size_t i) const    { return base_[ i]; }
   std::size_t dimension() const { return extents_.size(); } 

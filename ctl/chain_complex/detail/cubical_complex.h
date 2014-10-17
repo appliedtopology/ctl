@@ -61,7 +61,6 @@
 #include <ctl/io/io.h>
 #include <ctl/cube/cube.h>
 #include <ctl/chain_complex/detail/cube_boundary_wrapper.h>
-#include <ctl/chain_complex/detail/cubical_iterator.h>
 
 namespace ctl {
 namespace detail {
@@ -79,12 +78,12 @@ template< typename Cell_,
 class Cubical_complex  {
 public: //Public types
    typedef Cube_boundary_wrapper< Boundary_, Cubical_complex> Cell_boundary; 
-   typedef typename Cell_boundary::Cell Cell; //Describes a fundamental object,
+   typedef Cell_ Cube; //Describes a fundamental object,
 		       //e.g. Simplex, Cube, Polygon, etc..
-
    //Arbitrary data associated to space.
    typedef Data_ Data;
    typedef Hash_ Hash;
+   typedef typename Cell_boundary::Cell Cell;
 
 private: //Private types
    //Usually this is multi_array< Data> 
@@ -163,7 +162,6 @@ public:
 	    boost::make_transform_iterator( d_.end(), tnpo()),
 	    offsets_), index_data( d_), bd( *this){ 
 	  index_data.insert( index_data.begin(), 1);
-	  std::cout << "index_data: " << index_data[ 0] << " ";
  	   for( auto i = ++index_data.begin(); 
 		     i != index_data.end(); ++i){ 
 		     *i *= *(i-1); 
@@ -171,41 +169,7 @@ public:
 	  }
 	  assign_key_values();
    }
-   /**
-   * @brief boundary, length, and starting vertex constructor 
-   * @tparam Vertex_extents
-   * @param bd_
-   * @param d_
-   * @param offsets_
-   */
-   template< typename Vertex_extents> 
-   Cubical_complex( const Vertex_extents& d_): 
-     cells( boost::make_transform_iterator( d_.begin(), tnpo()), 
-	   boost::make_transform_iterator( d_.end(), tnpo())), 
-    index_data( d_){}
-
-  /**
-  * @brief 
-  *
-  * @tparam Vertex_extents
-  * @param d_
-  * @param offsets_
-  */
-   template< typename Vertex_extents> 
-   Cubical_complex( const Vertex_extents& d_,
-		    const Vertex_extents& offsets_): 
-     cells( boost::make_transform_iterator( d_.begin(), tnpo()), 
-	    boost::make_transform_iterator( d_.end(), tnpo()),
-	    offsets_), index_data( d_), bd( *this){ 
-	  index_data.insert( index_data.begin(), 1);
-	  std::cout << "index_data: " << index_data[ 0] << " ";
- 	   for( auto i = ++index_data.begin(); 
-		     i != index_data.end(); ++i){ 
-		     *i *= *(i-1); 
-		std::cout << *i << std::endl;
-	  }
-	  assign_key_values();
-   }
+   
    /**
    * @brief boundary, length, and starting vertex constructor 
    * @tparam Vertex_extents
@@ -478,10 +442,6 @@ private:
     }
   }
 
-  std::size_t cell_to_word( const Cell & cell){
-	std::cerr << "not yet implemented. TODO: fix this." << std::endl;
-	return size();
-  }
   template< typename Coordinate>
   Coordinate& vertex_id_to_coordinate( std::size_t index, Coordinate & c){
     c.resize( index_data.size()-1, 0);
@@ -493,30 +453,81 @@ private:
     c[ 0] = 2*index + cells.base( 0);
     return c;
   }
-
-  std::size_t cell_to_word( const Cell & cell){
-	std::cerr << "not yet implemented. TODO: fix this." << std::endl;
-	return size();
-  }
-  template< typename Coordinate>
-  Coordinate& vertex_id_to_coordinate( std::size_t index, Coordinate & c){
-    c.resize( index_data.size(), 0);
-    for( auto i = index_data.size()-1; i>1;  --i){ 
-        c[ i] = index/ index_data[ i-1];
-        index -= c[ i]*(index_data[ i-1]);
-	c[ i] = 2*c[ i] + cells.base( i);
+public:
+/**
+* @brief Given a cell encoded as a product of intervals
+* (each interval a product of vertex ids)
+* we return a unique id associate to this cell.
+* The id encodes the lower left vertex of the cube
+* and then in the lowest d bits the sum of the standard 
+* d-dimensional basis vectors which encodes the difference from this point.
+* E.g.  |=   this picture encodes a cubical complex where . is a vertex - and | 
+        ._   are edges and = is a face.
+* where . is say vertex 3 = 11b
+* we encode the edge | as 1110b 
+*  the edge - as 1101b 
+* and the face = as  1111b
+* In case its not clear to you 
+* the highest two bits in this example correspond to writing 3 in binary 
+* @param cell
+*
+* @return 
+*/
+  Cell cube_to_key( const Cube & cube){
+    Cell key=0;
+    Cell set_bits = 0;
+    auto begin = cells.offsets().begin();
+    auto end = cells.offsets.end();
+    for( auto & i : cube){
+      key = std::min( i.first, i.second);
+      set_bits &= (1 << (std::find( begin, end, i.second - i.first) - begin));
     }
-    c[ 0] = 2*index + cells.base( 0);
-    return c;
+    key <<= cells.dimension();
+    key &= set_bits;
+    return key;
+  }
+
+ /**
+ * @brief given the bit encoding of a cube as vertex_id_in_binary|b_1...b_d
+ * where bi specifies the displacement from the lower left vertex_id
+ *
+ * This function produces the cell representation as a product of intervals
+ * each interval is a product of vertices. 
+ *
+ * @param word
+ * @param cell
+ */
+  const Cube& key_to_cube( Cell word, Cube & cube){
+   cube.clear();
+   std::size_t lower_left_vertex_id = word >> (index_data.size()-1);
+   word ^= (lower_left_vertex_id << (index_data.size()-1));
+   std::vector< std::size_t> set_bits;
+   set_bits.reserve( index_data.size()-1);
+   if (word == 0){
+   	cube.insert( {lower_left_vertex_id, lower_left_vertex_id});
+   	return cube;
+   }
+   for( auto i = 0; i < (index_data.size()-1); ++i){ 
+     if(word && (1 << i)){ set_bits.push_back( i); } 
+   }
+   cube.reserve( set_bits.size());
+   for( auto i : set_bits){
+    cube.insert( {lower_left_vertex_id, 
+   		lower_left_vertex_id + cells.offsets( set_bits[ i]) } );
+   }
+   return cube;
   }
 
 //Private members
 private:
    Storage cells;
+   //precomputed products for offsets into the array
    Vector index_data;
    Cell_boundary bd;
 }; //chain_complex
 } //namespace ctl
+
+
 
 template< typename Stream, typename ... Args>
 Stream& operator<<( Stream& out, 
