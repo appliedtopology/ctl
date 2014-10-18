@@ -90,26 +90,30 @@ int main( int argc, char** argv){
 	}
 	std::ofstream out( "test.asc");
 	complex.write( out); 
-
 	std::cout << " ---------------------- " << std::endl;
 	std::cout << " testing cubical complexes " << std::endl;
-	std::vector< std::size_t> sizes{5,4};
+	std::vector< std::size_t> sizes{4,5};
 	std::vector< std::size_t> start{3,97};
 	Cubical_complex complex1( sizes, start);
+	Cubical_complex c2( complex1);
+	if( c2 != complex1) { std::cerr << "bug in copy/equality operators."; }
 	Cubical_complex_boundary c( complex1);
-	std::cout << "cubical_complex dimension: " << complex1.dimension() << std::endl;	
+	std::cout << "cubical_complex dimension: " 
+		  << complex1.dimension() << std::endl;	
 	std::size_t csize=0;
+	Cube temp_cube;
 	for( auto i = complex1.begin(); i != complex1.end(); ++i){ 
-	  csize++;
-	  std::cout << "boundary test: " 
-		    << ctl::delta << "(" << i->first << ") = "; 
-	  for( cubical_boundary_iterator j = c.begin( i); j != c.end( i); ++j){
-		Cube temp_cube;
-		std::cout << complex1.key_to_cube( j->cell()->first, temp_cube) << " ";
+	  std::cout << ctl::delta << "(";
+	  std::cout << ctl::key_to_cube( complex1, i->first); 
+	  std::cout << ") = ";
+	  if( ctl::cube_dimension( complex1, i->first) > 0){
+	  for( auto j = c.begin( i); j != c.end( i); ++j){
+	  	std::cout << ctl::key_to_cube( complex1, j->cell()->first); 
+		std::cout << " ";
 	  }
+	  } else { std::cout << 0; }
 	  std::cout << std::endl;
 	}
-
 	std::cout << csize << std::endl;
 	std::cout << complex1.size() << std::endl;
 	return 0;

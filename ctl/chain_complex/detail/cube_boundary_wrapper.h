@@ -80,17 +80,23 @@ class const_cube_boundary_wrapper_iterator:
       bit_index( f.bit_index),
       dim( std::move( f.dim)){}
 
-
+     
+    /**
+    * @brief begin constructor
+    *
+    * @param c_
+    * @param cell):
+    */
      const_cube_boundary_wrapper_iterator( const Complex& c_, const Cell& cell): 
-     c( &c_), cellptr( &cell), face(), boundary_pos( 0), bit_index( 0), 
+     c( &c_), cellptr( &cell), face(), boundary_pos( 0), 
+	bit_index( find_next_set_bit( cell, 0)), 
      dim( dimension( cell)){
        if( dim){
        	c = &c_;
 	cellptr = &cell;
-	bit_index = find_next_set_bit( cell, bit_index);
-	face.cell() = cell ^ (1 << bit_index);
-	face.coefficient( 1);
-	++boundary_pos;
+	face.cell() = cell; 
+	face.coefficient( -1);
+	this->operator++();
       } else{ cellptr = nullptr;  c = nullptr; }
      }
 
@@ -129,39 +135,40 @@ class const_cube_boundary_wrapper_iterator:
      const Term* operator->() const { return &face; }
 
      Self& operator++(){
-	 std::cout << "cube boundary wrapper ++" << std::endl;
-         if( boundary_pos == 2*dim){ 
-         	cellptr = nullptr;
-         	boundary_pos = 0;
-         	return *this;
-         }
-	 //set previous flipped bit
-	 face.cell() ^= (1 << bit_index); 
-	 //flip coefficient 
-         face.coefficient( -1*face.coefficient());
-	 //advance the indices
-         ++boundary_pos;
-	 ++bit_index;
-	 //when we get to dim iterations, we start over.
-	 bit_index *= (boundary_pos < dim);
-	 find_next_set_bit( face.cell(), bit_index);
-	 face.cell() ^= (1 << bit_index); //unset new bit.
-	 //if we are in the second half of boundary computation
-	 //the vertex id which owns a cell changes.
-	 //we add an offset, given by the index of the bit we just turned
-	 //off.
-	 std::cout << "bit_index: " << bit_index << std::endl;
-	 for( auto i = 0; i < 2; ++i){
-		std::cout << c->offset( i) << std::endl;
-	 }
-	 std::cout << "offset: " << c->offset( bit_index) << std::endl;
-	 face.cell() += (boundary_pos >= dim)*((c->offset( bit_index) << (c->dimension())));
-	 std::cout << "face.cell is now: " << face.cell() << std::endl;
-         return *this;	
+      typename Complex::Cube tmp_cube;
+      if( boundary_pos == 2*dim){ 
+      	cellptr = nullptr;
+      	boundary_pos = 0;
+      	return *this;
+      }
+      //flip coefficient 
+      face.coefficient( -1*face.coefficient());
+      //initially set to index of first set bit
+      //do nothing on first iteration, otherwise set previous flipped bit
+      face.cell() |= (1 << bit_index); 
+      //advance the indices
+      //when we get to dim iterations, we start over.
+      //find the next bit set, starting over if we did the first half of the boundary.
+      std::size_t next_bit_index = find_next_set_bit( face.cell(), (bit_index+1)*(boundary_pos != dim));
+      face.cell() ^= (1 << next_bit_index); //unset new bit.
+      //if we are in the second half of boundary computation
+      //the vertex id which owns a cell changes.
+      //we add an offset, given by the index of the bit we just turned
+      //off.
+      if( boundary_pos >= dim){
+	std::size_t shift = (c->offset( bit_index) << (c->dimension()));
+      	face.cell() += shift; 
+      }
+      ++boundary_pos;
+      return *this;	
      }
 
-     std::size_t& find_next_set_bit( const Cell & c, std::size_t & bit_index){
-		return bit_index+=__builtin_ctz( c >> bit_index); 
+     std::size_t find_next_set_bit( const Cell & c, std::size_t bit_index){
+      std::size_t num_bits_set = __builtin_popcount( c ^ (1 << bit_index))+1;
+      std::size_t r = 0; 
+      r += (num_bits_set != 1)*__builtin_ctz( c ^ (1 << bit_index));
+      r += (num_bits_set == 1 && bit_index)*std::numeric_limits<std::size_t>::max();
+      return r;
      }
 
      Self operator++( int){
@@ -172,9 +179,8 @@ class const_cube_boundary_wrapper_iterator:
 
    private:
      std::size_t dimension( const std::size_t c_) const{ 
-     	std::size_t d = 0;
-     	for( auto i = 0; i < c->dimension(); ++i){ d+= (c_&(i+1)); }
-     	return d;
+	std::size_t mask = (1 << (c->dimension() +1))-1;
+     	return __builtin_popcount( c_ & mask);
      }
 
      const Complex* c;

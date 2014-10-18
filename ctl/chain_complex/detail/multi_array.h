@@ -75,7 +75,13 @@ class multi_array {
   * @brief Default constructor
   */
   multi_array(){}	
-  
+  multi_array( const multi_array& c): 
+  data( c.data), d_( c.d_), extents_(c.extents_), base_( c.base_){} 
+
+  multi_array( multi_array&& c): 
+  data( std::move(  c.data)), d_( std::move( c.d_)), 
+  extents_( std::move( c.extents_)), base_( std::move( c.base_)){} 
+ 
   /**
   * @brief Extents constructor, 
   * Tells us the size of the array in every direction
@@ -320,7 +326,7 @@ class multi_array {
   bool operator!= ( const multi_array & o) const {
 	return !((*this)==o);
   }
-  multi_array& operator=( const multi_array&& o) {
+  multi_array& operator=( multi_array&& o) {
 	data = std::move( o.data);
 	d_ = std::move( o.d_);
 	extents_ = std::move( o.extents_);

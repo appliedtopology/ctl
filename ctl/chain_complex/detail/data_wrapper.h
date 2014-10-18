@@ -80,7 +80,10 @@ class Data_wrapper : public Data_ {
    Id id_;
 }; // class Data_wrapper
 
-struct Default_data {}; //class Default_data for complex.
+struct Default_data {
+constexpr bool operator==( const Default_data & d) const{ return true; }
+}; //class Default_data for complex.
+
 template< typename Stream>
 Stream& operator<<( Stream & out, const Default_data & d){ return out; }
 template< typename Stream>

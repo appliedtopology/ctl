@@ -46,7 +46,7 @@
 #include <utility> //std::pair
 #include <initializer_list>  // std::initializer_list
 #include <iostream> //cout (debug only)
-#include <algorithm> //sort, unique
+#include <algorithm> //swap, sort, unique
 #include <ctl/cube/cube_boundary.h>
 
 /*! \namespace ctl
@@ -297,6 +297,8 @@ class Cube {
 	}
 	void reserve( std::size_t n){ intervals.reserve( n); }
 	void resize( std::size_t n){ intervals.resize( n); }
+	void swap( Cube & r){ intervals.swap( r.intervals); 
+			      std::swap( dimension_, r.dimension_);} 
 	/**
 	* @brief Equality operator
 	* @param const Cube & b

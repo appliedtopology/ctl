@@ -124,7 +124,7 @@ public:
    	   for( auto i = ++index_data.begin(); 
 		     i != index_data.end(); ++i){ 
 		     *i *= *(i-1); 
-	  }
+	   }
 	  assign_key_values();
    }
    
@@ -165,7 +165,6 @@ public:
  	   for( auto i = ++index_data.begin(); 
 		     i != index_data.end(); ++i){ 
 		     *i *= *(i-1); 
-		std::cout << *i << std::endl;
 	  }
 	  assign_key_values();
    }
@@ -194,12 +193,13 @@ public:
 
    //! Copy
    Cubical_complex( const Cubical_complex & b): 
-   cells( b.cells), bd( b.bd), index_data( b.index_data) {}
+   cells( b.cells), index_data( b.index_data), bd( b.bd) {}
 
    //! Move
    Cubical_complex( Cubical_complex && b): 
-   cells( std::move( b.cells)), bd( std::move( b.bd)),
-   index_data( std::move( b.index_data)){}
+   cells( std::move( b.cells)), 
+   index_data( std::move( b.index_data)),
+   bd( std::move( b.bd)){}
    //! Assignment operator
    Cubical_complex& operator=( const Cubical_complex& b){
    	bd = b.bd;
@@ -215,7 +215,12 @@ public:
 	index_data = std::move( b.index_data);
    	return *this;
    }
-
+   bool operator==( const Cubical_complex & c) const {
+	return (cells == c.cells) && (index_data == c.index_data);  
+   }
+   bool operator!=( const Cubical_complex & c) const {
+	return !( this->operator==( c)); 
+  } 
    /**
    * @brief find  a cell described as a product of intervals 
    *
@@ -269,10 +274,6 @@ public:
    const_iterator find_cell( std::size_t vertex_bits_index) const {
 	Vector c;
 	id_and_bits_to_coordinate( vertex_bits_index, c);
-	std::cout << std::endl << " ---- "  << std::endl; 
-	std::cout << "size: " << c.size() << std::endl;
-	for( auto & i : c){ std::cout << i << " - ";}
-	std::cout << std::endl;
 	return cells.begin()+cells.coordinate_to_index( c);
    }
 
@@ -284,10 +285,6 @@ public:
    iterator find_cell( std::size_t vertex_bits_index) {
 	Vector c;
 	id_and_bits_to_coordinate( vertex_bits_index, c);
-	std::cout << std::endl << " ---- "  << std::endl; 
-	std::cout << "size: " << c.size() << std::endl;
-	for( auto & i : c){ std::cout << i << " - ";}
-	std::cout << std::endl;
 	return cells.begin()+cells.coordinate_to_index( c); 
    }
    
@@ -379,14 +376,17 @@ public:
    template< typename Coordinate>
    Coordinate& id_and_bits_to_coordinate( std::size_t index, 
 					  Coordinate & c){
-	std::size_t vertex_id = index >> (cells.dimension()+1);
-	std::cout << std::endl;
-	std::cout << "vertex_id = " << vertex_id << std::endl;
-	std::size_t bits = index^(vertex_id << (cells.dimension()+1));
-	std::cout << "bits = " << bits << std::endl;
+	std::size_t vertex_id = index >> cells.dimension();
 	vertex_id_to_coordinate( vertex_id, c);
-	std::size_t mask=1;
-	for( auto & i: c){ i += bits&mask; ++mask; }
+	std::size_t pos=0;
+	for( auto & i: c){ 
+		std::size_t mask = ((index&(1 << pos)) > 0);
+		std::cout << "mask: " << mask << " ";
+		std::cout << "pos: " << pos << std::endl;
+		std::cout << mask*offset( pos) << std::endl;
+		i += mask*offset( pos); 
+		++pos;
+	}
 	return c;
    }
 
@@ -403,11 +403,13 @@ public:
 	//this is equivalent
 	std::size_t mask = 0;
 	for( auto & i : vertex_coords){ 
-		const std::size_t k = (i%2)^(cells.base( pos)%2);
-		i -= k; 
-		mask ^= (k << pos);
+		i -= cells.base( pos);
+		mask ^= ((i%2) << pos);
+		i -= i%2;
+		i += cells.base( pos); 
 		++pos;
 	}
+	std::cout << std::endl;
 	std::size_t t = cells.coordinate_to_index( vertex_coords);
 	t <<= c.size();
 	t ^= mask;
@@ -435,17 +437,21 @@ public:
 //Private functions
 private:
   void assign_key_values(){
+    for( auto i : index_data){ std::cout << i << " "; } 
     Vector c;
     std::size_t p=0;
     for( auto i = cells.begin(); i != cells.end(); ++i, ++p){
-      i->first = coordinate_to_id_and_bits( cells.index_to_coordinate( p, c));
+      
+      i->first = coordinate_to_id_and_bits(  cells.index_to_coordinate( p, c));
+      auto p1 = cells.coordinate_to_index( id_and_bits_to_coordinate( i->first, c));
+      if( p != p1){ std::cerr << "idempotency failed.." << std::endl;} 
     }
   }
 
   template< typename Coordinate>
   Coordinate& vertex_id_to_coordinate( std::size_t index, Coordinate & c){
-    c.resize( index_data.size()-1, 0);
-    for( auto i = index_data.size()-1; i>1;  --i){ 
+    c.resize( dimension(), 0);
+    for( auto i = dimension(); i>0;  --i){ 
         c[ i] = index/ index_data[ i-1];
         index -= c[ i]*(index_data[ i-1]);
 	c[ i] = 2*c[ i] + cells.base( i);
@@ -454,6 +460,7 @@ private:
     return c;
   }
 public:
+
 /**
 * @brief Given a cell encoded as a product of intervals
 * (each interval a product of vertex ids)
@@ -473,7 +480,7 @@ public:
 *
 * @return 
 */
-  Cell cube_to_key( const Cube & cube){
+  Cell cube_to_key( const Cube & cube) const{
     Cell key=0;
     Cell set_bits = 0;
     auto begin = cells.offsets().begin();
@@ -497,25 +504,28 @@ public:
  * @param word
  * @param cell
  */
-  const Cube& key_to_cube( Cell word, Cube & cube){
-   cube.clear();
-   std::size_t lower_left_vertex_id = word >> (index_data.size()-1);
-   word ^= (lower_left_vertex_id << (index_data.size()-1));
+  Cube& key_to_cube( const Cell word1, Cube & r) const{
+   typedef typename Cube::Interval Interval;
+   Cube cube;
+   Cell word = word1;
+   std::size_t lower_left_vertex_id = word >> dimension();
+   word ^= (lower_left_vertex_id << dimension());
    std::vector< std::size_t> set_bits;
-   set_bits.reserve( index_data.size()-1);
+   set_bits.reserve( dimension());
    if (word == 0){
-   	cube.insert( {lower_left_vertex_id, lower_left_vertex_id});
-   	return cube;
+     	cube.insert( {{lower_left_vertex_id, lower_left_vertex_id}});
+	r.swap( cube);
+   	return r;
    }
-   for( auto i = 0; i < (index_data.size()-1); ++i){ 
-     if(word && (1 << i)){ set_bits.push_back( i); } 
+   for( auto i = 0; i < dimension(); ++i){ 
+     if((word & (1 << i)) != 0){ set_bits.push_back( i); } 
    }
    cube.reserve( set_bits.size());
-   for( auto i : set_bits){
-    cube.insert( {lower_left_vertex_id, 
-   		lower_left_vertex_id + cells.offsets( set_bits[ i]) } );
-   }
-   return cube;
+   for( auto & i : set_bits){
+     cube.insert( {{lower_left_vertex_id, lower_left_vertex_id+ index_data[ i]}});
+   } 
+   r.swap( cube);
+   return r;
   }
 
 //Private members
@@ -525,8 +535,42 @@ private:
    Vector index_data;
    Cell_boundary bd;
 }; //chain_complex
-} //namespace ctl
+} //namespace detail
 
+
+/**
+* @brief Helper function for converting the key representation of a cube to a 
+*        product of intervals.
+* @tparam Key
+* @tparam Args
+* @param complex
+* @param key
+*
+* @return 
+*/
+template< typename Cubical_complex> 
+typename Cubical_complex::Cube 
+key_to_cube( const Cubical_complex & complex, 
+	     const typename Cubical_complex::Cell & key){
+	typedef typename Cubical_complex::Cube  Cube;
+	Cube cube;	
+	complex.key_to_cube( key, cube);
+	return cube;
+}
+
+template< typename ... Args>
+typename ctl::detail::Cubical_complex< Args ...>::Cell 
+cube_to_key( const ctl::detail::Cubical_complex< Args ...>& complex, 
+	     const typename ctl::detail::Cubical_complex< Args ...>::Cube & cube){ 
+	return complex.cube_to_key( complex, cube);
+}
+
+template< typename Cubical_complex>
+std::size_t cube_dimension( const Cubical_complex& complex, 
+			    const typename Cubical_complex::Cell & cell){ 
+	std::size_t mask = (1 << (complex.dimension()+1)) - 1;
+	return __builtin_popcount( cell & mask);
+}
 
 
 template< typename Stream, typename ... Args>
@@ -549,11 +593,14 @@ Stream& operator<<( Stream& out,
 template< typename Stream, typename ... Args>
 Stream& operator<<( Stream& out, 
 		    const ctl::detail::Cubical_complex< Args...> & c){ 
+	typedef ctl::detail::Cubical_complex< Args...> Cubical_complex;
+	typedef typename Cubical_complex::Cube Cube;
+   	Cube cube; 
 	for(auto i = c.begin(); i != c.end(); ++i){
 		      const std::size_t id = i->second.id();
 		      out << id; 
 		      out << ": ";
-		      out << i->first << std::endl; 
+		      out << c.key_to_cube( i->first, cube) << std::endl; 
 	}
 	return out;
 }
