@@ -275,7 +275,7 @@ public:
 	std::size_t cell_index = vertex_bits_index >> cells.dimension();
 	for( auto i = 0; i < cells.dimension(); ++i){
 		std::size_t mask = vertex_bits_index & (1 << i);
-		cell_index += (mask>0)*offset( i);
+		cell_index += (mask>0)*(2*offset( i)-1);
 	}
 	return cells.begin()+cell_index; 
    }
@@ -289,7 +289,7 @@ public:
 	std::size_t cell_index = vertex_bits_index >> cells.dimension();
 	for( auto i = 0; i < cells.dimension(); ++i){
 		std::size_t mask = vertex_bits_index & (1 << i);
-		cell_index += (mask>0)*offset( i);
+		cell_index += (mask>0)*(2*offset( i)-1);
 	}
 	return cells.begin()+cell_index; 
    }
@@ -520,7 +520,7 @@ public:
    std::vector< std::size_t> set_bits;
    set_bits.reserve( dimension());
    if (word == 0){
-     	cube.insert( {{lower_left_vertex_id, lower_left_vertex_id}});
+     	cube.insert( {{lower_left_vertex_id/2, lower_left_vertex_id/2}});
 	r.swap( cube);
    	return r;
    }
@@ -529,7 +529,7 @@ public:
    }
    cube.reserve( set_bits.size());
    for( auto & i : set_bits){
-     cube.insert( {{lower_left_vertex_id, lower_left_vertex_id+ 2*index_data[ i]}});
+     cube.insert( {{lower_left_vertex_id/2, lower_left_vertex_id/1+ index_data[ i]}});
    } 
    r.swap( cube);
    return r;
