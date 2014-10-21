@@ -69,15 +69,16 @@ class const_cube_boundary_wrapper_iterator:
        face(), boundary_pos( 0), bit_index( 0), dim( 0) {}
 
      const_cube_boundary_wrapper_iterator( const Self & f): 
-       c( f.c), cellptr( f.cellptr), 
-       boundary_pos( f.boundary_pos), bit_index( f.bit_index), 
-       dim( f.dim), face( f.face) {}
+       c( f.c), cellptr( f.cellptr), face( f.face), 
+       boundary_pos( f.boundary_pos), 
+	bit_index( f.bit_index), 
+       dim( f.dim) {}
 
      const_cube_boundary_wrapper_iterator( const Self && f): 
       c( std::move( f.c)), cellptr( f.cellptr), 
       face( std::move( f.face)),
       boundary_pos( std::move( f.boundary_pos)), 
-      bit_index( f.bit_index),
+      bit_index( std::move( f.bit_index)),
       dim( std::move( f.dim)){}
 
      
@@ -89,9 +90,12 @@ class const_cube_boundary_wrapper_iterator:
     */
      const_cube_boundary_wrapper_iterator( const Complex& c_, const Cell& cell): 
      c( &c_), cellptr( &cell), face(), boundary_pos( 0), 
-	bit_index( find_next_set_bit( cell, 0)), 
+	bit_index( 0), 
      dim( dimension( cell)){
        if( dim){
+	//since dim > 0 this implies c_ must be nonzero
+	//therefore this is correct.
+	bit_index = __builtin_ctz( cell);
        	c = &c_;
 	cellptr = &cell;
 	face.cell() = cell; 
@@ -113,6 +117,7 @@ class const_cube_boundary_wrapper_iterator:
        cellptr = b.cellptr;
        boundary_pos = b.boundary_pos;
        dim = b.dim;
+       bit_index = b.bit_index;
        face = b.face; 
        return *this;
      }
@@ -146,29 +151,26 @@ class const_cube_boundary_wrapper_iterator:
       //initially set to index of first set bit
       //do nothing on first iteration, otherwise set previous flipped bit
       face.cell() |= (1 << bit_index); 
+      face.cell() -= (boundary_pos > dim)*(c->offset( bit_index) << (c->dimension()));
       //advance the indices
       //when we get to dim iterations, we start over.
       //find the next bit set, starting over if we did the first half of the boundary.
-      std::size_t next_bit_index = find_next_set_bit( face.cell(), (bit_index+1)*(boundary_pos != dim));
+
+      std::size_t next_bit_index = find_next_set_bit( face.cell(), bit_index, 
+				(boundary_pos != 0) && (boundary_pos!=dim) );
       face.cell() ^= (1 << next_bit_index); //unset new bit.
       //if we are in the second half of boundary computation
       //the vertex id which owns a cell changes.
       //we add an offset, given by the index of the bit we just turned
       //off.
-      if( boundary_pos >= dim){
-	std::size_t shift = (c->offset( bit_index) << (c->dimension()));
-      	face.cell() += shift; 
-      }
+      face.cell() += (boundary_pos >= dim)*(c->offset( next_bit_index) << (c->dimension()));
       ++boundary_pos;
+      bit_index = next_bit_index;
       return *this;	
      }
 
-     std::size_t find_next_set_bit( const Cell & c, std::size_t bit_index){
-      std::size_t num_bits_set = __builtin_popcount( c ^ (1 << bit_index))+1;
-      std::size_t r = 0; 
-      r += (num_bits_set != 1)*__builtin_ctz( c ^ (1 << bit_index));
-      r += (num_bits_set == 1 && bit_index)*std::numeric_limits<std::size_t>::max();
-      return r;
+     std::size_t find_next_set_bit( const Cell & c, char bit_index, bool flag){
+      return __builtin_ctz( c ^ (flag << bit_index));
      }
 
      Self operator++( int){
@@ -187,7 +189,9 @@ class const_cube_boundary_wrapper_iterator:
      const Cell* cellptr;
      Term face; 
      std::size_t boundary_pos;
-     std::size_t bit_index;
+     //purposively a bit bigger than necessary.
+     //this really only needs to be d bits..
+     short bit_index;
      std::size_t dim;
 }; //end const_cube_boundary_wrapper_iterator
 
