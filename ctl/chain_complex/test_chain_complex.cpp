@@ -63,7 +63,7 @@ typedef Simplicial_complex_boundary::const_iterator
 typedef ctl::Cube< int> Cube;
 typedef ctl::Cube_boundary< Cube, Z3 > Cube_boundary;
 typedef ctl::Chain_complex< Cube, Cube_boundary> Cubical_complex;
-
+typedef Cubical_complex::Cell_boundary Cubical_cell_boundary;
 typedef ctl::Complex_boundary< Cubical_complex> Cubical_complex_boundary;
 typedef Cubical_complex_boundary::const_iterator cubical_boundary_iterator;
 
@@ -97,6 +97,7 @@ int main( int argc, char** argv){
 	Cubical_complex complex1( sizes, start);
 	Cubical_complex c2( complex1);
 	if( c2 != complex1) { std::cerr << "bug in copy/equality operators."; }
+	Cubical_cell_boundary cube_cell_bd = complex1.cell_boundary();
 	Cubical_complex_boundary c( complex1);
 	std::cout << "cubical_complex dimension: " 
 		  << complex1.dimension() << std::endl;	
@@ -107,8 +108,8 @@ int main( int argc, char** argv){
 	  std::cout << ctl::key_to_cube( complex1, i->first); 
 	  std::cout << ") = ";
 	  if( ctl::cube_dimension( complex1, i->first) > 0){
-	  for( auto j = c.begin( i); j != c.end( i); ++j){
-	  	std::cout << ctl::key_to_cube( complex1, j->cell()->first); 
+	  for( auto j = cube_cell_bd.begin( i->first); j != cube_cell_bd.end( i->first); ++j){
+	  	std::cout << ctl::key_to_cube( complex1, j->cell()); 
 		std::cout << " ";
 	  }
 	  } else { std::cout << 0; }
