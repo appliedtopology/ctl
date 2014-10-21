@@ -322,7 +322,6 @@ public:
  	}
 	return out;
    }
-   
    template< typename Stream> 
    Stream& read( Stream & in){
     std::size_t line_num = 0;
@@ -365,7 +364,8 @@ public:
          //and it's id
          Data d( vertex_id_number);
 	 ss >> d;
-	 auto& p = cells( vertex_id_to_coordinate( vertex_id_number, c) );
+	 vertex_id_to_coordinate( vertex_id_number, c); 
+	 auto& p = cells( c);
 	 p.first = vertex_id_number; 
 	 p.second = d;
     }
@@ -374,24 +374,18 @@ public:
    }
 
    template< typename Coordinate>
-   Coordinate& id_and_bits_to_coordinate( std::size_t index, 
-					  Coordinate & c){
+   void id_and_bits_to_coordinate( std::size_t index, Coordinate & c) const {
 	std::size_t vertex_id = index >> cells.dimension();
-	vertex_id_to_coordinate( vertex_id, c);
+	cells.index_to_coordinate( vertex_id, c);
 	std::size_t pos=0;
 	for( auto & i: c){ 
-		std::size_t mask = ((index&(1 << pos)) > 0);
-		std::cout << "mask: " << mask << " ";
-		std::cout << "pos: " << pos << std::endl;
-		std::cout << mask*offset( pos) << std::endl;
-		i += mask*offset( pos); 
+		i += ((index&(1 << pos)) > 0);
 		++pos;
 	}
-	return c;
    }
 
    template< typename Coordinate>
-   std::size_t coordinate_to_id_and_bits( const Coordinate & c){
+   std::size_t coordinate_to_id_and_bits( const Coordinate & c) const {
 	Coordinate vertex_coords( c);
 	std::size_t pos=0;
 	//in 0 based systems go from coordinates to vertex coordinates
@@ -409,7 +403,6 @@ public:
 		i += cells.base( pos); 
 		++pos;
 	}
-	std::cout << std::endl;
 	std::size_t t = cells.coordinate_to_index( vertex_coords);
 	t <<= c.size();
 	t ^= mask;
@@ -437,28 +430,36 @@ public:
 //Private functions
 private:
   void assign_key_values(){
-    for( auto i : index_data){ std::cout << i << " "; } 
     Vector c;
     std::size_t p=0;
     for( auto i = cells.begin(); i != cells.end(); ++i, ++p){
-      
-      i->first = coordinate_to_id_and_bits(  cells.index_to_coordinate( p, c));
-      auto p1 = cells.coordinate_to_index( id_and_bits_to_coordinate( i->first, c));
-      if( p != p1){ std::cerr << "idempotency failed.." << std::endl;} 
+	cells.index_to_coordinate( p, c);
+        i->first = coordinate_to_id_and_bits( c);
     }
   }
 
+/**
+* @brief This method is used to convert vertex_id's 
+* 0 ... #vertex --> coordinates in the larger complex.
+* This is _not_ to be used to convert the vertex id in 
+* the high bits of a key to a coordinate. That will result
+* in a bug!
+* 
+* @tparam Coordinate
+* @param index
+* @param c
+*/
   template< typename Coordinate>
-  Coordinate& vertex_id_to_coordinate( std::size_t index, Coordinate & c){
+  void vertex_id_to_coordinate( std::size_t index, Coordinate & c) const{
     c.resize( dimension(), 0);
-    for( auto i = dimension(); i>0;  --i){ 
-        c[ i] = index/ index_data[ i-1];
-        index -= c[ i]*(index_data[ i-1]);
-	c[ i] = 2*c[ i] + cells.base( i);
+    for( auto i = dimension()-1; i>0;  --i){ 
+       c[ i] = index/ index_data[ i-1];
+       index -= c[ i]*(index_data[ i-1]);
+       c[ i] = 2*c[i]+ cells.base( i);
     }
     c[ 0] = 2*index + cells.base( 0);
-    return c;
   }
+
 public:
 
 /**
