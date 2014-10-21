@@ -272,9 +272,12 @@ public:
    * @return 
    */
    const_iterator find_cell( std::size_t vertex_bits_index) const {
-	Vector c;
-	id_and_bits_to_coordinate( vertex_bits_index, c);
-	return cells.begin()+cells.coordinate_to_index( c);
+	std::size_t cell_index = vertex_bits_index >> cells.dimension();
+	for( auto i = 0; i < cells.dimension(); ++i){
+		std::size_t mask = vertex_bits_index & (1 << i);
+		cell_index += (mask>0)*offset( i);
+	}
+	return cells.begin()+cell_index; 
    }
 
    /**
@@ -282,10 +285,13 @@ public:
    * @param vertex_bits_index
    * @return 
    */
-   iterator find_cell( std::size_t vertex_bits_index) {
-	Vector c;
-	id_and_bits_to_coordinate( vertex_bits_index, c);
-	return cells.begin()+cells.coordinate_to_index( c); 
+   iterator find_cell( std::size_t vertex_bits_index){
+	std::size_t cell_index = vertex_bits_index >> cells.dimension();
+	for( auto i = 0; i < cells.dimension(); ++i){
+		std::size_t mask = vertex_bits_index & (1 << i);
+		cell_index += (mask>0)*offset( i);
+	}
+	return cells.begin()+cell_index; 
    }
    
    iterator       		begin()       	{ return cells.begin(); } 
@@ -374,7 +380,7 @@ public:
    }
 
    template< typename Coordinate>
-   void id_and_bits_to_coordinate( std::size_t index, Coordinate & c) const {
+   void id_and_bits_to_index( std::size_t index, Coordinate & c) const {
 	std::size_t vertex_id = index >> cells.dimension();
 	cells.index_to_coordinate( vertex_id, c);
 	std::size_t pos=0;
@@ -523,7 +529,7 @@ public:
    }
    cube.reserve( set_bits.size());
    for( auto & i : set_bits){
-     cube.insert( {{lower_left_vertex_id, lower_left_vertex_id+ index_data[ i]}});
+     cube.insert( {{lower_left_vertex_id, lower_left_vertex_id+ 2*index_data[ i]}});
    } 
    r.swap( cube);
    return r;

@@ -330,7 +330,12 @@ class Cube {
 template< typename Stream, typename T>
 Stream& operator<<( Stream & out, const ctl::Cube< T> & c){
     for( auto i = c.begin(); i != c.end(); ++i){
-    	out << "[" << i->first << "," << i->second << "]";  
+	
+    	out << "[" << i->first;
+	if ( i->first != i->second){
+		out  << "," << i->second ;
+	}
+	out << "]";  
     	if( i+1 != c.end()){ out << " x "; }		
     }
 	return out;
