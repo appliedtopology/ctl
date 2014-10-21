@@ -108,8 +108,8 @@ int main( int argc, char** argv){
 	  std::cout << ctl::key_to_cube( complex1, i->first); 
 	  std::cout << ") = ";
 	  if( ctl::cube_dimension( complex1, i->first) > 0){
-	  for( auto j = cube_cell_bd.begin( i->first); j != cube_cell_bd.end( i->first); ++j){
-	  	std::cout << ctl::key_to_cube( complex1, j->cell()); 
+	  for( auto j = c.begin( i); j != c.end( i); ++j){
+	  	std::cout << ctl::key_to_cube( complex1, j->cell()->first); 
 		std::cout << " ";
 	  }
 	  } else { std::cout << 0; }
