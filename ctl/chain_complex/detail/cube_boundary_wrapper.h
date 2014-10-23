@@ -98,9 +98,10 @@ class const_cube_boundary_wrapper_iterator:
 	bit_index = __builtin_ctz( cell);
        	c = &c_;
 	cellptr = &cell;
-	face.cell() = cell; 
-	face.coefficient( -1);
-	this->operator++();
+	//initially we remove the first set bit
+	face.cell() = cell ^ (1 << bit_index); 
+	face.coefficient( 1);
+	++boundary_pos;
       } else{ cellptr = nullptr;  c = nullptr; }
      }
 
@@ -140,37 +141,39 @@ class const_cube_boundary_wrapper_iterator:
      const Term* operator->() const { return &face; }
 
      Self& operator++(){
-      typename Complex::Cube tmp_cube;
-      if( boundary_pos == 2*dim){ 
+      if( boundary_pos >= 2*dim){ 
       	cellptr = nullptr;
       	boundary_pos = 0;
       	return *this;
       }
-      //flip coefficient 
+      //set previously flipped bit
+      //flip the coefficient
       face.coefficient( -1*face.coefficient());
-      //initially set to index of first set bit
-      //do nothing on first iteration, otherwise set previous flipped bit
-      face.cell() |= (1 << bit_index); 
-      face.cell() -= (boundary_pos > dim)*(c->offset( bit_index) << (c->dimension()));
-      //advance the indices
-      //when we get to dim iterations, we start over.
-      //find the next bit set, starting over if we did the first half of the boundary.
-
-      std::size_t next_bit_index = find_next_set_bit( face.cell(), bit_index, 
-				(boundary_pos != 0) && (boundary_pos!=dim) );
-      face.cell() ^= (1 << next_bit_index); //unset new bit.
+      std::size_t shift=2*c->offset( bit_index);
+      if( boundary_pos%2 == 0){
+        face.cell() |= (1 << bit_index);
+      	face.cell() -= (shift << c->dimension()); 
+       //all but the lowest bits are set
+        std::size_t mask = (1 << (c->dimension()))-1;
+	if( boundary_pos == dim){ bit_index = __builtin_ctz( face.cell()); }
+	else{ bit_index = find_next_set_bit( mask&face.cell(), bit_index); }
+        face.cell() ^= (1 << bit_index); //unset new bit
+        shift=2*c->offset( bit_index);
+       }
+       face.cell() += (shift << c->dimension());
+       std::cout << std::bitset< 8>( face.cell()) << std::endl;
       //if we are in the second half of boundary computation
       //the vertex id which owns a cell changes.
       //we add an offset, given by the index of the bit we just turned
       //off.
-      face.cell() += (boundary_pos >= dim)*(c->offset( next_bit_index) << (c->dimension()));
       ++boundary_pos;
-      bit_index = next_bit_index;
       return *this;	
      }
 
-     std::size_t find_next_set_bit( const Cell & c, char bit_index, bool flag){
-      return __builtin_ctz( c ^ (flag << bit_index));
+     std::size_t find_next_set_bit( const Cell & c, char bit_index){
+	std::size_t wtf= ((c >> bit_index) << bit_index);
+      std::cout << std::bitset< 64>( wtf) << std::endl;
+      return __builtin_ctz( wtf);
      }
 
      Self operator++( int){

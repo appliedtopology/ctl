@@ -98,31 +98,41 @@ int main( int argc, char** argv){
 	Cubical_complex c2( complex1);
 	if( c2 != complex1) { std::cerr << "bug in copy/equality operators."; }
 	Cubical_cell_boundary cube_cell_bd = complex1.cell_boundary();
-	Cubical_complex_boundary c( complex1);
+	Cubical_complex_boundary cube_complex_boundary( complex1);
 	std::cout << "cubical_complex dimension: " 
 		  << complex1.dimension() << std::endl;	
-	std::size_t csize=0;
-	Cube temp_cube;
-	std::size_t pos = 0;
-	for( auto i = complex1.begin(); i != complex1.end(); ++i){ 
-//	  std::cout << ctl::delta << "(";
-	  std::cout << pos << " " << std::bitset< 8>( i->first) << " ";
-	  std::cout << ctl::key_to_cube( complex1, i->first) << " "; 
-	  std::cout << complex1.find_cell( i->first)-complex1.begin() << " ";
-//	  std::cout << ") = ";
-/*	  if( ctl::cube_dimension( complex1, i->first) > 0){
-	  auto k = cube_cell_bd.begin( i->first);
-	  for( auto j = c.begin( i); j != c.end( i); ++j, ++k){
-	  	std::cout << ctl::key_to_cube( complex1, j->cell()->first); 
-		std::cout << " correct: ";
-	  	std::cout << ctl::key_to_cube( complex1, k->cell()); 
-		std::cout << " | ";
+	bool fail = false;
+
+//	for( auto i = complex1.begin(); i != complex1.end(); ++i){ 
+//	  std::size_t distance = complex1.find_cell( i->first)-i;
+//	  if( distance != 0){ 
+//		std::cout << "find_cell bug!" << std::endl;
+//		fail=true;
+//	  }
+//	}
+//	if( fail==false){ 
+//		std::cout << "find_cell( . ) seems to work in all cases." << std::endl;
+//	}
+
+	for( auto i = complex1.begin(); i != complex1.end(); ++i){
+	  std::cout << ctl::delta << "_{Cube}(" 
+		    << ctl::key_to_cube( complex1, i->first) << ") = "; 
+	  for( auto j = cube_cell_bd.begin( i->first); 
+		    j != cube_cell_bd.end( i->first); ++j){
+	 	std::cout << ctl::key_to_cube( complex1, j->cell()) << " ";
 	  }
-	  } else { std::cout << 0; }
-*/	 pos++;
+	  if( ctl::cube_dimension( complex1, i->first) == 0){ std::cout << 0; }
 	  std::cout << std::endl;
+	  /*std::cout << ctl::delta << "_K(" 
+		    << i->first << ") = "; 
+	  for( auto j = cube_complex_boundary.begin( i); 
+		    j != cube_complex_boundary.end( i); ++j){
+	 	std::cout << j->cell()->first << " ";
+	  }
+	  if( ctl::cube_dimension( complex1, i->first) == 0){ std::cout << 0; }
+	  std::cout << std::endl;
+	  std::cout << std::endl;*/
 	}
-	std::cout << csize << std::endl;
 	std::cout << complex1.size() << std::endl;
 	return 0;
 }

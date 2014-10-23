@@ -88,7 +88,6 @@ public:
 	_const_boundary_iterator( Self && i):
 	complex ( std::move( i.complex)),
 	next_term ( std::move( i.next_term)),
-	//future_term ( std::move( i.future_term)),
 	end_term ( std::move( i.end_term)),
 	term( std::move( i.term)) { i.complex = NULL; }
 
@@ -98,9 +97,7 @@ public:
 				  const typename Complex::Cell& cell):
 	  complex( &_complex), 
 	  next_term ( _bd.begin( cell)), 
-	  //future_term( next_term), 
 	  end_term( _bd.end( cell)){ 
-		//++future_term;
 		_next_term();
 	}
         //end constructor
@@ -110,7 +107,6 @@ public:
 	Self& operator=( const Self& from){
 		complex = from.complex;
 		next_term = from.next_term;
-		//future_term = from.future_term;
 		end_term = from.end_term;
 		term = from.term;
 		return *this;
@@ -140,12 +136,9 @@ protected:
   }
 
   void _end_term(){ term.cell() = complex->end(); }
-  //we use a pointer since references are not default constructible
+
   Complex* complex;
-  //if we want to define operator-- 
-  //typename Cell_boundary::const_iterator begin_term; 
   typename Cell_boundary::const_iterator next_term;
-  //typename Cell_boundary::const_iterator future_term;
   typename Cell_boundary::const_iterator end_term;
   Term term;
 }; //class _const_boundary_iterator

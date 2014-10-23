@@ -125,7 +125,7 @@ public:
 		     i != index_data.end(); ++i){ 
 		     *i *= *(i-1); 
 	   }
-	  assign_key_values();
+	  assign_keys();
    }
    
   /**
@@ -145,7 +145,7 @@ public:
 		     i != index_data.end(); ++i){ 
 		     *i *= *(i-1); 
 	  }
-	  assign_key_values();
+	  assign_keys();
    }
 
   /**
@@ -166,7 +166,7 @@ public:
 		     i != index_data.end(); ++i){ 
 		     *i *= *(i-1); 
 	  }
-	  assign_key_values();
+	  assign_keys();
    }
    
    /**
@@ -188,7 +188,7 @@ public:
 		     i != index_data.end(); ++i){ 
 		     *i *= *(i-1); 
 	  }
-	  assign_key_values();
+	  assign_keys();
    }
 
    //! Copy
@@ -272,10 +272,11 @@ public:
    * @return 
    */
    const_iterator find_cell( std::size_t vertex_bits_index) const {
+	std::cout << std::endl << "input: " << vertex_bits_index << std::endl;
 	std::size_t cell_index = vertex_bits_index >> cells.dimension();
 	for( auto i = 0; i < cells.dimension(); ++i){
 		std::size_t mask = vertex_bits_index & (1 << i);
-		cell_index += (mask>0)*(2*offset( i)-1);
+		cell_index += (mask>0)*(offset( i));
 	}
 	return cells.begin()+cell_index; 
    }
@@ -286,11 +287,13 @@ public:
    * @return 
    */
    iterator find_cell( std::size_t vertex_bits_index){
+	std::cout << std::endl << "input: " << vertex_bits_index << std::endl;
 	std::size_t cell_index = vertex_bits_index >> cells.dimension();
 	for( auto i = 0; i < cells.dimension(); ++i){
 		std::size_t mask = vertex_bits_index & (1 << i);
-		cell_index += (mask>0)*(2*offset( i)-1);
+		cell_index += (mask>0)*(offset( i));
 	}
+	std::cout << "cell_index: " << cell_index << std::endl;
 	return cells.begin()+cell_index; 
    }
    
@@ -363,31 +366,34 @@ public:
     
     for( auto i = ++(index_data.begin()); 
     	      i != index_data.end(); ++i){ *i *= *(i-1); }
-    std::size_t vertex_id_number=0;
-    Vector c;
+    std::size_t vertex_id=0;
     while( ctl::get_line(in, line, line_num)){
          std::istringstream ss( line);
          //and it's id
-         Data d( vertex_id_number);
+         Data d( vertex_id);
 	 ss >> d;
-	 vertex_id_to_coordinate( vertex_id_number, c); 
-	 auto& p = cells( c);
-	 p.first = vertex_id_number; 
+	 std::size_t vertex_index = vertex_id_to_index( vertex_id); 
+	 auto& p = cells[ vertex_index];
+	 p.first = vertex_id; 
 	 p.second = d;
+	 vertex_id++;
     }
-    assign_key_values(); 
+    assign_keys(); 
     return in;
    }
 
+    
+    
    template< typename Coordinate>
-   void id_and_bits_to_index( std::size_t index, Coordinate & c) const {
+   std::size_t id_and_bits_to_index( std::size_t index) const {
+	//By linearity the id_and_bits_encoding can be immediately turned into
+	//the array_index	
 	std::size_t vertex_id = index >> cells.dimension();
-	cells.index_to_coordinate( vertex_id, c);
-	std::size_t pos=0;
-	for( auto & i: c){ 
-		i += ((index&(1 << pos)) > 0);
-		++pos;
+	for( auto i = 0; i < cells.dimension(); ++i){ 
+		std::size_t mask = ((index&(1 <<i)) > 0);
+		vertex_id += mask*index_data[ i]; 
 	}
+	return vertex_id;
    }
 
    template< typename Coordinate>
@@ -432,10 +438,10 @@ public:
    	return true;
    }
 
-   std::size_t offset( std::size_t i) const { return index_data[ i]; }
+   std::size_t offset( std::size_t i) const { if( i){ return cells.offsets( i-1); } return 1; }
 //Private functions
 private:
-  void assign_key_values(){
+  void assign_keys(){
     Vector c;
     std::size_t p=0;
     for( auto i = cells.begin(); i != cells.end(); ++i, ++p){
@@ -456,14 +462,15 @@ private:
 * @param c
 */
   template< typename Coordinate>
-  void vertex_id_to_coordinate( std::size_t index, Coordinate & c) const{
-    c.resize( dimension(), 0);
+  std::size_t vertex_id_to_index( std::size_t index) const{
+    Coordinate c( dimension(), 0);
     for( auto i = dimension()-1; i>0;  --i){ 
        c[ i] = index/ index_data[ i-1];
        index -= c[ i]*(index_data[ i-1]);
        c[ i] = 2*c[i]+ cells.base( i);
     }
     c[ 0] = 2*index + cells.base( 0);
+    return cells.coordinate_to_index( c);
   }
 
 public:
@@ -519,17 +526,18 @@ public:
    word ^= (lower_left_vertex_id << dimension());
    std::vector< std::size_t> set_bits;
    set_bits.reserve( dimension());
+    std::size_t vid = lower_left_vertex_id;
    if (word == 0){
-     	cube.insert( {{lower_left_vertex_id/2, lower_left_vertex_id/2}});
+     	cube.insert( {{vid, vid}});
 	r.swap( cube);
    	return r;
    }
    for( auto i = 0; i < dimension(); ++i){ 
-     if((word & (1 << i)) != 0){ set_bits.push_back( i); } 
+     if((word1 & (1 << i)) != 0){ set_bits.push_back( i); } 
    }
    cube.reserve( set_bits.size());
    for( auto & i : set_bits){
-     cube.insert( {{lower_left_vertex_id/2, lower_left_vertex_id/1+ index_data[ i]}});
+     cube.insert( {{vid, vid + 2*offset( i)}});
    } 
    r.swap( cube);
    return r;
