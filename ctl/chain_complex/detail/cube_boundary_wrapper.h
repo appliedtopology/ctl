@@ -155,13 +155,11 @@ class const_cube_boundary_wrapper_iterator:
       	face.cell() -= (shift << c->dimension()); 
        //all but the lowest bits are set
         std::size_t mask = (1 << (c->dimension()))-1;
-	if( boundary_pos == dim){ bit_index = __builtin_ctz( face.cell()); }
-	else{ bit_index = find_next_set_bit( mask&face.cell(), bit_index); }
+	bit_index = find_next_set_bit( mask&face.cell(), bit_index);
         face.cell() ^= (1 << bit_index); //unset new bit
-        shift=2*c->offset( bit_index);
-       }
+       }else{
        face.cell() += (shift << c->dimension());
-       std::cout << std::bitset< 8>( face.cell()) << std::endl;
+       }
       //if we are in the second half of boundary computation
       //the vertex id which owns a cell changes.
       //we add an offset, given by the index of the bit we just turned
@@ -171,8 +169,7 @@ class const_cube_boundary_wrapper_iterator:
      }
 
      std::size_t find_next_set_bit( const Cell & c, char bit_index){
-	std::size_t wtf= ((c >> bit_index) << bit_index);
-      std::cout << std::bitset< 64>( wtf) << std::endl;
+	std::size_t wtf= ((c >> (bit_index+1)) << (bit_index+1));
       return __builtin_ctz( wtf);
      }
 
