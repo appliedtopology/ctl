@@ -447,7 +447,6 @@ private:
     for( auto i = cells.begin(); i != cells.end(); ++i, ++p){
 	cells.index_to_coordinate( p, c);
         i->first = coordinate_to_id_and_bits( c);
-	std::cout << p << " " << std::bitset< 8>( i->first) << std::endl;
     }
   }
 
