@@ -123,15 +123,14 @@ int main( int argc, char** argv){
 	  }
 	  if( ctl::cube_dimension( complex1, i->first) == 0){ std::cout << 0; }
 	  std::cout << std::endl;
-	  /*std::cout << ctl::delta << "_K(" 
+	  std::cout << ctl::delta << "_K(" 
 		    << i->first << ") = "; 
 	  for( auto j = cube_complex_boundary.begin( i); 
 		    j != cube_complex_boundary.end( i); ++j){
-	 	std::cout << j->cell()->first << " ";
+	 	std::cout << ctl::key_to_cube( complex1, j->cell()->first) << " ";
 	  }
 	  if( ctl::cube_dimension( complex1, i->first) == 0){ std::cout << 0; }
 	  std::cout << std::endl;
-	  std::cout << std::endl;*/
 	}
 	std::cout << complex1.size() << std::endl;
 	return 0;

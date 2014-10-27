@@ -272,7 +272,6 @@ public:
    * @return 
    */
    const_iterator find_cell( std::size_t vertex_bits_index) const {
-	std::cout << std::endl << "input: " << vertex_bits_index << std::endl;
 	std::size_t cell_index = vertex_bits_index >> cells.dimension();
 	for( auto i = 0; i < cells.dimension(); ++i){
 		std::size_t mask = vertex_bits_index & (1 << i);
@@ -287,13 +286,11 @@ public:
    * @return 
    */
    iterator find_cell( std::size_t vertex_bits_index){
-	std::cout << std::endl << "input: " << vertex_bits_index << std::endl;
 	std::size_t cell_index = vertex_bits_index >> cells.dimension();
 	for( auto i = 0; i < cells.dimension(); ++i){
 		std::size_t mask = vertex_bits_index & (1 << i);
 		cell_index += (mask>0)*(offset( i));
 	}
-	std::cout << "cell_index: " << cell_index << std::endl;
 	return cells.begin()+cell_index; 
    }
    
