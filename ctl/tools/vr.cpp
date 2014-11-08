@@ -47,7 +47,9 @@ typedef std::vector<Point> Points;
 
 int main (int argc, char* argv[]) {
     if( argc != 4){ 	
-	std::cerr << "Usage: " << argv[ 0]  << " filename.dat max_epsilon max_dimension" << std::endl;
+	std::cerr << "Usage: " 
+		  << argv[ 0]  
+		  << " filename.dat max_epsilon max_dimension" << std::endl;
 	return 0;
     } 
     ctl::Timer clock;
@@ -57,7 +59,12 @@ int main (int argc, char* argv[]) {
     Points points; 
     std::ifstream in;
     ctl::open_file( in, argv[ 1]);
- 
+    std::string output_file( argv[ 1]);
+    auto pos = output_file.rfind('.');
+    if(  pos != std::string::npos){
+	output_file.erase(output_file.begin()+pos, output_file.end());
+    }
+    output_file.append(".asc");
     Point point;
     double coordinate;
     std::size_t line_num = 0;
@@ -84,7 +91,12 @@ int main (int argc, char* argv[]) {
     Complex complex; 
     ctl::incremental_vr( graph, complex, dimension);
     clock.stop();
+    std::ofstream out( output_file.c_str());
     std::cerr << "Complex construction: " << clock.elapsed() << std::endl;
     std::cerr << "|K| = " << complex.size() << std::endl;
+    std::cout << "Writing to disk ... ";
+    complex.write( out);
+    std::cout << " complete!" << std::endl;
+
     return 0;	
 }
