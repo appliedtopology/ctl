@@ -8,6 +8,10 @@ if( ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	target_link_libraries( persistence ${Boost_LIBRARIES} ${DSO_FIX})
 endif( ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
+add_executable(ngraph ngraph.cpp)
+target_link_libraries( ngraph ${ANN_LIBRARIES})
+install( TARGETS ngraph RUNTIME DESTINATION bin)
+
 add_executable(duplicate build_blobs.cpp)
 install( TARGETS duplicate RUNTIME DESTINATION bin)
 
