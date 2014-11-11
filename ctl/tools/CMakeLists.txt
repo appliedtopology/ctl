@@ -48,7 +48,7 @@ target_link_libraries (cover_homology ${Boost_LIBRARIES} ${METIS_LIBRARIES} ${TB
 install( TARGETS cover_homology RUNTIME DESTINATION bin)
 
 add_executable (vr vr.cpp)
-target_link_libraries( vr ${Boost_LIBRARIES} ${DSO_FIX})
+target_link_libraries( vr ${Boost_LIBRARIES} ${ANN_LIBRARIES} ${DSO_FIX})
 
 
 
