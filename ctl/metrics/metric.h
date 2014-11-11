@@ -51,27 +51,27 @@
 *
 *
 *******************************************************************************/
-/
+
 //exported functionality
 namespace ctl{
 
 template< typename Point, int p=2>
-value_type lp( const Point & a, const Point & b) {
+double lp( const Point & a, const Point & b) {
 	typedef typename Point::const_iterator iterator;
-	value_type dist=0;
-	for( auto i = a.begin(), 
-	     auto j = b.begin(); i != a.end(); ++i, ++j){
+	double dist=0;
+	auto i = a.begin(); 
+	for(  auto j = b.begin(); i != a.end(); ++i, ++j){
 		dist += std::pow((*i)-(*j),p);	
 	}
 	return dist;
 }
 
 template< typename Point>
-value_type hamming( const Point & a, const Point & b) {
+double hamming( const Point & a, const Point & b) {
 	typedef typename Point::const_iterator iterator;
-	value_type dist=0;
-	for( auto i = a.begin(), 
-	     auto j = b.begin(); i != a.end(); ++i, ++j){
+	double dist=0;
+	auto i = a.begin();
+	for( auto j = b.begin(); i != a.end(); ++i, ++j){
 		dist += (*i==*j);
 	}
 	return dist;

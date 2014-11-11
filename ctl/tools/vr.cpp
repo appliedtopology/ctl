@@ -26,7 +26,7 @@
 #include <ctl/term/term.h>
 
 //VR Construction
-#include <ctl/vr/construct_graph.h>
+#include <ctl/nbhd_graph/all_pairs.h>
 #include <ctl/vr/incremental_complex.h> 
 
 //Graph
@@ -82,7 +82,7 @@ int main (int argc, char* argv[]) {
     }
     clock.start();
     Graph graph;
-    ctl::construct_graph(points, epsilon, graph);
+    ctl::all_pairs::construct_graph(points, epsilon, graph);
     clock.stop();
     std::cerr << "# vertices = " <<  boost::num_vertices( graph) << std::endl;
     std::cerr << "# edges = " << boost:: num_edges( graph) << std::endl;
@@ -94,7 +94,7 @@ int main (int argc, char* argv[]) {
     std::ofstream out( output_file.c_str());
     std::cerr << "Complex construction: " << clock.elapsed() << std::endl;
     std::cerr << "|K| = " << complex.size() << std::endl;
-    std::cout << "Writing to disk ... ";
+    std::cout << "Writing to disk ... " << std::flush;
     complex.write( out);
     std::cout << " complete!" << std::endl;
 
