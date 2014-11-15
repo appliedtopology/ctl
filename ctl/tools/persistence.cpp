@@ -152,8 +152,10 @@ void run_persistence( Complex & complex,
    Complex_chain_map cascade_bd_property_map( complex_cascade_boundaries.begin(),
          				      offset_map);
    timer.start();
-   auto times = ctl::persistence( complex_filtration.begin(), complex_filtration.end(),
-  		    filtration_boundary, cascade_bd_property_map);
+   auto times = ctl::persistence( complex_filtration.begin(), 
+				  complex_filtration.end(),
+  		    		  filtration_boundary, 
+				  cascade_bd_property_map);
    timer.stop();
    double boundary_map_build = times.first;
    double complex_persistence = times.second;
@@ -166,6 +168,8 @@ void run_persistence( Complex & complex,
    ctl::compute_barcodes( complex_filtration, 
 			  cascade_bd_property_map, 
 			  barcode, tag, true);
+  std::vector< std::size_t> bti;
+  compute_betti( complex_filtration, cascade_bd_property_map, bti, true);
 }
 typedef ctl::parallel::Timer Timer;
 

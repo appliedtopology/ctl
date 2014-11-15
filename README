@@ -9,7 +9,7 @@ This C++11 library provides a set of generic tools for:
 	5) Parallel algorithm(s) for (4)
 
 === LICENSE ===
-CTL is GPLv2+ (e.g. or later at your discretion). See LICENSE for more info. 
+CTL is BSD See LICENSE for more info. 
 
 === DEPENDENCIES ==
 C++11 compiler (clang or gcc)

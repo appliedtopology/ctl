@@ -23,7 +23,7 @@
 #include <ctl/term/term.h>
 
 //VR Construction
-#include <ctl/vr/construct_graph.h>
+#include <ctl/nbhd_graph/all_pairs.h>
 #include <ctl/vr/incremental_complex.h> 
 
 //Graph
@@ -73,7 +73,7 @@ int main (int argc, char* argv[]) {
     }
     clock.start();
     Graph graph;
-    ctl::construct_graph(points, epsilon, graph);
+    ctl::all_pairs::construct_graph(points, epsilon, graph);
     clock.stop();
     std::cerr << "Graph: " <<  boost::num_vertices( graph) << ", "
 	      << boost:: num_edges( graph) << std::endl;

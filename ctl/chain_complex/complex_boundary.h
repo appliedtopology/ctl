@@ -1,5 +1,5 @@
-#ifndef CTLIB_COMPLEX_BOUNDARY_H
-#define CTLIB_COMPLEX_BOUNDARY_H
+#ifndef CTL_COMPLEX_BOUNDARY_H
+#define CTL_COMPLEX_BOUNDARY_H
 /*******************************************************************************
 * -Academic Honesty-
 * Plagarism: The unauthorized use or close imitation of the language and 
@@ -18,22 +18,34 @@
 * !!! DO NOT CITE THE USER MANUAL !!!
 *******************************************************************************
 * Copyright (C) Ryan H. Lewis 2014 <me@ryanlewis.net>
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-* 
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-* 
-* You should have received a copy of the GNU General Public License
-* along with this program in a file entitled COPYING; if not, write to the 
-* Free Software Foundation, Inc., 
-* 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
+* ********** BSD-3 License ****************
+* Redistribution and use in source and binary forms, with or without 
+* modification, are permitted provided that the following conditions are met:
+* 
+* 1. Redistributions of source code must retain the above copyright notice, 
+* this list of conditions and the following disclaimer.
+* 
+* 2. Redistributions in binary form must reproduce the above copyright notice, 
+* this list of conditions and the following disclaimer in the documentation 
+* and/or other materials provided with the distribution.
+* 
+* 3. Neither the name of the copyright holder nor the names of its contributors 
+* may be used to endorse or promote products derived from this software without 
+* specific prior written permission.
+* 
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+* POSSIBILITY OF SUCH DAMAGE.
+********************************************************************************
 *******************************************************************************
 * NOTES
 * For now this is an input_iterator, cell boundary operations could be 
@@ -76,7 +88,6 @@ public:
 	_const_boundary_iterator( Self && i):
 	complex ( std::move( i.complex)),
 	next_term ( std::move( i.next_term)),
-	//future_term ( std::move( i.future_term)),
 	end_term ( std::move( i.end_term)),
 	term( std::move( i.term)) { i.complex = NULL; }
 
@@ -86,9 +97,7 @@ public:
 				  const typename Complex::Cell& cell):
 	  complex( &_complex), 
 	  next_term ( _bd.begin( cell)), 
-	  //future_term( next_term), 
 	  end_term( _bd.end( cell)){ 
-		//++future_term;
 		_next_term();
 	}
         //end constructor
@@ -98,7 +107,6 @@ public:
 	Self& operator=( const Self& from){
 		complex = from.complex;
 		next_term = from.next_term;
-		//future_term = from.future_term;
 		end_term = from.end_term;
 		term = from.term;
 		return *this;
@@ -119,11 +127,7 @@ public:
 protected:
   void _next_term(){
 	if( next_term != end_term){
-		//#ifdef NDEBUG
-		//__builtin_prefetch( complex->_get_bucket_address( future_term->cell()));
-		//#endif
 		term.cell() = complex->find_cell( next_term->cell());
-		//++future_term;
 		term.coefficient( next_term->coefficient());
 		++next_term;
 		return;
@@ -132,12 +136,9 @@ protected:
   }
 
   void _end_term(){ term.cell() = complex->end(); }
-  //we use a pointer since references are not default constructible
+
   Complex* complex;
-  //if we want to define operator-- 
-  //typename Cell_boundary::const_iterator begin_term; 
   typename Cell_boundary::const_iterator next_term;
-  //typename Cell_boundary::const_iterator future_term;
   typename Cell_boundary::const_iterator end_term;
   Term term;
 }; //class _const_boundary_iterator
@@ -148,7 +149,7 @@ protected:
 namespace ctl{
 
 template< typename Complex_,
-	  typename Cell_boundary_ = typename Complex_::Boundary,
+	  typename Cell_boundary_ = typename Complex_::Cell_boundary,
 	  typename Iterator_ = typename Complex_::iterator >
 class Complex_boundary{
 	typedef Complex_boundary< Complex_> Self;
@@ -184,13 +185,13 @@ class Complex_boundary{
 	Complex_boundary( Complex & complex): _complex( complex) {};
 	
 	const_iterator begin( const typename Term::Cell & c) const {
-		return const_iterator( _complex, _complex.boundary(), c->first);
+	  return const_iterator( _complex, _complex.cell_boundary(), c->first);
 	}
 	const_iterator end( const typename Term::Cell & c) const {
-		return const_iterator( _complex);
+	  return const_iterator( _complex);
 	}
 	size_type length( const typename Term::Cell & c) const {
-		return _complex.boundary().length( c->first);
+	  return _complex.cell_boundary().length( c->first);
 	}
 		
 	private:		

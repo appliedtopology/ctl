@@ -1,5 +1,5 @@
-#ifndef CTLIB_PAIRWISE_DISTANCE_H
-#define CTLIB_PAIRWISE_DISTANCE_H
+#ifndef CTL_ALL_PAIRS_H
+#define CTL_ALL_PAIRS_H
 /*******************************************************************************
 * -Academic Honesty-
 * Plagarism: The unauthorized use or close imitation of the language and 
@@ -12,51 +12,94 @@
 * that for any [academic] use of this source code one should cite one the 
 * following works:
 * 
-* \cite{hatcher, z-fcv-10a}
+* \cite{hatcher, z-ct-10}
 * 
 * See ct.bib for the corresponding bibtex entries. 
 * !!! DO NOT CITE THE USER MANUAL !!!
 *******************************************************************************
 * Copyright (C) Ryan H. Lewis 2014 <me@ryanlewis.net>
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-* 
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-* 
-* You should have received a copy of the GNU General Public License
-* along with this program in a file entitled COPYING; if not, write to the 
-* Free Software Foundation, Inc., 
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+* ********** BSD-3 License ****************
+* Redistribution and use in source and binary forms, with or without 
+* modification, are permitted provided that the following conditions are met:
+* 
+* 1. Redistributions of source code must retain the above copyright notice, 
+* this list of conditions and the following disclaimer.
+* 
+* 2. Redistributions in binary form must reproduce the above copyright notice, 
+* this list of conditions and the following disclaimer in the documentation 
+* and/or other materials provided with the distribution.
+* 
+* 3. Neither the name of the copyright holder nor the names of its contributors 
+* may be used to endorse or promote products derived from this software without 
+* specific prior written permission.
+* 
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+* POSSIBILITY OF SUCH DAMAGE.
+********************************************************************************
 *******************************************************************************
+*******************************************************************************
+* NOTES
+* We use the all pairs approach to constuct a graph. 
+*
 *******************************************************************************/
-//NOTE: syntax in this file is C++1x style.
 
-//exported functionality
+//STL 
+#include <vector> 
+#include <algorithm>
+
+//BOOST
+#include <boost/graph/adjacency_list.hpp>
+
+//CTL
+#include <ctl/metrics/metric.h>
+
 namespace ctl{
+namespace all_pairs{
+template<typename Points, typename Graph>
+void construct_graph( const Points& points, 
+		      const double epsilon, 
+		      Graph& graph) {
+    typedef typename boost::graph_traits<Graph> graph_traits;
+    typedef typename graph_traits::vertex_iterator vertex_iterator;
+    typedef typename boost::graph_traits< Graph>::vertex_descriptor vertex_descriptor; 
+    typedef typename boost::property_map< Graph,
+					  boost::vertex_name_t>::type name_map_t;
+    typedef typename boost::property_traits< name_map_t>::value_type  vertex_name_t;
+    typedef std::unordered_map< vertex_name_t, vertex_descriptor> Name_to_descriptor_map;
 
-template< typename Point_iterator, 
-	  typename Output_iterator,
-	  typename Coordinate, 
-	  typename Distance_metric>
-Output_iterator all_pairs( Points_iterator begin, Points_iterator end, 
-			   Output_iterator out, const Coordinate epsilon,
-			   const Distance_metric & distance){
-	for( auto p1 = begin; p1 != end; ++p1){
-		for( auto p2 = p1+1; p2 != end; ++p2){
-		   const auto d = distance( p1, p2);
-		   if (d <= epsilon) { *out++ = std::make_tuple( p1, p2, d); }
-		} 
-	}	
-	return out;
+    name_map_t name_map = boost::get( boost::vertex_name, graph);
+    Name_to_descriptor_map descriptor( points.size());
+
+    // add vertices
+    for( std::size_t i = 0; i < points.size(); ++i) {
+	vertex_descriptor v_descriptor = boost::add_vertex( graph);
+	name_map[ v_descriptor] = i;
+	descriptor.emplace( i, v_descriptor);
+    }
+
+    // add edges
+    vertex_iterator vi, vj, vlast;
+    double epsilon_squared = epsilon*epsilon;
+    for ( std::tie( vi, vlast) = boost::vertices( graph); vi != vlast; ++vi) {
+      for ( std::tie( vj, vlast) = boost::vertices (graph); vj != vi; ++vj) {
+       if( lp(points[name_map[*vi]], points[name_map[*vj]]) < epsilon_squared) {
+        boost::add_edge(*vi, *vj, graph);
+       }
+      } 
+    }
 } 
+} //end namespace all_pairs
+} //end namespace CTL
 
-} //namespace ctl
 
-
-#endif //CTLIB_PAIRWISE_DISTANCE_H
+#endif //CTL_ALL_PAIRS_H

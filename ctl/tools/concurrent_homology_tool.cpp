@@ -137,7 +137,7 @@ typedef ctl::parallel::Chain_complex< Product,
 typedef Blowup::iterator Blowup_iterator;
 typedef ctl::Complex_boundary< Blowup, Blowup_iterator> Blowup_complex_boundary;
 typedef ctl::Product_first_less < Blowup_iterator> Parallel_id_less;
-typedef Blowup::Boundary Cell_boundary;
+typedef Blowup::Cell_boundary Cell_boundary;
 
 typedef ctl::Filtration< Blowup, ctl::Id_less> Blowup_filtration;
 typedef std::vector< int> Betti;
