@@ -65,20 +65,54 @@ void get_lower_neighbors (const Graph& g,
     } 
 } 
 
+// We add the given graph to the complex. Also, we update the kcells vector to
+// keep track of the dimensions of the cells.
+template<typename Graph, typename Complex, typename Kcells>
+void add_graph_to_complex (const Graph& g, Complex& complex, Kcells& kcells) {
+    typedef typename Complex::Cell Simplex;
+    typedef typename Simplex::value_type Vertex;
+    typedef typename boost::graph_traits< Graph>::vertex_iterator vertex_iterator;
+    typedef typename boost::graph_traits< Graph>::adjacency_iterator Iterator;
+    std::vector< Simplex> zero_cells;
+    std::vector< Simplex> one_cells;
+    vertex_iterator vi, vlast;
+    for ( std::tie( vi, vlast) = boost::vertices( g); vi != vlast; ++vi) {
+        // adding {*vi} to both kcells[0] and complex
+        Simplex tau(1, *vi);
+        zero_cells.push_back(tau);
+        complex.insert_open_cell(tau);
+        Iterator ai, ai_end;
+        for ( boost::tie(ai, ai_end) = boost::adjacent_vertices(*vi, g);
+              ai != ai_end; ++ai) {
+                // adding {*vi, *ai} to both kcells[1] and complex
+                Simplex sigma( tau);
+                sigma.insert( *ai);
+                one_cells.push_back(sigma);
+                complex.insert_open_cell(sigma);
+        }
+    }
+    kcells.push_back(zero_cells);
+    kcells.push_back(one_cells);
+}
+
 // We loop through all nodes, selecting each one as the starting point for
 // constructing our simplicial complex.
 template<typename Graph, typename Complex> 
 void inductive_vr (const Graph& g, Complex& complex, std::size_t dimension) { 
     typedef typename Complex::Cell Simplex;
     typedef typename Simplex::value_type Vertex;
-    std::vector< Complex::mapped_type& > kcells;
-    add_zero_cells(kcells, 0, boost::vertices( g));
-    add_one_cells(kcells, 1, boost::edges( g));
+    typedef typename Vertex::const_iterator vertex_iterator;
+    std::vector< std::vector< Simplex> > kcells;
+    // adding the graph to the complex
+    add_graph_to_complex (g, complex, kcells);
+    // inductive algorithm
     for ( int k = 1; k < dimension; k++) {
-        Complex& k_plus_one_cell;
-	for ( Simplex_iterator tau; tau != kcells[k].end(); tau++) {
+        std::vector< Simplex> k_plus_one_cells;
+	for ( int i = 0; i < kcells[k].size(); i++) {
+	    Simplex tau(kcells[k][i]);
+	    // getting the intersection of all lower neighbors
 	    std::vector< Vertex> final_neighbors;
-	    for ( vertex_iterator vi; vi != tau.end(); vi++) {
+	    for(vertex_iterator vi = tau.begin(); vi != tau.end(); ++vi) {
 		std::vector< Vertex> lower_neighbors;
 		get_lower_neighbors(g, *vi, lower_neighbors);
 		set_intersection(lower_neighbors.begin(),
@@ -87,14 +121,15 @@ void inductive_vr (const Graph& g, Complex& complex, std::size_t dimension) {
 				 final_neighbors.end(),
 				 back_inserter(final_neighbors));
 	    }
-
-	    for ( vertex_iterator vi; vi != final_neighbors.end(); vi++) {
+	    // constructing new simplices and adding them to the complex
+	    for ( int j = 0; j < final_neighbors.end(); j++) {
 		Simplex sigma(tau);
-		sigma.insert(*vi);
-		k_plus_one_cell.insert_open_cell(sigma);
+		sigma.insert(final_neighbors[j]);
+		k_plus_one_cells.push_back(sigma);
+		complex.insert_open_cell(sigma);
 	    }
 	}
-        kcells.push_back(k_plus_one_cell);
+        kcells.push_back(k_plus_one_cells);
     }
 }
 
