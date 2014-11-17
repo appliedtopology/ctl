@@ -69,7 +69,32 @@ void get_lower_neighbors (const Graph& g,
 // constructing our simplicial complex.
 template<typename Graph, typename Complex> 
 void inductive_vr (const Graph& g, Complex& complex, std::size_t dimension) { 
-    for ( int i = 1; i < dimension; i++) {
+    typedef typename Complex::Cell Simplex;
+    typedef typename Simplex::value_type Vertex;
+    std::vector< Complex::mapped_type& > kcells;
+    add_zero_cells(kcells, 0, boost::vertices( g));
+    add_one_cells(kcells, 1, boost::edges( g));
+    for ( int k = 1; k < dimension; k++) {
+        Complex& k_plus_one_cell;
+	for ( Simplex_iterator tau; tau != kcells[k].end(); tau++) {
+	    std::vector< Vertex> final_neighbors;
+	    for ( vertex_iterator vi; vi != tau.end(); vi++) {
+		std::vector< Vertex> lower_neighbors;
+		get_lower_neighbors(g, *vi, lower_neighbors);
+		set_intersection(lower_neighbors.begin(),
+				 lower_neighbors.end(),
+				 final_neighbors.begin(),
+				 final_neighbors.end(),
+				 back_inserter(final_neighbors));
+	    }
+
+	    for ( vertex_iterator vi; vi != final_neighbors.end(); vi++) {
+		Simplex sigma(tau);
+		sigma.insert(*vi);
+		k_plus_one_cell.insert_open_cell(sigma);
+	    }
+	}
+        kcells.push_back(k_plus_one_cell);
     }
 }
 
