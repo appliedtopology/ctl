@@ -6,11 +6,12 @@
 #  ANN_FOUND        - True if nana found.
 
 # Look for the header file.
+set(ANN_INCLUDE_DIR /usr/include)
 FIND_PATH(ANN_INCLUDE_DIR NAMES ANN/ANN.h)
 MARK_AS_ADVANCED(ANN_INCLUDE_DIR)
 
 # Look for the library.
-FIND_LIBRARY(ANN_LIBRARY NAMES ANN)
+FIND_LIBRARY(ANN_LIBRARY NAMES ANN ann)
 MARK_AS_ADVANCED(ANN_LIBRARY)
 
 # handle the QUIETLY and REQUIRED arguments and set ANN_FOUND to TRUE if 

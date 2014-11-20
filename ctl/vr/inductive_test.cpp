@@ -9,6 +9,7 @@
 #include <ctl/utility/timer.h>
 
 //Types for Graphs
+#include <ctl/nbhd_graph/all_pairs.h>
 #include <ctl/nbhd_graph/nbhd_graph.h>
 
 //Types for Building a Simplicial Chain Complex 
@@ -23,7 +24,6 @@
 #include <ctl/term/term.h>
 
 //VR Construction
-#include <ctl/vr/construct_graph.h>
 #include <ctl/vr/inductive_complex.h> 
 
 //Graph

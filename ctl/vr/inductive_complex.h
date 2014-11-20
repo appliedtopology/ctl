@@ -102,6 +102,8 @@ void inductive_vr (const Graph& g, Complex& complex, std::size_t dimension) {
     typedef typename Complex::Cell Simplex;
     typedef typename Simplex::value_type Vertex;
     typedef typename Vertex::const_iterator vertex_iterator;
+    // TODO: We only need two vectors of Simplices NOT a vector of vectors.
+    // Particularly, we need k_cells and k_plus_one_cells.
     std::vector< std::vector< Simplex> > kcells;
     // adding the graph to the complex
     add_graph_to_complex (g, complex, kcells);

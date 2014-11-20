@@ -20,10 +20,10 @@ if (NOT APPLE)
 	set(DSO_FIXES rt)
 endif (NOT APPLE)
 
-find_package( ANN REQUIRED)
-find_package(Boost COMPONENTS program_options serialization MPI REQUIRED)
+find_package(ANN REQUIRED)
+find_package(Boost COMPONENTS program_options serialization mpi REQUIRED)
 message( "Boost_LIBRARIES = " ${Boost_LIBRARIES}) 
-include_directories(/usr/local/inlcude ${ANN_INCLUDE_DIRS})
+include_directories(/usr/local/include ${ANN_INCLUDE_DIRS})
 link_directories(/usr/local/lib ${ANN_LIBRARY_DIR} ${Boost_LIBRARY_DIR})
 
 set(Boost_USE_MULTITHREADED ON)
