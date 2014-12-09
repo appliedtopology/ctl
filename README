@@ -54,6 +54,11 @@ make install
 There are no shared libraries!
 
 ==== USING (coming soon) ====
+Documentation:
+1) Ensure that Doxygen is installed before running ``cmake .``.
+2) ``make doc``
+3) Documentation is generated inside doc/doxygen/.
+
 See /usr/share/doc/examples for a number of examples of using the library. (coming soon)
 See tutorial/ for a tutorial (coming soon)
 
