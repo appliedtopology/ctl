@@ -9,7 +9,6 @@
 #include <ctl/utility/timer.h>
 
 //Types for Graphs
-#include <ctl/nbhd_graph/all_pairs.h>
 #include <ctl/nbhd_graph/nbhd_graph.h>
 
 //Types for Building a Simplicial Chain Complex 
@@ -24,7 +23,8 @@
 #include <ctl/term/term.h>
 
 //VR Construction
-#include <ctl/vr/inductive_complex.h> 
+#include <ctl/nbhd_graph/all_pairs.h>
+#include <ctl/vr/inductive_complex.h>
 
 //Graph
 typedef typename ctl::Nbhd_graph<> Graph;
@@ -73,7 +73,7 @@ int main (int argc, char* argv[]) {
     }
     clock.start();
     Graph graph;
-    ctl::construct_graph(points, epsilon, graph);
+    ctl::all_pairs::construct_graph(points, epsilon, graph);
     clock.stop();
     std::cerr << "Graph: " <<  boost::num_vertices( graph) << ", "
 	      << boost:: num_edges( graph) << std::endl;
@@ -87,3 +87,4 @@ int main (int argc, char* argv[]) {
     std::cerr << "dimension of complex: " << complex.dimension() << std::endl;
     return 0;	
 }
+

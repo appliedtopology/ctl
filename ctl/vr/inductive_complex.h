@@ -64,7 +64,7 @@ void get_lower_neighbors (const Graph& g,
         if (*ai < v) { lower_neighbors.push_back( *ai); }
     } 
 } 
-
+/*
 // We add the given graph to the complex. Also, we update the kcells vector to
 // keep track of the dimensions of the cells.
 template<typename Graph, typename Complex, typename Kcells>
@@ -94,14 +94,19 @@ void add_graph_to_complex (const Graph& g, Complex& complex, Kcells& kcells) {
     kcells.push_back(zero_cells);
     kcells.push_back(one_cells);
 }
-
+*/
 // We loop through all nodes, selecting each one as the starting point for
 // constructing our simplicial complex.
 template<typename Graph, typename Complex> 
 void inductive_vr (const Graph& g, Complex& complex, std::size_t dimension) { 
     typedef typename Complex::Cell Simplex;
     typedef typename Simplex::value_type Vertex;
-    typedef typename Vertex::const_iterator vertex_iterator;
+/*
+
+
+//    typedef typename Vertex::const_iterator vertex_iterator;
+
+
     // TODO: We only need two vectors of Simplices NOT a vector of vectors.
     // Particularly, we need k_cells and k_plus_one_cells.
     std::vector< std::vector< Simplex> > kcells;
@@ -133,6 +138,7 @@ void inductive_vr (const Graph& g, Complex& complex, std::size_t dimension) {
 	}
         kcells.push_back(k_plus_one_cells);
     }
+*/
 }
 
 } //end namespace CTL
