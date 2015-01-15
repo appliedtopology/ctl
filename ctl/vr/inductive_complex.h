@@ -99,6 +99,7 @@ template<typename Graph, typename Complex>
 void inductive_vr (const Graph& g, Complex& complex, std::size_t dimension) { 
     typedef typename Complex::Cell Simplex;
     typedef typename Simplex::value_type Vertex;
+    typedef typename Simplex::const_iterator simplex_iterator;
     std::vector<Simplex> k_cells;
     std::vector<Simplex> k_plus_one_cells;
     // adding the graph to the complex
@@ -111,7 +112,6 @@ void inductive_vr (const Graph& g, Complex& complex, std::size_t dimension) {
 	    Simplex tau(k_cells[i]);
 	    // getting the intersection of all lower neighbors
 	    std::vector< Vertex> final_neighbors;
-    	    typedef typename Simplex::const_iterator simplex_iterator;
 	    for(simplex_iterator vi = tau.begin(); vi != tau.end(); ++vi) {
 		std::vector< Vertex> lower_neighbors;
 		get_lower_neighbors(g, *vi, lower_neighbors);
@@ -122,9 +122,10 @@ void inductive_vr (const Graph& g, Complex& complex, std::size_t dimension) {
 				 back_inserter(final_neighbors));
 	    }
 	    // constructing new simplices and adding them to the complex
-	    for ( int j = 0; j < final_neighbors.size(); j++) {
+    	    for( simplex_iterator j = final_neighbors.begin();
+		 j != final_neighbors.end(); ++j) {
 		Simplex sigma( tau);
-		sigma.insert( final_neighbors[j]);
+		sigma.insert( *j);
 		k_plus_one_cells.push_back(sigma);
 		complex.insert_open_cell(sigma);
 	    }
