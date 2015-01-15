@@ -64,62 +64,55 @@ void get_lower_neighbors (const Graph& g,
         if (*ai < v) { lower_neighbors.push_back( *ai); }
     } 
 } 
-/*
-// We add the given graph to the complex. Also, we update the kcells vector to
+
+// We add the given graph to the complex. Also, we update the cells vectors to
 // keep track of the dimensions of the cells.
-template<typename Graph, typename Complex, typename Kcells>
-void add_graph_to_complex (const Graph& g, Complex& complex, Kcells& kcells) {
+template<typename Graph, typename Complex, typename Vector>
+void add_graph_to_complex (const Graph& g,
+			   Complex& complex,
+			   Vector& k_cells,
+			   Vector& k_plus_one_cells) {
     typedef typename Complex::Cell Simplex;
-    typedef typename Simplex::value_type Vertex;
     typedef typename boost::graph_traits< Graph>::vertex_iterator vertex_iterator;
     typedef typename boost::graph_traits< Graph>::adjacency_iterator Iterator;
-    std::vector< Simplex> zero_cells;
-    std::vector< Simplex> one_cells;
     vertex_iterator vi, vlast;
     for ( std::tie( vi, vlast) = boost::vertices( g); vi != vlast; ++vi) {
-        // adding {*vi} to both kcells[0] and complex
+        // adding {*vi} to both k_cells and complex
         Simplex tau(1, *vi);
-        zero_cells.push_back(tau);
+        k_cells.push_back(tau);
         complex.insert_open_cell(tau);
         Iterator ai, ai_end;
         for ( boost::tie(ai, ai_end) = boost::adjacent_vertices(*vi, g);
               ai != ai_end; ++ai) {
-                // adding {*vi, *ai} to both kcells[1] and complex
+                // adding {*vi, *ai} to both k_plus_one_cells and complex
                 Simplex sigma( tau);
                 sigma.insert( *ai);
-                one_cells.push_back(sigma);
+                k_plus_one_cells.push_back(sigma);
                 complex.insert_open_cell(sigma);
         }
     }
-    kcells.push_back(zero_cells);
-    kcells.push_back(one_cells);
 }
-*/
+
 // We loop through all nodes, selecting each one as the starting point for
 // constructing our simplicial complex.
 template<typename Graph, typename Complex> 
 void inductive_vr (const Graph& g, Complex& complex, std::size_t dimension) { 
     typedef typename Complex::Cell Simplex;
     typedef typename Simplex::value_type Vertex;
-/*
-
-
-//    typedef typename Vertex::const_iterator vertex_iterator;
-
-
-    // TODO: We only need two vectors of Simplices NOT a vector of vectors.
-    // Particularly, we need k_cells and k_plus_one_cells.
-    std::vector< std::vector< Simplex> > kcells;
+    std::vector<Simplex> k_cells;
+    std::vector<Simplex> k_plus_one_cells;
     // adding the graph to the complex
-    add_graph_to_complex (g, complex, kcells);
+    add_graph_to_complex (g, complex, k_cells, k_plus_one_cells);
     // inductive algorithm
     for ( int k = 1; k < dimension; k++) {
-        std::vector< Simplex> k_plus_one_cells;
-	for ( int i = 0; i < kcells[k].size(); i++) {
-	    Simplex tau(kcells[k][i]);
+        k_cells.swap(k_plus_one_cells);
+	k_plus_one_cells.clear();
+	for ( int i = 0; i < k_cells.size(); i++) {
+	    Simplex tau(k_cells[i]);
 	    // getting the intersection of all lower neighbors
 	    std::vector< Vertex> final_neighbors;
-	    for(vertex_iterator vi = tau.begin(); vi != tau.end(); ++vi) {
+    	    typedef typename Simplex::const_iterator simplex_iterator;
+	    for(simplex_iterator vi = tau.begin(); vi != tau.end(); ++vi) {
 		std::vector< Vertex> lower_neighbors;
 		get_lower_neighbors(g, *vi, lower_neighbors);
 		set_intersection(lower_neighbors.begin(),
@@ -129,16 +122,14 @@ void inductive_vr (const Graph& g, Complex& complex, std::size_t dimension) {
 				 back_inserter(final_neighbors));
 	    }
 	    // constructing new simplices and adding them to the complex
-	    for ( int j = 0; j < final_neighbors.end(); j++) {
+	    for ( int j = 0; j < final_neighbors.size(); j++) {
 		Simplex sigma(tau);
 		sigma.insert(final_neighbors[j]);
 		k_plus_one_cells.push_back(sigma);
 		complex.insert_open_cell(sigma);
 	    }
 	}
-        kcells.push_back(k_plus_one_cells);
     }
-*/
 }
 
 } //end namespace CTL
