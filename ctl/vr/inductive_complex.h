@@ -123,8 +123,8 @@ void inductive_vr (const Graph& g, Complex& complex, std::size_t dimension) {
 	    }
 	    // constructing new simplices and adding them to the complex
 	    for ( int j = 0; j < final_neighbors.size(); j++) {
-		Simplex sigma(tau);
-		sigma.insert(final_neighbors[j]);
+		Simplex sigma( tau);
+		sigma.insert( final_neighbors[j]);
 		k_plus_one_cells.push_back(sigma);
 		complex.insert_open_cell(sigma);
 	    }
