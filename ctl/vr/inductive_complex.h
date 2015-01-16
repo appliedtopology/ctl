@@ -112,6 +112,7 @@ void inductive_vr (const Graph& g, Complex& complex, std::size_t dimension) {
 	    Simplex tau(k_cells[i]);
 	    // getting the intersection of all lower neighbors
 	    std::vector< Vertex> final_neighbors;
+	    get_lower_neighbors(g, *(tau.begin()), final_neighbors);
 	    for(simplex_iterator vi = tau.begin(); vi != tau.end(); ++vi) {
 		std::vector< Vertex> lower_neighbors;
 		get_lower_neighbors(g, *vi, lower_neighbors);
@@ -121,11 +122,18 @@ void inductive_vr (const Graph& g, Complex& complex, std::size_t dimension) {
 				 final_neighbors.end(),
 				 back_inserter(final_neighbors));
 	    }
+
+	std::cerr << "current complex: " << complex << std::endl << std::endl << std::endl;
+	std::cerr << "about to add: " << std::endl;
+
 	    // constructing new simplices and adding them to the complex
     	    for( simplex_iterator j = final_neighbors.begin();
 		 j != final_neighbors.end(); ++j) {
 		Simplex sigma( tau);
 		sigma.insert( *j);
+
+		std::cerr << tau << "U" << *j << "=" << sigma << std::endl; 
+
 		k_plus_one_cells.push_back(sigma);
 		complex.insert_open_cell(sigma);
 	    }
