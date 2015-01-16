@@ -43,6 +43,7 @@
 *******************************************************************************/
 
 //STL
+#include <set>
 #include <vector> 
 #include <algorithm>
 
@@ -53,16 +54,16 @@ namespace ctl {
 
 // Given a node, we loop through all its neighbors and return a vector
 // of all the neighbors that have a lower ordering.
-template<typename Graph, typename Vertex, typename Points> 
-void get_lower_neighbors (const Graph& g,  
-                 	  const Vertex& v,  
-                 	  Points& lower_neighbors) {
+template<typename Graph, typename Vertex, typename Points>
+void get_lower_neighbors (const Graph& g,
+                          const Vertex& v,
+                          Points& lower_neighbors) {
     typedef typename boost::graph_traits<Graph>::adjacency_iterator Iterator;
     Iterator ai, ai_end;
-    for( boost::tie(ai, ai_end) = boost::adjacent_vertices(v, g); 
-	 ai != ai_end; ++ai) {
+    for( boost::tie(ai, ai_end) = boost::adjacent_vertices(v, g);
+         ai != ai_end; ++ai) {
         if (*ai < v) { lower_neighbors.push_back( *ai); }
-    } 
+    }
 } 
 
 // We add the given graph to the complex. Also, we update the cells vectors to
@@ -112,28 +113,24 @@ void inductive_vr (const Graph& g, Complex& complex, std::size_t dimension) {
 	    Simplex tau(k_cells[i]);
 	    // getting the intersection of all lower neighbors
 	    std::vector< Vertex> final_neighbors;
+            std::vector< Vertex> lower_neighbors;
 	    get_lower_neighbors(g, *(tau.begin()), final_neighbors);
 	    for(simplex_iterator vi = tau.begin(); vi != tau.end(); ++vi) {
-		std::vector< Vertex> lower_neighbors;
+		lower_neighbors.clear();
 		get_lower_neighbors(g, *vi, lower_neighbors);
-		set_intersection(lower_neighbors.begin(),
-				 lower_neighbors.end(),
-				 final_neighbors.begin(),
-				 final_neighbors.end(),
+		std::set< Vertex> finalN(final_neighbors.begin(), final_neighbors.end());
+		std::set< Vertex> lowerN(lower_neighbors.begin(), lower_neighbors.end());
+		final_neighbors.clear();
+		set_intersection(lowerN.begin(),
+				 lowerN.end(),
+				 finalN.begin(),
+				 finalN.end(),
 				 back_inserter(final_neighbors));
 	    }
-
-	std::cerr << "current complex: " << complex << std::endl << std::endl << std::endl;
-	std::cerr << "about to add: " << std::endl;
-
 	    // constructing new simplices and adding them to the complex
-    	    for( simplex_iterator j = final_neighbors.begin();
-		 j != final_neighbors.end(); ++j) {
+    	    for( int j = 0; j < final_neighbors.size(); ++j) {
 		Simplex sigma( tau);
-		sigma.insert( *j);
-
-		std::cerr << tau << "U" << *j << "=" << sigma << std::endl; 
-
+		sigma.insert( final_neighbors[j]); 
 		k_plus_one_cells.push_back(sigma);
 		complex.insert_open_cell(sigma);
 	    }
