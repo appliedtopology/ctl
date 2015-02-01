@@ -13,10 +13,12 @@ CTL is BSD See LICENSE for more info.
 
 === DEPENDENCIES ==
 C++11 compiler (clang or gcc)
-Boost
+Boost with MPI
 Intel's TBB
 METIS (graph partitioning)
-ANN (soon)
+ANN 
+MPI
+Doxygen (Optional)
 
 === BUILDING ====
 To build the library type:

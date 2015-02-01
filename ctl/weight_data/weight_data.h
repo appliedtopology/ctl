@@ -65,8 +65,8 @@ class Weight_data {
 public:
   typedef Weight_ Weight;
   typedef Weight_less_ Weight_less;
-
-  Weight_data( const Weight& weight = Weight( 0)) : weight_( weight) {}
+  typedef std::numeric_limits< Weight_> limits;
+  Weight_data( const Weight& weight = Weight( limits::min())) : weight_( weight) {}
   Weight_data( const Weight_data &from) : weight_( from.weight_) {}
   Weight_data( Weight_data &&from) : weight_( std::move( from.weight_)) {}
 
@@ -82,7 +82,7 @@ public:
   }
   
   Weight&        weight()         { return weight_; }
-  void 		 weight( const Weight & w)         { weight_ = w; }
+  void 		 weight( const Weight & w) { weight_ = w; }
   const Weight   weight() const   { return weight_; }
 private:
   Weight_ weight_;

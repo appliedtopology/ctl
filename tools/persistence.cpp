@@ -75,8 +75,8 @@
 //Chains & Persistence 
 #include <ctl/chain/chain.h>
 #include <ctl/persistence/persistence.h>
-#include <ctl/persistence/iterator_property_map.h>
-#include <ctl/persistence/offset_maps.h>
+#include <ctl/matrix/iterator_property_map.h>
+#include <ctl/matrix/offset_maps.h>
 #include <ctl/persistence/compute_betti.h>
 #include <ctl/persistence/compute_barcodes.h>
 
@@ -124,16 +124,17 @@ void run_persistence( Complex & complex,
    //Chain Type
    typedef ctl::Chain< Filtration_term> Complex_chain;
    
-   //Essentially our sparse boundary matrix
+   //Sparse boundary matrix
    typedef std::vector< Complex_chain> Complex_chains;
    
    //Generic wrapper to access the sparse matrix.
    typedef ctl::Pos_offset_map< typename Filtration_term::Cell> 
-						Complex_offset_map;
+					 Complex_offset_map;
    typedef ctl::iterator_property_map< typename Complex_chains::iterator, 
-                                         Complex_offset_map, 
-                                         Complex_chain, 
-                                         Complex_chain&> Complex_chain_map;
+                                       Complex_offset_map, 
+                                       Complex_chain, 
+                                       Complex_chain&> 
+				       Complex_chain_map;
    //produce a filtration
    timer.start();
    Filtration complex_filtration( complex);

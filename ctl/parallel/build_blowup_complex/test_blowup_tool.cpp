@@ -50,8 +50,8 @@
 //Persistence
 #include <ctl/chain/chain.h>
 #include <ctl/persistence/persistence.h>
-#include <ctl/persistence/iterator_property_map.h>
-#include <ctl/persistence/offset_maps.h>
+#include <ctl/matrix/iterator_property_map.h>
+#include <ctl/matrix/offset_maps.h>
 #include <ctl/persistence/compute_betti.h>
 
 //Blowup

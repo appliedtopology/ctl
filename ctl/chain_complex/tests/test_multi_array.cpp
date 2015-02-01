@@ -40,34 +40,8 @@
 #include <ctl/chain_complex/detail/data_wrapper.h>
 #include <ctl/chain_complex/detail/multi_array.h>
 
-template< typename Stream, typename Vector>
-Stream& print_vector( Stream& out, const Vector & v){
-	for( auto& i : v){ out << i << " "; }
-	return out;
-}
-
-template< typename M>
-void print_multi_array( const M & m){
-std::vector< std::size_t> coordinate;
-for( auto& i: m){ 
-   std::cout << "d=" << i.d << " : "; 
-   print_vector( std::cout,  m.index_to_coordinate( i.d, coordinate)); 
-   std::cout << std::endl;
-}
-}
-
-template< typename M>
-bool check_multi_indexing( const M & m){
-	typedef std::vector< std::size_t> Coordinate;
-	Coordinate c;
-	for( auto i = m.begin(); i != m.end(); ++i){
-	  std::size_t p = std::distance( m.begin(), i);
-	  if( m[ p] != *i){ return false; }
-	  if( m.coordinate_to_index( m.index_to_coordinate( p, c)) != p){ return false; }
-	}
-	return true;
-} 
-
+//Gtest
+#include <gtest/gtest.h>
 
 struct Filter_function_value { 
 Filter_function_value(): d( 0){}
@@ -84,15 +58,40 @@ Filter_function_value& operator=( const Filter_function_value && f){
 }
 std::size_t d; 
 }; //end struct Filter_function_value
-template< typename Stream>
-Stream& operator<<( Stream& out, const Filter_function_value & v){
-	out << v.d;
+
+template< typename Stream, typename Vector>
+Stream& print_vector( Stream& out, const Vector & v){
+	for( auto& i : v){ out << i << " "; }
 	return out;
 }
+
+template< typename M>
+void print_multi_array( const M & m){
+std::vector< std::size_t> coordinate;
+for( auto& i: m){ 
+   std::cout << "d=" << i.d << " : "; 
+   print_vector( std::cout,  m.index_to_coordinate( i.d, coordinate)); 
+   std::cout << std::endl;
+}
+}
+
+
+template< typename M>
+bool check_multi_indexing( const M & m){
+	typedef std::vector< std::size_t> Coordinate;
+	Coordinate c;
+	for( auto i = m.begin(); i != m.end(); ++i){
+	  std::size_t p = std::distance( m.begin(), i);
+	  if( m[ p] != *i){ return false; }
+	  if( m.coordinate_to_index( m.index_to_coordinate( p, c)) != p){ return false; }
+	}
+	return true;
+} 
+
 typedef ctl::detail::Data_wrapper< Filter_function_value > Data;
 typedef ctl::detail::multi_array< Data> multi_array;
-int main( int argc, char** argv){
-	multi_array m1;
+
+TEST(MultiArray, VanillaMultiIndexing){
 	std::vector< std::size_t> extents{5,4,3};
 	std::vector< Data> foobar(5*4*3);
 	std::vector< std::size_t> base{1,1,3};
@@ -101,25 +100,31 @@ int main( int argc, char** argv){
 
 	multi_array m( extents.begin(), extents.end(), 
 		       foobar.begin(), foobar.end());
-	std::cout << "base: "; 
-	print_vector( std::cout, m.base());
-	std::cout << std::endl;
-	if( check_multi_indexing( m) == false){ 
-		std::cerr << "multi indexing off." << std::endl;
-		print_multi_array( m);
-	}else{ 
-		std::cerr << "vanilla multi indexing works fine." << std::endl;
-	}
+	ASSERT_EQ( check_multi_indexing( m), true);
+}
+
+TEST(MultiArray, OffsetMultiIndexing){
+	std::vector< std::size_t> extents{5,4,3};
+	std::vector< Data> foobar(5*4*3);
+	std::vector< std::size_t> base{1,1,3};
+	
 	multi_array m2( extents.begin(), extents.end(), 
 		       foobar.begin(), foobar.end(), base);
 	std::cout << "base: "; 
 	print_vector( std::cout, m2.base());
 	std::cout << std::endl;
-	if( check_multi_indexing( m2) == false){
-		std::cerr << "multi indexing off with base" << std::endl;
-		print_multi_array( m2);
-	}else{
-		std::cerr << "offset by one indexing works fine." << std::endl;
-	}
-	return 0;
+	ASSERT_EQ( check_multi_indexing( m2), true);
+}
+
+TEST(MultiArray, ConstructorTest){
+	std::vector< std::size_t> extents{5,4,3};
+	std::vector< Data> foobar(5*4*3);
+	std::vector< std::size_t> base{1,1,3};
+	int next=0;
+	for( auto& i: foobar){ i.d = next++; }
+
+	multi_array m( extents.begin(), extents.end(), 
+		       foobar.begin(), foobar.end());
+	ASSERT_EQ( base, m.base());
+	ASSERT_EQ( extents, m.extents());
 }

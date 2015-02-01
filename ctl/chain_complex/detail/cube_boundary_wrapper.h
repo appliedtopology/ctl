@@ -47,8 +47,7 @@
 
 //non-exported functionality
 namespace ctl {
-namespace detail{
-
+namespace detail {
 template< typename Complex_, typename Term_>
 class const_cube_boundary_wrapper_iterator:
     public std::iterator< std::forward_iterator_tag, 

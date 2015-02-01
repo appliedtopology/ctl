@@ -65,8 +65,8 @@
 #include <ctl/finite_field/finite_field.h>
 #include <ctl/chain/chain.h>
 #include <ctl/persistence/persistence.h>
-#include <ctl/persistence/offset_maps.h>
-#include <ctl/persistence/iterator_property_map.h>
+#include <ctl/matrix/offset_maps.h>
+#include <ctl/matrix/iterator_property_map.h>
 
 //Local Project Deps
 //#include <ctl/parallel/build_blowup_complex/build_blowup_complex.h>

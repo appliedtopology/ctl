@@ -57,18 +57,13 @@
 //BOOST
 #include <boost/iterator/transform_iterator.hpp>
 
-//CTL
-#include <ctl/io/io.h>
-#include <ctl/cube/cube.h>
-#include <ctl/chain_complex/detail/cube_boundary_wrapper.h>
-
 namespace ctl {
 namespace detail {
-
-//2*n+1
+//2*n-1
 struct tnpo : public std::unary_function<std::size_t, std::size_t> {
 	std::size_t operator()( const std::size_t & i) const { return 2*i-1; }
 }; //end struct tnpo
+} //end namespace detail
 
 template< typename Cell_,
 	  typename Boundary_,
@@ -77,7 +72,7 @@ template< typename Cell_,
 	  template< typename ...> class Storage_> 
 class Cubical_complex  {
 public: //Public types
-   typedef Cube_boundary_wrapper< Boundary_, Cubical_complex> Cell_boundary; 
+   typedef detail::Cube_boundary_wrapper< Boundary_, Cubical_complex> Cell_boundary; 
    typedef Cell_ Cube; //Describes a fundamental object,
 		       //e.g. Simplex, Cube, Polygon, etc..
    //Arbitrary data associated to space.
@@ -108,6 +103,7 @@ public:
    //!Default
    Cubical_complex() {}
 
+public:
   /**
   * @brief 
   *
@@ -115,18 +111,20 @@ public:
   * @param bd_
   * @param d_:
   */
-   template< typename Vertex_extents>
-   Cubical_complex( Boundary_ & bd_, Vertex_extents & d_):
-    cells( boost::make_transform_iterator( d_.begin(), tnpo()),  
-	   boost::make_transform_iterator( d_.end(), tnpo())), 
+   template< typename Vertex_extents, typename Function_values>
+   Cubical_complex( Boundary_ & bd_, Vertex_extents & d_, Function_values & f):
+    cells( boost::make_transform_iterator( d_.begin(), detail::tnpo()),  
+	   boost::make_transform_iterator( d_.end(), detail::tnpo())), 
 	   bd( *this, bd_), index_data( d_) { 
 	   index_data.insert( index_data.begin(), 1);
    	   for( auto i = ++index_data.begin(); 
 		     i != index_data.end(); ++i){ 
 		     *i *= *(i-1); 
 	   }
-	  assign_keys();
-   }
+	   assign_keys();
+	   assign_function_data_to_vertices( f);  
+	   expand_function_data();
+  }
    
   /**
   * @brief Vertex_extents
@@ -134,18 +132,21 @@ public:
   * @tparam Vertex_extents
   * @param d_
   */
-   template< typename Vertex_extents> 
-   Cubical_complex( const Vertex_extents& d_): 
-     cells( boost::make_transform_iterator( d_.begin(), tnpo()), 
-	   boost::make_transform_iterator( d_.end(), tnpo())), 
-    bd( *this), 
-    index_data( d_){ 
+   template< typename Vertex_extents, typename Function_values> 
+   Cubical_complex( const Vertex_extents& d_, Function_values & f): 
+     cells( boost::make_transform_iterator( d_.begin(), detail::tnpo()), 
+	   boost::make_transform_iterator( d_.end(), detail::tnpo())), 
+    index_data( d_), 
+	bd( *this){ 
 	  index_data.insert( index_data.begin(), 1);
    	   for( auto i = ++index_data.begin(); 
 		     i != index_data.end(); ++i){ 
 		     *i *= *(i-1); 
 	  }
+	  
 	  assign_keys();
+	  assign_function_data_to_vertices( f);  
+	  expand_function_data();
    }
 
   /**
@@ -155,11 +156,12 @@ public:
   * @param d_
   * @param offsets_
   */
-   template< typename Vertex_extents> 
+   template< typename Vertex_extents, typename Function_values> 
    Cubical_complex( const Vertex_extents& d_,
+		    Function_values & f,
 		    const Vertex_extents& offsets_): 
-     cells( boost::make_transform_iterator( d_.begin(), tnpo()), 
-	    boost::make_transform_iterator( d_.end(), tnpo()),
+     cells( boost::make_transform_iterator( d_.begin(), detail::tnpo()), 
+	    boost::make_transform_iterator( d_.end(), detail::tnpo()),
 	    offsets_), index_data( d_), bd( *this){ 
 	  index_data.insert( index_data.begin(), 1);
  	   for( auto i = ++index_data.begin(); 
@@ -167,6 +169,8 @@ public:
 		     *i *= *(i-1); 
 	  }
 	  assign_keys();
+	  assign_function_data_to_vertices( f);  
+	  expand_function_data();
    }
    
    /**
@@ -176,12 +180,13 @@ public:
    * @param d_
    * @param offsets_
    */
-   template< typename Vertex_extents> 
+   template< typename Vertex_extents, typename Function_values> 
    Cubical_complex( Cell_boundary & bd_, 
 		    const Vertex_extents& d_,
+		    Function_values & f,
 		    const Vertex_extents& offsets_): 
-     cells( boost::make_transform_iterator( d_.begin(), tnpo()), 
-	   boost::make_transform_iterator( d_.end(), tnpo())), 
+     cells( boost::make_transform_iterator( d_.begin(), detail::tnpo()), 
+	   boost::make_transform_iterator( d_.end(), detail::tnpo())), 
     bd( bd_), index_data( d_){ 
 	  index_data.insert( index_data.begin(), 1);
  	   for( auto i = ++index_data.begin(); 
@@ -189,6 +194,8 @@ public:
 		     *i *= *(i-1); 
 	  }
 	  assign_keys();
+	  assign_function_data_to_vertices( f);  
+	  expand_function_data();
    }
 
    //! Copy
@@ -357,7 +364,7 @@ public:
     //we think of a grid which is the 
     //cartesian product like this:
     //*-*-*-*-* x *-*-*-*
-    tnpo t;
+    detail::tnpo t;
     cells.resize( boost::make_transform_iterator( ++index_data.begin(), t),
        	          boost::make_transform_iterator( index_data.end(), t));
     
@@ -420,6 +427,10 @@ public:
 
    void reserve( const std::size_t n) { cells.reserve( n); }
    const std::size_t dimension() const { return cells.dimension(); }
+   const std::size_t dimension( const Cell & c) const { 
+	std::size_t mask = (1 << (dimension()+1)) - 1;
+	return __builtin_popcount( c & mask);
+   }
    const std::size_t size() const { return cells.size(); }
    const std::size_t size( std::size_t i) const { return cells.extents( i); }
    Cell_boundary& cell_boundary() { return bd; }
@@ -444,8 +455,9 @@ private:
     for( auto i = cells.begin(); i != cells.end(); ++i, ++p){
 	cells.index_to_coordinate( p, c);
         i->first = coordinate_to_id_and_bits( c);
-    }
+    }  
   }
+
 
 /**
 * @brief This method is used to convert vertex_id's 
@@ -459,16 +471,64 @@ private:
 * @param c
 */
   template< typename Coordinate>
-  std::size_t vertex_id_to_index( std::size_t index) const{
-    Coordinate c( dimension(), 0);
-    for( auto i = dimension()-1; i>0;  --i){ 
-       c[ i] = index/ index_data[ i-1];
-       index -= c[ i]*(index_data[ i-1]);
-       c[ i] = 2*c[i]+ cells.base( i);
+  void vertex_id_to_coordinate( std::size_t index, Coordinate & c) const{
+    for( auto i = dimension(); i>0;  --i){ 
+       c[i-1] = index/ index_data[ i];
+       index -= c[i-1]*(index_data[ i]);
+       c[i-1] = 2*c[i-1]+ cells.base( i-1);
     }
-    c[ 0] = 2*index + cells.base( 0);
+  }
+
+
+/**
+* @brief This method is used to convert vertex_id's 
+* 0 ... #vertex --> coordinates in the larger complex.
+* This is _not_ to be used to convert the vertex id in 
+* the high bits of a key to a coordinate. That will result
+* in a bug!
+* 
+* @param index
+* @param c
+*/
+  std::size_t vertex_id_to_index( std::size_t index) const{
+    Vector c( dimension(), 0);
+    vertex_id_to_coordinate( index, c);
     return cells.coordinate_to_index( c);
   }
+  void expand_function_data( Cell & c){
+	if( dimension( c.first)){
+		auto j = bd.begin( c.first);
+		auto k = find_cell( j.cell());
+		expand_function_data( k); 
+		c.second.weight() = k.second.weight();
+		for( ++j; j != bd.end( c.first); ++j){
+			expand_function_data( find_cell( j.cell()));
+			k = find_cell( j.cell());
+			if( k.second.weight() > c.second.weight()){
+				c.second.weight() = k.second.weight();
+			}
+		}
+	}
+   }
+
+   void expand_function_data(){
+	for( auto & i : cells){
+		if( dimension( i.first) && 
+			i.second.weight() < 0){
+						
+		}
+	}
+   }
+
+   template< typename Function_values>
+   void assign_function_data_to_vertices( Function_values & f){
+ 	std::size_t vertex_id = 0;
+	for( auto & v : f){
+	  auto& p = cells[ vertex_id_to_index( vertex_id)]; 
+	  p.second.weight( v);
+	  ++vertex_id;
+	}
+   }
 
 public:
 
@@ -516,7 +576,7 @@ public:
  * @param cell
  */
   Cube& key_to_cube( const Cell word1, Cube & r) const{
-   typedef typename Cube::Interval Interval;
+   //typedef typename Cube::Interval Interval;
    Cube cube;
    Cell word = word1;
    std::size_t lower_left_vertex_id = word >> dimension();
@@ -547,7 +607,6 @@ private:
    Vector index_data;
    Cell_boundary bd;
 }; //chain_complex
-} //namespace detail
 
 
 /**
@@ -571,9 +630,9 @@ key_to_cube( const Cubical_complex & complex,
 }
 
 template< typename ... Args>
-typename ctl::detail::Cubical_complex< Args ...>::Cell 
-cube_to_key( const ctl::detail::Cubical_complex< Args ...>& complex, 
-	     const typename ctl::detail::Cubical_complex< Args ...>::Cube & cube){ 
+typename ctl::Cubical_complex< Args ...>::Cell 
+cube_to_key( const ctl::Cubical_complex< Args ...>& complex, 
+	     const typename ctl::Cubical_complex< Args ...>::Cube & cube){ 
 	return complex.cube_to_key( complex, cube);
 }
 
@@ -587,7 +646,7 @@ std::size_t cube_dimension( const Cubical_complex& complex,
 
 template< typename Stream, typename ... Args>
 Stream& operator<<( Stream& out, 
-		    const typename ctl::detail::Cubical_complex< Args...>::
+		    const typename ctl::Cubical_complex< Args...>::
 					iterator c){ 
 	out << c->first;
 	return out;	
@@ -596,7 +655,7 @@ Stream& operator<<( Stream& out,
 
 template< typename Stream, typename ... Args>
 Stream& operator<<( Stream& out, 
-		    const typename ctl::detail::Cubical_complex< Args...>::
+		    const typename ctl::Cubical_complex< Args...>::
 					const_iterator c){ 
 	out << c->first;
 	return out;	
@@ -604,8 +663,8 @@ Stream& operator<<( Stream& out,
 
 template< typename Stream, typename ... Args>
 Stream& operator<<( Stream& out, 
-		    const ctl::detail::Cubical_complex< Args...> & c){ 
-	typedef ctl::detail::Cubical_complex< Args...> Cubical_complex;
+		    const ctl::Cubical_complex< Args...> & c){ 
+	typedef ctl::Cubical_complex< Args...> Cubical_complex;
 	typedef typename Cubical_complex::Cube Cube;
    	Cube cube; 
 	for(auto i = c.begin(); i != c.end(); ++i){
@@ -619,14 +678,14 @@ Stream& operator<<( Stream& out,
 
 template< typename Stream, typename ... Args>
 Stream& operator<<( Stream& out, 
-   const ctl::detail::Cubical_complex< Args...>  && c){ 
+   const ctl::Cubical_complex< Args...>  && c){ 
 	out << c;
 	return out;
 }
 
 template< typename Stream, typename ... Args>
 Stream& operator>>( Stream& in, 
-		    ctl::detail::Cubical_complex< Args...> & c){  
+		    ctl::Cubical_complex< Args...> & c){  
 return c.read( in); 
 }
 

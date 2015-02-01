@@ -109,7 +109,7 @@ void graph_to_metis( Graph & graph,
         Vertex_iterator vi, vlast;
         //CSR calls each vertex 1 ... n
 	Vertices_size_t count = 0;
-        for (tie( vi, vlast) = vertices( graph); vi != vlast; ++vi, ++count){
+        for (std::tie( vi, vlast) = vertices( graph); vi != vlast; ++vi, ++count){
                 Vertex_name name = boost::get( name_map, *vi);
                 vertex_to_index[ name] = count;
                 index_to_vertex[ count] = name;

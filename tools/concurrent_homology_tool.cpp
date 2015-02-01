@@ -79,11 +79,13 @@
 #include <ctl/product_cell/product_cell_less.h>
 #include <ctl/parallel/build_blowup_complex/build_blowup_complex.h>
 
-//Persistence 
+//Boundary matrix stuff
+#include <ctl/matrix/iterator_property_map.h>
+#include <ctl/matrix/offset_maps.h>
+
+//Persistence
 #include <ctl/chain/chain.h>
 #include <ctl/persistence/persistence.h>
-#include <ctl/persistence/iterator_property_map.h>
-#include <ctl/persistence/offset_maps.h>
 #include <ctl/persistence/compute_betti.h>
 
 //Parallel Homology 

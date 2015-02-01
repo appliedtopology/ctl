@@ -1,5 +1,5 @@
-#ifndef CTL_GENERIC_COMPLEX_H
-#define CTL_GENERIC_COMPLEX_H
+#ifndef CTL_SIMPLICIAL_CHAIN_COMPLEX_H
+#define CTL_SIMPLICIAL_CHAIN_COMPLEX_H
 /*******************************************************************************
 * -Academic Honesty-
 * Plagarism: The unauthorized use or close imitation of the language and
@@ -66,20 +66,18 @@
 
 //STL
 #include <unordered_map>
-//#include <ctl/abstract_simplex/abstract_simplex.h>
 #include <vector>
 #include <sstream>
 #include <fstream>
 
 namespace ctl {
-namespace detail {
 
 template< typename Cell_,
 	  typename Boundary_,
 	  typename Data_,
 	  typename Hash_, 
 	  template< typename ...> class Storage_> 
-class Generic_complex{
+class Simplicial_chain_complex{
 public:
    typedef Cell_ Cell; //Describes a fundamental object,
 		       //e.g. Simplex, Cube, Polygon, etc..
@@ -100,9 +98,11 @@ public:
 public:
    //Constructors
    //Default
-   Generic_complex(): max_id( 0), max_dim( 0) { cells.max_load_factor( 1); }
+   Simplicial_chain_complex(): max_id( 0), max_dim( 0) { 
+	cells.max_load_factor( 1); 
+   }
 
-   Generic_complex( Cell_boundary & bd_, const std::size_t num_cells): 
+   Simplicial_chain_complex( Cell_boundary & bd_, const std::size_t num_cells): 
    cells( num_cells), bd( bd_), max_id( 0), max_dim( 0) {
 	cells.max_load_factor( 1); 
    }
@@ -110,25 +110,24 @@ public:
    //TODO: Expand complex structure to store cells of a fixed dimension
    //in different containers. glue together objects with a crazy iterator
    template< typename Size_by_dimension>
-   Generic_complex( Cell_boundary & bd_, const Size_by_dimension d): 
+   Simplicial_chain_complex( Cell_boundary & bd_, const Size_by_dimension d): 
     cells( std::accumulate( d.begin(), d.end(), 0)),
     bd( bd_), max_id( 0), max_dim( 0) {
 	cells.max_load_factor( 1); 
    }
 
    //Copy
-   Generic_complex( const Generic_complex & b): cells( b.cells), bd( b.bd),
-   				 max_id( b.max_id), max_dim( b.max_dim)
+   Simplicial_chain_complex( const Simplicial_chain_complex & b): 
+   cells( b.cells), bd( b.bd), max_id( b.max_id), max_dim( b.max_dim)
    { cells.max_load_factor( 1); }
 
    //Move
-   Generic_complex( Generic_complex && b): cells( std::move( b.cells)),
-   			  bd( std::move( b.bd)),
-   			  max_id( std::move(b.max_id)),
-   			  max_dim( std::move( b.max_dim)) {}
+   Simplicial_chain_complex( Simplicial_chain_complex && b): 
+   cells( std::move( b.cells)), bd( std::move( b.bd)),
+   max_id( std::move(b.max_id)), max_dim( std::move( b.max_dim)) {}
 
    // assignment operator
-   Generic_complex& operator=( const Generic_complex& b){
+   Simplicial_chain_complex& operator=( const Simplicial_chain_complex& b){
    	bd = b.bd;
    	max_id = b.max_id;
    	max_dim = b.max_dim;
@@ -137,7 +136,7 @@ public:
    }
 
    // move assignment operator
-   Generic_complex& operator=( Generic_complex&& b){
+   Simplicial_chain_complex& operator=( Simplicial_chain_complex&& b){
    	bd      = std::move( b.bd);
    	max_id  = std::move( b.max_id);
    	max_dim = std::move( b.max_dim);
@@ -301,7 +300,7 @@ private:
    Cell_boundary bd;
    std::size_t max_id;
    std::size_t max_dim;
-}; //end class Generic_complex
+}; //end class Simplicial_chain_complex
 
 template< typename Stream, typename Cell_,
           typename Boundary_,
@@ -309,7 +308,7 @@ template< typename Stream, typename Cell_,
           typename Hash_, 
           template< typename ...> class Storage_> 
 Stream& operator<<( Stream& out, 
-   const typename ctl::detail::Generic_complex< Cell_, Boundary_, Data_, Hash_, Storage_>::iterator c){ 
+   const typename ctl::Simplicial_chain_complex< Cell_, Boundary_, Data_, Hash_, Storage_>::iterator c){ 
 	out << c->first;
 	return out;	
 }
@@ -319,7 +318,7 @@ template< typename Stream, typename Cell_,
           typename Hash_, 
           template< typename ...> class Storage_> 
 Stream& operator<<( Stream& out, 
-   const typename ctl::detail::Generic_complex< Cell_, Boundary_, Data_, Hash_, Storage_>::const_iterator c){ 
+   const typename ctl::Simplicial_chain_complex< Cell_, Boundary_, Data_, Hash_, Storage_>::const_iterator c){ 
 	out << c->first;
 	return out;	
 }
@@ -330,7 +329,7 @@ template< typename Stream, typename Cell_,
           typename Hash_, 
           template< typename ...> class Storage_> 
 Stream& operator<<( Stream& out, 
-   const ctl::detail::Generic_complex< Cell_, Boundary_, Data_, Hash_, Storage_> & c){ 
+   const ctl::Simplicial_chain_complex< Cell_, Boundary_, Data_, Hash_, Storage_> & c){ 
 	for(auto i = c.begin(); i != c.end(); ++i){
 		      const std::size_t id = i->second.id();
 		      out << id; 
@@ -345,7 +344,7 @@ template< typename Stream, typename Cell_,
           typename Hash_, 
           template< typename ...> class Storage_> 
 Stream& operator<<( Stream& out, 
-		    const ctl::detail::Generic_complex< Cell_, Boundary_, Data_, Hash_, Storage_>&& c){
+		    const ctl::Simplicial_chain_complex< Cell_, Boundary_, Data_, Hash_, Storage_>&& c){
 	out << c;
 	return out;
 }
@@ -354,11 +353,10 @@ template< typename Stream, typename Cell_,
           typename Data_,
           typename Hash_, 
           template< typename ...> class Storage_> 
-Stream& operator>>( Stream& in, ctl::detail::Generic_complex< Cell_, Boundary_, Data_, Hash_, Storage_> & c){  
+Stream& operator>>( Stream& in, ctl::Simplicial_chain_complex< Cell_, Boundary_, Data_, Hash_, Storage_> & c){  
 	return c.read( in); 
 }
 
-} //namespace detail
 } //namespace ctl
 
-#endif //CTL_CHAIN_COMPLEX_MAP_H
+#endif //CTL_SIMPLICIAL_CHAIN_COMPLEX_H
