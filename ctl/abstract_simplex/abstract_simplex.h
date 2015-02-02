@@ -47,11 +47,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 ********************************************************************************
 *******************************************************************************/
+//STL
 #include <vector> //std::vector
 #include <initializer_list>  // std::initializer_list
 #include <iostream> //cout (debug only)
 #include <algorithm> //sort, unique
+
+//BOOST
+#include <boost/serialization/base_object.hpp>
+
+//CTL
 #include <ctl/abstract_simplex/simplex_boundary.h>
+
+
 /*! \namespace ctl
 Namespace where all library functionality resides
 */

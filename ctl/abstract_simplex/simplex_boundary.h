@@ -47,9 +47,14 @@
 * POSSIBILITY OF SUCH DAMAGE.
 ********************************************************************************
 *******************************************************************************/
+//CLIB
+#include <cassert>
+//BOOST
+#include <boost/serialization/base_object.hpp>
+
+//CTL
 #include <ctl/term/term.h>
 #include <ctl/finite_field/finite_field.h>
-#include <cassert>
 namespace ctl {
 namespace detail {
 template< typename Term_>
@@ -156,10 +161,11 @@ class const_simplex_boundary_iterator :
 		return tmp;
 	}
 	 private:
-		const Cell* cellptr;
-		typename Cell::size_t pos;
-		Term face;
-		Vertex removed;
+
+	const Cell* cellptr;
+	typename Cell::size_t pos;
+	Term face;
+	Vertex removed;
 }; // END const_simplex_boundary_iterator
 } //END detail namespace
 } //end ctl namespace

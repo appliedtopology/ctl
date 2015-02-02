@@ -70,6 +70,10 @@
 #include <sstream>
 #include <fstream>
 
+//BOOST
+#include <boost/serialization/base_object.hpp>
+
+
 namespace ctl {
 
 template< typename Cell_,
@@ -285,17 +289,25 @@ public:
    Cell_boundary& cell_boundary() { return bd; }
 
    bool is_closed() const{
-   	for( auto sigma : cells){
-   		for( auto tau = bd.begin( sigma.first);
-   			  tau != bd.end( sigma.first); ++tau){
-   			if( find_cell( tau->cell()) == end()){
-   				return false;
-   			}
-   		}
-   	}
-   	return true;
+    for( auto sigma : cells){
+    	for( auto tau = bd.begin( sigma.first);
+    		  tau != bd.end( sigma.first); ++tau){
+    		if( find_cell( tau->cell()) == end()){
+    			return false;
+    		}
+    	}
+    }
+    return true;
    }
 private:
+  friend class boost::serialization::access;
+  template<class Archive>
+  void serialize(Archive & ar, const std::size_t version){
+     ar & cells;
+     ar & max_id;
+     ar & max_dim;
+  }
+
    Storage cells;
    Cell_boundary bd;
    std::size_t max_id;

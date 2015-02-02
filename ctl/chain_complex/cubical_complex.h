@@ -47,6 +47,7 @@
 #include <functional>
 
 //BOOST
+#include <boost/serialization/base_object.hpp>
 #include <boost/iterator/transform_iterator.hpp>
 
 //CTL
@@ -602,10 +603,16 @@ public:
 
 //Private members
 private:
-   Storage cells;
-   //precomputed products for offsets into the array
-   Vector index_data;
-   Cell_boundary bd;
+  friend class boost::serialization::access;
+  template<class Archive>
+  void serialize(Archive & ar, const std::size_t version){
+     ar & cells;
+     ar & index_data; 
+  }
+  Storage cells;
+  //precomputed products for offsets into the array
+  Vector index_data;
+  Cell_boundary bd;
 }; //chain_complex
 
 

@@ -431,14 +431,13 @@ pair_cells( Filtration_iterator begin, Filtration_iterator end,
 	   #ifdef DEBUG_PERSISTENCE
 	    std::cerr << "Pairing to: " << (*(tau.cell()))->first << std::endl;
 	   #endif
-	    cascade_boundary_map[ sigma ].swap( data.cascade_boundary);
 	    store_scaled_cascade( data, sigma, output_policy);  
 	    //make sigma tau's partner
 	    cascade_boundary_map[ tau ].emplace( fm[ sigma], 1); 
 	   } else{
 	    store_cascade( data, sigma, output_policy); 
-	    cascade_boundary_map[ sigma ].swap( data.cascade_boundary);
 	   }
+	   cascade_boundary_map[ sigma ].swap( data.cascade_boundary);
 	   timer.stop();
 	   persistence_algorithm += timer.elapsed();
 	}
