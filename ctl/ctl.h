@@ -95,21 +95,13 @@
 #include <ctl/nbhd_graph/epsilon_search.h>
 #include <ctl/nbhd_graph/nbhd_graph.h>
 
+//VR
+#include <ctl/vr/incremental_complex.h>
+
 //Facilities for extracting the one_skeleton
 #include <ctl/one_skeleton/complex_to_graph.h>
 #include <ctl/one_skeleton/graph_to_metis.h>
 #include <ctl/one_skeleton/one_skeleton.h>
-
-//Distributed
-#include <ctl/distributed/build_blowup_complex/build_blowup_complex.h>
-#include <ctl/distributed/covers/cover_data.h>
-#include <ctl/distributed/io/read_complex.h>
-#include <ctl/distributed/persistence/blowup_persistence.h>
-#include <ctl/distributed/persistence/initialize_cascade_boundaries.h>
-#include <ctl/distributed/persistence/persistence.h>
-#include <ctl/distributed/persistence/sparse_matrix_algorithms.h>
-#include <ctl/distributed/relative_simplex_boundary/relative_simplex_boundary.h>
-#include <ctl/distributed/utility/timer.h>
 
 //Parallel library (multithreaded)
 #include <ctl/parallel/build_blowup_complex/build_blowup_complex.h>

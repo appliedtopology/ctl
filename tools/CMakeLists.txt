@@ -54,8 +54,6 @@ install( TARGETS cover_homology RUNTIME DESTINATION bin)
 add_executable (vr vr.cpp)
 target_link_libraries( vr ${Boost_LIBRARIES} ${ANN_LIBRARIES} ${DSO_FIX})
 
-
-
 add_executable (convert_asc_format add_header_to_complex.cpp)
 target_link_libraries( convert_asc_format ${Boost_LIBRARIES} ${DSO_FIX})
 

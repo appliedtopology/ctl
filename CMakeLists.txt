@@ -59,7 +59,6 @@ link_directories(${METIS_LIBRARY_DIR} ${TBB_LIBRARY_DIR})
 
 add_subdirectory( ctl)
 add_subdirectory( tools)
-#add_subdirectory( distributed)
 
 install( DIRECTORY ${CMAKE_SOURCE_DIR}/ctl 
 	 DESTINATION include 
