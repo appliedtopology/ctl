@@ -50,6 +50,9 @@
 //timer
 #include <ctl/utility/timer.h>
 
+//GTest
+#include <gtest/gtest.h>
+
 //We build a simplicial chain complex with Z2 coefficients
 typedef ctl::Abstract_simplex< int> Simplex;
 typedef ctl::Finite_field< 2> Z2;
@@ -71,7 +74,7 @@ bool is_sorted( const Filtration & f){
 	return true;
 }
 
-int main( int argc, char** argv){
+TEST( Filtration_cell_less, TotalOrderWorking){
 	Complex c;
 	Timer t;
 	t.start();
@@ -83,16 +86,24 @@ int main( int argc, char** argv){
 	t.start();
 	Filtration_cell_less f1( c);
 	t.stop();
-	std::cout << "f1 is sorted " << is_sorted( f1) 
-		  << " " << t.elapsed() << std::endl; 
+	ASSERT_TRUE( is_sorted( f1));
+}
+TEST( Filtration_id_less, TotalOrderWorking){ 
+	Complex c;
+	Timer t;
+	t.start();
+	Cell s( {1,2,3,4,5,6,8,9,10} );
+	c.insert_closed_cell( s);
+	t.stop();
+	std::cout << "construction: " << t.elapsed() << std::endl;
+	std::cout << "size: " << c.size() << std::endl;
 	t.start();
 	Filtration_id_less f2( c);
 	t.stop();
-	std::cout << "f2 is sorted " << is_sorted( f2) 
-		  << " " << t.elapsed() << std::endl; 
+	ASSERT_TRUE( is_sorted( f2));
 	std::size_t pos=0;
-	for( auto i = f2.begin(); i != f2.end(); ++i, ++pos){
-		std::cout << pos << ": " << (*i)->first << std::endl;
+	for( auto i: f2){
+		std::cout << pos << ": " << i->first << std::endl;
+		++pos;
 	}
-	return 0;
 }
