@@ -63,12 +63,14 @@ struct Pos_offset_map {
   Pos_offset_map( const Filtration_iterator _b) : begin( _b) {}
   Filtration_iterator begin;
 };
-/*
+
 template< typename Filtration_iterator>
 typename Pos_offset_map< Filtration_iterator>::value_type 
-get( const Pos_offset_map< Filtration_iterator>& map, const std::size_t pos) { 
+get( const Pos_offset_map< Filtration_iterator>& map, 
+     const std::size_t pos) { 
 	return pos; 
-}*/
+}
+
 template< typename Filtration_iterator>
 struct Permutation_offset_map {
   // types
@@ -94,9 +96,6 @@ get( const Pos_offset_map< Filtration_iterator> & map ,
 				        Index_type_iterator> p){
 	return *(p.base());
 }
-
-
-
 
 template< typename Filtration_iterator>
 typename Pos_offset_map< Filtration_iterator>::value_type 
@@ -129,12 +128,13 @@ get( Id_offset_map< Cell>, const Cell& cell) { return (*cell)->second.id(); }
 
 template< typename Cell>
 typename Id_offset_map< Cell>::value_type 
+get( Id_offset_map< Cell>, const std::size_t pos) { return pos; }
+
+template< typename Cell>
+typename Id_offset_map< Cell>::value_type 
 get( Id_offset_map< Cell>, const typename Cell::value_type& cell) { 
 	return cell->second.id(); 
 }
-
-
-
 
 } //end namespace ctl
 #endif //CTLIB_OFFSET_MAPS_H
