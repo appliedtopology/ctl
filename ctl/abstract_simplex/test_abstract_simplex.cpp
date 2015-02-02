@@ -44,32 +44,45 @@
 
 typedef ctl::Abstract_simplex< int> Simplex;
 typedef ctl::Simplex_boundary< Simplex, int> Boundary;
-int main( int argc, char** argv){
+
+TEST(Simplex, DefaultConstruct){
 	Simplex s;
-	std::cout << "build a simplex, vertex by vertex." << std::endl;
+	ASSERT_EQ(s.size(), 0)
+}
+
+TEST(Simplex, InsertCopyTest){
+	Simplex s;
 	s.insert( 2);
-	std::cout << s << std::flush << std::endl;
 	s.insert( 1);
-	std::cout << s << std::flush << std::endl;
 	s.insert( 4);
-	std::cout << s << std::flush << std::endl;
 	s.insert( 3);
-	std::cout << s << std::flush << std::endl;
 	Simplex c( s);
-	std::cout << "(copy test) c = " << c << " does c == s?" << (c == s) << std::flush << std::endl;
+	ASSERT_EQ( c, s);
+}
+
+TEST(Simplex,InitializerListAndRemove){
 	Simplex t( {1,2,5,5,4});
-	std::cout << "(il constructor) t = " << t << std::flush << std::endl;
+	Simplex s;
+	s.insert( 1); s.insert( 2); s.insert( 4); s.insert( 5);
+	ASSERT_EQ( s, t);
 	t.insert( {8,9,10} );
-	std::cout << "(insert test 8,9,10) t = " << t << std::flush << std::endl;
 	t.remove( 5);
-	std::cout << "t = " << t << std::flush << std::endl;
+	ASSERT_EQ(t.size(), 6);
 	t.remove( t.begin()+2, t.begin()+4);
+	ASSERT_EQ(t.size(), 4);
+}
 	
-	std::cout << "t = " << t << std::flush << std::endl;
+TEST(Simplex, SimplexBoundary){
 	Boundary b;
-	std::cout << "printing out the boundary of t" << std::endl;
+	Simplex s{1,2,3};
+	std::vector< Simplex> bd{ {2,3},{1,3},{1,2}};	
 	for (auto i = b.begin( t); i != b.end( t); ++i){
-		std::cout << (*i).cell() << std::endl;
+	 ASSERT_NE(std::find( bd.begin(), bd.end(), i->cell()), bd.end()); 	
 	}
-	return 0;
+}
+
+TEST(Simplex, SelfAssignmentComparison){
+	Simplex s{ 3,4,5};
+	s = s;
+	ASSERT_EQ(s,s);
 }

@@ -341,6 +341,13 @@ class Abstract_simplex {
 	private:
 	Vector vertices;
 
+	friend class boost::serialization::access;
+
+	template<class Archive>
+    	void serialize(Archive & ar, const std::size_t version){
+           ar & vertices; 
+        }
+
 	//typename Self since the compiler complains
 	template< typename Term> 
 	friend class ctl::detail::const_simplex_boundary_iterator;
