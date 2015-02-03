@@ -2,14 +2,11 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/dependencies/CMa
 set(CMAKE_PREFIX_PATH /usr/lib64/openmpi)
 
 include(ExternalProject)
-
-ExternalProject_Add(gtest_build
-PREFIX ../../gtest 
-URL http://googletest.googlecode.com/files/gtest-1.7.0.zip
-INSTALL_COMMAND cp -r -p libgtest.a libgtest_main.a <SOURCE_DIR>/include <INSTALL_DIR>/../gtest/)
-
+execute_process( COMMAND cmake . 
+		 COMMAND make 
+		 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/gtest)
 set(GTEST_ROOT ${CMAKE_SOURCE_DIR}/dependencies/gtest)
-find_package(GTest REQUIRED)
+find_package(GTest)
 
 include( ${CMAKE_SOURCE_DIR}/build_dependencies.txt RESULT_VARIABLE bdvars)
 
