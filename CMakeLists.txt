@@ -10,17 +10,12 @@ if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" VERSION_GREATER 2.6)
   endif()
 endif()
 
-#This matters
+#zoom zoom
 set(CMAKE_BUILD_TYPE Release)
 
-#Frame pointers are useful for profiling.
+#Frame pointers are useful for profiling. 
+#Complaints and pedantry accepted here.
 add_definitions(" -fno-omit-frame-pointer -Wall -ansi -std=c++11")
-
-#For make install
-set(CTL_INCLUDE_INSTALL_DIR ${CMAKE_SOURCE_DIR}/include)
-set(CTL_DOC_INSTALL_DIR ${CMAKE_SOURCE_DIR}/doc)
-set(CTL_BIN_INSTALL_DIR ${CMAKE_SOURCE_DIR}/bin)
-set(CTL_EXAMPLES_INSTALL_DIR ${CMAKE_SOURCE_DIR}/examples)
 
 #Fix issues on LINUX
 if (NOT APPLE)
@@ -30,18 +25,17 @@ endif (NOT APPLE)
 #Handle dependencies
 add_subdirectory( dependencies)
 
-include_directories(${CMAKE_SOURCE_DIR} ${Boost_INCLUDE_DIR})
-include_directories(/usr/local/include ${MPI_INCLUDE_DIR})
-include_directories(${ANN_INCLUDE_DIRS} ${GTEST_INCLUDE_DIR})
-include_directories(${METIS_INCLUDE_DIR} ${TBB_INCLUDE_DIR})
-
-link_directories(/usr/local/lib ${ANN_LIBRARY_DIR} ${Boost_LIBRARY_DIR})
-link_directories( ${MPI_LIBRARY_DIR} ${GTEST_LIBRARY_DIR})
-link_directories(/usr/local/lib ${Boost_LIBRARY_DIR})
-link_directories(${METIS_LIBRARY_DIR} ${TBB_LIBRARY_DIR})
-
+#Compile all the tests
 add_subdirectory( ctl)
+
+#Compile all the tools
 add_subdirectory( tools)
+
+#All of this is for make install
+set(CTL_INCLUDE_INSTALL_DIR ${CMAKE_SOURCE_DIR}/include)
+set(CTL_DOC_INSTALL_DIR ${CMAKE_SOURCE_DIR}/doc)
+set(CTL_BIN_INSTALL_DIR ${CMAKE_SOURCE_DIR}/bin)
+set(CTL_EXAMPLES_INSTALL_DIR ${CMAKE_SOURCE_DIR}/examples)
 
 install( DIRECTORY ${CMAKE_SOURCE_DIR}/ctl 
 	 DESTINATION include 
