@@ -67,7 +67,7 @@ Doxygen (Optional)
 3. Compile: (the -j option makes in parallel)
 	`make -j`
 
-=== For OS/X Users: ===  
+### For OS/X Users: ###  
 If you plan on using the default compiler (clang)
 then when installing boost ensure that you use:
 	brew install boost ---build-from-source --with-c++11 --with-mpi --with-program_options --with-clang --without-single
