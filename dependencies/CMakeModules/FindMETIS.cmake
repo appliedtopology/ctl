@@ -59,12 +59,12 @@ else(METIS_LIBRARIES AND METIS_INCLUDE_DIRS)
                       HINTS ${METIS_INCLUDE_DIR}
                       NO_DEFAULT_PATH)
             if(NOT metis_test_include_path)
-                message(SEND_ERROR "Can not locate ${metis_inc_names} in ${METIS_INCLUDE_DIR}")
+                message("Can not locate ${metis_inc_names} in ${METIS_INCLUDE_DIR}")
             endif()
             set(METIS_INCLUDE_DIR "${metis_test_include_path}")
 
         else()
-            message(SEND_ERROR "METIS_INCLUDE_DIR=${METIS_INCLUDE_DIR} does not exist")
+            message("METIS_INCLUDE_DIR=${METIS_INCLUDE_DIR} does not exist")
             set(METIS_INCLUDE_DIR "METIS_INCLUDE_DIR-NOTFOUND")
         endif()
 
@@ -84,7 +84,7 @@ else(METIS_LIBRARIES AND METIS_INCLUDE_DIRS)
                           NO_DEFAULT_PATH)
 
             else()
-                 message(SEND_ERROR "METIS_DIR=${METIS_DIR} does not exist")
+                 message("METIS_DIR=${METIS_DIR} does not exist")
                  set(METIS_INCLUDE_DIR "METIS_INCLUDE_DIR-NOTFOUND")
             endif()    
 
@@ -100,7 +100,7 @@ else(METIS_LIBRARIES AND METIS_INCLUDE_DIRS)
     endif()
 
     if ( NOT METIS_INCLUDE_DIR )
-        message(SEND_ERROR "Can not locate METIS include directory")
+        message("Can not locate METIS include directory")
     endif()
 
     # Search for libraries 
@@ -119,7 +119,7 @@ else(METIS_LIBRARIES AND METIS_INCLUDE_DIRS)
                          HINTS ${METIS_LIBRARY_DIR}
                          NO_DEFAULT_PATH)
         else()
-            message(SEND_ERROR "METIS_LIBRARY_DIR=${METIS_LIBRARY_DIR} does not exist")
+            message("METIS_LIBRARY_DIR=${METIS_LIBRARY_DIR} does not exist")
             set(METIS_LIBRARY "METIS_LIBRARY-NOTFOUND")
         endif()
 
@@ -137,7 +137,7 @@ else(METIS_LIBRARIES AND METIS_INCLUDE_DIRS)
                              NO_DEFAULT_PATH)
 
             else()
-                 message(SEND_ERROR "METIS_DIR=${METIS_DIR} does not exist")
+                 message("METIS_DIR=${METIS_DIR} does not exist")
                  set(METISLIBRARY "METIS_LIBRARY-NOTFOUND")
             endif()    
 
@@ -153,7 +153,7 @@ else(METIS_LIBRARIES AND METIS_INCLUDE_DIRS)
     endif()
 
     if ( NOT METIS_LIBRARY )
-        message(SEND_ERROR "Can not locate METIS library")
+        message("Can not locate METIS library")
     endif()    
 
    

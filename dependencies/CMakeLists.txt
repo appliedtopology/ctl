@@ -1,14 +1,26 @@
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/dependencies/CMakeModules")
 set(CMAKE_PREFIX_PATH /usr/lib64/openmpi)
 
-include(ExternalProject)
+include( ${CMAKE_SOURCE_DIR}/build_dependencies.txt RESULT_VARIABLE bdvars)
+
+message("Configure GTest Build.")
 execute_process( COMMAND cmake . 
-		 COMMAND make 
-		 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/gtest)
+		 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/dependencies/external/gtest)
+
+message("Building GTest")
+execute_process( COMMAND make
+		 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/dependencies/external/gtest)
+
 set(GTEST_ROOT ${CMAKE_SOURCE_DIR}/dependencies/gtest)
 find_package(GTest)
 
-include( ${CMAKE_SOURCE_DIR}/build_dependencies.txt RESULT_VARIABLE bdvars)
+
+add_custom_target(ann COMMAND cmake . -DANN_Version=${ANN_Version} 
+		      COMMAND make WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/ann)
+add_custom_target(boost COMMAND cmake . -DBoost_Version_Underscore=${Boost_Version_Underscore} -DBoost_Version=${Boost_Version} 
+		        COMMAND make WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/boost)
+add_custom_target(metis COMMAND cmake . -DMetis_Version=${Metis_Version} COMMAND make WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/metis)
+
 
 include_directories(/usr/local/include)
 link_directories(/usr/local/lib)
@@ -16,7 +28,7 @@ link_directories(/usr/local/lib)
 ##TODO: Check if not found
 #endif()
 if( NOT Boost_FOUND)
-	find_package(Boost COMPONENTS program_options serialization mpi)
+	find_package(Boost COMPONENTS program_options serialization mpi QUIET)
 	if( NOT Boost_FOUND)
 	 message( "--- Boost not found. Install locally by typing 'make boost'")
 	endif() 
@@ -54,7 +66,7 @@ endif()
 if( NOT ANN_FOUND)
 	find_package(ANN)
 	if( NOT ANN_FOUND)
-	 message( "--- ANN not found. Install locally by typing 'make ANN'")
+	 message( "--- ANN not found. Install locally by typing 'make ann'")
 	endif()
 elseif( ANN_FOUND)
 	message( "-- Using ANN specified by user")
@@ -66,7 +78,7 @@ set(ANN_LIBRARIES ${ANN_LIBRARIES} PARENT_SCOPE)
 endif()
 
 if( NOT METIS_FOUND)
-	find_package(METIS)
+	find_package(METIS QUIET)
 	if( NOT METIS_FOUND)
 	 message( "--- METIS not found. Install locally by typing 'make metis'")
 	endif()
@@ -98,9 +110,3 @@ WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 COMMENT "Generating API documentation with Doxygen" VERBATIM
 )
 endif(DOXYGEN_FOUND)
-
-add_custom_target(ann COMMAND cmake . -DANN_Version=${ANN_Version} 
-		      COMMAND make WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/ann)
-add_custom_target(boost COMMAND cmake . -DBoost_Version_Underscore=${Boost_Version_Underscore} -DBoost_Version=${Boost_Version} 
-		        COMMAND make WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/boost)
-add_custom_target(metis COMMAND cmake . -DMetis_Version=${Metis_Version} COMMAND make WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/metis)
