@@ -5,9 +5,8 @@ compiler:
   - gcc
 
 before_install:
- sudo apt-get update -qq
- sudo apt-get install libann-dev libboost-program-options-dev libboost-dev libtbb-dev libmetis-dev
-
+ - sudo apt-get update
+ - sudo apt-get install libann-dev libboost-program-options-dev libboost-dev libtbb-dev libmetis-dev;
 script: 
- cmake .
- make 
+ - cmake .
+ - make 
