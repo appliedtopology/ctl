@@ -2,14 +2,16 @@
 
 
 This C++11 library provides a set of generic tools for:
-	1) Generating point sets (coming soon)
-	2) Building Neighborhood Graphs 
-	3) Building Cellular Complexes
-	4) Computing [persistent] homology over finite fields
-	5) Parallel algorithm(s) for (4)
 
+ * Generating point sets (coming soon)
+ * Building Neighborhood Graphs 
+ * Building Cellular Complexes
+ * Computing [persistent] homology over finite fields
+ * Parallel algorithm(s) for homology
+	
 === LICENSE ===
-CTL is BSD See LICENSE for more info. 
+CTL is licensed under the BSD. 
+See LICENSE for more info. 
 
 === DEPENDENCIES ==
 CTL has a number of dependencies. We have listed them below.
@@ -105,11 +107,9 @@ See tutorial/ for a tutorial
 Please Do! Accepting Pull Requests via github.
 
 In the future we hope to add support for:
-	0) [Persistent] Co-homology
-	1) Zig Zag Persistence
-	2) Multidimensional Persistence
-	3) Multidimensional Zig-Zag Persistence
-	4) Tidy Sets
-	5) Persistent Landscapes
-	6) OpenGL Visualizations
-	7) Bindings to other languages such as Python, MATLAB, and R
+	* [Persistent] Co-homology
+	* Zig Zag Persistence
+	* Multidimensional Persistence
+	* Tidy Sets
+	* OpenGL Visualizations
+	* Bindings to other languages such as Python, MATLAB, and R
