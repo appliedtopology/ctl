@@ -79,7 +79,7 @@ one needs to take care to use the correct compilers for libraries linked against
 if boost is compiled with gcc, you cannot use clang to compile CTL and vice versa.
 
 
-=== INSTALL === 
+## INSTALL ##
 
 Fedora/CentOS/RHEL:(coming soon)
 `yum install ctl` 
@@ -91,22 +91,25 @@ OS/X
  `brew tap appliedtopology/software`
  `brew install ctl`
  
-=== INSTALL (from source) ===
+## INSTALL (from source) ##
  `make install`
 
 This sticks the headers into the default location on your system and all the tools into the appropriate path/bin directory
 
-==== USING (coming soon) ====
-See /usr/share/doc/examples for a number of examples of using the library. 
-See tutorial/ for a tutorial 
+## USING (coming soon) ##
+See tools/ or the unit tests for a number of examples of using the library. 
+We hope to write a tutorial soon.
 
-==== SUBMITTING PATCHES ====
+## SUBMITTING PATCHES ##
 Please Do! Accepting Pull Requests via github.
 
-In the future we hope to add support for:
+### Future ###
+we hope to add support for:
  * [Persistent] Co-homology
  * Zig Zag Persistence
  * Multidimensional Persistence
  * Tidy Sets
  * OpenGL Visualizations
  * Bindings to other languages such as Python, MATLAB, and R
+  
+Feel free to fork and help development. Do ask questions!
