@@ -1,4 +1,4 @@
-===== README ======
+# README #
 
 
 This C++11 library provides a set of generic tools for:
@@ -9,11 +9,12 @@ This C++11 library provides a set of generic tools for:
  * Computing [persistent] homology over finite fields
  * Parallel algorithm(s) for homology
 	
-=== LICENSE ===
-CTL is licensed under the BSD. 
-See LICENSE for more info. 
+## LICENSE ##
+ * CTL is licensed under the BSD. 
+ * See LICENSE for more info. 
 
-=== DEPENDENCIES ==
+## DEPENDENCIES ##
+
 CTL has a number of dependencies. We have listed them below.
 
 We have made an effort to make getting an using these dependencies simple.
@@ -58,15 +59,13 @@ METIS (make metis) (used for graph partitioning)
 ANN (make ann)
 Doxygen (Optional)
 
-=== BUILDING ====
-Step 1) Make sure you have all the dependencies and you know the paths to the 
-						     include/link directories
-Step 2) Fill out the relevant bits of `build_dependencies.txt`
-
-Step 3) Create makefiles
-	cmake .
-Step 4) Compile: (the -j option makes in parallel)
-	make -j 
+## BUILDING ##
+1. Make sure you have all the dependencies and you know the paths to the include/link directories and	
+	`vim build_dependencies.txt`
+2. Create makefiles
+	`cmake .`
+3. Compile: (the -j option makes in parallel)
+	`make -j`
 
 === For OS/X Users: ===  
 If you plan on using the default compiler (clang)
@@ -81,23 +80,21 @@ if boost is compiled with gcc, you cannot use clang to compile CTL and vice vers
 
 
 === INSTALL === 
--- We don't recommend doing this unless you are really desperate. --
- --- And even then watch out for zombies. --- 
 
-Fedora/CentOS/RHEL:
- yum install ctl (coming soon)
+Fedora/CentOS/RHEL:(coming soon)
+`yum install ctl` 
 
-Ubuntu:
- apt-get install ctl (coming soon)
+Ubuntu:  (coming soon)
+ `apt-get install ctl`
 
 OS/X
- brew tap appliedtopology/software
- brew install ctl
-
+ `brew tap appliedtopology/software`
+ `brew install ctl`
+ 
 === INSTALL (from source) ===
-make install
+ `make install`
 
-There are no shared libraries!
+This sticks the headers into the default location on your system and all the tools into the appropriate path/bin directory
 
 ==== USING (coming soon) ====
 See /usr/share/doc/examples for a number of examples of using the library. 
@@ -107,9 +104,9 @@ See tutorial/ for a tutorial
 Please Do! Accepting Pull Requests via github.
 
 In the future we hope to add support for:
-	* [Persistent] Co-homology
-	* Zig Zag Persistence
-	* Multidimensional Persistence
-	* Tidy Sets
-	* OpenGL Visualizations
-	* Bindings to other languages such as Python, MATLAB, and R
+ * [Persistent] Co-homology
+ * Zig Zag Persistence
+ * Multidimensional Persistence
+ * Tidy Sets
+ * OpenGL Visualizations
+ * Bindings to other languages such as Python, MATLAB, and R
