@@ -18,7 +18,8 @@ set(Boost_Found 0)
 #set(Boost_LIBRARIES program_options boost_mpi serialization) 
 
 
-#We do not provide a build target for this. If you don't got it go get it yourself
+#We do not provide a build target for this. 
+#If you don't got it go get it yourself
 #If providing MPI comment out the line below
 set(MPI_FOUND 0)
 #and uncomment these lines
@@ -61,8 +62,9 @@ set(DOXYGEN_FOUND 0)
 
 ##These set the version for CMake ExternalProject_Add
 #Usually you wont touch these
-set( Boost_Version 1.57.0)
-set( Metis_Version 5.1.0)
+set(Boost_Version 1.57.0)
+set(Metis_Version 5.1.0)
 set(ANN_Version 1.1.2)
 
+#Cant touch this .. na na na na..
 string( REPLACE "." "_" Boost_Version_Underscore ${Boost_Version} )
