@@ -23,6 +23,7 @@ if (NOT APPLE)
 endif (NOT APPLE)
 
 #Handle dependencies
+include_directories(${CMAKE_SOURCE_DIR})
 add_subdirectory( dependencies)
 
 #Compile all the tests
