@@ -6,7 +6,8 @@ compiler:
 
 before_install:
  - sudo apt-get update
- - sudo apt-get install libann-dev libboost-program-options-dev libboost-dev libtbb-dev libmetis-dev;
+ - sudo apt-get install libann-dev libboost-program-options-dev libboost-dev libtbb-dev libscotchmetis-dev
+
 script: 
  - cmake .
  - make 
