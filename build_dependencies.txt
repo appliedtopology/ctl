@@ -9,10 +9,6 @@
 #			 'make <dependency-target-name>'
 #  This installs this the specified dependency for the user in dependencies
 
-if( EXISTS ${CMAKE_SOURCE_DIR}/dependencies/gtest)
-set(GTEST_ROOT ${CMAKE_SOURCE_DIR}/dependencies/gtest)
-endif()
-
 #If providing BOOST comment out the line below 
 set(Boost_Found 0)
 #and uncomment these lines
@@ -66,7 +62,7 @@ set(DOXYGEN_FOUND 0)
 ##These set the version for CMake ExternalProject_Add
 #Usually you wont touch these
 set( Boost_Version 1.57.0)
-set( Metis_Version 5.10.0)
+set( Metis_Version 5.1.0)
 set(ANN_Version 1.1.2)
 
 string( REPLACE "." "_" Boost_Version_Underscore ${Boost_Version} )

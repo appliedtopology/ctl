@@ -1,3 +1,8 @@
+dependencies/ann
+dependencies/gtest
+dependencies/metis
+dependencies/boost
+
 **/test_multi
 deps/gtest
 deps/CMakeFiles

@@ -6,7 +6,6 @@ include( ${CMAKE_SOURCE_DIR}/build_dependencies.txt RESULT_VARIABLE bdvars)
 #if( bdvars NOTFOUND)
 ##TODO: Check if not found
 #endif()
-
 if( NOT Boost_FOUND)
 	find_package(Boost COMPONENTS program_options serialization mpi)
 	if( NOT Boost_FOUND)
@@ -52,11 +51,9 @@ elseif( DOXYGEN_FOUND)
 	message( "-- Using Doxygen specified by user")
 endif() 
 
-find_package(GTest REQUIRED)
-
 if( GTest_FOUND)
-   set(GTEST_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/gtest/include)
-   set(GTEST_LIBRARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/gtest)
+   set(GTEST_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/dependencies/gtest/include)
+   set(GTEST_LIBRARY_DIR ${CMAKE_SOURCE_DIR}/dependencies/gtest)
    set(GTEST_LIBRARIES gtest gtest_main)
 endif()
 
@@ -69,49 +66,9 @@ COMMENT "Generating API documentation with Doxygen" VERBATIM
 )
 endif(DOXYGEN_FOUND)
 
-if( OSX)
- set(ANN_VAR macos-g++)
-elseif( NOT OSX)
- set(ANN_VAR linux-g++)
-endif( OSX)
-
-ExternalProject_add(ann
-PREFIX ann
-URL http://www.cs.umd.edu/~mount/ANN/Files/${ANN_Version}/ann_${ANN_Version}.zip
-URL_MD5 31267ffbe4e6d04768b3ec21763e9343
-CONFIGURE_COMMAND ""
-BUILD_COMMAND make ${ANN_VAR}
-BUILD_IN_SOURCE 1
-INSTALL_COMMAND ""
-)
-
-ExternalProject_Add(boost
-PREFIX ${CMAKE_CURRENT_BINARY_DIR}/boost
-URL http://downloads.sourceforge.net/project/boost/boost/${Boost_Version}/boost_${Boost_Version_Underscore}.zip
-URL_MD5 854dcbbff31b896c85c38247060b7713
-UPDATE_COMMAND "bootstrap.bat"
-CONFIGURE_COMMAND ""
-BUILD_COMMAND bjam --with-program_options address-model=64 toolset=msvc-11.0 link=static stage
-BUILD_IN_SOURCE 1
-INSTALL_COMMAND ""
-)
-
-
-ExternalProject_Add(gtest
-DEPENDS gtest
-PREFIX gtest 
-URL http://googletest.googlecode.com/files/gtest-1.7.0.zip
-INSTALL_COMMAND cp -r -p libgtest.a libgtest_main.a <SOURCE_DIR>/include <INSTALL_DIR>/../gtest/)
-
-ExternalProject_Add(metis
-DEPENDS metis
-PREFIX metis
-URL http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/metis-${Metis_Version}.tar.gz
-URL_MD5 0
-SOURCE_DIR metis
-BUILD_IN_SOURCE 1
-BUILD_COMMAND ${CMAKE_BUILD_TOOL}
-CONFIGURE_COMMAND ${CMAKE_BUILD_TOOL} -DGKLIB_PATH="Gklib" config shared=1
-INSTALL_COMMAND ${CMAKE_BUILD_TOOL} install
-INSTALL_DIR <INSTALL_DIR>/../metis
-)
+add_custom_target(ann COMMAND cmake . -DANN_Version=${ANN_Version} 
+		      COMMAND make WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/ann)
+add_custom_target(boost COMMAND cmake . -DBoost_Version_Underscore=${Boost_Version_Underscore} -DBoost_Version=${Boost_Version} 
+		        COMMAND make WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/boost)
+add_custom_target(metis COMMAND cmake . -DMetis_Version=${Metis_Version} COMMAND make WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/metis)
+add_custom_target(gtest COMMAND cmake . COMMAND make WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/gtest)
