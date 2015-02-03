@@ -108,9 +108,9 @@ class Concurrent_data_wrapper : public Data_ {
    typedef std::size_t Unsafe_id;
    typedef tbb::atomic< Unsafe_id> Safe_id;
    //default
-   Concurrent_data_wrapper(): id_( 0) {}
+   Concurrent_data_wrapper(): id_( (Unsafe_id)0) {}
    
-   Concurrent_data_wrapper( const std::size_t tid):
+   Concurrent_data_wrapper( std::size_t tid):
    Data_(), id_( tid) {}
 
    //copy
