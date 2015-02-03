@@ -1,0 +1,13 @@
+language: cpp
+
+compiler:
+  - clang
+  - gcc
+
+before_install:
+ sudo apt-get update -qq
+ sudo apt-get install libann-dev libboost-program-options-dev libboost-dev libtbb-dev libmetis-dev
+
+script: 
+ cmake .
+ make 
