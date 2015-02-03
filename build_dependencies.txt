@@ -5,18 +5,24 @@
 # First, we use those settings.
 # Second, we fall back to the CMake built in find_package() routine.
 #  -- For some packages like MPI if we dont find things this way, we fail.
-# Finally, for more esoteric packages, we provide scripts which: 
-# 	- Install this software for the user in deps/
-#	- update the appropriate environment variables in the config file. 
+# Finally, for many dependencies we provide 
+#			 'make <dependency-target-name>'
+#  This installs this the specified dependency for the user in dependencies
+
+if( EXISTS ${CMAKE_SOURCE_DIR}/dependencies/gtest)
+set(GTEST_ROOT ${CMAKE_SOURCE_DIR}/dependencies/gtest)
+endif()
 
 #If providing BOOST comment out the line below 
-set(BOOST_FOUND 0)
+set(Boost_Found 0)
 #and uncomment these lines
 #set(Boost_FOUND 1)
 #set(Boost_INCLUDE_DIR /path/to/boost/include)
 #set(Boost_LIBRARY_DIR /path/to/boost/lib)
-#set(Boost_LIBRARIES program_options etc.. etc..) 
+#set(Boost_LIBRARIES program_options boost_mpi serialization) 
 
+
+#We do not provide a build target for this. If you don't got it go get it yourself
 #If providing MPI comment out the line below
 set(MPI_FOUND 0)
 #and uncomment these lines
@@ -37,22 +43,30 @@ set(TBB_FOUND 0)
 set(ANN_FOUND 0)
 #and uncomment these lines
 #set(ANN_FOUND 1)
-#set(ANN_INCLUDE_DIR /path/to/ann/include)
-#set(ANN_LIBRARY_DIR /path/to/ann/lib)
-#set(ANN_LIBRARIES ...) 
+#set(ANN_INCLUDE_DIR ${CTL_DEPS}/ann/include)
+#set(ANN_LIBRARY_DIR ${CTL_DEPS}/ann/lib)
+#set(ANN_LIBRARIES ANN) 
 
 #If providing METIS comment out the line below
 set(METIS_FOUND 0)
 #and uncomment these lines
 #set(METIS_FOUND 1)
-#set(METIS_INCLUDE_DIR /path/to/metis/include)
-#set(METIS_LIBRARY_DIR /path/to/metis/lib)
-#set(METIS_LIBRARIES ...)
+#set(METIS_INCLUDE_DIR ${CTL_DEPS}/metis/include)
+#set(METIS_LIBRARY_DIR ${CTL_DEPS/metis/libmetis)
+#set(METIS_LIBRARIES metis)
 
 #If providing DOXYGEN comment out the line below
 set(DOXYGEN_FOUND 0)
 #and uncomment these lines
 #set(DOXYGEN_FOUND 1)
-#set(DOXYGEN_INCLUDE_DIR /path/to/ann/include)
-#set(DOXYGEN_LIBRARY_DIR /path/to/ann/lib)
-#set(DOXYGEN_LIBRARIES ...) 
+#set(DOXYGEN_INCLUDE_DIR /path/to/doxygen/include)
+#set(DOXYGEN_LIBRARY_DIR /path/to/doxygen/lib)
+#set(DOXYGEN_LIBRARIES ...)
+
+##These set the version for CMake ExternalProject_Add
+#Usually you wont touch these
+set( Boost_Version 1.57.0)
+set( Metis_Version 5.10.0)
+set(ANN_Version 1.1.2)
+
+string( REPLACE "." "_" Boost_Version_Underscore ${Boost_Version} )
