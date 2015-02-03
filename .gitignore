@@ -1,5 +1,8 @@
 **/test_multi
-deps
+deps/gtest
+deps/CMakeFiles
+deps/Makefile
+deps/CMakeCache.txt
 distributed/distributed_persistence
 ctl/chain_complex/tm
 ctl/cube/test_cube
