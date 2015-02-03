@@ -1,10 +1,10 @@
 ===== README ======
-Thanks for downloading The Computational Topology library!
+
 
 This C++11 library provides a set of generic tools for:
 	1) Generating point sets (coming soon)
-	2) Building Neighborhood Graphs (coming soon)
-	3) Building Cellular Complexes (coming soon)
+	2) Building Neighborhood Graphs 
+	3) Building Cellular Complexes
 	4) Computing [persistent] homology over finite fields
 	5) Parallel algorithm(s) for (4)
 
@@ -83,14 +83,14 @@ if boost is compiled with gcc, you cannot use clang to compile CTL and vice vers
  --- And even then watch out for zombies. --- 
 
 Fedora/CentOS/RHEL:
-yum install ctl (coming soon)
+ yum install ctl (coming soon)
 
 Ubuntu:
-apt-get install ctl (coming soon)
+ apt-get install ctl (coming soon)
 
 OS/X
-brew tap appliedtopology/software
-brew install ctl
+ brew tap appliedtopology/software
+ brew install ctl
 
 === INSTALL (from source) ===
 make install
