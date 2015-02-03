@@ -152,16 +152,15 @@ public:
 	Complex& complex() const { return complex_;}
 	std::size_t size() const { return filtration_.size(); } 
  private:
-     friend class boost::serialization::access; 
+  friend class boost::serialization::access; 
 
-     template <typename Archive> 
-     friend void serialize(Archive &ar, const unsigned int version){
-		ar & filtration_;
-		ar & complex_;
-     }
-
-     Vector filtration_;
-     Complex& complex_;
+  //template <typename Archive> 
+  //friend void serialize(Archive &ar, const unsigned int version){
+  //   	ar & filtration_;
+  //   	ar & complex_;
+  //}
+  Vector filtration_;
+  Complex& complex_;
 }; //class Filtration
 
 template< typename Stream, typename Complex, typename L>
