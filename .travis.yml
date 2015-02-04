@@ -1,9 +1,16 @@
 language: cpp
 
+os:
+ - linux
+ - osx
+
 compiler:
   - gcc
+  - clang
 
 before_install:
+ - if [ "$TRAVIS_OS_NAME" -eq "linux"]
+ - then
  - sudo add-apt-repository ppa:yade-users/external -y
  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
  - sudo apt-get update -qq
@@ -13,6 +20,10 @@ before_install:
  - sudo update-alternatives --config gcc
  - sudo apt-get update
  - sudo apt-get install doxygen libann-dev libboost-all-dev libtbb-dev libmetis-dev 
+ - else
+ - brew install tbb metis doxygen openmpi ann 
+ - brew install boost ---build-from-source --with-c++11 --with-mpi --with-program_options --with-clang --without-single
+ - fi
 
 script: 
  - cmake .
