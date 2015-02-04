@@ -49,6 +49,7 @@
 
 //BOOST
 #include <boost/graph/adjacency_list.hpp>
+#include <boost/algorithm/string/join.hpp>
 
 //CTL
 #include <ctl/vr/incremental_complex.h>
@@ -99,8 +100,8 @@ void inductive_vr (const Graph& g, Complex& complex, std::size_t dimension) {
 	k_plus_one_cells.clear();
 	for( const auto & tau: k_cells){
 	    // getting the intersection of all lower neighbors
-	    std::set< Vertex> final_neighbors;
-            std::set< Vertex> lower_neighbors;
+	    std::vector< Vertex> final_neighbors;
+            std::vector< Vertex> lower_neighbors;
 	    ctl::get_lower_neighbors(g, *(tau.begin()), final_neighbors);
 	    for( auto & vi: tau) {
 		if( final_neighbors.empty()) { break; }
@@ -112,14 +113,13 @@ void inductive_vr (const Graph& g, Complex& complex, std::size_t dimension) {
 				 final_neighbors.begin(),
 				 final_neighbors.end(),
 				 std::inserter(intersect,intersect.begin()));
-		final_neighbors.swap(intersect);
-				 //back_inserter(final_neighbors));
+		std::vector< Vertex> intersected(intersect.begin(), intersect.end());
+		final_neighbors.swap(intersected);
 	    }
-	    std::vector< Vertex> finals(final_neighbors.begin(), final_neighbors.end());
 	    // constructing new simplices and adding them to the complex
-    	    for( int j = 0; j < finals.size(); j++) {
+    	    for( int j = 0; j < final_neighbors.size(); j++) {
 		Simplex sigma( tau);
-		sigma.insert( finals[j]); 
+		sigma.insert( final_neighbors[j]); 
 		k_plus_one_cells.push_back(sigma);
 		complex.insert_open_cell(sigma);
 	    }
