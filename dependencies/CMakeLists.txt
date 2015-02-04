@@ -28,7 +28,7 @@ link_directories(/usr/local/lib)
 ##TODO: Check if not found
 #endif()
 if( NOT Boost_FOUND)
-	find_package(Boost COMPONENTS program_options serialization mpi QUIET)
+	find_package(Boost COMPONENTS program_options serialization mpi)
 	if( NOT Boost_FOUND)
 	 message( "--- Boost not found. Install locally by typing 'make boost'")
 	endif() 

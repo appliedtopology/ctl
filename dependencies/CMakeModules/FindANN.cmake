@@ -1,4 +1,3 @@
-# - Find nana
 # Find the native ANN headers and libraries.
 #
 #  ANN_INCLUDE_DIRS - where to find nana/nana.h, etc.
@@ -6,12 +5,16 @@
 #  ANN_FOUND        - True if nana found.
 
 # Look for the header file.
-FIND_PATH(ANN_INCLUDE_DIR NAMES ANN/ANN.h)
+FIND_PATH(ANN_INCLUDE_DIR NAMES ANN/ANN.h PATHS /usr/include/ /usr/include/ANN /opt/local/include/ANN /usr/local/include/ANN  $ENV{ANN_DIR}/include/)
 MARK_AS_ADVANCED(ANN_INCLUDE_DIR)
 
 # Look for the library.
-FIND_LIBRARY(ANN_LIBRARY NAMES ANN)
-MARK_AS_ADVANCED(ANN_LIBRARY)
+FIND_LIBRARY(ANN_LIBRARY NAMES ANN  PATHS /usr/lib /opt/local/lib  $ENV{ANN_DIR}/lib)
+if( NOT ANN_LIBRARY)
+FIND_LIBRARY(ANN_LIBRARY NAMES ann  PATHS /usr/lib /opt/local/lib  $ENV{ANN_DIR}/lib)
+endif()
+set(ANN_LIBRARIES ${ANN_LIBRARY})
+MARK_AS_ADVANCED(ANN_LIBRARY ANN_LIBRARIES ANN_LIBRARY_DIR)
 
 # handle the QUIETLY and REQUIRED arguments and set ANN_FOUND to TRUE if 
 # all listed variables are TRUE
