@@ -50,6 +50,7 @@
 //NOTE: syntax in this file is C++1x style.
 //STL
 #include <unordered_map>
+#include <sstream>
 
 //BOOST
 #include <boost/graph/adjacency_list.hpp>
