@@ -9,7 +9,7 @@ compiler:
   - clang
 
 before_install:
-  sh ./dependencies/ci.sh
+  - sh ./dependencies/ci_$TRAVIS_OS_NAME.sh
 
 script: 
  - cmake .
