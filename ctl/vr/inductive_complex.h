@@ -50,21 +50,10 @@
 //BOOST
 #include <boost/graph/adjacency_list.hpp>
 
-namespace ctl {
+//CTL
+#include <ctl/vr/incremental_complex.h>
 
-// Given a node, we loop through all its neighbors and return a vector
-// of all the neighbors that have a lower ordering.
-template<typename Graph, typename Vertex, typename Points>
-void get_lower_neighbors (const Graph& g,
-                          const Vertex& v,
-                          Points& lower_neighbors) {
-    typedef typename boost::graph_traits<Graph>::adjacency_iterator Iterator;
-    Iterator ai, ai_end;
-    for( boost::tie(ai, ai_end) = boost::adjacent_vertices(v, g);
-         ai != ai_end; ++ai) {
-        if (*ai < v) { lower_neighbors.push_back( *ai); }
-    }
-} 
+namespace ctl {
 
 // We add the given graph to the complex. Also, we update the cells vectors to
 // keep track of the dimensions of the cells.
@@ -117,12 +106,11 @@ void inductive_vr (const Graph& g, Complex& complex, std::size_t dimension) {
 	    get_lower_neighbors(g, *(tau.begin()), final_neighbors);
 	    for(simplex_iterator vi = tau.begin(); vi != tau.end(); ++vi) {
 		lower_neighbors.clear();
-		get_lower_neighbors(g, *vi, lower_neighbors);
+	    	ctl::get_lower_neighbors(g, *vi, lower_neighbors);
 		std::set< Vertex> finalN(final_neighbors.begin(), final_neighbors.end());
-		std::set< Vertex> lowerN(lower_neighbors.begin(), lower_neighbors.end());
 		final_neighbors.clear();
-		set_intersection(lowerN.begin(),
-				 lowerN.end(),
+		set_intersection(lower_neighbors.begin(),
+				 lower_neighbors.end(),
 				 finalN.begin(),
 				 finalN.end(),
 				 back_inserter(final_neighbors));
