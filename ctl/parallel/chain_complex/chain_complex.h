@@ -110,8 +110,8 @@ class Concurrent_data_wrapper : public Data_ {
    //default
    Concurrent_data_wrapper(): id_() {}
    
-   Concurrent_data_wrapper( std::size_t tid):
-   Data_(), id_( tid) {}
+   Concurrent_data_wrapper( const std::size_t tid):
+   Data_(), id_() { id_ = tid;}
 
    //copy
    Concurrent_data_wrapper( const Concurrent_data_wrapper & from) :
