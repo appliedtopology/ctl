@@ -89,7 +89,6 @@ template<typename Graph, typename Complex>
 void inductive_vr (const Graph& g, Complex& complex, std::size_t dimension) { 
     typedef typename Complex::Cell Simplex;
     typedef typename Simplex::value_type Vertex;
-    typedef typename Simplex::const_iterator simplex_iterator;
     std::vector<Simplex> k_cells;
     std::vector<Simplex> k_plus_one_cells;
     // adding the graph to the complex
@@ -98,27 +97,29 @@ void inductive_vr (const Graph& g, Complex& complex, std::size_t dimension) {
     for ( int k = 1; k < dimension; k++) {
         k_cells.swap(k_plus_one_cells);
 	k_plus_one_cells.clear();
-	for ( int i = 0; i < k_cells.size(); i++) {
-	    Simplex tau(k_cells[i]);
+	for( const auto & tau: k_cells){
 	    // getting the intersection of all lower neighbors
-	    std::vector< Vertex> final_neighbors;
-            std::vector< Vertex> lower_neighbors;
-	    get_lower_neighbors(g, *(tau.begin()), final_neighbors);
-	    for(simplex_iterator vi = tau.begin(); vi != tau.end(); ++vi) {
+	    std::set< Vertex> final_neighbors;
+            std::set< Vertex> lower_neighbors;
+	    ctl::get_lower_neighbors(g, *(tau.begin()), final_neighbors);
+	    for( auto & vi: tau) {
+		if( final_neighbors.empty()) { break; }
 		lower_neighbors.clear();
-	    	ctl::get_lower_neighbors(g, *vi, lower_neighbors);
-		std::set< Vertex> finalN(final_neighbors.begin(), final_neighbors.end());
-		final_neighbors.clear();
+		ctl::get_lower_neighbors( g, vi, lower_neighbors);
+		std::set< Vertex> intersect;
 		set_intersection(lower_neighbors.begin(),
 				 lower_neighbors.end(),
-				 finalN.begin(),
-				 finalN.end(),
-				 back_inserter(final_neighbors));
+				 final_neighbors.begin(),
+				 final_neighbors.end(),
+				 std::inserter(intersect,intersect.begin()));
+		final_neighbors.swap(intersect);
+				 //back_inserter(final_neighbors));
 	    }
+	    std::vector< Vertex> finals(final_neighbors.begin(), final_neighbors.end());
 	    // constructing new simplices and adding them to the complex
-    	    for( int j = 0; j < final_neighbors.size(); ++j) {
+    	    for( int j = 0; j < finals.size(); j++) {
 		Simplex sigma( tau);
-		sigma.insert( final_neighbors[j]); 
+		sigma.insert( finals[j]); 
 		k_plus_one_cells.push_back(sigma);
 		complex.insert_open_cell(sigma);
 	    }

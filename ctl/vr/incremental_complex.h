@@ -73,7 +73,7 @@ void get_lower_neighbors (const Graph& g,
     Iterator ai, ai_end;
     for( boost::tie(ai, ai_end) = boost::adjacent_vertices(v, g); 
 	 ai != ai_end; ++ai) {
-        if (*ai < v) { lower_neighbors.push_back( *ai); }
+        if (*ai < v) { lower_neighbors.insert( lower_neighbors.end(), *ai); }
     } 
 } 
 
