@@ -49,7 +49,6 @@
 
 //BOOST
 #include <boost/graph/adjacency_list.hpp>
-#include <boost/algorithm/string/join.hpp>
 
 //CTL
 #include <ctl/vr/incremental_complex.h>
