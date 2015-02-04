@@ -9,6 +9,7 @@ compiler:
   - clang
 
 before_install:
+ - echo $TRAVIS_OS_NAME
  - if [ "$TRAVIS_OS_NAME" == "linux" ]
  - then
  - sudo add-apt-repository ppa:yade-users/external -y
