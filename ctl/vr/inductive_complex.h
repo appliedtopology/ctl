@@ -112,8 +112,8 @@ void inductive_vr (const Graph& g, Complex& complex, std::size_t dimension) {
 				 final_neighbors.begin(),
 				 final_neighbors.end(),
 				 std::inserter(intersect,intersect.begin()));
-		std::vector< Vertex> intersected(intersect.begin(), intersect.end());
-		final_neighbors.swap(intersected);
+		final_neighbors.clear();
+		std::copy (intersect.begin(),intersect.end(),back_inserter(final_neighbors));
 	    }
 	    // constructing new simplices and adding them to the complex
     	    for( int j = 0; j < final_neighbors.size(); j++) {
