@@ -12,9 +12,9 @@ before_install:
   - pwd 
   - ls -la 
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then chmod 777 ./dependencies/ci_linux.sh ; fi
-  - if [ "$TRAVIS_OS_NAME" = "os" ]; then chmod 777 ./dependencies/ci_osx.sh ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then chmod 777 ./dependencies/ci_osx.sh ; fi
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then ./dependencies/ci_linux.sh ; fi
-  - if [ "$TRAVIS_OS_NAME" = "os" ]; then ./dependencies/ci_osx.sh ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then ./dependencies/ci_osx.sh ; fi
 
 
 script: 
