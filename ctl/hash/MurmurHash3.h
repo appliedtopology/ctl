@@ -1,3 +1,5 @@
+#ifndef GOOGLE_MURMUR_HASH
+#define GOOGLE_MURMUR_HASH
 /*******************************************************************************
 * -Academic Honesty-
 * Plagarism: The unauthorized use or close imitation of the language and 
@@ -404,3 +406,4 @@ void MurmurHash3_x64_128 ( const void * key, const int len,
 
 //-----------------------------------------------------------------------------
 #endif // _MURMURHASH3_H_
+#endif

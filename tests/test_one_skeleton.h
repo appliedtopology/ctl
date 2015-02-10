@@ -10,12 +10,12 @@
 * that for any [academic] use of this source code one should cite one the 
 * following works:
 * 
-* \cite{hatcher, z-ct-10}
+* \cite{hatcher, z-fcv-10a}
 * 
 * See ct.bib for the corresponding bibtex entries. 
 * !!! DO NOT CITE THE USER MANUAL !!!
 *******************************************************************************
-* Copyright (C) Ryan H. Lewis 2014 <me@ryanlewis.net>
+* Copyright (C) Ryan H. Lewis 2011 <me@ryanlewis.net>
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -33,77 +33,48 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 *******************************************************************************/
+
+
+
 //STL
 #include <iostream>
 
-//CTL
-//abstract_simplex
+//Project
 #include <ctl/abstract_simplex/abstract_simplex.h>
-#include <ctl/abstract_simplex/simplex_boundary.h>
-
-//chain_complex
 #include <ctl/chain_complex/chain_complex.h>
+#include <ctl/one_skeleton/one_skeleton.h>
 
-//filtration
-#include <ctl/filtration/filtration.h>
-#include <ctl/filtration/less.h>
-//timer
-#include <ctl/utility/timer.h>
-
-//GTest
 #include <gtest/gtest.h>
 
-//We build a simplicial chain complex with Z2 coefficients
+TEST(OneSkeleton, GrabsOnlyGraph){ 
 typedef ctl::Abstract_simplex< int> Simplex;
-typedef ctl::Finite_field< 2> Z2;
-typedef ctl::Simplex_boundary< Simplex, Z2 > Boundary;
-typedef ctl::Chain_complex< Simplex, Boundary> Complex;
-typedef Complex::Cell Cell;
-typedef ctl::Filtration< Complex> Filtration_cell_less;
-typedef ctl::Timer Timer;
-typedef ctl::Filtration< Complex, ctl::Id_less> Filtration_id_less;
+typedef ctl::Finite_field< 2> Z2; 
+typedef ctl::Simplex_boundary< Simplex, Z2> Simplex_boundary;
+typedef ctl::Chain_complex< Simplex, Simplex_boundary> Complex;
 
-template< typename Filtration>
-bool is_sorted( const Filtration & f){
-	typedef typename Filtration::Less Less;
-	Less less;
-	auto last = f.begin();
-	for( auto i = ++f.begin(); i < f.end(); ++i, ++last){
-		if (!less( *last, *i)){ return false; }
-	}
-	return true;
+
+
+  Complex complex, complex1;
+
+  // Types for METIS CSR & map
+  typedef Complex::Cell Simplex;
+  typedef Simplex::vertex_type vertex_type;
+  typedef std::vector< unsigned int> Vector;
+  std::vector< vertex_type> index_to_vertex_map, i1;
+
+  // Results
+  Vector neighbors, n1, offsets, o1;
+
+  complex.insert_closed_cell( {1,2,3});
+  complex1.insert_closed_cell( {1,2});
+  complex1.insert_closed_cell( {1,3});
+  complex1.insert_closed_cell( {2,3});
+
+  // Extract out 1-skeleton in CSR format
+  one_skeleton( complex, neighbors, offsets, index_to_vertex_map);
+  one_skeleton( complex1, n1, o1, i1);
+  ASSERT_TRUE(std::is_permutation( n1.begin(), n1.end(), neighbors.begin()));
+  ASSERT_TRUE(std::is_permutation( o1.begin(), o1.end(), offsets.begin()));
+  ASSERT_TRUE(std::is_permutation( i1.begin(), i1.end(), index_to_vertex_map.begin()));
 }
 
-TEST( Filtration_cell_less, TotalOrderWorking){
-	Complex c;
-	Timer t;
-	t.start();
-	Cell s( {1,2,3,4,5,6,8,9,10} );
-	c.insert_closed_cell( s);
-	t.stop();
-	std::cout << "construction: " << t.elapsed() << std::endl;
-	std::cout << "size: " << c.size() << std::endl;
-	t.start();
-	Filtration_cell_less f1( c);
-	t.stop();
-	ASSERT_TRUE( is_sorted( f1));
-}
-TEST( Filtration_id_less, TotalOrderWorking){ 
-	Complex c;
-	Timer t;
-	t.start();
-	Cell s( {1,2,3,4,5,6,8,9,10} );
-	c.insert_closed_cell( s);
-	t.stop();
-	std::cout << "construction: " << t.elapsed() << std::endl;
-	std::cout << "size: " << c.size() << std::endl;
-	t.start();
-	Filtration_id_less f2( c);
-	t.stop();
-	ASSERT_TRUE( is_sorted( f2));
-	std::size_t pos=0;
-	for( auto i: f2){
-		std::cout << pos << ": " << i->first << std::endl;
-		++pos;
-	}
-}

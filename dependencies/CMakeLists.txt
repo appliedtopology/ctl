@@ -1,6 +1,8 @@
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/dependencies/CMakeModules")
 set(CMAKE_PREFIX_PATH /usr/lib64/openmpi)
 
+include_directories(${CMAKE_SOURCE_DIR})
+
 include( ${CMAKE_SOURCE_DIR}/build_dependencies.txt RESULT_VARIABLE bdvars)
 
 message("Configure GTest Build.")
@@ -16,11 +18,11 @@ find_package(GTest)
 
 
 add_custom_target(ann COMMAND cmake . -DANN_Version=${ANN_Version} 
-		      COMMAND make WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/ann)
+		      COMMAND make WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/dependencies/external/ann)
 add_custom_target(boost COMMAND cmake . -DBoost_Version_Underscore=${Boost_Version_Underscore} -DBoost_Version=${Boost_Version} 
-		        COMMAND make WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/boost)
-add_custom_target(metis COMMAND cmake . -DMetis_Version=${Metis_Version} COMMAND make WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/metis)
-
+		        COMMAND make WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/dependencies/external/boost)
+add_custom_target(metis COMMAND cmake . -DMetis_Version=${Metis_Version} COMMAND make 
+		 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/depedencies/external/metis)
 
 include_directories(/usr/local/include)
 link_directories(/usr/local/lib)
@@ -39,7 +41,7 @@ endif()
 if( Boost_FOUND)
 include_directories(${Boost_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIR})
-set(Boost_LIBRARIES ${Boost_LIBRARIES} PARENT_SCOPE)
+set(Boost_LIBRARIES ${Boost_LIBRARIES} )
 endif()
 
 if( NOT MPI_FOUND)
@@ -50,7 +52,7 @@ endif()
 if( MPI_FOUND)
 include_directories( ${MPI_INCLUDE_DIR})
 link_directories( ${MPI_LIBRARY_DIR})
-set(MPI_LIBRARIES ${MPI_LIBRARIES} PARENT_SCOPE)
+set(MPI_LIBRARIES ${MPI_LIBRARIES} )
 endif()
 
 if( NOT TBB_FOUND)
@@ -61,7 +63,7 @@ endif()
 if(TBB_FOUND)
 include_directories(${TBB_INCLUDE_DIR})
 link_directories(${TBB_LIBRARY_DIR})
-set(TBB_LIBRARIES ${TBB_LIBRARIES} PARENT_SCOPE)
+set(TBB_LIBRARIES ${TBB_LIBRARIES} )
 endif()
 if( NOT ANN_FOUND)
 	find_package(ANN)
@@ -74,7 +76,7 @@ endif()
 if( ANN_FOUND)
 include_directories(${ANN_INCLUDE_DIR})
 link_directories(${ANN_LIBRARY_DIR})
-set(ANN_LIBRARIES ${ANN_LIBRARIES} PARENT_SCOPE)
+set(ANN_LIBRARIES ${ANN_LIBRARIES} )
 endif()
 
 if( NOT METIS_FOUND)
@@ -89,7 +91,7 @@ endif()
 if( METIS_FOUND)
 include_directories(${METIS_INCLUDE_DIR})
 link_directories(${METIS_LIBRARY_DIR})
-set(METIS_LIBRARIES ${METIS_LIBRARIES} PARENT_SCOPE)
+set(METIS_LIBRARIES ${METIS_LIBRARIES} )
 endif()
 
 if( NOT DOXYGEN_FOUND)
@@ -100,7 +102,7 @@ endif()
 
 include_directories(${GTEST_INCLUDE_DIR})
 link_directories( ${GTEST_LIBRARY_DIR})
-set(GTEST_LIBRARIES ${GTEST_LIBRARIES} PARENT_SCOPE)
+set(GTEST_LIBRARIES ${GTEST_LIBRARIES} )
 
 if(DOXYGEN_FOUND)
 configure_file(${CMAKE_SOURCE_DIR}/doc/Doxyfile.in 

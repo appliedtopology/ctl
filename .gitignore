@@ -1,3 +1,4 @@
+tests/ctl_test
 dependencies/ann
 dependencies/gtest
 dependencies/metis

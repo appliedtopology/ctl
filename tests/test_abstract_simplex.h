@@ -41,16 +41,21 @@
 #include <ctl/abstract_simplex/simplex_boundary.h>
 #include <ctl/term/term.h>
 
-
-typedef ctl::Abstract_simplex< int> Simplex;
-typedef ctl::Simplex_boundary< Simplex, int> Boundary;
+//GTest
+#include "gtest/gtest.h"
 
 TEST(Simplex, DefaultConstruct){
+	typedef ctl::Abstract_simplex< int> Simplex;
+	typedef ctl::Simplex_boundary< Simplex, int> Boundary;
+
 	Simplex s;
-	ASSERT_EQ(s.size(), 0)
+	ASSERT_EQ(s.size(), 0);
 }
 
 TEST(Simplex, InsertCopyTest){
+	typedef ctl::Abstract_simplex< int> Simplex;
+	typedef ctl::Simplex_boundary< Simplex, int> Boundary;
+
 	Simplex s;
 	s.insert( 2);
 	s.insert( 1);
@@ -61,6 +66,9 @@ TEST(Simplex, InsertCopyTest){
 }
 
 TEST(Simplex,InitializerListAndRemove){
+	typedef ctl::Abstract_simplex< int> Simplex;
+	typedef ctl::Simplex_boundary< Simplex, int> Boundary;
+
 	Simplex t( {1,2,5,5,4});
 	Simplex s;
 	s.insert( 1); s.insert( 2); s.insert( 4); s.insert( 5);
@@ -73,15 +81,21 @@ TEST(Simplex,InitializerListAndRemove){
 }
 	
 TEST(Simplex, SimplexBoundary){
+	typedef ctl::Abstract_simplex< int> Simplex;
+	typedef ctl::Simplex_boundary< Simplex, int> Boundary;
+
 	Boundary b;
 	Simplex s{1,2,3};
 	std::vector< Simplex> bd{ {2,3},{1,3},{1,2}};	
-	for (auto i = b.begin( t); i != b.end( t); ++i){
+	for (auto i = b.begin( s); i != b.end( s); ++i){
 	 ASSERT_NE(std::find( bd.begin(), bd.end(), i->cell()), bd.end()); 	
 	}
 }
 
 TEST(Simplex, SelfAssignmentComparison){
+	typedef ctl::Abstract_simplex< int> Simplex;
+	typedef ctl::Simplex_boundary< Simplex, int> Boundary;
+
 	Simplex s{ 3,4,5};
 	s = s;
 	ASSERT_EQ(s,s);

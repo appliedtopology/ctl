@@ -33,32 +33,27 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 *******************************************************************************/
-#include <ctl/finite_field/finite_field.h>
-#include <iostream>
 
-int main( int argc, char** argv){
-	typedef ctl::Finite_field< 2> Z2;
-	typedef ctl::Finite_field< 3> Z3;
-	typedef ctl::Finite_field< 11> Z11;
-	
-	Z2  a( 1);
-	std::cout << "a = " << a << " a+a = " << a+a << std::endl;	
-	Z3  b( 1);	
-	std::cout << "b = " << b << " b + b = " << b+b  
-		  << " 3*b: " << b+b+b << std::endl;	
-	Z3 bneg( -1); 
-	std::cout << "bneg = " << bneg << std::endl;
-	Z11 c( 1);
-	std::cout << "c = " << c << " 11*c  = " << 11*c << std::endl;
-	for( std::size_t i = 1; i < c.prime(); ++i){
-		c = i;
-		std::cout << c << " inverse: " << c.inverse() << std::flush << std::endl;
-	}
-	for( std::size_t i = 1; i < c.prime(); ++i){
-		c = i;
-		std::cout << c << "/" << c << " should always be 1: " 
-			  << c/c << std::flush << std::endl; 
-	}
-	std::cout << "div by zero: " << c/0 << std::endl;
-	return 0;
+//GTest
+#include "gtest/gtest.h"
+
+#include "test_abstract_simplex.h"
+//#include <test_blowup_tool.h>
+//#include <test_chain.h>
+//#include <test_cover_tool.h>
+//#include <test_cube.h>
+//#include <test_cubical_chain_complex.h>
+#include "test_filtration.h"
+#include "test_finite_field.h"
+#include "test_multi_array.h"
+#include "test_one_skeleton.h"
+//#include <test_product_cell.h>
+//#include <test_simplicial_chain_complex.h>
+//#include <test_vr.h>
+
+
+
+int main(int argc, char **argv) {
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }

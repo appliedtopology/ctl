@@ -23,14 +23,14 @@ if (NOT APPLE)
 endif (NOT APPLE)
 
 #Handle dependencies
-include_directories(${CMAKE_SOURCE_DIR})
-add_subdirectory( dependencies)
-
-#Compile all the tests
-add_subdirectory( ctl)
+include( dependencies/CMakeLists.txt)
 
 #Compile all the tools
 add_subdirectory( tools)
+
+#Compile all the tools
+add_subdirectory( tests)
+
 
 #All of this is for make install
 set(CTL_INCLUDE_INSTALL_DIR ${CMAKE_SOURCE_DIR}/include)
