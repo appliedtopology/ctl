@@ -98,14 +98,14 @@ class const_simplex_boundary_iterator :
 	} 
 	const_simplex_boundary_iterator& operator=(const Self & b){
 		cellptr = b.cellptr;
-		remove = b.removed;
+		removed = b.removed;
 		face = b.face;
 		pos = b.pos;
 		return *this;
 	}
 	const_simplex_boundary_iterator& operator=(Self && b){
 		cellptr = std::move(b.cellptr);
-		remove  = std::move(b.removed);
+		removed  = std::move(b.removed);
 		face    = std::move(b.face);
 		pos     = std::move(b.pos);
 		return *this;

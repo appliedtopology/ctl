@@ -1,5 +1,5 @@
-#ifndef _CTL_COVERHELPER_H_
-#define _CTL_COVERHELPER_H_
+#ifndef _CTL_COVER_TEST_H_
+#define _CTL_COVER_TEST_H_
 /*******************************************************************************
 * -Academic Honesty-
 * Plagarism: The unauthorized use or close imitation of the language and 
@@ -47,57 +47,45 @@
 * POSSIBILITY OF SUCH DAMAGE.
 ********************************************************************************
 *******************************************************************************/
-#include "chain_complex/chain_complex.h"
+#include "gtest/gtest.h"
+
 namespace ctl{
-namespace parallel{
-//TODO: rewrite this, move it to a new place, useful for parallelism
-template<typename Complex, typename Cell, typename PartMap>
-bool is_cross_cell(Complex & c,Cell & simplex,PartMap & partMap, 
-						int & partitionId){
-        typedef typename Complex::iterator cell_it;
-        typedef typename Cell::const_iterator const_cell_elt_it;
-        partitionId = partMap[*(simplex.begin())];
-	for (const_cell_elt_it j = simplex.begin(); j != simplex.end(); ++j){
-                if (partMap[*j] != partitionId){
-                        partitionId = -1;
-                        return true;
-                }
-        }
-        return false;
-}
-
+namespace parallel { 
 template<typename Complex>
-void print_cover(Complex &cover){
-	typedef typename Complex::iterator cell_it;
-	typedef typename ctl::Cell_less< cell_it > Cell_order;
-	typedef typename ctl::Filtration< Complex, Cell_order > Filtration;
-	typedef typename Filtration::iterator Filtration_iterator;
-
-        std::cout << "Cover: " << std::endl;
-        Filtration filtered_complex(cover);
-        for (Filtration_iterator it = filtered_complex.begin();
-                                        it != filtered_complex.end(); ++it){
-                std::cout << (*it)->first << " ---> {";
-                std::cout << (*it)->second.first_set;
-                if ((*it)->second.second_set != -1){
-                        std::cout << "," << (*it)->second.second_set;
-                }
-                std::cout << "}";
-                std::cout << std::endl;
+void covered_complex(Complex & complex){
+	typedef typename Complex::iterator cell_iterator;
+	typedef typename Complex::Cell Cell;
+	typedef typename Complex::Data Data;
+        for (cell_iterator it = complex.begin(); it != complex.end(); ++it){
+                const Cell & cell = it->first;
+		Data & data = it->second;
+		ASSERT_NEQ(data.data(), Data().data());
         }
 }
 
 template<typename Complex>
-void print_cover(Complex & cover, unsigned int limit){
-	if (cover.size() <= limit){
-		print_cover(cover);
-	}
+void sheets_closed(Complex & complex){
+        typedef typename Complex::iterator cell_iterator;
+        typedef typename Complex::Data Data;
+        typedef typename Complex::Cell Cell;
+        typedef typename ctl::Complex_boundary< Complex, cell_iterator> 
+								Boundary;
+	Boundary boundary(complex);
+        typedef typename Boundary::const_iterator Boundary_iterator;
+	for (cell_iterator i = complex.begin(); i != complex.end(); ++i){
+		const Cell & data = i->second.data()->first;	
+		for(Boundary_iterator j = boundary.begin( i); 
+				      j != boundary.end( i); ++j){
+			const Data & face_data = j->get_cell()->second;
+			const Cell & face = face_data.data()->first;
+			const Cell & face_cell = j->get_cell()->first;
+			ASSERT_TRUE(std::includes(face.begin(), face.end(),
+				      		  data.begin(), data.end()));
+		}
+	} 
 }
-template<typename Complex>
-void failure(Complex & complex){
-        print_cover(complex);
-        std::exit( -1);
-}
-} //end namespace parallel
-} //end namespace ctl
-#endif
+
+} //namespace parallel
+} //namespace ctl
+
+#endif //_CTL_COVER_TEST_H_

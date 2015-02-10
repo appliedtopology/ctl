@@ -90,7 +90,7 @@
 
 //Graphs & metrics
 #include <ctl/points/points.h>
-#include <ctl/metric/metric.h>
+#include <ctl/metrics/metric.h>
 #include <ctl/nbhd_graph/all_pairs.h>
 #include <ctl/nbhd_graph/epsilon_search.h>
 #include <ctl/nbhd_graph/nbhd_graph.h>
@@ -107,24 +107,24 @@
 #include <ctl/parallel/build_blowup_complex/build_blowup_complex.h>
 #include <ctl/parallel/chain_complex/chain_complex.h>
 #include <ctl/parallel/filtration/filtration.h>
-#include <ctl/parallel/homology/homology.h>
 #include <ctl/parallel/homology/persistence.h>
 #include <ctl/parallel/partition_covers/cover_data.h>
-#include <ctl/parallel/partition_covers/cover_helper.h>
 #include <ctl/parallel/partition_covers/covers.h>
 #include <ctl/parallel/partition_covers/cover_stats.h>
-#include <ctl/parallel/partition_covers/cover_tests.h>
 #include <ctl/parallel/partition_covers/graph_partition.h>
 #include <ctl/parallel/utility/timer.h>
+#include <ctl/parallel/homology/homology.h>
+
+#include <ctl/matrix/iterator_property_map.h>
+#include <ctl/matrix/offset_maps.h>
 
 //Persistence 
 #include <ctl/persistence/compute_barcodes.h>
 #include <ctl/persistence/compute_betti.h>
-#include <ctl/persistence/iterator_property_map.h>
-#include <ctl/persistence/offset_maps.h>
 #include <ctl/persistence/persistence_data.h>
 #include <ctl/persistence/persistence.h>
+
 //Not implemented
-#include <ctl/zigzag/persistence.h>
+//#include <ctl/zigzag/persistence.h>
 
 #endif //CTLIB_CTL_H
