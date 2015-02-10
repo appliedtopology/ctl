@@ -9,7 +9,8 @@ compiler:
   - clang
 
 before_install:
-  - sh ./dependencies/ci_$TRAVIS_OS_NAME.sh
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then ./dependencies/ci_linux.sh ; fi
+  - if [ "$TRAVIS_OS_NAME" = "os" ]; then ./dependencies/ci_osx.sh ; fi
 
 script: 
  - cmake .
