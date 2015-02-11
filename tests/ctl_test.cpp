@@ -39,7 +39,7 @@
 
 #include "test_abstract_simplex.h"
 //#include <test_blowup_tool.h>
-//#include <test_chain.h>
+#include "test_chain.h"
 //#include <test_cover_tool.h>
 //#include <test_cube.h>
 //#include <test_cubical_chain_complex.h>

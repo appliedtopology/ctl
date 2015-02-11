@@ -324,6 +324,7 @@ Stream& operator<<( Stream& out,
 	out << c->first;
 	return out;	
 }
+
 template< typename Stream, typename Cell_,
           typename Boundary_,
           typename Data_,
@@ -350,6 +351,7 @@ Stream& operator<<( Stream& out,
 	}
 	return out;
 }
+
 template< typename Stream, typename Cell_,
           typename Boundary_,
           typename Data_,

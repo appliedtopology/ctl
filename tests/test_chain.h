@@ -39,30 +39,13 @@
 #include <iomanip>
 
 //CTL
+#include <ctl/ctl.h>
 
-//abstract_simplex
-#include <ctl/abstract_simplex/abstract_simplex.h>
-#include <ctl/abstract_simplex/simplex_boundary.h>
+//GTest
+#include "gtest/gtest.h"
 
-//Chain_complex
-#include <ctl/chain_complex/chain_complex.h>
-#include <ctl/chain_complex/complex_boundary.h>
 
-//chain
-#include <ctl/chain/chain_add.h>
-#include <ctl/chain/chain.h>
-
-//delta
-#include <ctl/io/io.h>
-
-//filtration
-#include <ctl/filtration/filtration.h>
-#include <ctl/filtration/less.h>
-
-//Term
-#include <ctl/term/term_less.h>
-#include <ctl/utility/timer.h>
-
+TEST(Chain,ChainTest){
 //We build a simplicial chain complex with Z2 coefficients
 typedef ctl::Abstract_simplex< int> Simplex;
 typedef ctl::Finite_field< 2> Z2;
@@ -74,57 +57,28 @@ typedef Complex_boundary::Term Term;
 typedef ctl::Filtration< Complex, ctl::Id_less> Filtration;
 typedef ctl::Chain< Term, ctl::Term_cell_less< ctl::Id_less> > Chain;
  
-std::string print_chain( const Chain & a){
-	std::stringstream out;
-	if (a.size() == 0) { return out.str(); }
-	out << a.begin()->coefficient() 
-	    << "*" << a.begin()->cell()->first << " "; 
-	for( auto i = ++(a.begin()); i != a.end(); ++i){
-		out << i->coefficient() <<  "*" << i->cell()->first << " ";
-	}
-	return out.str();
+Complex complex;
+ctl::Timer timer;
+Cell s( {1,2,3,4,5,6} );
+Cell t( {1,2,3,4,5,11} );
+
+complex.insert_closed_cell( s);
+complex.insert_closed_cell( t);
+
+Complex_boundary bd( complex);	
+auto complex_s = complex.find_cell( s);
+auto complex_t = complex.find_cell( t);
+Chain bds( bd.begin( complex_s), bd.end( complex_s));
+Chain bdt( bd.begin( complex_t), bd.end( complex_t));
+auto bdsandt = bds+bdt;
+ASSERT_EQ(bdsandt.size(),10);
+
+constexpr int N = 600000;
+Chain temp;
+for( int i = 0; i < N; ++i){	
+ bds.scaled_add( 1, bdt, temp);
+ Chain bds( bd.begin( complex_s), bd.end( complex_s));
+ Chain bdt( bd.begin( complex_t), bd.end( complex_t));
 }
-
-int main( int argc, char** argv){
-	Complex complex;
-	ctl::Timer timer;
-	Cell s( {1,2,3,4,5,6,7,8,9,10} );
-	Cell t( {1,2,3,4,5,11,12,13,14,15} );
-
-	std::cout  << std::setprecision( 20) << std::endl;
-	
-	timer.start();	
-	auto cell_and_count = complex.insert_closed_cell( s);
-	timer.stop();
-	std::cout << cell_and_count.second 
-		  << " cells inserted! in " << timer.elapsed() << std::endl;
-
-	timer.start();	
-	cell_and_count = complex.insert_closed_cell( t);
-	timer.stop();
-	std::cout << cell_and_count.second 
-		  << " cells inserted! in " << timer.elapsed() << std::endl;
-
-	Complex_boundary bd( complex);	
-	auto complex_s = complex.find_cell( s);
-	auto complex_t = complex.find_cell( t);
-	Chain bds( bd.begin( complex_s), bd.end( complex_s));
-	Chain bdt( bd.begin( complex_t), bd.end( complex_t));
-	constexpr int N = 600000;
-	Chain temp;
-	ctl::Timer l;
-	l.start();
-	timer.start();
-	for( int i = 0; i < N; ++i){	
-	bds.scaled_add( 1, bdt, temp);
-	timer.stop();
-	Chain bds( bd.begin( complex_s), bd.end( complex_s));
-	Chain bdt( bd.begin( complex_t), bd.end( complex_t));
-	}
-	l.stop();
-	std::cout << timer.elapsed()/N << std::endl;
-	std::cout << l.elapsed() << std::endl;
-	std::cout << print_chain( bds+bdt) << std::endl;
-	return 0;
 
 }

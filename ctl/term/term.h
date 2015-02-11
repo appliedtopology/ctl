@@ -177,6 +177,26 @@ class Term< Cell_, ctl::Finite_field< 2> > {
 	struct rebind { typedef Term<_Ce, _Co> T; };
 
 }; //Class Term specialization for Z2
+
+namespace detail{
+
+template<class T>
+struct is_iterator : std::integral_constant<
+                               bool,
+			      !std::is_same< typename std::iterator_traits<T>::value_type, void>::value> {};
+
+template<typename Stream, class T, typename std::enable_if<is_iterator<T>::value, T>::type* = nullptr> 
+void  print_cell(Stream& out, T & t){ out << t->first; }
+template<typename Stream, class T, typename std::enable_if<!is_iterator<T>::value, T>::type* = nullptr> 
+void  print_cell(Stream& out, T & t){ out << t; }
+}
+
+template< typename Stream, typename Ce, typename Co>
+Stream& operator<<(Stream&out, const Term<Ce, Co>&term){
+	out << term.coefficient() << "*";
+	detail::print_cell( out, term.cell()); 
+	return out;
+}
 } //namespace ctl
 
 template< typename Cell, typename Coefficient, typename T>
