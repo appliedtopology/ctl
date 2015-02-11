@@ -53,6 +53,7 @@
 * on the other hand it doesn't seem like this should really cause an issue here.
 *******************************************************************************/
 //STL
+#include <iostream>
 #include <set>
 #include <vector>
 #include <utility>

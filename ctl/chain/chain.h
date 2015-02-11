@@ -51,12 +51,13 @@
 #include <algorithm>
 #include <functional>
 #include <memory>
+#include <vector>
 
 //CTL
 #include <ctl/chain/chain_add.h>
 #include <ctl/term/term_less.h>
 #include <ctl/term/term_tags.h>
-
+#include <ctl/io/io.h>
 
 namespace ctl{
 //exported functionality
