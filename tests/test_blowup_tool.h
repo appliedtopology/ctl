@@ -63,13 +63,13 @@
 //Google Test Framework
 #include "gtest/gtest.h"
 
-template<typename Blowup, typename Cover_complex, typename Complex>
+template<typename Blowup, typename Nerve, typename Complex>
 void factor_blowup(const Blowup & blowup,
-		   const Cover_complex & complex1, 
-		   const Complex & complex2){
+		   const Complex & complex2,
+		   const Nerve & complex1){ 
 	typedef typename Blowup::const_iterator Blowup_iterator;
 	
-	Cover_complex new_complex1;
+	Nerve new_complex1;
 	Complex new_complex2;
 	for (Blowup_iterator product_cell = blowup.begin();
 			     product_cell != blowup.end();

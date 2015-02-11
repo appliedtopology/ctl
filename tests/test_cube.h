@@ -41,30 +41,23 @@
 #include <ctl/cube/cube_boundary.h>
 #include <ctl/term/term.h>
 
+#include "gtest/gtest.h"
 
+TEST(Cube,CubeTest){
 typedef ctl::Cube< int> Cube;
 typedef Cube::Interval Interval;
 typedef ctl::Cube_boundary< Cube, int> Boundary;
-int main( int argc, char** argv){
 	Cube s;
-	std::cout << "build a cube, interval by interval." << std::endl;
 	s.insert( Interval( 2, 3) );
-	std::cout << s << std::flush << std::endl;
 	s.insert( Interval( 3, 3) );
-	std::cout << s << std::flush << std::endl;
 	Cube c( s);
-	std::cout << "(copy test) c = " << c << " does c == s?" << (c == s) << std::flush << std::endl;
+	ASSERT_EQ(c,s);
 	Cube t( {{1,2},{4,5},{4,4}});
-	std::cout << "(il constructor) t = " << t << std::flush << std::endl;
 	t.insert( {{8,9},{9,10}, {11,11}} );
 	t.remove( {11,11} );
-	std::cout << "t = " << t << std::flush << std::endl;
 	t.remove( t.begin(), t.begin()+1);
-	std::cout << "t = " << t << std::flush << std::endl;
 	Boundary b;
-	std::cout << "called begin iterator" << std::endl << std::flush; 
 	for (auto i = b.begin( t); i != b.end( t); ++i){
-		std::cout << (*i).cell() << std::endl;
+		auto j = (*i).cell();
 	}
-	return 0;
 }

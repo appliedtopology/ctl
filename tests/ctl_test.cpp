@@ -38,20 +38,18 @@
 #include "gtest/gtest.h"
 
 #include "test_abstract_simplex.h"
-//#include <test_blowup_tool.h>
 #include "test_chain.h"
-//#include <test_cover_tool.h>
-//#include <test_cube.h>
+#include "test_cube.h"
 //#include <test_cubical_chain_complex.h>
+//#include <test_simplicial_chain_complex.h>
+//#include <test_vr.h>
 #include "test_filtration.h"
 #include "test_finite_field.h"
 #include "test_multi_array.h"
 #include "test_one_skeleton.h"
 #include "test_product_cell.h"
-//#include <test_simplicial_chain_complex.h>
-//#include <test_vr.h>
-
-
+//#include <test_cover_tool.h>
+//#include <test_blowup_tool.h>
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
