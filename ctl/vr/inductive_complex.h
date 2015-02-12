@@ -94,6 +94,7 @@ void inductive_vr (const Graph& g, Complex& complex, std::size_t dimension) {
     // adding the graph to the complex
     add_graph_to_complex (g, complex, k_cells, k_plus_one_cells);
     // inductive algorithm
+    std::vector< Vertex> intersect;
     for ( int k = 1; k < dimension; k++) {
         k_cells.swap(k_plus_one_cells);
 	k_plus_one_cells.clear();
@@ -106,14 +107,16 @@ void inductive_vr (const Graph& g, Complex& complex, std::size_t dimension) {
 		if( final_neighbors.empty()) { break; }
 		lower_neighbors.clear();
 		ctl::get_lower_neighbors( g, vi, lower_neighbors);
-		std::set< Vertex> intersect;
+		//std::vector< Vertex> intersect;
 		set_intersection(lower_neighbors.begin(),
 				 lower_neighbors.end(),
 				 final_neighbors.begin(),
 				 final_neighbors.end(),
-				 std::inserter(intersect,intersect.begin()));
-		final_neighbors.clear();
-		std::copy (intersect.begin(),intersect.end(),back_inserter(final_neighbors));
+				 std::back_inserter(intersect));
+		final_neighbors.swap(intersect);
+		intersect.clear();
+		//final_neighbors.clear();
+		//std::copy (intersect.begin(),intersect.end(),back_inserter(final_neighbors));
 	    }
 	    // constructing new simplices and adding them to the complex
     	    for( int j = 0; j < final_neighbors.size(); j++) {
