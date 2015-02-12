@@ -53,6 +53,9 @@
 //Abstract Cube 
 //TODO
 
+//IO
+#include <ctl/io/io.h>
+
 //Product Cell
 #include <ctl/product_cell/product_boundary.h>
 #include <ctl/product_cell/product_cell.h>
@@ -90,49 +93,41 @@
 
 //Graphs & metrics
 #include <ctl/points/points.h>
-#include <ctl/metric/metric.h>
+#include <ctl/metrics/metric.h>
 #include <ctl/nbhd_graph/all_pairs.h>
 #include <ctl/nbhd_graph/epsilon_search.h>
 #include <ctl/nbhd_graph/nbhd_graph.h>
+
+//VR
+#include <ctl/vr/incremental_complex.h>
 
 //Facilities for extracting the one_skeleton
 #include <ctl/one_skeleton/complex_to_graph.h>
 #include <ctl/one_skeleton/graph_to_metis.h>
 #include <ctl/one_skeleton/one_skeleton.h>
 
-//Distributed
-#include <ctl/distributed/build_blowup_complex/build_blowup_complex.h>
-#include <ctl/distributed/covers/cover_data.h>
-#include <ctl/distributed/io/read_complex.h>
-#include <ctl/distributed/persistence/blowup_persistence.h>
-#include <ctl/distributed/persistence/initialize_cascade_boundaries.h>
-#include <ctl/distributed/persistence/persistence.h>
-#include <ctl/distributed/persistence/sparse_matrix_algorithms.h>
-#include <ctl/distributed/relative_simplex_boundary/relative_simplex_boundary.h>
-#include <ctl/distributed/utility/timer.h>
-
 //Parallel library (multithreaded)
 #include <ctl/parallel/build_blowup_complex/build_blowup_complex.h>
 #include <ctl/parallel/chain_complex/chain_complex.h>
 #include <ctl/parallel/filtration/filtration.h>
-#include <ctl/parallel/homology/homology.h>
 #include <ctl/parallel/homology/persistence.h>
 #include <ctl/parallel/partition_covers/cover_data.h>
-#include <ctl/parallel/partition_covers/cover_helper.h>
 #include <ctl/parallel/partition_covers/covers.h>
 #include <ctl/parallel/partition_covers/cover_stats.h>
-#include <ctl/parallel/partition_covers/cover_tests.h>
 #include <ctl/parallel/partition_covers/graph_partition.h>
 #include <ctl/parallel/utility/timer.h>
+#include <ctl/parallel/homology/homology.h>
+
+#include <ctl/matrix/iterator_property_map.h>
+#include <ctl/matrix/offset_maps.h>
 
 //Persistence 
 #include <ctl/persistence/compute_barcodes.h>
 #include <ctl/persistence/compute_betti.h>
-#include <ctl/persistence/iterator_property_map.h>
-#include <ctl/persistence/offset_maps.h>
 #include <ctl/persistence/persistence_data.h>
 #include <ctl/persistence/persistence.h>
+
 //Not implemented
-#include <ctl/zigzag/persistence.h>
+//#include <ctl/zigzag/persistence.h>
 
 #endif //CTLIB_CTL_H

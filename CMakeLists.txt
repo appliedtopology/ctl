@@ -1,5 +1,6 @@
 project(ctl CXX)
-set( CMAKE_VERBOSE_MAKEFILE  false)
+
+#stop the whining
 cmake_minimum_required(VERSION 2.6.2)
 if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" VERSION_GREATER 2.6)
   if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION}" VERSION_GREATER 2.8.3)
@@ -9,54 +10,41 @@ if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" VERSION_GREATER 2.6)
   endif()
 endif()
 
-set(CMAKE_BUILD_TYPE RELWITHDEBINFO)
+#zoom zoom
+set(CMAKE_BUILD_TYPE Release)
 
-set(CTL_INCLUDE_INSTALL_DIR ${CMAKE_SOURCE_DIR}/include)
-set(CTL_DOC_INSTALL_DIR ${CMAKE_SOURCE_DIR}/doc)
-set(CTL_BIN_INSTALL_DIR ${CMAKE_SOURCE_DIR}/bin)
-set(CTL_EXAMPLES_INSTALL_DIR ${CMAKE_SOURCE_DIR}/examples)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules")
+#Frame pointers are useful for profiling. 
+#Complaints and pedantry accepted here.
+add_definitions(" -fno-omit-frame-pointer -Wall -ansi -std=c++11")
+
+#Fix issues on LINUX
 if (NOT APPLE)
 	set(DSO_FIXES rt)
 endif (NOT APPLE)
 
-find_package(ANN REQUIRED)
-find_package(Boost COMPONENTS program_options serialization mpi REQUIRED)
-message( "Boost_LIBRARIES = " ${Boost_LIBRARIES}) 
-include_directories(/usr/local/include ${ANN_INCLUDE_DIRS})
-link_directories(/usr/local/lib ${ANN_LIBRARY_DIR} ${Boost_LIBRARY_DIR})
+#Handle dependencies
+include( dependencies/CMakeLists.txt)
 
-set(Boost_USE_MULTITHREADED ON)
-add_definitions(" -fno-omit-frame-pointer -Wall -ansi -std=c++11")
+#Compile all the tools
+add_subdirectory( tools)
 
-find_package(TBB REQUIRED) 
-find_package(METIS REQUIRED) 
-find_package(Doxygen)
-if(DOXYGEN_FOUND)
-configure_file(${CMAKE_SOURCE_DIR}/doc/Doxyfile.in ${CMAKE_BINARY_DIR}/Doxyfile @ONLY)
-add_custom_target(doc
-${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/Doxyfile
-WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-COMMENT "Generating API documentation with Doxygen" VERBATIM
-)
-endif(DOXYGEN_FOUND)
+#Compile all the tools
+add_subdirectory( tests)
 
 
-include_directories(${CMAKE_SOURCE_DIR} ${Boost_INCLUDE_DIR})
-include_directories(${METIS_INCLUDE_DIR} ${TBB_INCLUDE_DIR})
-
-link_directories(/usr/local/lib ${Boost_LIBRARY_DIR})
-link_directories(${METIS_LIBRARY_DIR} ${TBB_LIBRARY_DIR})
-
-add_subdirectory( ctl)
+#All of this is for make install
+set(CTL_INCLUDE_INSTALL_DIR ${CMAKE_SOURCE_DIR}/include)
+set(CTL_DOC_INSTALL_DIR ${CMAKE_SOURCE_DIR}/doc)
+set(CTL_BIN_INSTALL_DIR ${CMAKE_SOURCE_DIR}/bin)
+set(CTL_EXAMPLES_INSTALL_DIR ${CMAKE_SOURCE_DIR}/examples)
 
 install( DIRECTORY ${CMAKE_SOURCE_DIR}/ctl 
 	 DESTINATION include 
 	 FILES_MATCHING PATTERN "*.h"
 	 PATTERN "CMakeFiles" EXCLUDE)
 
-install( DIRECTORY ${CMAKE_SOURCE_DIR}/ctl
-	 DESTINATION share/ctl/examples
+install( DIRECTORY ${CMAKE_SOURCE_DIR}/tools
+	 DESTINATION share/ctl/tools
 	 FILES_MATCHING PATTERN "*.cpp"
 	 PATTERN "CMakeLists.txt"
 	 PATTERN "CMakeFiles" EXCLUDE)

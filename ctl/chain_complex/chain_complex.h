@@ -56,8 +56,8 @@
 #include <ctl/hash/hash.h>
 #include <ctl/chain_complex/detail/data_wrapper.h>
 #include <ctl/chain_complex/detail/default_complex_storage.h>
-#include <ctl/chain_complex/detail/cubical_complex.h>
-#include <ctl/chain_complex/detail/generic_complex.h>
+#include <ctl/chain_complex/cubical_complex.h>
+#include <ctl/chain_complex/simplicial_chain_complex.h>
 
 namespace ctl {
 
@@ -135,18 +135,17 @@ typename std::conditional<
 std::is_same< typename detail::recombine< Cell, detail::Dummy>::type, 
 	      ctl::Cube< detail::Dummy> >::value, 
 //then we create a Cubical_complex which optimizes storage.
- ctl::detail::Cubical_complex< Cell, 
-			       Boundary, 
-			       detail::Data_wrapper< Data>, 
-			       Hash, 
-			       Storage
-		              >,
+ ctl::Cubical_complex< Cell, 
+		       Boundary, 
+		       Data, 
+		       Hash, 
+		       Storage>,
 //Otherwise all other cell types are stored generically
- ctl::detail::Generic_complex< Cell, 
-			       Boundary, 
-			       detail::Data_wrapper< Data>, 
-			       Hash, 
-			       Storage> 
+ ctl::Simplicial_chain_complex< Cell, 
+			        Boundary, 
+			        detail::Data_wrapper< Data>, 
+			        Hash, 
+			        Storage> 
 	    >::type;
 
 //! Utility to read a complex and any associated data 

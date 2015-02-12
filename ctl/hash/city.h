@@ -1,3 +1,5 @@
+#ifndef GOOGLE_CITY_HASH
+#define GOOGLE_CITY_HASH 
 // Copyright (c) 2011 Google, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -801,3 +803,4 @@ uint128 CityHashCrc128(const char *s, size_t len) {
 }
 */
 #endif
+#endif //GOOGLE_CITY_HASH

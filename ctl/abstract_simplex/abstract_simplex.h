@@ -47,11 +47,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 ********************************************************************************
 *******************************************************************************/
+//STL
 #include <vector> //std::vector
 #include <initializer_list>  // std::initializer_list
 #include <iostream> //cout (debug only)
 #include <algorithm> //sort, unique
+
+//BOOST
+#include <boost/serialization/base_object.hpp>
+
+//CTL
 #include <ctl/abstract_simplex/simplex_boundary.h>
+
+
 /*! \namespace ctl
 Namespace where all library functionality resides
 */
@@ -340,6 +348,13 @@ class Abstract_simplex {
 
 	private:
 	Vector vertices;
+
+	friend class boost::serialization::access;
+
+	template<class Archive>
+    	void serialize(Archive & ar, const std::size_t version){
+           ar & vertices; 
+        }
 
 	//typename Self since the compiler complains
 	template< typename Term> 

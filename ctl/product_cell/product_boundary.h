@@ -186,7 +186,7 @@ class const_product_boundary_iterator :
 	 const_iterator2 face2;
 	 const_iterator1 end1;
 	 const_iterator2 end2;
-	 const int sign=0;
+	 int sign=0;
 	 Term face;
 }; // END const_product_boundary_iterator
 } //END private namespace

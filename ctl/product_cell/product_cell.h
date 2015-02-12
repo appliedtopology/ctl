@@ -146,15 +146,9 @@ class Product_cell : public std::pair< Cell_iterator1_ , Cell_iterator2_> {
 }; //Product_cell
 
 template< typename Stream, typename T1, typename T2>
-Stream& operator<<(Stream& out, const Product_cell< T1, T2> & alpha){
+Stream& operator<<(Stream& out, const Product_cell< T1, T2> && alpha){
 	out << alpha.first_cell() << ctl::otimes 
 	    << alpha.second_cell();
-	return out;
-}
-
-template< typename Stream, typename T1, typename T2>
-Stream& operator<<(Stream& out, const Product_cell< T1, T2> && alpha){
-	out << alpha;
 	return out;
 }
 } // namespace ctl

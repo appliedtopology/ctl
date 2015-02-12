@@ -323,7 +323,7 @@ Stream& operator<<( Stream& out, const Chain< T, L> & c){
 		return out;
 	}
 	for( auto i = c.rbegin(); i != c.rend(); ++i){
-		out << i->coefficient() << (*(i->cell()))->first;
+		out << *i; 
 		if( (i+1) != c.rend()){ out << " " << ctl::oplus << " " ; }
 	}
 	return out;

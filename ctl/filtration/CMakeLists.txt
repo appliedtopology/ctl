@@ -1,2 +1,2 @@
 #include_directories(${CMAKE_SOURCE_DIR})
-add_executable(test_filtration test_filtration.cpp)
+set(CTL_UNIT_TESTS ${CTL_UNIT_TESTS} test_filtration.cpp)

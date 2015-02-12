@@ -108,10 +108,10 @@ class Concurrent_data_wrapper : public Data_ {
    typedef std::size_t Unsafe_id;
    typedef tbb::atomic< Unsafe_id> Safe_id;
    //default
-   Concurrent_data_wrapper(): id_( 0) {}
+   Concurrent_data_wrapper(): id_() {}
    
    Concurrent_data_wrapper( const std::size_t tid):
-   Data_(), id_( tid) {}
+   Data_(), id_() { id_ = tid;}
 
    //copy
    Concurrent_data_wrapper( const Concurrent_data_wrapper & from) :
@@ -176,11 +176,11 @@ public:
 public:
    //Constructors
    //Default
-   Chain_complex(): max_id( 0), max_dim( 0) { 
+   Chain_complex(): max_id(), max_dim() { 
 	cells.max_load_factor( 1); 
    }
    Chain_complex( Cell_boundary & bd_, const std::size_t num_cells=1): 
-   cells( num_cells), bd( bd_), max_id( 0), max_dim( 0) {
+   cells( num_cells), bd( bd_), max_id(), max_dim() {
 	cells.max_load_factor( 1); 
    }
    //Copy

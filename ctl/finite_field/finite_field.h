@@ -85,6 +85,7 @@ std::size_t inverse( const ctl::Finite_field< N> & x, const std::size_t prime){
 
 } //detail namespace
 } //ctl namespace
+
 //exported functionality
 namespace ctl{
 template< std::size_t _prime>
@@ -192,7 +193,7 @@ class Finite_field{
 
 
 template< typename Stream, std::size_t N>
-Stream& operator<<( Stream & out, const Finite_field< N> & x ){
+Stream& operator<<( Stream & out, const Finite_field< N> && x ){
 	int value = x.value();
 	if( x.prime()>2 && value >= x.prime()/2.0){ 
 		value = -1*(x.prime() -value);  
@@ -200,11 +201,7 @@ Stream& operator<<( Stream & out, const Finite_field< N> & x ){
 	out << value; 
 	return out;
 }
-template< typename Stream, std::size_t N>
-Stream& operator<<( Stream & out, const Finite_field< N> && x ){
-	out << x;
-	return out;
-}
+
 } //namespace ctl
 
 template<typename T, std::size_t N> 
