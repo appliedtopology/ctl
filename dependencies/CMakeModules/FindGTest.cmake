@@ -160,6 +160,7 @@ function(_gtest_find_library _name)
 endfunction()
 
 #
+include(FindPackageHandleStandardArgs)
 
 if(NOT DEFINED GTEST_MSVC_SEARCH)
     set(GTEST_MSVC_SEARCH MD)
@@ -200,7 +201,6 @@ else()
     _gtest_find_library(GTEST_MAIN_LIBRARY_DEBUG gtest_maind)
 endif()
 
-include(${CMAKE_CURRENT_LIST_DIR}/FindPackageHandleStandardArgs.cmake)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(GTest DEFAULT_MSG GTEST_LIBRARY GTEST_INCLUDE_DIR GTEST_MAIN_LIBRARY)
 
 if(GTEST_FOUND)
