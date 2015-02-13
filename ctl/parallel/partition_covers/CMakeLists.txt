@@ -1,2 +1,0 @@
-add_executable( cover_test test_cover_tool.cpp)
-target_link_libraries( cover_test ${Boost_LIBRARIES} ${METIS_LIBRARIES} ${TBB_LIBRARIES}  ${DSO_FIX})
