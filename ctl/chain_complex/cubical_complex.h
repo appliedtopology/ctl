@@ -72,7 +72,8 @@ template< typename Cell_,
 	  template< typename ...> class Storage_> 
 class Cubical_complex  {
 public: //Public types
-   typedef detail::Cube_boundary_wrapper< Boundary_, Cubical_complex> Cell_boundary; 
+   typedef detail::Cube_boundary_wrapper< Boundary_, 
+					  Cubical_complex> Cell_boundary; 
    typedef Cell_ Cube; //Describes a fundamental object,
 		       //e.g. Simplex, Cube, Polygon, etc..
    //Arbitrary data associated to space.
@@ -111,8 +112,8 @@ public:
   * @param bd_
   * @param d_:
   */
-   template< typename Vertex_extents, typename Function_values>
-   Cubical_complex( Boundary_ & bd_, Vertex_extents & d_, Function_values & f):
+   template< typename Vertex_extents>
+   Cubical_complex( Boundary_ & bd_, Vertex_extents & d_):
     cells( boost::make_transform_iterator( d_.begin(), detail::tnpo()),  
 	   boost::make_transform_iterator( d_.end(), detail::tnpo())), 
 	   bd( *this, bd_), index_data( d_) { 
@@ -122,8 +123,6 @@ public:
 		     *i *= *(i-1); 
 	   }
 	   assign_keys();
-	   assign_function_data_to_vertices( f);  
-	   expand_function_data();
   }
    
   /**
@@ -132,8 +131,8 @@ public:
   * @tparam Vertex_extents
   * @param d_
   */
-   template< typename Vertex_extents, typename Function_values> 
-   Cubical_complex( const Vertex_extents& d_, Function_values & f): 
+   template< typename Vertex_extents>
+   Cubical_complex( const Vertex_extents& d_): 
      cells( boost::make_transform_iterator( d_.begin(), detail::tnpo()), 
 	   boost::make_transform_iterator( d_.end(), detail::tnpo())), 
     index_data( d_), 
@@ -143,10 +142,7 @@ public:
 		     i != index_data.end(); ++i){ 
 		     *i *= *(i-1); 
 	  }
-	  
 	  assign_keys();
-	  assign_function_data_to_vertices( f);  
-	  expand_function_data();
    }
 
   /**
@@ -156,21 +152,18 @@ public:
   * @param d_
   * @param offsets_
   */
-   template< typename Vertex_extents, typename Function_values> 
+   template< typename Vertex_extents, typename Offset>
    Cubical_complex( const Vertex_extents& d_,
-		    Function_values & f,
-		    const Vertex_extents& offsets_): 
+		    const Offset& offset_): 
      cells( boost::make_transform_iterator( d_.begin(), detail::tnpo()), 
 	    boost::make_transform_iterator( d_.end(), detail::tnpo()),
-	    offsets_), index_data( d_), bd( *this){ 
+	    offset_), index_data( d_), bd( *this){ 
 	  index_data.insert( index_data.begin(), 1);
  	   for( auto i = ++index_data.begin(); 
 		     i != index_data.end(); ++i){ 
 		     *i *= *(i-1); 
 	  }
 	  assign_keys();
-	  assign_function_data_to_vertices( f);  
-	  expand_function_data();
    }
    
    /**
@@ -194,8 +187,6 @@ public:
 		     *i *= *(i-1); 
 	  }
 	  assign_keys();
-	  assign_function_data_to_vertices( f);  
-	  expand_function_data();
    }
 
    //! Copy
@@ -495,40 +486,6 @@ private:
     vertex_id_to_coordinate( index, c);
     return cells.coordinate_to_index( c);
   }
-  void expand_function_data( Cell & c){
-	if( dimension( c.first)){
-		auto j = bd.begin( c.first);
-		auto k = find_cell( j.cell());
-		expand_function_data( k); 
-		c.second.weight() = k.second.weight();
-		for( ++j; j != bd.end( c.first); ++j){
-			expand_function_data( find_cell( j.cell()));
-			k = find_cell( j.cell());
-			if( k.second.weight() > c.second.weight()){
-				c.second.weight() = k.second.weight();
-			}
-		}
-	}
-   }
-
-   void expand_function_data(){
-	for( auto & i : cells){
-		if( dimension( i.first) && 
-			i.second.weight() < 0){
-						
-		}
-	}
-   }
-
-   template< typename Function_values>
-   void assign_function_data_to_vertices( Function_values & f){
- 	std::size_t vertex_id = 0;
-	for( auto & v : f){
-	  auto& p = cells[ vertex_id_to_index( vertex_id)]; 
-	  p.second.weight( v);
-	  ++vertex_id;
-	}
-   }
 
 public:
 
@@ -638,7 +595,7 @@ key_to_cube( const Cubical_complex & complex,
 template< typename ... Args>
 typename ctl::detail::Cubical_complex< Args ...>::Cell 
 cube_to_key( const ctl::detail::Cubical_complex< Args ...>& complex, 
-	     const typename ctl::detail::Cubical_complex< Args ...>::Cube & cube){ 
+	  const typename ctl::detail::Cubical_complex< Args ...>::Cube & cube){ 
 	return complex.cube_to_key( complex, cube);
 }
 
