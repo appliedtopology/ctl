@@ -89,6 +89,22 @@ struct Weight_data_functor {
     Weight&  operator()( Weight_data & data) const { return data.weight(); }
 }; //end struct Weight_data_functor
 
+// Functor for comparison
+struct Weight_less {
+  template< typename Iterator>
+  bool operator()( const Iterator& c1, 
+                   const Iterator& c2) const 
+  {
+    // second to get data - problematic
+    if( c1->second.weight() < c2->second.weight()) { return true; }
+    if( c1->second.weight() > c2->second.weight()) { return false; }
+    return c1->first < c2->first;
+  }
+}; // class Weight_less
+
+
+
+
 } //namespace ctl
 
 #endif //CTLIB_WEIGHT_DATA_FUNCTOR_H

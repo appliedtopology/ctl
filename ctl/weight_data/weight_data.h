@@ -66,7 +66,7 @@ public:
   typedef Weight_ Weight;
   typedef Weight_less_ Weight_less;
   typedef std::numeric_limits< Weight_> limits;
-  Weight_data( const Weight& weight = Weight( limits::min())) : weight_( weight) {}
+  Weight_data( const Weight& weight = Weight( limits::infinity())) : weight_( weight) {}
   Weight_data( const Weight_data &from) : weight_( from.weight_) {}
   Weight_data( Weight_data &&from) : weight_( std::move( from.weight_)) {}
 
@@ -87,15 +87,6 @@ public:
 private:
   Weight_ weight_;
 }; // class Weight_data
-
-struct Weight_less {
-  template< typename Cell_iterator>
-  bool operator()( const Cell_iterator& a, const Cell_iterator& b) const {
-    if( a->second.weight() < b->second.weight()) return true;
-    if( b->second.weight() > a->second.weight()) return false;
-    return a->first < b->first;
-  }
-}; // struct Weight_less
 
 } //namespace ctl
 

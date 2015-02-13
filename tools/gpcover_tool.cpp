@@ -45,7 +45,6 @@
 
 #include <ctl/parallel/partition_covers/covers.h>
 #include <ctl/parallel/partition_covers/cover_data.h>
-#include <ctl/parallel/partition_covers/cover_tests.h>
 
 //BOOST
 #include <boost/program_options.hpp>

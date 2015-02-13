@@ -75,7 +75,7 @@
 
 
 namespace ctl {
-
+namespace detail{
 template< typename Cell_,
 	  typename Boundary_,
 	  typename Data_,
@@ -320,7 +320,7 @@ template< typename Stream, typename Cell_,
           typename Hash_, 
           template< typename ...> class Storage_> 
 Stream& operator<<( Stream& out, 
-   const typename ctl::Simplicial_chain_complex< Cell_, Boundary_, Data_, Hash_, Storage_>::iterator c){ 
+   const typename ctl::detail::Simplicial_chain_complex< Cell_, Boundary_, Data_, Hash_, Storage_>::iterator c){ 
 	out << c->first;
 	return out;	
 }
@@ -331,7 +331,7 @@ template< typename Stream, typename Cell_,
           typename Hash_, 
           template< typename ...> class Storage_> 
 Stream& operator<<( Stream& out, 
-   const typename ctl::Simplicial_chain_complex< Cell_, Boundary_, Data_, Hash_, Storage_>::const_iterator c){ 
+   const typename ctl::detail::Simplicial_chain_complex< Cell_, Boundary_, Data_, Hash_, Storage_>::const_iterator c){ 
 	out << c->first;
 	return out;	
 }
@@ -342,7 +342,7 @@ template< typename Stream, typename Cell_,
           typename Hash_, 
           template< typename ...> class Storage_> 
 Stream& operator<<( Stream& out, 
-   const ctl::Simplicial_chain_complex< Cell_, Boundary_, Data_, Hash_, Storage_> & c){ 
+   const ctl::detail::Simplicial_chain_complex< Cell_, Boundary_, Data_, Hash_, Storage_> & c){ 
 	for(auto i = c.begin(); i != c.end(); ++i){
 		      const std::size_t id = i->second.id();
 		      out << id; 
@@ -358,7 +358,7 @@ template< typename Stream, typename Cell_,
           typename Hash_, 
           template< typename ...> class Storage_> 
 Stream& operator<<( Stream& out, 
-		    const ctl::Simplicial_chain_complex< Cell_, Boundary_, Data_, Hash_, Storage_>&& c){
+		    const ctl::detail::Simplicial_chain_complex< Cell_, Boundary_, Data_, Hash_, Storage_>&& c){
 	out << c;
 	return out;
 }
@@ -367,10 +367,10 @@ template< typename Stream, typename Cell_,
           typename Data_,
           typename Hash_, 
           template< typename ...> class Storage_> 
-Stream& operator>>( Stream& in, ctl::Simplicial_chain_complex< Cell_, Boundary_, Data_, Hash_, Storage_> & c){  
+Stream& operator>>( Stream& in, ctl::detail::Simplicial_chain_complex< Cell_, Boundary_, Data_, Hash_, Storage_> & c){  
 	return c.read( in); 
 }
-
+}
 } //namespace ctl
 
 #endif //CTL_SIMPLICIAL_CHAIN_COMPLEX_H

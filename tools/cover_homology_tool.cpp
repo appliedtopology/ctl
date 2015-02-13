@@ -74,7 +74,6 @@
 //Covers
 #include <ctl/parallel/partition_covers/covers.h>
 #include <ctl/parallel/partition_covers/cover_data.h>
-#include <ctl/parallel/partition_covers/cover_tests.h>
 
 //Blowup
 #include <ctl/product_cell/product_boundary.h>

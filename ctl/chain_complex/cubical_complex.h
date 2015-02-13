@@ -64,7 +64,6 @@ namespace detail {
 struct tnpo : public std::unary_function<std::size_t, std::size_t> {
 	std::size_t operator()( const std::size_t & i) const { return 2*i-1; }
 }; //end struct tnpo
-} //end namespace detail
 
 template< typename Cell_,
 	  typename Boundary_,
@@ -637,9 +636,9 @@ key_to_cube( const Cubical_complex & complex,
 }
 
 template< typename ... Args>
-typename ctl::Cubical_complex< Args ...>::Cell 
-cube_to_key( const ctl::Cubical_complex< Args ...>& complex, 
-	     const typename ctl::Cubical_complex< Args ...>::Cube & cube){ 
+typename ctl::detail::Cubical_complex< Args ...>::Cell 
+cube_to_key( const ctl::detail::Cubical_complex< Args ...>& complex, 
+	     const typename ctl::detail::Cubical_complex< Args ...>::Cube & cube){ 
 	return complex.cube_to_key( complex, cube);
 }
 
@@ -653,7 +652,7 @@ std::size_t cube_dimension( const Cubical_complex& complex,
 
 template< typename Stream, typename ... Args>
 Stream& operator<<( Stream& out, 
-		    const typename ctl::Cubical_complex< Args...>::
+		    const typename ctl::detail::Cubical_complex< Args...>::
 					iterator c){ 
 	out << c->first;
 	return out;	
@@ -662,7 +661,7 @@ Stream& operator<<( Stream& out,
 
 template< typename Stream, typename ... Args>
 Stream& operator<<( Stream& out, 
-		    const typename ctl::Cubical_complex< Args...>::
+		    const typename ctl::detail::Cubical_complex< Args...>::
 					const_iterator c){ 
 	out << c->first;
 	return out;	
@@ -670,8 +669,8 @@ Stream& operator<<( Stream& out,
 
 template< typename Stream, typename ... Args>
 Stream& operator<<( Stream& out, 
-		    const ctl::Cubical_complex< Args...> & c){ 
-	typedef ctl::Cubical_complex< Args...> Cubical_complex;
+		    const ctl::detail::Cubical_complex< Args...> & c){ 
+	typedef ctl::detail::Cubical_complex< Args...> Cubical_complex;
 	typedef typename Cubical_complex::Cube Cube;
    	Cube cube; 
 	for(auto i = c.begin(); i != c.end(); ++i){
@@ -685,16 +684,17 @@ Stream& operator<<( Stream& out,
 
 template< typename Stream, typename ... Args>
 Stream& operator<<( Stream& out, 
-   const ctl::Cubical_complex< Args...>  && c){ 
+   const ctl::detail::Cubical_complex< Args...>  && c){ 
 	out << c;
 	return out;
 }
 
 template< typename Stream, typename ... Args>
 Stream& operator>>( Stream& in, 
-		    ctl::Cubical_complex< Args...> & c){  
+		    ctl::detail::Cubical_complex< Args...> & c){  
 return c.read( in); 
 }
+} //end namespace detail
 
 } //namespace ctl
 

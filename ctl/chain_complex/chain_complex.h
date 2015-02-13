@@ -135,18 +135,31 @@ typename std::conditional<
 std::is_same< typename detail::recombine< Cell, detail::Dummy>::type, 
 	      ctl::Cube< detail::Dummy> >::value, 
 //then we create a Cubical_complex which optimizes storage.
- ctl::Cubical_complex< Cell, 
+ ctl::detail::Cubical_complex< Cell, 
 		       Boundary, 
 		       Data, 
 		       Hash, 
 		       Storage>,
 //Otherwise all other cell types are stored generically
- ctl::Simplicial_chain_complex< Cell, 
+ ctl::detail::Simplicial_chain_complex< Cell, 
 			        Boundary, 
 			        detail::Data_wrapper< Data>, 
 			        Hash, 
 			        Storage> 
 	    >::type;
+
+
+template< std::size_t N, typename T, typename Vertex_type=int>
+using Simplicial_complex = 
+ctl::Chain_complex< ctl::Abstract_simplex< Vertex_type>, 
+		    ctl::Simplex_boundary< ctl::Abstract_simplex< Vertex_type>, 
+				           ctl::Finite_field< N> >, T>;
+
+template< std::size_t N, typename T, typename Vertex_type=int>
+using Cubical_complex =
+ctl::Chain_complex< ctl::Cube< Vertex_type>, 
+		    ctl::Cube_boundary< ctl::Cube< Vertex_type>, 
+					ctl::Finite_field< N> >, T>;
 
 //! Utility to read a complex and any associated data 
 template<typename String, typename Complex, typename Functor>
