@@ -31,6 +31,8 @@ add_subdirectory( tools)
 #Compile all the tools
 add_subdirectory( tests)
 
+enable_testing()
+add_test(gtest tests/ctl_test)
 
 #All of this is for make install
 set(CTL_INCLUDE_INSTALL_DIR ${CMAKE_SOURCE_DIR}/include)

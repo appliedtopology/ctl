@@ -1,6 +1,4 @@
 # README #
-
-
 This C++11 library provides a set of generic tools for:
 
  * Generating point sets (coming soon)
@@ -51,17 +49,19 @@ This list of the dependencies is below and we have annoted
 which packages we can auto-help you install locally.
 
 C++11 compiler (clang or gcc)
-GTest (make gtest)
-MPI 
-Boost with MPI (make boost)
+GTest (cmake .; make will download and compile automagically)
+#MPI 
+Boost #(with MPI) 
 Intel's TBB 
 METIS (make metis) (used for graph partitioning)
 ANN (make ann)
 Doxygen (Optional)
 
 ## BUILDING ##
-1. Make sure you have all the dependencies and you know the paths to the include/link directories and	
+0. You may specify paths to the include/link directories here:	
 	`vim build_dependencies.txt`
+1. CMake will use what you specify, and if you dont it will look on the system
+   for dependencies (and ideally find them...)
 2. Create makefiles
 	`cmake .`
 3. Compile: (the -j option makes in parallel)
@@ -81,16 +81,16 @@ if boost is compiled with gcc, you cannot use clang to compile CTL and vice vers
 
 ## INSTALL ##
 
+OS/X:
+ `brew tap appliedtopology/software`
+ `brew install ctl`
+
 Fedora/CentOS/RHEL:(coming soon)
 `yum install ctl` 
 
 Ubuntu:  (coming soon)
  `apt-get install ctl`
 
-OS/X
- `brew tap appliedtopology/software`
- `brew install ctl`
- 
 ## INSTALL (from source) ##
  `make install`
 
