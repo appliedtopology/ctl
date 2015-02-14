@@ -19,7 +19,7 @@ add_definitions(" -fno-omit-frame-pointer -Wall -ansi -std=c++11")
 
 #Fix issues on LINUX
 if (NOT APPLE)
-	set(DSO_FIXES rt)
+	set(DSO_FIX rt)
 endif (NOT APPLE)
 
 #Handle dependencies
