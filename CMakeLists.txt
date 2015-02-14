@@ -10,12 +10,24 @@ if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" VERSION_GREATER 2.6)
   endif()
 endif()
 
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++1y" COMPILER_SUPPORTS_CXX1y)
+CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+if(COMPILER_SUPPORTS_CXX11)
+	add_definitions("-std=c++11")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+        message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has C++11 support.")
+else()
+        message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+endif()
+
 #zoom zoom
 set(CMAKE_BUILD_TYPE Release)
 
 #Frame pointers are useful for profiling. 
 #Complaints and pedantry accepted here.
-add_definitions(" -fno-omit-frame-pointer -Wall -ansi -std=c++11")
+add_definitions("-fno-omit-frame-pointer -Wall -ansi -std=c++11")
 
 #Fix issues on LINUX
 if (NOT APPLE)
