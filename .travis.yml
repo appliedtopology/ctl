@@ -16,5 +16,5 @@ before_install:
 
 script: 
  - cmake .
- - make -j VERBOSE=1
+ - make VERBOSE=1
  - make test
