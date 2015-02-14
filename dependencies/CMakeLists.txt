@@ -23,9 +23,11 @@ add_custom_target(boost COMMAND cmake . -DBoost_Version_Underscore=${Boost_Versi
 		        COMMAND make WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/dependencies/external/boost)
 add_custom_target(metis COMMAND cmake . -DMetis_Version=${Metis_Version} COMMAND make 
 		 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/depedencies/external/metis)
-
+if( APPLE)
 include_directories(/usr/local/include)
 link_directories(/usr/local/lib)
+endif( APPLE)
+
 #if( bdvars NOTFOUND)
 ##TODO: Check if not found
 #endif()

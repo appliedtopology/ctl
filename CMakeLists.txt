@@ -32,7 +32,7 @@ add_definitions("-fno-omit-frame-pointer -Wall -ansi -std=c++11")
 #Fix issues on LINUX
 if (NOT APPLE)
 	set(DSO_FIX rt)
-	set(PTHREAD pthread)
+	set(PTHREAD_LIBRARY pthread)
 endif (NOT APPLE)
 
 #Handle dependencies
