@@ -14,7 +14,6 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then ./dependencies/ci_linux.sh ; fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then ./dependencies/ci_osx.sh ; fi
 
-
 script: 
  - cmake .
  - make -j
