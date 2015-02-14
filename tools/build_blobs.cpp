@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
 	    output_complex.insert_open_cell( cell);
 	}
   }
-  if (flag > 0 && flag <= num_vertices) { 
+  if (flag > 0 && (std::size_t)flag <= num_vertices) { 
 	for( int i=0; i < (int)num-1; ++i){
 		Cell cell = { i*max_vertex_name, (i+1)*max_vertex_name};
 		for (int j = 2; j < flag+1; ++j){
