@@ -52,7 +52,6 @@ int main (int argc, char* argv[]) {
     } 
     ctl::Timer clock;
     double epsilon = atof( argv[ 2]);
-    std::size_t dimension = atoi( argv[ 3]);
 
     Points points; 
     std::ifstream in;
