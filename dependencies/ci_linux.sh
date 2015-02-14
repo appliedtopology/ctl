@@ -9,4 +9,5 @@ if [ "$CXX" == "g++" ]; then
          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 40 --slave /usr/bin/g++ g++ /usr/bin/g++-4.8 
          sudo update-alternatives --config gcc 
 fi
+sudo apt-cache search *boost*
 sudo apt-get install libann-dev libboost1.54-all-dev libtbb-dev libmetis-dev 
