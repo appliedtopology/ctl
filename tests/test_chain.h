@@ -54,7 +54,7 @@ typedef ctl::Chain_complex< Simplex, Boundary> Complex;
 typedef Complex::Cell Cell;
 typedef ctl::Complex_boundary< Complex> Complex_boundary;
 typedef Complex_boundary::Term Term;
-typedef ctl::Filtration< Complex, ctl::Id_less> Filtration;
+//typedef ctl::Filtration< Complex, ctl::Id_less> Filtration;
 typedef ctl::Chain< Term, ctl::Term_cell_less< ctl::Id_less> > Chain;
  
 Complex complex;

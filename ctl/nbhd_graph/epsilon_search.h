@@ -72,11 +72,11 @@ void construct_graph( const Points& points,
 		      const double epsilon, 
 		      Graph& graph) {
     typedef typename boost::graph_traits<Graph> graph_traits;
-    typedef typename graph_traits::vertex_iterator vertex_iterator;
+    //typedef typename graph_traits::vertex_iterator vertex_iterator;
     typedef typename boost::graph_traits< Graph>::vertex_descriptor vertex_descriptor; 
     typedef typename boost::property_map< Graph,
 					  boost::vertex_name_t>::type name_map_t;
-    typedef typename boost::property_traits< name_map_t>::value_type  vertex_name_t;
+    //typedef typename boost::property_traits< name_map_t>::value_type  vertex_name_t;
     typedef typename boost::property_map< Graph, boost::edge_weight_t>::type
       weight_map_t;
     typedef typename boost::property_traits< weight_map_t>::value_type

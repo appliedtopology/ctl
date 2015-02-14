@@ -57,7 +57,7 @@ namespace ctl{
 
 template< typename Point, int p=2>
 double lp( const Point & a, const Point & b) {
-	typedef typename Point::const_iterator iterator;
+	//typedef typename Point::const_iterator iterator;
 	double dist=0;
 	auto i = a.begin(); 
 	for(  auto j = b.begin(); i != a.end(); ++i, ++j){
@@ -68,7 +68,7 @@ double lp( const Point & a, const Point & b) {
 
 template< typename Point>
 double hamming( const Point & a, const Point & b) {
-	typedef typename Point::const_iterator iterator;
+	//typedef typename Point::const_iterator iterator;
 	double dist=0;
 	auto i = a.begin();
 	for( auto j = b.begin(); i != a.end(); ++i, ++j){

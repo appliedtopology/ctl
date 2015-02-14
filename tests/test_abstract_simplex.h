@@ -46,7 +46,6 @@
 
 TEST(Simplex, DefaultConstruct){
 	typedef ctl::Abstract_simplex< int> Simplex;
-	typedef ctl::Simplex_boundary< Simplex, int> Boundary;
 
 	Simplex s;
 	ASSERT_EQ(s.size(), 0);
@@ -54,7 +53,6 @@ TEST(Simplex, DefaultConstruct){
 
 TEST(Simplex, InsertCopyTest){
 	typedef ctl::Abstract_simplex< int> Simplex;
-	typedef ctl::Simplex_boundary< Simplex, int> Boundary;
 
 	Simplex s;
 	s.insert( 2);
@@ -67,7 +65,6 @@ TEST(Simplex, InsertCopyTest){
 
 TEST(Simplex,InitializerListAndRemove){
 	typedef ctl::Abstract_simplex< int> Simplex;
-	typedef ctl::Simplex_boundary< Simplex, int> Boundary;
 
 	Simplex t( {1,2,5,5,4});
 	Simplex s;
@@ -94,7 +91,6 @@ TEST(Simplex, SimplexBoundary){
 
 TEST(Simplex, SelfAssignmentComparison){
 	typedef ctl::Abstract_simplex< int> Simplex;
-	typedef ctl::Simplex_boundary< Simplex, int> Boundary;
 
 	Simplex s{ 3,4,5};
 	s = s;
