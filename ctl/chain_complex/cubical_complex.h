@@ -102,7 +102,7 @@ public: //Public Types
 public:
    //Constructors
    //!Default
-   Cubical_complex() {}
+   Cubical_complex(): bd( *this) {}
 
 public:
   /**
@@ -142,8 +142,8 @@ public:
 		     i != index_data.end(); ++i){ 
 		     *i *= *(i-1); 
 	  }
-	  assign_keys();
-   }
+	 assign_keys();
+  }
 
   /**
   * @brief 
@@ -378,19 +378,22 @@ public:
    }
 
     
-    
-   template< typename Coordinate>
-   std::size_t id_and_bits_to_index( std::size_t index) const {
+   std::size_t id_and_bits_to_index( std::size_t id_and_bits) const {
 	//By linearity the id_and_bits_encoding can be immediately turned into
 	//the array_index	
-	std::size_t vertex_id = index >> cells.dimension();
+	std::size_t vertex_id = id_and_bits >> cells.dimension();
 	for( auto i = 0; i < cells.dimension(); ++i){ 
-		std::size_t mask = ((index&(1 <<i)) > 0);
+		std::size_t mask = ((id_and_bits&(1 <<i)) > 0);
 		vertex_id += mask*index_data[ i]; 
 	}
 	return vertex_id;
    }
 
+   template< typename Coordinate>
+   Coordinate& id_and_bits_to_coordinate( std::size_t id_and_bits, const Coordinate & c) const{
+	return index_to_coordinate( id_and_bits_to_index( id_and_bits), c);
+   }
+ 
    template< typename Coordinate>
    std::size_t coordinate_to_id_and_bits( const Coordinate & c) const {
 	Coordinate vertex_coords( c);

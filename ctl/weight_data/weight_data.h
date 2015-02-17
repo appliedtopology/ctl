@@ -80,7 +80,8 @@ public:
     weight_ = std::move( from.weight_);
     return *this;
   }
-  
+  void uninitialize_weight() { weight_ = limits::infinity(); }
+  bool initialized() const { return !(weight_ == limits::infinity()); }  
   Weight&        weight()         { return weight_; }
   void 		 weight( const Weight & w) { weight_ = w; }
   const Weight   weight() const   { return weight_; }

@@ -215,9 +215,9 @@ class Cube_boundary_wrapper: Cell_boundary_{
     /**
     * @brief Default constructor
     */
-    Cube_boundary_wrapper( const Complex & c_): Cell_boundary_(), c( c_){};	
+    Cube_boundary_wrapper( const Complex & c_): Cell_boundary_(), c( &c_){};	
     
-    Cube_boundary_wrapper( const Complex & c_, Cell_boundary_ & b): Cell_boundary_( b), c( c_){};	
+    Cube_boundary_wrapper( const Complex & c_, Cell_boundary_ & b): Cell_boundary_( b), c( &c_){};	
     /**
     * @brief Equality assignment operator 
     * @param Cube_boundary_wrapper& from
@@ -236,7 +236,7 @@ class Cube_boundary_wrapper: Cell_boundary_{
     * @return const_iterator
     */
     const_iterator begin( const std::size_t s) const { 
-	return const_iterator( c, s); 
+	return const_iterator( *c, s); 
    }
     
     /**
@@ -265,12 +265,12 @@ class Cube_boundary_wrapper: Cell_boundary_{
 
     std::size_t dimension( const std::size_t & c_) const{ 
      	std::size_t d = 0;
-     	for( auto i = 0; i < c.dimension(); ++i){ d+= (c_&(i+1)); }
+     	for( auto i = 0; i < c->dimension(); ++i){ d+= (c_&(i+1)); }
      	return d;
     }
 
     private:
-    const Complex & c;
+    const Complex* c;
 }; //end class Cube_boundary_wrapper
 
 } // end namespace detail
