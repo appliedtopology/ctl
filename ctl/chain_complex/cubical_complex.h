@@ -61,9 +61,9 @@
 namespace ctl {
 namespace detail {
 //2*n-1
-struct tnpo : public std::unary_function<std::size_t, std::size_t> {
+struct tnmo : public std::unary_function<std::size_t, std::size_t> {
 	std::size_t operator()( const std::size_t & i) const { return 2*i-1; }
-}; //end struct tnpo
+}; //end struct tnmo
 
 template< typename Cell_,
 	  typename Boundary_,
@@ -102,7 +102,7 @@ public: //Public Types
 public:
    //Constructors
    //!Default
-   Cubical_complex(): bd( *this) {}
+   Cubical_complex(): cells(), index_data(), bd( *this) {}
 
 public:
   /**
@@ -114,9 +114,9 @@ public:
   */
    template< typename Vertex_extents>
    Cubical_complex( Boundary_ & bd_, Vertex_extents & d_):
-    cells( boost::make_transform_iterator( d_.begin(), detail::tnpo()),  
-	   boost::make_transform_iterator( d_.end(), detail::tnpo())), 
-	   bd( *this, bd_), index_data( d_) { 
+    cells( boost::make_transform_iterator( d_.begin(), detail::tnmo()),  
+	   boost::make_transform_iterator( d_.end(), detail::tnmo())), 
+	   index_data( d_), bd( *this, bd_){ 
 	   index_data.insert( index_data.begin(), 1);
    	   for( auto i = ++index_data.begin(); 
 		     i != index_data.end(); ++i){ 
@@ -133,10 +133,9 @@ public:
   */
    template< typename Vertex_extents>
    Cubical_complex( const Vertex_extents& d_): 
-     cells( boost::make_transform_iterator( d_.begin(), detail::tnpo()), 
-	   boost::make_transform_iterator( d_.end(), detail::tnpo())), 
-    index_data( d_), 
-	bd( *this){ 
+     cells( boost::make_transform_iterator( d_.begin(), detail::tnmo()), 
+	   boost::make_transform_iterator( d_.end(), detail::tnmo())), 
+	   index_data( d_), bd( *this){
 	  index_data.insert( index_data.begin(), 1);
    	   for( auto i = ++index_data.begin(); 
 		     i != index_data.end(); ++i){ 
@@ -155,9 +154,9 @@ public:
    template< typename Vertex_extents, typename Offset>
    Cubical_complex( const Vertex_extents& d_,
 		    const Offset& offset_): 
-     cells( boost::make_transform_iterator( d_.begin(), detail::tnpo()), 
-	    boost::make_transform_iterator( d_.end(), detail::tnpo()),
-	    offset_), index_data( d_), bd( *this){ 
+     cells( boost::make_transform_iterator( d_.begin(), detail::tnmo()), 
+	    boost::make_transform_iterator( d_.end(), detail::tnmo()),
+	    offset_), bd( *this), index_data( d_){
 	  index_data.insert( index_data.begin(), 1);
  	   for( auto i = ++index_data.begin(); 
 		     i != index_data.end(); ++i){ 
@@ -178,8 +177,8 @@ public:
 		    const Vertex_extents& d_,
 		    Function_values & f,
 		    const Vertex_extents& offsets_): 
-     cells( boost::make_transform_iterator( d_.begin(), detail::tnpo()), 
-	   boost::make_transform_iterator( d_.end(), detail::tnpo())), 
+     cells( boost::make_transform_iterator( d_.begin(), detail::tnmo()), 
+	   boost::make_transform_iterator( d_.end(), detail::tnmo())), 
     bd( bd_), index_data( d_){ 
 	  index_data.insert( index_data.begin(), 1);
  	   for( auto i = ++index_data.begin(); 
@@ -191,13 +190,14 @@ public:
 
    //! Copy
    Cubical_complex( const Cubical_complex & b): 
-   cells( b.cells), index_data( b.index_data), bd( b.bd) {}
+   cells( b.cells), bd( b.bd), index_data( b.index_data) {}
 
    //! Move
    Cubical_complex( Cubical_complex && b): 
    cells( std::move( b.cells)), 
-   index_data( std::move( b.index_data)),
-   bd( std::move( b.bd)){}
+   bd( std::move( b.bd)),
+   index_data( std::move( b.index_data))
+   {}
    //! Assignment operator
    Cubical_complex& operator=( const Cubical_complex& b){
    	bd = b.bd;
@@ -355,7 +355,7 @@ public:
     //we think of a grid which is the 
     //cartesian product like this:
     //*-*-*-*-* x *-*-*-*
-    detail::tnpo t;
+    detail::tnmo t;
     cells.resize( boost::make_transform_iterator( ++index_data.begin(), t),
        	          boost::make_transform_iterator( index_data.end(), t));
     
