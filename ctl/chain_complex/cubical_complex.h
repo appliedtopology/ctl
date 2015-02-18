@@ -156,7 +156,7 @@ public:
 		    const Offset& offset_): 
      cells( boost::make_transform_iterator( d_.begin(), detail::tnmo()), 
 	    boost::make_transform_iterator( d_.end(), detail::tnmo()),
-	    offset_), bd( *this), index_data( d_){
+	    offset_),index_data( d_), bd( *this){ 
 	  index_data.insert( index_data.begin(), 1);
  	   for( auto i = ++index_data.begin(); 
 		     i != index_data.end(); ++i){ 

@@ -74,7 +74,7 @@ class multi_array {
   /**
   * @brief Default constructor
   */
-  multi_array(){}	
+  multi_array(): data(), d_(), extents_(), base_(){}	
   multi_array( const multi_array& c): 
   data( c.data), d_( c.d_), extents_(c.extents_), base_( c.base_){} 
 
@@ -137,16 +137,12 @@ class multi_array {
   */
   template< typename Extents_iterator>
   multi_array( Extents_iterator begin, Extents_iterator end, 
-	       const Coordinate & base__): 
-   d_( begin, end), extents_( begin, end), base_( base__){ 
+	       const Coordinate & base__):
+   data(), d_( begin, end), extents_( begin, end), base_( base__){ 
    assert( base_.size() == d_.size());
    for( auto i = ++d_.begin(); i != d_.end(); ++i){ *i *= *(i-1); }
    data.resize( *(d_.rbegin()));
   }
-
-
-
-
    
   /**
   * @brief Reindexes the array to be "rooted" at position given by c 
