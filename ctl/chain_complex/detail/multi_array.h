@@ -74,7 +74,7 @@ class multi_array {
   /**
   * @brief Default constructor
   */
-  multi_array(){}	
+  multi_array(): data(), d_(), extents_(), base_() {}	
   multi_array( const multi_array& c): 
   data( c.data), d_( c.d_), extents_(c.extents_), base_( c.base_){} 
 
