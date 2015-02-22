@@ -87,6 +87,7 @@ private: //Private types
    typedef typename Storage::Coordinate  Vector;
 public: //Public Types
    typedef typename std::size_t size_type;
+   typedef typename Storage::Coordinate  Coordinate;
 
    typedef typename Storage::iterator iterator;
    typedef typename Storage::const_iterator const_iterator;
@@ -390,8 +391,8 @@ public:
    }
 
    template< typename Coordinate>
-   Coordinate& id_and_bits_to_coordinate( std::size_t id_and_bits, const Coordinate & c) const{
-	return index_to_coordinate( id_and_bits_to_index( id_and_bits), c);
+   Coordinate& id_and_bits_to_coordinate( std::size_t id_and_bits, Coordinate & c) const{
+	return cells.index_to_coordinate( id_and_bits_to_index( id_and_bits), c);
    }
  
    template< typename Coordinate>

@@ -100,7 +100,7 @@ class Abstract_simplex {
 	//! Default constructor
 	Abstract_simplex(): vertices(){};
 	//! Reserves space for at least d vertices.
-	Abstract_simplex( size_t d) { vertices.reserve( d); }
+	Abstract_simplex( size_t d): vertices() { vertices.reserve( d); }
 	//! Reserves space for at least d vertices and initializes them to t
 	Abstract_simplex( size_t d, const T & t): vertices( d, t){}
 	//! Initializer list constructor
@@ -113,7 +113,7 @@ class Abstract_simplex {
 	//!  Range constructor 
 	template< typename Iterator>
 	Abstract_simplex( const Iterator begin, 
-			  const Iterator end): vertices( begin,end){}
+			  const Iterator end): vertices( begin, end){}
 	//! Copies the data from one simplex to another
 	Abstract_simplex( const Self & from): vertices( from.vertices){}
 	//! Moves the data from one simplex to another
@@ -211,7 +211,7 @@ class Abstract_simplex {
 		vertices.insert( vertices.end(), first, last);
 		std::inplace_merge( vertices.begin(), 
 				    vertices.begin()+offset, vertices.end());
-		vertices.erase( unique( vertices.begin(), vertices.end() ), 
+		vertices.erase( std::unique( vertices.begin(), vertices.end() ), 
 				vertices.end() );
 	}
 	

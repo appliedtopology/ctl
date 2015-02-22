@@ -66,7 +66,8 @@ public:
   typedef Weight_ Weight;
   typedef Weight_less_ Weight_less;
   typedef std::numeric_limits< Weight_> limits;
-  Weight_data( const Weight& weight = Weight( limits::infinity())) : weight_( weight) {}
+  Weight_data(): weight_( Weight( limits::infinity())) {}
+  Weight_data( const Weight& weight) : weight_( weight) {}
   Weight_data( const Weight_data &from) : weight_( from.weight_) {}
   Weight_data( Weight_data &&from) : weight_( std::move( from.weight_)) {}
 
