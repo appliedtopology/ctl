@@ -104,50 +104,15 @@ class multi_array {
   * @param begin
   * @param end
   */
-  template< typename Extents_iterator, typename Data_iterator>
+  template< typename Extents_iterator, typename Base_iterator>
   multi_array( Extents_iterator begin, Extents_iterator end,
-	       Data_iterator begin1, Data_iterator end1): 
-   data( begin1, end1), d_( begin, end), 
-   extents_( begin, end), base_( d_.size(), 0){
-   for( auto i = ++d_.begin(); i != d_.end(); ++i){ *i *= *(i-1); }
-  }
-
-
-  /**
-  * @brief Complete constructor, specifies extents_, data, 
-  * and optionally, base coordinate
-  * @tparam Extents_iterator
-  * @param begin
-  * @param end
-  */
-  template< typename Extents_iterator, typename Data_iterator>
-  multi_array( Extents_iterator begin, Extents_iterator end,
-	       Data_iterator begin1, Data_iterator end1, 
-	       const Coordinate & base__): 
-   data( begin1, end1), d_( begin, end), extents_( begin, end), base_( base__){ 
+	       Base_iterator begin2, Base_iterator end2): 
+   data( std::accumulate(begin, end, 1, std::multiplies< double>())),
+   d_( begin, end), extents_( begin, end), base_( begin2, end2){ 
    assert( base_.size() == d_.size());
    for( auto i = ++d_.begin(); i != d_.end(); ++i){ *i *= *(i-1); }
   }
-  /**
-  * @brief Complete constructor, specifies extents_, data, 
-  * and optionally, base coordinate
-  * @tparam Extents_iterator
-  * @param begin
-  * @param end
-  */
-  template< typename Extents_iterator>
-  multi_array( Extents_iterator begin, Extents_iterator end, 
-	       const Coordinate & base__): 
-   d_( begin, end), extents_( begin, end), base_( base__){ 
-   assert( base_.size() == d_.size());
-   for( auto i = ++d_.begin(); i != d_.end(); ++i){ *i *= *(i-1); }
-   data.resize( *(d_.rbegin()));
-  }
 
-
-
-
-   
   /**
   * @brief Reindexes the array to be "rooted" at position given by c 
   * Complexity: Runs in O(d) time where d is the dimension of the array.

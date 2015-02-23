@@ -65,6 +65,13 @@ struct tnmo : public std::unary_function<std::size_t, std::size_t> {
 	std::size_t operator()( const std::size_t & i) const { return 2*i-1; }
 }; //end struct tnmo
 
+//2*n
+struct two: public std::unary_function<std::size_t, std::size_t> {
+	std::size_t operator()( const std::size_t & i) const { return 2*i; }
+}; //end struct two
+
+
+
 template< typename Cell_,
 	  typename Boundary_,
 	  typename Data_,
@@ -104,7 +111,15 @@ public:
    //Constructors
    //!Default
    Cubical_complex(): cells(), index_data(), bd( *this) {}
-
+private:
+   void compute_index_data_and_keys(){
+     index_data.insert( index_data.begin(), 1);
+     for( auto i = ++index_data.begin(); 
+        i != index_data.end(); ++i){ 
+        *i *= *(i-1); 
+     }
+     assign_keys();
+  }
 public:
   /**
   * @brief 
@@ -117,14 +132,7 @@ public:
    Cubical_complex( Boundary_ & bd_, Vertex_extents & d_):
     cells( boost::make_transform_iterator( d_.begin(), detail::tnmo()),  
 	   boost::make_transform_iterator( d_.end(), detail::tnmo())), 
-	   index_data( d_), bd( *this, bd_){ 
-	   index_data.insert( index_data.begin(), 1);
-   	   for( auto i = ++index_data.begin(); 
-		     i != index_data.end(); ++i){ 
-		     *i *= *(i-1); 
-	   }
-	   assign_keys();
-  }
+	   index_data( d_), bd( *this, bd_){ compute_index_data_and_keys(); }
    
   /**
   * @brief Vertex_extents
@@ -136,14 +144,7 @@ public:
    Cubical_complex( const Vertex_extents& d_): 
      cells( boost::make_transform_iterator( d_.begin(), detail::tnmo()), 
 	   boost::make_transform_iterator( d_.end(), detail::tnmo())), 
-	   index_data( d_), bd( *this){
-	  index_data.insert( index_data.begin(), 1);
-   	   for( auto i = ++index_data.begin(); 
-		     i != index_data.end(); ++i){ 
-		     *i *= *(i-1); 
-	  }
-	 assign_keys();
-  }
+	   index_data( d_), bd( *this){ compute_index_data_and_keys(); }
 
   /**
   * @brief 
@@ -157,38 +158,10 @@ public:
 		    const Offset& offset_): 
      cells( boost::make_transform_iterator( d_.begin(), detail::tnmo()), 
 	    boost::make_transform_iterator( d_.end(), detail::tnmo()),
-	    offset_), index_data( d_), bd( *this){
-	  index_data.insert( index_data.begin(), 1);
- 	   for( auto i = ++index_data.begin(); 
-		     i != index_data.end(); ++i){ 
-		     *i *= *(i-1); 
-	  }
-	  assign_keys();
-   }
+	    boost::make_transform_iterator( offset_.begin(), detail::two()),
+	    boost::make_transform_iterator( offset_.end(), detail::two())),
+	    index_data( d_), bd( *this){ compute_index_data_and_keys(); }
    
-   /**
-   * @brief boundary, length, and starting vertex constructor 
-   * @tparam Vertex_extents
-   * @param bd_
-   * @param d_
-   * @param offsets_
-   */
-   template< typename Vertex_extents, typename Function_values> 
-   Cubical_complex( Cell_boundary & bd_, 
-		    const Vertex_extents& d_,
-		    Function_values & f,
-		    const Vertex_extents& offsets_): 
-     cells( boost::make_transform_iterator( d_.begin(), detail::tnmo()), 
-	   boost::make_transform_iterator( d_.end(), detail::tnmo())), 
-    bd( bd_), index_data( d_){ 
-	  index_data.insert( index_data.begin(), 1);
- 	   for( auto i = ++index_data.begin(); 
-		     i != index_data.end(); ++i){ 
-		     *i *= *(i-1); 
-	  }
-	  assign_keys();
-   }
-
    //! Copy
    Cubical_complex( const Cubical_complex & b): 
    cells( b.cells), bd( b.bd), index_data( b.index_data) {}
