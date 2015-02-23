@@ -157,7 +157,7 @@ public:
 		    const Offset& offset_): 
      cells( boost::make_transform_iterator( d_.begin(), detail::tnmo()), 
 	    boost::make_transform_iterator( d_.end(), detail::tnmo()),
-	    offset_), bd( *this), index_data( d_){
+	    offset_), index_data( d_), bd( *this){
 	  index_data.insert( index_data.begin(), 1);
  	   for( auto i = ++index_data.begin(); 
 		     i != index_data.end(); ++i){ 
@@ -440,6 +440,8 @@ public:
    	}
    	return true;
    }
+   Coordinate base() const { return cells.base; }
+   std::size_t base( std::size_t i) const { return cells.base( i); }
 
    std::size_t offset( std::size_t i) const { if( i){ return cells.offsets( i-1); } return 1; }
 //Private functions

@@ -224,10 +224,18 @@ class Cube_boundary_wrapper: Cell_boundary_{
     * @return reference to this.
     */
     Cube_boundary_wrapper& operator=( const Cube_boundary_wrapper& from){ 
-	c = from.c;
 	Cell_boundary_::operator=( from);
+	c = from.c;
 	return *this; 
     }
+
+    Cube_boundary_wrapper& operator=( Cube_boundary_wrapper&& from){ 
+	Cell_boundary_::operator=( std::move( from));
+	//c = std::move( from.c);
+	from.c = nullptr;
+	return *this; 
+    }
+ 
     
     /**
     * @brief boundary begin

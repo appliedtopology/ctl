@@ -215,16 +215,16 @@ class multi_array {
   * @return 
   */
  
-  iterator rbegin() 	        { return data.rbegin(); }
-  const_iterator rbegin() const { return data.rbegin(); }
+  reverse_iterator rbegin() 	        { return data.rbegin(); }
+  const_reverse_iterator rbegin() const { return data.rbegin(); }
 
   /**
   * @brief returns a reverse_iterator to the before-the-first element of the array
   * @return 
   */
  
-  iterator rend() 	       { return data.rend(); }
-  const_iterator rend()  const { return data.rend(); }
+  reverse_iterator rend() 	       { return data.rend(); }
+  const_reverse_iterator rend()  const { return data.rend(); }
   
   /**
   * @brief Reserves internal storage to hold at least n elements sizeof(Data)
