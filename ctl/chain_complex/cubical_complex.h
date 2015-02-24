@@ -363,6 +363,11 @@ public:
 	return vertex_id;
    }
 
+   Coordinate id_and_bits_to_coordinate( std::size_t id_and_bits) const {
+	Coordinate c;
+	return cells.index_to_coordinate( id_and_bits_to_index( id_and_bits), c);
+   }
+
    template< typename Coordinate>
    Coordinate& id_and_bits_to_coordinate( std::size_t id_and_bits, Coordinate & c) const{
 	return cells.index_to_coordinate( id_and_bits_to_index( id_and_bits), c);
