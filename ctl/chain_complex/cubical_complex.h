@@ -399,6 +399,7 @@ public:
 	std::size_t mask = (1 << (dimension()+1)) - 1;
 	return __builtin_popcount( c & mask);
    }
+   Coordinate extents() const { return cells.extents(); }
    const std::size_t size() const { return cells.size(); }
    const std::size_t size( std::size_t i) const { return cells.extents( i); }
    Cell_boundary& cell_boundary() { return bd; }
@@ -413,7 +414,7 @@ public:
    	}
    	return true;
    }
-   Coordinate base() const { return cells.base; }
+   Coordinate base() const { return cells.base(); }
    std::size_t base( std::size_t i) const { return cells.base( i); }
 
    std::size_t offset( std::size_t i) const { if( i){ return cells.offsets( i-1); } return 1; }
