@@ -90,7 +90,10 @@
 //forward declaration
 namespace ctl{
 namespace parallel{
-struct Default_data {}; //class Default_data for complex.
+struct Default_data {
+constexpr bool operator==( const Default_data & d) const{ return true; }
+constexpr bool operator<( const Default_data & d) const { return false; }
+}; //class Default_data for complex.
 template< typename Cell_, typename Boundary_,
 	  typename Data_, typename Hash_>
 class Chain_complex;
@@ -131,6 +134,12 @@ class Concurrent_data_wrapper : public Data_ {
    	return *this;
    }
 
+   bool operator<( const Self & from) const{
+	return Data_::operator<( from);
+   }
+   bool operator==( const Self & b) const {
+	return (id_ == b.id_) && Data_::operator==( b);
+   }
 
    Safe_id id() const { return id_; }
    //a bit akward.. probably should change this later.
@@ -144,11 +153,15 @@ class Concurrent_data_wrapper : public Data_ {
 }; // class Concurrent_data_wrapper
 } //anonymous namespace
 
-
 template< typename Stream>
 Stream& operator<<( Stream & out, const ctl::parallel::Default_data & d){ 
 	return out; 
 }
+template< typename Stream>
+Stream& operator<<( Stream & out, const ctl::parallel::Default_data && d){ 
+	return out; 
+}
+
 
 //exported functionality
 namespace ctl{

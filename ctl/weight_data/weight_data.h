@@ -71,6 +71,11 @@ public:
   Weight_data( const Weight_data &from) : weight_( from.weight_) {}
   Weight_data( Weight_data &&from) : weight_( std::move( from.weight_)) {}
 
+
+  
+  bool operator<( const Weight_data & d) const {
+	return Weight_less_::operator()( weight_, d.weight_); 
+  }
   // assignment operator
   Weight_data& operator=( const Weight_data& from) {
     weight_ = from.weight_;

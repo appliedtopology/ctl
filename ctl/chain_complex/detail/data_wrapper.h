@@ -41,53 +41,50 @@
 namespace ctl {
 namespace detail {
 
-
 struct Default_data {
 constexpr bool operator==( const Default_data & d) const{ return true; }
+constexpr bool operator<( const Default_data & d) const { return false; }
 }; //class Default_data for complex.
 
-
-template< typename Data1_, typename Data2_=Default_data>
-class Data_wrapper : public Data1_ , public Data2_ {
-   private:
-   typedef Data_wrapper< Data1_, Data2_> Self;
-   public:
-   //default
-   Data_wrapper(): Data1_(), Data2_(){}
-   //copy
-   Data_wrapper( const Data_wrapper & from) : Data1_( from), Data2_( from){} 
-   //move
-   Data_wrapper( const Data_wrapper && from): Data1_( std::forward( from)), 
-					      Data2_( std::forward( from)){}
-
-   Self& operator=( const Self & from){
-   	Data1_::operator=( from);
-   	Data2_::operator=( from);
-   	return *this;
-   }
-
-   Self& operator=( Self && from){
-   	Data1_::operator=( from);
-   	Data2_::operator=( from);
-   	return *this;
-   }
-
-   bool operator==( const Self & b) const {
-	return     Data1_::operator==( b)
-		&& Data2_::operator==( b);
-   }
-   bool operator!= (const Self & b) const { return !((*this)==b); }
-}; // class Data_wrapper< D1, D2> 
-
-
-
-
+//template< typename Data1_, typename Data2_=Default_data>
+//class Data_wrapper : public Data1_ , public Data2_ {
+//   private:
+//   typedef Data_wrapper< Data1_, Data2_> Self;
+//   public:
+//   //default
+//   Data_wrapper(): Data1_(), Data2_(){}
+//   //copy
+//   Data_wrapper( const Data_wrapper & from) : Data1_( from), Data2_( from){} 
+//   //move
+//   Data_wrapper( const Data_wrapper && from): Data1_( std::forward( from)), 
+//					      Data2_( std::forward( from)){}
+//
+//   Self& operator=( const Self & from){
+//   	Data1_::operator=( from);
+//   	Data2_::operator=( from);
+//   	return *this;
+//   }
+//
+//   Self& operator=( Self && from){
+//   	Data1_::operator=( from);
+//   	Data2_::operator=( from);
+//   	return *this;
+//   }
+//
+//   bool operator==( const Self & b) const {
+//	return     Data1_::operator==( b)
+//		&& Data2_::operator==( b);
+//   }
+//   bool operator!= (const Self & b) const { return !((*this)==b); }
+//}; // class Data_wrapper< D1, D2> 
 
 
 template< typename Data_>
-class Data_wrapper< Data_, Default_data> : public Data_ {
+//class Data_wrapper< Data_, Default_data> : public Data_ {
+class Data_wrapper : public Data_ {
    private:
-   typedef Data_wrapper< Data_, Default_data> Self;
+  // typedef Data_wrapper< Data_, Default_data> Self;
+   typedef Data_wrapper< Data_> Self;
    public:
    typedef std::size_t Id;
    //default
@@ -101,6 +98,7 @@ class Data_wrapper< Data_, Default_data> : public Data_ {
    	id_( std::move( from.id_)){
    }
 
+
    Self& operator=( const Self & from){
    	Data_::operator=( from);
    	id_ = from.id_;
@@ -111,6 +109,10 @@ class Data_wrapper< Data_, Default_data> : public Data_ {
    	Data_::operator=( from);
    	id_ = std::move( from.id_);
    	return *this;
+   }
+
+   bool operator<( const Self & from) const{
+	return Data_::operator<( from);
    }
 
    bool operator==( const Self & b) const {

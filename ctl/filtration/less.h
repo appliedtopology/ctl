@@ -58,11 +58,14 @@ struct Id_less{
       }
 }; //struct Id_less
 
+//Order by data, break ties by cell order
 struct Cell_less{
       constexpr Cell_less(){}
+
       template< typename Cell_iterator>
       bool operator()( const Cell_iterator & a, const Cell_iterator & b) const {
-	return a->first < b->first;
+	return (a->second < b->second) || 	
+		(!(b->second < a->second) && (a->first < b->first));
       }
 }; //struct Cell_less
 

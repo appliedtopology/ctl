@@ -95,13 +95,8 @@ TEST(MultiArray, VanillaMultiIndexing){
 
 
 	std::vector< std::size_t> extents{5,4,3};
-	std::vector< Data> foobar(5*4*3);
-	std::vector< std::size_t> base{1,1,3};
-	int next=0;
-	for( auto& i: foobar){ i.d = next++; }
 
-	multi_array m( extents.begin(), extents.end(), 
-		       foobar.begin(), foobar.end());
+	multi_array m( extents.begin(), extents.end());
 	ASSERT_EQ( check_multi_indexing( m), true);
 }
 
@@ -115,7 +110,7 @@ typedef ctl::detail::multi_array< Data> multi_array;
 	std::vector< std::size_t> base{1,1,3};
 	
 	multi_array m2( extents.begin(), extents.end(), 
-		       foobar.begin(), foobar.end(), base);
+		        base.begin(), base.end());
 	ASSERT_EQ( base, m2.base());
 	std::cout << std::endl;
 	ASSERT_EQ( check_multi_indexing( m2), true);
@@ -124,15 +119,7 @@ typedef ctl::detail::multi_array< Data> multi_array;
 TEST(MultiArray, ConstructorTest){
 typedef ctl::detail::Data_wrapper< Filter_function_value > Data;
 typedef ctl::detail::multi_array< Data> multi_array;
-
-
 	std::vector< std::size_t> extents{5,4,3};
-	std::vector< Data> foobar(5*4*3);
-	std::vector< std::size_t> base{1,1,3};
-	int next=0;
-	for( auto& i: foobar){ i.d = next++; }
-
-	multi_array m( extents.begin(), extents.end(), 
-		       foobar.begin(), foobar.end());
+	multi_array m( extents.begin(), extents.end());
 	ASSERT_EQ( extents, m.extents());
 }

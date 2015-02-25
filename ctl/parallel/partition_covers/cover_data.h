@@ -71,6 +71,9 @@ public:
     count_ = from.count_;
     return *this;
   }
+  //dont enforce anything extra on order
+  inline const bool operator<( const Self & f) const { return false; }
+
   void 		pp()			{ count_++;} 
   Count_t & 	count() 	        { return count_;  }
   const Count_t  count()  const   	{ return count_;  }
@@ -98,7 +101,10 @@ public:
     data_ = from.data_;
     return *this;
   }
- 
+
+  //dont enforce covering relation..
+  constexpr bool operator<( const Self & f) const { return false; }
+
   Data1&        data()         { return data_; }
   const Data1&   data() const   { return data_; }
 
