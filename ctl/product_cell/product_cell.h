@@ -57,6 +57,8 @@
 #include <tuple> //std::pair, and piecewise_construct
 #include <iostream> //cout (debug only)
 #include <ctl/product_cell/product_boundary.h>
+#include <ctl/hash/hash.h>
+
 namespace ctl {
 
 template< typename Cell_iterator1_, typename Cell_iterator2_>
@@ -125,10 +127,11 @@ class Product_cell : public std::pair< Cell_iterator1_ , Cell_iterator2_> {
 	bool operator!=( const Self & b) const { 
 		return (this->first != b.first) || (this->second != b.second); 
 	}
+
 	std::size_t hash() const{
 		constexpr std::size_t shift_factor = sizeof(std::size_t) >> 2;
-		return this->second->second.id() | 
-			(this->first->second.id() << shift_factor);
+		return ctl::hash_function( this->first->first) |
+			(ctl::hash_function( this->first->second.id()) << shift_factor);
 	}
 	struct Hash {
   	   std::size_t operator()( const Product_cell & p) const {

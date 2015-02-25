@@ -48,6 +48,8 @@
 ********************************************************************************
 *******************************************************************************/
 
+#define CTL_USE_CITY
+
 //STL
 #include <cstring>
 
@@ -63,7 +65,8 @@ namespace ctl{
 namespace detail{ 
 namespace cth = ctl::hash;
 template< typename Container>
-inline std::size_t murmur3_hash( const Container & key){
+inline 
+std::size_t murmur3_hash( const Container & key, std::false_type){
 	typedef typename Container::value_type T;
 	std::size_t out;
 	//MurmurHash3_x86_32 
@@ -73,11 +76,24 @@ inline std::size_t murmur3_hash( const Container & key){
 	return out;
 }
 
+template< typename T>
+inline std::size_t murmur3_hash( const T & t, std::true_type){
+	std::size_t out;
+	cth::MurmurHash3_x86_128( (const char*)&t, sizeof(T), 1, &out);
+	return out;
+}
+
 template< typename Container>
-inline std::size_t city_hash( const Container & key){
+inline std::size_t city_hash( const Container & key, std::false_type){
 	typedef typename Container::value_type T;
 	return cth::CityHash64WithSeed( (const char*)&(*(key.begin())), 
 					 sizeof(T)*key.size(),key.size()); 
+}
+
+template< typename T>
+inline std::size_t city_hash( const T & t, std::true_type){
+	return cth::CityHash64WithSeed( (const char*)&(t),
+					 sizeof(T),1);
 }
 
 template< typename T>
@@ -110,21 +126,25 @@ inline std::size_t jenkins_hash( const T & key){
 } //detail namespace
 } //ctl namespace
 
-#define CTL_USE_CITY
 namespace ctl {
+
+	template< typename T>
+	std::size_t hash_function( const T & key){
+	#ifdef  CTL_USE_MURMUR
+		return detail::murmur3_hash( key, std::is_integral< T>());
+	#elif defined( CTL_USE_CITY)
+		return detail::city_hash( key, std::is_integral< T>());
+	#elif defined( CTL_USE_JENKINS)
+		return detail::jenkins_hash( key);
+	#else 
+		return detail::pjw_hash( key);
+	#endif
+	}
+
 	template< typename T>
 	struct Hash{
 		std::size_t operator()( const T & key) const{
-			#ifdef  CTL_USE_MURMUR
-				return detail::murmur3_hash( key);
-			#elif defined( CTL_USE_CITY)
-				return detail::city_hash( key);
-			#elif defined( CTL_USE_JENKINS)
-				return detail::jenkins_hash( key);
-			#else 
-				return detail::pjw_hash( key);
-			#endif
-					
+			return hash_function( key);	
 		}
 	}; //class Hash
 } //namespace ctl
