@@ -78,7 +78,6 @@ constexpr bool operator<( const Default_data & d) const { return false; }
 //   bool operator!= (const Self & b) const { return !((*this)==b); }
 //}; // class Data_wrapper< D1, D2> 
 
-
 template< typename Data_>
 //class Data_wrapper< Data_, Default_data> : public Data_ {
 class Data_wrapper : public Data_ {

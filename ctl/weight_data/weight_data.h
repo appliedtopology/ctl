@@ -66,15 +66,15 @@ public:
   typedef Weight_ Weight;
   typedef Weight_less_ Weight_less;
   typedef std::numeric_limits< Weight_> limits;
-  Weight_data(): weight_( Weight( limits::infinity())) {}
-  Weight_data( const Weight& weight) : weight_( weight) {}
-  Weight_data( const Weight_data &from) : weight_( from.weight_) {}
-  Weight_data( Weight_data &&from) : weight_( std::move( from.weight_)) {}
+  Weight_data(): weight_( Weight( limits::infinity())), less() {}
+  Weight_data( const Weight& weight) : weight_( weight), less() {}
+  Weight_data( const Weight_data &from) : weight_( from.weight_), less() {}
+  Weight_data( Weight_data &&from) : weight_( std::move( from.weight_)), less() {}
 
 
   
   bool operator<( const Weight_data & d) const {
-	return Weight_less_::operator()( weight_, d.weight_); 
+	return less( weight_, d.weight_); 
   }
   // assignment operator
   Weight_data& operator=( const Weight_data& from) {
@@ -93,6 +93,7 @@ public:
   const Weight   weight() const   { return weight_; }
 private:
   Weight_ weight_;
+  Weight_less_ less;
 }; // class Weight_data
 
 } //namespace ctl
