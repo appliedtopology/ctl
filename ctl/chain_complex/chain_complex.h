@@ -135,7 +135,7 @@ typename std::conditional<
 std::is_same< typename detail::recombine< Cell, detail::Dummy>::type, 
 	      ctl::Cube< detail::Dummy> >::value, 
 //then we create a Cubical_complex which optimizes storage.
- ctl::detail::Cubical_complex< Cell, 
+ ctl::detail::Cubical_complex< ctl::detail::Cube< Cell>, 
 		       Boundary, 
 		       Data, 
 		       Hash, 
