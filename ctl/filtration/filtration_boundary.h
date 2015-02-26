@@ -203,6 +203,14 @@ class Filtration_boundary{
 	Filtration_boundary( Filtration & f): 
 	_filtration( f) {};
 
+	const_iterator begin( const typename Term::Cell & c) const {
+		const std::size_t pos = c;
+		auto i = _filtration.begin()+pos;
+		(*i)->second.id( pos);
+		return const_iterator( _filtration, 
+				      _filtration.complex().cell_boundary(), i);
+	}
+
 	const_iterator begin( const Iterator & c) const {
 		const std::size_t pos = std::distance( _filtration.begin(), c);
 		(*c)->second.id( pos);
@@ -214,12 +222,11 @@ class Filtration_boundary{
 	const_iterator end( const T & c) const { return const_iterator( _filtration); }
 
 	size_type length( const typename Term::Cell & c) const {
-		return _filtration.complex().cell_boundary().length( (*(_filtration+c))->first);
+		return _filtration.complex().cell_boundary().length( (*(_filtration.begin()+c))->first);
 	}
-	size_type length( const Iterator & c) const {
+	size_type length( const Iterator& c) const {
 		return _filtration.complex().cell_boundary().length( (*(c))->first);
 	}
-
 
 	private:		
 	Filtration & _filtration;

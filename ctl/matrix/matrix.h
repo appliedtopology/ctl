@@ -17,7 +17,7 @@ namespace ctl {
 * @tparam T
 */
 template< typename Coeff, typename Cell=std::size_t>
-using Sparse_matrix = std::vector< ctl::Chain< ctl::Term< Coeff, Cell> > >;
+using Sparse_matrix = std::vector< ctl::Chain< ctl::Term< Cell, Coeff> > >;
 
 template< typename Iterator>
 using Offset_map = ctl::Pos_offset_map< Iterator>;

@@ -351,26 +351,31 @@ public:
     return in;
    }
 
-    
    std::size_t id_and_bits_to_index( Cell id_and_bits) const {
 	//By linearity the id_and_bits_encoding can be immediately turned into
 	//the array_index	
-	auto vertex_id = id_and_bits >> cells.dimension();
-	for( auto i = 0; i < cells.dimension(); ++i){ 
-		auto mask = ((id_and_bits&(1 <<i)) > 0);
+	std::size_t vertex_id = (id_and_bits.data() >> cells.dimension());
+	for( std::size_t i = 0; i < cells.dimension(); ++i){ 
+		std::size_t mask = ((id_and_bits.data()&(1 <<i)) > 0);
 		vertex_id += mask*index_data[ i]; 
 	}
-	return vertex_id.data();
-   }
-
-   Coordinate id_and_bits_to_coordinate( Cell id_and_bits) const {
-	Coordinate c;
-	return cells.index_to_coordinate( id_and_bits_to_index( id_and_bits), c);
+	return vertex_id;
    }
 
    template< typename Coordinate>
-   Coordinate& id_and_bits_to_coordinate( Cell id_and_bits, Coordinate & c) const{
-	return cells.index_to_coordinate( id_and_bits_to_index( id_and_bits), c);
+   Coordinate& id_and_bits_to_coordinate( const Cell & id_and_bits, Coordinate & c) const {
+	Cell vtx = id_and_bits;
+	for( std::size_t x = 0; x < cells.dimension(); ++x){ vtx &= ~(1 << x); }
+	cells.index_to_coordinate( vtx.data(), c);
+	for( std::size_t x = 0; x < cells.dimension(); ++x){ 
+		c[ x]+= ((id_and_bits.data()&(1 <<x))>0); 
+	} 
+	return c;
+   }
+
+   Coordinate id_and_bits_to_coordinate( const Cell id_and_bits) const{
+	Coordinate c;
+	return id_and_bits_to_coordinate( id_and_bits, c);
    }
  
    template< typename Coordinate>
@@ -421,7 +426,7 @@ public:
    }
    Coordinate base() const { return cells.base(); }
    std::size_t base( std::size_t i) const { return cells.base( i); }
-
+   std::size_t id( std::size_t i) const{ return index_data[ i]; }
    std::size_t offset( std::size_t i) const { if( i){ return cells.offsets( i-1); } return 1; }
 //Private functions
 private:

@@ -49,6 +49,7 @@
 *******************************************************************************/
 #include <boost/property_map/property_map.hpp>
 #include <boost/iterator/permutation_iterator.hpp>
+#include <boost/iterator/filter_iterator.hpp>
 //code here modeled after:
 
 namespace ctl {
@@ -62,6 +63,10 @@ struct Pos_offset_map {
   typedef boost::readable_property_map_tag category; 
   Pos_offset_map( const Filtration_iterator _b) : begin( _b) {}
   Filtration_iterator begin;
+  template< typename T>
+  value_type operator[]( const T & t) const {
+	return get( *this, t);
+  }
 };
 
 template< typename Filtration_iterator>
@@ -97,6 +102,17 @@ get( const Pos_offset_map< Filtration_iterator> & map ,
 	return *(p.base());
 }
 
+template< typename Filtration_iterator, typename Predicate>
+typename Pos_offset_map< Filtration_iterator>::value_type 
+get( const Pos_offset_map< Filtration_iterator> & map , 
+     const boost::filter_iterator< Predicate, Filtration_iterator> p){
+	return std::distance(map.begin, (p.base()));
+}
+
+
+
+
+
 template< typename Filtration_iterator>
 typename Pos_offset_map< Filtration_iterator>::value_type 
 get( const Pos_offset_map< Filtration_iterator>& map , 
@@ -110,6 +126,16 @@ get( const Pos_offset_map< Filtration_iterator>& map,
      const ctl::Term< Filtration_iterator, Coefficient> & term) { 
 	return std::distance(map.begin, term.cell());
 }
+
+
+template< typename Filtration_iterator, typename Coefficient>
+typename Pos_offset_map< Filtration_iterator>::value_type 
+get( const Pos_offset_map< Filtration_iterator>& map, 
+     const ctl::Term< std::size_t, Coefficient> & term) { 
+	return term.cell();
+}
+
+
 
 //Necessary for oldschool boundary operator
 template< typename Filtration_iterator> 

@@ -64,7 +64,7 @@ class Term {
 		typedef ctl::detail::term_non_z2_tag coeff_tag;
 	public:	
 		Term() {}
-		Term( Cell & cell): cell_( cell), coeff_( 1) {}
+		Term( Cell && cell): cell_( cell), coeff_( 1) {}
 		Term( const Cell & cell, 
 		      const Coefficient & coeff):
 			cell_( cell), coeff_( coeff) {}
