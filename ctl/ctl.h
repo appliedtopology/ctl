@@ -120,6 +120,7 @@
 
 #include <ctl/matrix/iterator_property_map.h>
 #include <ctl/matrix/offset_maps.h>
+#include <ctl/matrix/matrix.h>
 
 //Persistence 
 #include <ctl/persistence/compute_barcodes.h>
