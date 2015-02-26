@@ -86,7 +86,7 @@ public: //Public types
    //Arbitrary data associated to space.
    typedef Data_ Data;
    typedef Hash_ Hash;
-   typedef typename Cell_boundary::Cell Cell;
+   typedef typename detail::Cube< Cube, 3> Cell;
 
 private: //Private types
    //Usually this is multi_array< Data> 
@@ -243,7 +243,7 @@ public:
    * @param vertex_bits_index
    * @return 
    */
-   const_iterator find_cell( std::size_t vertex_bits_index) const {
+   const_iterator find_cell( const Cell& vertex_bits_index) const {
 	std::size_t cell_index = vertex_bits_index >> cells.dimension();
 	for( auto i = 0; i < cells.dimension(); ++i){
 		std::size_t mask = vertex_bits_index & (1 << i);
@@ -257,13 +257,13 @@ public:
    * @param vertex_bits_index
    * @return 
    */
-   iterator find_cell( std::size_t vertex_bits_index){
-	std::size_t cell_index = vertex_bits_index >> cells.dimension();
+   iterator find_cell( const Cell & vertex_bits_index){
+	auto cell_index = vertex_bits_index >> cells.dimension();
 	for( auto i = 0; i < cells.dimension(); ++i){
-		std::size_t mask = vertex_bits_index & (1 << i);
+		auto mask = vertex_bits_index & (1 << i);
 		cell_index += (mask>0)*(offset( i));
 	}
-	return cells.begin()+cell_index; 
+	return cells.begin()+cell_index.data(); 
    }
    
    iterator       		begin()       	{ return cells.begin(); } 
@@ -352,24 +352,24 @@ public:
    }
 
     
-   std::size_t id_and_bits_to_index( std::size_t id_and_bits) const {
+   std::size_t id_and_bits_to_index( Cell id_and_bits) const {
 	//By linearity the id_and_bits_encoding can be immediately turned into
 	//the array_index	
-	std::size_t vertex_id = id_and_bits >> cells.dimension();
+	auto vertex_id = id_and_bits >> cells.dimension();
 	for( auto i = 0; i < cells.dimension(); ++i){ 
-		std::size_t mask = ((id_and_bits&(1 <<i)) > 0);
+		auto mask = ((id_and_bits&(1 <<i)) > 0);
 		vertex_id += mask*index_data[ i]; 
 	}
-	return vertex_id;
+	return vertex_id.data();
    }
 
-   Coordinate id_and_bits_to_coordinate( std::size_t id_and_bits) const {
+   Coordinate id_and_bits_to_coordinate( Cell id_and_bits) const {
 	Coordinate c;
 	return cells.index_to_coordinate( id_and_bits_to_index( id_and_bits), c);
    }
 
    template< typename Coordinate>
-   Coordinate& id_and_bits_to_coordinate( std::size_t id_and_bits, Coordinate & c) const{
+   Coordinate& id_and_bits_to_coordinate( Cell id_and_bits, Coordinate & c) const{
 	return cells.index_to_coordinate( id_and_bits_to_index( id_and_bits), c);
    }
  

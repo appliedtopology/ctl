@@ -53,6 +53,7 @@
 #include <ctl/utility/recombine.h>
 #include <ctl/chain_complex/detail/multi_array.h>
 #include <ctl/cube/cube.h>
+#include <ctl/cube/detail/cube.h>
 
 namespace ctl {
 namespace detail {
@@ -65,7 +66,7 @@ typename std::conditional<
 //If C is a type of the form ctl::Cube< T> for any T, 
 std::is_same< typename recombine< Cell, Dummy>::type, 
 	      ctl::Cube< Dummy> >::value, 
-	      multi_array< std::pair< std::size_t, Data> >,
+	      multi_array< std::pair< ctl::detail::Cube< Cell>, Data> >,
 	      std::unordered_map< Cell, Data, Hash>
 	    >::type;
 } //namespace detail  

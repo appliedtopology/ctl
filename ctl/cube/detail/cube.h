@@ -88,7 +88,7 @@ class Cube {
 	* Returns the total number of vertices in the cube.
 	* @return size_t 
 	*/
-	size_t  size() const	{ std::pow(2, dimension()+1); }
+	size_t  size() const	{ return std::pow(2, dimension()+1); }
 	/*! Returns the dimension of the cube
 	 * @return size_t
 	 */
@@ -103,6 +103,8 @@ class Cube {
 	size_t   capacity() const  { return 1; }
 	void clear() { data_ = 0; }
 
+	//TODO: THIS IS A TOTAL HACK	
+	const std::size_t* begin() const { return &data_; }
 	//TODO: IMPLEMENT insert/remove?
 
 	/**
@@ -124,6 +126,8 @@ class Cube {
 		data_ = std::move( b.data_);
 		return *this;
 	}
+	template< typename T>
+	std::size_t operator&( const T & t) const{ return data_&t;}
 
 	template< typename T>
 	Self operator+( const T & t) const{return Self(data_+t);}
@@ -143,6 +147,8 @@ class Cube {
 	Self& operator&=( const T & t) {data_&=t; return *this;}
 	template< typename T>
 	Self& operator|=( const T & t) {data_|=t; return *this;}
+	template< typename T>
+	Self operator^(const T & t)const {return Self( data_^t);}
 	template< typename T>
 	Self& operator^=( const T & t) {data_^=t; return *this;}
 	Self& operator++() { data_+=1; return *this;}
@@ -196,7 +202,8 @@ class Cube {
 		return (data_ != b.data_);
 	}
 
-	std::size_t data(){ return data_; }
+	std::size_t& data()	 { return data_; }
+	std::size_t data() const { return data_; }
 	private:
 	std::size_t data_;
 
