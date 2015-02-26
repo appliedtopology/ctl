@@ -33,14 +33,12 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 *******************************************************************************/
+#include "gtest/gtest.h"
+
 //STL
 #include <iostream>
 
 //CTL
-//abstract_simplex
-#include <ctl/abstract_simplex/abstract_simplex.h>
-#include <ctl/abstract_simplex/simplex_boundary.h>
-//cube
 #include <ctl/cube/cube.h>
 #include <ctl/cube/cube_boundary.h>
 
@@ -50,16 +48,7 @@
 
 //We build a simplicial chain complex with Z2 coefficients
 
-typedef ctl::Abstract_simplex< int> Simplex;
 typedef ctl::Finite_field< 3> Z3;
-typedef ctl::Simplex_boundary< Simplex, Z3 > Simplex_boundary;
-typedef ctl::Chain_complex< Simplex, Simplex_boundary> Simplicial_complex;
-typedef Simplicial_complex::Cell Cell;
-typedef ctl::Complex_boundary< Simplicial_complex> Simplicial_complex_boundary;
-typedef Simplicial_complex_boundary::const_iterator 
-						  simplicial_boundary_iterator;
-
-
 typedef ctl::Cube< int> Cube;
 typedef ctl::Cube_boundary< Cube, Z3 > Cube_boundary;
 typedef ctl::Chain_complex< Cube, Cube_boundary> Cubical_complex;
@@ -67,71 +56,42 @@ typedef Cubical_complex::Cell_boundary Cubical_cell_boundary;
 typedef ctl::Complex_boundary< Cubical_complex> Cubical_complex_boundary;
 typedef Cubical_complex_boundary::const_iterator cubical_boundary_iterator;
 
-int main( int argc, char** argv){
-	Simplicial_complex complex;
-	Cell s( {1,2,3,4} );
-	auto pair = complex.insert_closed_cell( s);
-	std::cout << pair.second << " cells inserted!" << std::endl;
-	std::cout << "complex is " << 
-		((complex.is_closed())? "closed":"not closed") << std::endl; 
-	std::cout << complex << std::endl;
-
-	Simplicial_complex_boundary b( complex);
-	Simplicial_complex_boundary copyd( b);
-	Simplicial_complex_boundary moved( std::move( copyd));
-	for( auto i = complex.begin(); i != complex.end(); ++i){
-	std::cout << "boundary test: " << ctl::delta << "("  
-		  << i->first << ")" << std::endl;
-	std::cout << "boundary length: " << b.length( i) << std::endl;
-	for( simplicial_boundary_iterator j = b.begin( i); j != b.end( i); ++j){
-		std::cout << j->cell()->first << " ";
-	}
-	std::cout << std::endl;
-	}
-	std::ofstream out( "test.asc");
-	complex.write( out); 
-	std::cout << " ---------------------- " << std::endl;
-	std::cout << " testing cubical complexes " << std::endl;
+TEST(CubicalComplex, EqualityTest){
 	std::vector< std::size_t> sizes{4,5};
 	std::vector< std::size_t> start{3,97};
-	Cubical_complex complex1( sizes, start);
-	Cubical_complex c2( complex1);
-	if( c2 != complex1) { std::cerr << "bug in copy/equality operators."; }
-	Cubical_cell_boundary cube_cell_bd = complex1.cell_boundary();
-	Cubical_complex_boundary cube_complex_boundary( complex1);
-	std::cout << "cubical_complex dimension: " 
-		  << complex1.dimension() << std::endl;	
-	bool fail = false;
+	Cubical_complex complex( sizes, start);
+	Cubical_complex c2( complex);
+	ASSERT_TRUE(complex==c2);
+}
 
-//	for( auto i = complex1.begin(); i != complex1.end(); ++i){ 
-//	  std::size_t distance = complex1.find_cell( i->first)-i;
-//	  if( distance != 0){ 
-//		std::cout << "find_cell bug!" << std::endl;
-//		fail=true;
-//	  }
-//	}
-//	if( fail==false){ 
-//		std::cout << "find_cell( . ) seems to work in all cases." << std::endl;
-//	}
 
-	for( auto i = complex1.begin(); i != complex1.end(); ++i){
-	  std::cout << ctl::delta << "_{Cube}(" 
-		    << ctl::key_to_cube( complex1, i->first) << ") = "; 
-	  for( auto j = cube_cell_bd.begin( i->first); 
-		    j != cube_cell_bd.end( i->first); ++j){
-	 	std::cout << ctl::key_to_cube( complex1, j->cell()) << " ";
-	  }
-	  if( ctl::cube_dimension( complex1, i->first) == 0){ std::cout << 0; }
-	  std::cout << std::endl;
-	  std::cout << ctl::delta << "_K(" 
-		    << i->first << ") = "; 
-	  for( auto j = cube_complex_boundary.begin( i); 
-		    j != cube_complex_boundary.end( i); ++j){
-	 	std::cout << ctl::key_to_cube( complex1, j->cell()->first) << " ";
-	  }
-	  if( ctl::cube_dimension( complex1, i->first) == 0){ std::cout << 0; }
-	  std::cout << std::endl;
+TEST(CubicalComplex, FindCellWorks){
+	std::vector< std::size_t> sizes{4,5};
+	std::vector< std::size_t> start{3,97};
+	Cubical_complex complex( sizes, start);
+	for( auto i = complex.begin(); i != complex.end(); ++i){ 
+	  ASSERT_EQ( complex.find_cell( i->first), i);
 	}
-	std::cout << complex1.size() << std::endl;
-	return 0;
+}
+
+TEST(CubicalComplex, IdNBits2Index){
+ 	std::vector< std::size_t> sizes{16,16};
+ 	std::vector< std::size_t> start{16,16};
+	Cubical_complex complex( sizes, start);
+	std::size_t pos = 0;
+	for( auto i = complex.begin(); i != complex.end(); ++i, ++pos){ 
+	  ASSERT_EQ( complex.id_and_bits_to_index( i->first), pos);
+	}
+}
+
+TEST(CubicalComplex, IdNBits2CoordinateIdempotency){
+ 	std::vector< std::size_t> sizes{16,16};
+ 	std::vector< std::size_t> start{16,16};
+	Cubical_complex complex( sizes, start);
+	std::size_t pos = 0;
+	for( auto i = complex.begin(); i != complex.end(); ++i, ++pos){ 
+	  ASSERT_EQ( (i->first).data(),
+                 complex.coordinate_to_id_and_bits( 
+			complex.id_and_bits_to_coordinate( i->first)).data());
+	}
 }

@@ -40,7 +40,7 @@
 #include "test_abstract_simplex.h"
 #include "test_chain.h"
 #include "test_cube.h"
-//#include <test_cubical_chain_complex.h>
+#include "test_cubical_chain_complex.h"
 //#include <test_simplicial_chain_complex.h>
 //#include <test_vr.h>
 #include "test_filtration.h"

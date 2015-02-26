@@ -208,12 +208,12 @@ class Cube {
 	std::size_t data_;
 
 }; //detail::Cube
-} //namespace detail
 template< typename Stream, typename T, std::size_t D>
-Stream& operator<<( Stream & out, const ctl::detail::Cube< T, D> & c){
+Stream& operator<<( Stream & out, const Cube< T, D> & c){
 	out << c.data(); 
 	return out;
 }
+} //namespace detail
  
 } //namespace ctl
 

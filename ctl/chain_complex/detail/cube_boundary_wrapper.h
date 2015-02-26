@@ -217,6 +217,10 @@ class Cube_boundary_wrapper: Cell_boundary_{
     Cube_boundary_wrapper( const Complex & c_): Cell_boundary_(), c( &c_){};	
     
     Cube_boundary_wrapper( const Complex & c_, Cell_boundary_ & b): Cell_boundary_( b), c( &c_){};	
+
+    Cube_boundary_wrapper( const Cube_boundary_wrapper & from): c( from.c){};
+    Cube_boundary_wrapper( Cube_boundary_wrapper && from): c( std::move(from.c)){ from.c = nullptr;}
+ 
     /**
     * @brief Equality assignment operator 
     * @param Cube_boundary_wrapper& from

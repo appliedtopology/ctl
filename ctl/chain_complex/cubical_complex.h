@@ -164,7 +164,7 @@ public:
    
    //! Copy
    Cubical_complex( const Cubical_complex & b): 
-   cells( b.cells), bd( b.bd), index_data( b.index_data) {}
+   cells( b.cells), index_data( b.index_data), bd( b.bd){}
 
    //! Move
    Cubical_complex( Cubical_complex && b): 
@@ -357,19 +357,21 @@ public:
 	std::size_t vertex_id = (id_and_bits.data() >> cells.dimension());
 	for( std::size_t i = 0; i < cells.dimension(); ++i){ 
 		std::size_t mask = ((id_and_bits.data()&(1 <<i)) > 0);
-		vertex_id += mask*index_data[ i]; 
+		vertex_id += mask*(2*index_data[ i]-1);
 	}
 	return vertex_id;
    }
 
    template< typename Coordinate>
    Coordinate& id_and_bits_to_coordinate( const Cell & id_and_bits, Coordinate & c) const {
-	Cell vtx = id_and_bits;
-	for( std::size_t x = 0; x < cells.dimension(); ++x){ vtx &= ~(1 << x); }
-	cells.index_to_coordinate( vtx.data(), c);
-	for( std::size_t x = 0; x < cells.dimension(); ++x){ 
-		c[ x]+= ((id_and_bits.data()&(1 <<x))>0); 
-	} 
+	//Cell vtx = id_and_bits;
+	//for( std::size_t x = 0; x < cells.dimension(); ++x){ vtx &= ~(1 << x); }
+	//cells.index_to_coordinate( vtx.data(), c);
+	//for( std::size_t x = 0; x < cells.dimension(); ++x){ 
+	//	c[ x]+= ((id_and_bits.data()&(1 <<x))>0); 
+	//} 
+	std::size_t index = id_and_bits_to_index( id_and_bits);
+	cells.index_to_coordinate( index, c);
 	return c;
    }
 
@@ -379,7 +381,7 @@ public:
    }
  
    template< typename Coordinate>
-   std::size_t coordinate_to_id_and_bits( const Coordinate & c) const {
+   Cell coordinate_to_id_and_bits( const Coordinate & c) const {
 	Coordinate vertex_coords( c);
 	std::size_t pos=0;
 	//in 0 based systems go from coordinates to vertex coordinates
@@ -400,7 +402,7 @@ public:
 	std::size_t t = cells.coordinate_to_index( vertex_coords);
 	t <<= c.size();
 	t ^= mask;
-	return t;
+	return Cell( t);
    }
 
    void reserve( const std::size_t n) { cells.reserve( n); }
