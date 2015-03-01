@@ -65,10 +65,16 @@ Some highly optimizing compilers will not correctly build CMake, but the GNU com
 
 ### Specifying Compilers With CMake
 
-There are two ways to specify compilers to CMake.
+There are two ways to [specify compilers](http://www.cmake.org/Wiki/CMake_FAQ#How_do_I_use_a_different_compiler.3F) to CMake.
+We summarize them below:
 
+Method 1:
 
-You can specify which compilers to use by setting the environment variables CC and CXX to the full paths to your preferred C and C++ compilers before running the bootstrap script.
+	CC=gcc-4.2 CXX=/usr/bin/g++-4.2 cmake -G "Your Generator" path/to/your/source
+
+Method 2:
+
+	cmake -G "Your Generator" -D CMAKE_C_COMPILER=gcc-4.2 -D CMAKE_CXX_COMPILER=g++-4.2 path/to/your/source
 
 ## Building
 Though many configuration utilities, like [autoconf](http://www.gnu.org/software/autoconf/), are designed such that the user need only invoke ./configure && make && make install from the top-level source directory, CMake targets out-of-source builds, which is to say that the build process occurs away from the source code. The out-of-source build approach is ideal for projects that offer several different build modes, as each version of the project can be built in a separate folder.
