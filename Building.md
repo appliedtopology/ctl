@@ -36,15 +36,12 @@ If this succeeds proceed below to [Building](##Building)
 
 If the instructions so far have not helped you to escape dependency hell. Do not fear. We have tried to make such non-simple installs as _simple as possible_.  
 
-If you are having trouble please do [file an issue](https://github.com/appliedtopology/ctl/issues).
-
 ## Local Dependencies
 So you dont have root access, or, you don't want to do a system wide installation, or, you want to try and compile against some special version of a dependency. No problem! 
 
 The [### Installing Local Dependencies](next sub section) has instructions on _installing_ local copies of software.
 
 And then the [### Pointing CMake at the local dependencies](final sub section) explains how to easily point CMake at those local copies.
-
 
 ### Installing Local Dependencies
 1. If the system does not have CMake, then follow the instructions below to install [### CMake (From Source)](CMake from source) 
@@ -57,13 +54,13 @@ If you see:
 
 Then first install an appropriate compiler then return here.
 
-3. Observe the messages such as
-> Boost not found. Install locally by typing 'make boost'
-> METIS not found. Install locally by typing 'make metis'
-OR
-> Found Doxygen: /usr/bin/doxygen (found version "1.6.1") 
+3. Observe the messages such as:
+ > Boost not found. Install locally by typing 'make boost'
 
-Now you may use our premade build scripts to download, build, and install the missing dependencies!
+4. Type 
+		make boost
+
+If you are having trouble with these scripts please do [file an issue](https://github.com/appliedtopology/ctl/issues).
 
 ### Pointing CMake at the local dependencies
 In order to 
