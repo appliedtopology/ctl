@@ -524,10 +524,10 @@ public:
  * @param word
  * @param cell
  */
-  Cube& key_to_cube( const Cell word1, Cube & r) const{
+  Cube& key_to_cube( const std::size_t word1, Cube & r) const{
    //typedef typename Cube::Interval Interval;
    Cube cube;
-   Cell word = word1;
+   std::size_t word = word1;
    std::size_t lower_left_vertex_id = word >> dimension();
    word ^= (lower_left_vertex_id << dimension());
    std::vector< std::size_t> set_bits;
@@ -580,7 +580,7 @@ key_to_cube( const Cubical_complex & complex,
 	     const typename Cubical_complex::Cell & key){
 	typedef typename Cubical_complex::Cube  Cube;
 	Cube cube;	
-	complex.key_to_cube( key, cube);
+	complex.key_to_cube( key.data(), cube);
 	return cube;
 }
 

@@ -154,6 +154,13 @@ Stream& operator<<(Stream& out, const Product_cell< T1, T2> && alpha){
 	    << alpha.second_cell();
 	return out;
 }
+template< typename Stream, typename T1, typename T2>
+Stream& operator<<(Stream& out, const Product_cell< T1, T2> & alpha){
+	out << alpha.first_cell() << ctl::otimes 
+	    << alpha.second_cell();
+	return out;
+}
+
 } // namespace ctl
 
 #endif //PRODUCT_CELL_H

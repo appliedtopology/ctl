@@ -257,6 +257,17 @@ class Abstract_simplex {
 		vertices = std::move( b.vertices); 
 		return *this;
 	}
+	
+	/**
+	* @brief Move assignment operator 
+	* @param Vector< Vertex_type> && b
+	* @return Reference to the assigned to simplex
+	*/
+	Self& operator=( Vector && b) {
+		vertices = std::move( b);
+		return *this;
+	}
+
 
 	/**
 	* @brief Comparator

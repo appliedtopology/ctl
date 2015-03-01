@@ -126,6 +126,10 @@ class Finite_field{
 		return *this;
 	}
 
+	
+	Self& operator++(){
+        	return ((*this)+=1);
+	}
 	template< typename T>
 	Self operator+( const T& rhs) const { 
 		return Self( x+get_number_data(rhs)); 

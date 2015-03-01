@@ -106,7 +106,8 @@ class Cube {
 	//TODO: THIS IS A TOTAL HACK	
 	const std::size_t* begin() const { return &data_; }
 	//TODO: IMPLEMENT insert/remove?
-
+	
+	Self lower_left_vertex() const{ return Self( data_ & ~( (1 << D)-1));}
 	/**
 	* @brief Copy assignment operator
 	* @param Cube & b
@@ -209,7 +210,7 @@ class Cube {
 
 }; //detail::Cube
 template< typename Stream, typename T, std::size_t D>
-Stream& operator<<( Stream & out, const Cube< T, D> & c){
+Stream& operator<<( Stream & out, const ctl::detail::Cube< T, D> & c){
 	out << c.data(); 
 	return out;
 }
