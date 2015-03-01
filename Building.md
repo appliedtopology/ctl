@@ -34,7 +34,9 @@ We have had trouble with these sorts of instructions on Ubuntu 12.x and other ol
 
 If this succeeds proceed below to [Building](##Building)
 
-To make escaping dependency hell as simple as possible, we have taken steps to make local installation of dependencies as _simple_ as possible. If you are having trouble please do write to [ctl@appliedtopology.org](mailto:ctl@appliedtopology.org)
+If the instructions so far have not helped you to escape dependency hell. Do not fear. We have tried to make such non-simple installs as _simple as possible_.  
+
+If you are having trouble please do file an issue
 
 ## Local Dependencies
 So you dont have root access, or, you don't want to do a system wide installation, or, you want to try and compile against some special version of a dependency. No problem! 
@@ -65,7 +67,10 @@ Now you may use our premade build scripts to download, build, and install the mi
 
 ### Pointing CMake at the local dependencies
 In order to 
-1. Open /path/to/
+1. Open /path/to/ctl/build_dependencies.txt
+2. Uncomment the `set(...)` lines and change `XXX_FOUND 0` to `XXX_FOUND 1`
+3. Fill in the `INCLUDE_DIR` and `LIBRARY_DIR` with the relavent data.
+
 ### CMake (From Source)
 CTL uses several new CMake modules, so it is important to ensure that version 2.8.8 or later is installed. 
 
