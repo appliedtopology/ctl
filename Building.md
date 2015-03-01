@@ -2,7 +2,7 @@
 
 CTL’s build system relies on [CMake](http://cmake.org) in order to manage a large number of configuration options in a platform-independent manner; it can be easily configured to build on Linux and Unix environments (including Darwin), and, at least in theory, various versions of Microsoft Windows. 
 
-**A relatively up-to-date C++11 compiler (e.g., gcc >= 4.7)** is required in all cases.
+**A relatively up-to-date C++11 compiler (e.g., g++ >= 4.7)** is required in all cases.
 
 CTL’s main dependencies are:
 - [CMake](http://www.cmake.org)
@@ -34,10 +34,38 @@ We have had trouble with these sorts of instructions on Ubuntu 12.x and other ol
 
 If this succeeds proceed below to [Building](##Building)
 
-If you are trying to do a local installation, this requires a bit more work.
-To make escaping dependency hell as simple as possible, we have taken steps to make the installation process as _simple_ as possible. If you are having trouble
-please do write to [ctl@appliedtopology.org](mailto:ctl@appliedtopology.org)
+To make escaping dependency hell as simple as possible, we have taken steps to make local installation of dependencies as _simple_ as possible. If you are having trouble please do write to [ctl@appliedtopology.org](mailto:ctl@appliedtopology.org)
 
+## Local Dependencies
+So you dont have root access, or, you don't want to do a system wide installation, or, you want to try and compile against some special version of a dependency. No problem! 
+
+The [### Installing Local Dependencies](next sub section) has instructions on _installing_ local copies of software.
+
+And then the [### Pointing CMake at the local dependencies](final sub section) explains how to easily point CMake at those local copies.
+
+
+### Installing Local Dependencies
+1. If the system does not have CMake, then follow the instructions below to install [### CMake (From Source)](CMake from source) 
+2. Within /path/to/ctl:
+		mkdir build
+		cd build
+		cmake ..
+If you see: 
+> The compiler /usr/bin/c++ has no C++11 support. Please use a different C++ compiler.      
+
+Then first install an appropriate compiler then return here.
+
+3. Observe the messages such as
+> Boost not found. Install locally by typing 'make boost'
+> METIS not found. Install locally by typing 'make metis'
+OR
+> Found Doxygen: /usr/bin/doxygen (found version "1.6.1") 
+
+Now you may use our premade build scripts to download, build, and install the missing dependencies!
+
+### Pointing CMake at the local dependencies
+In order to 
+1. Open /path/to/
 ### CMake (From Source)
 CTL uses several new CMake modules, so it is important to ensure that version 2.8.8 or later is installed. 
 
@@ -76,6 +104,7 @@ Method 2:
 
 	cmake -G "Your Generator" -D CMAKE_C_COMPILER=gcc-4.2 -D CMAKE_CXX_COMPILER=g++-4.2 path/to/your/source
 
+
 ## Building
 Though many configuration utilities, like [autoconf](http://www.gnu.org/software/autoconf/), are designed such that the user need only invoke ./configure && make && make install from the top-level source directory, CMake targets out-of-source builds, which is to say that the build process occurs away from the source code. The out-of-source build approach is ideal for projects that offer several different build modes, as each version of the project can be built in a separate folder.
 
@@ -84,7 +113,7 @@ A common approach is to create a folder named build in the top-level of the sour
 	mkdir build
 	cd build
 	cmake ..
-    
+
 # Citations
 Most of the content of this page has been adapted from our friends at:
 [libelemental](http://www.libelemental.org).
