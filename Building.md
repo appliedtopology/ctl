@@ -36,7 +36,7 @@ If this succeeds proceed below to [Building](##Building)
 
 If the instructions so far have not helped you to escape dependency hell. Do not fear. We have tried to make such non-simple installs as _simple as possible_.  
 
-If you are having trouble please do file an issue
+If you are having trouble please do [file an issue](https://github.com/appliedtopology/ctl/issues).
 
 ## Local Dependencies
 So you dont have root access, or, you don't want to do a system wide installation, or, you want to try and compile against some special version of a dependency. No problem! 
