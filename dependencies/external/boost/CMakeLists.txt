@@ -12,7 +12,7 @@ URL http://downloads.sourceforge.net/project/boost/boost/${Boost_Version}/boost_
 UPDATE_COMMAND    ""
 #--Configure step-------------
 SOURCE_DIR        ${BOOST_PREFIX}/source
-CONFIGURE_COMMAND ./bootstrap.sh
+CONFIGURE_COMMAND ./bootstrap.sh 
 BUILD_COMMAND     ./b2 install -j 4
                           --build-dir=${BOOST_PREFIX}/build
                           --prefix=${BOOST_PREFIX}

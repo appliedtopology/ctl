@@ -22,22 +22,27 @@ as root or with the help of your system adminstrator via your operating systems
 package manager e.g. apt on debian based systems, yum on RHEL systems, or 
 brew/port/fink on OSX.
 
-
 If you do not tell us specifically where these dependencies are, we will try to
 find them for you via the CMake `find_package` system. 
 
-If this fails, but you have a local/system wide install of the library, 
+If this fails or if you wish to use a local/system wide install of the library, 
 simply update the corresponding entries in:
 	build_dependencies.txt
 
-If you do not have the software installed anywhere, then for some of our 
+If you do not have the software installed anywhere, then for most of our 
 dependencies we provide make targets to download, and install them on your 
 system.
 
 For example:
-	`make gtest`
+	`make boost`
 
-Will download and install gtest into the dependencies/ directory.
+Will download and install boost into the dependencies/ directory.
+
+You may also type:
+	`make dependencies`
+
+Which will download and install all of the dependencies into the dependencies/
+directory.
 
 For your convienence `build_dependencies.txt` already lists the directories
 where this software should be installed to. So just uncomment!
@@ -50,11 +55,10 @@ which packages we can auto-help you install locally.
 
 C++11 compiler (clang or gcc)
 GTest (cmake .; make will download and compile automagically)
-#MPI 
-Boost #(with MPI) 
-Intel's TBB 
+Boost 
+Intel TBB 
 METIS (make metis) (used for graph partitioning)
-ANN (make ann)
+ANN (make ann) (used for nearest neighbor querying..)
 Doxygen (Optional)
 
 ## BUILDING ##
@@ -63,7 +67,7 @@ Doxygen (Optional)
 1. CMake will use what you specify, and if you dont it will look on the system
    for dependencies (and ideally find them...)
 2. Create makefiles
-	`cmake .`
+	`mkdir build; cd build; cmake ..`
 3. Compile: (the -j option makes in parallel)
 	`make -j`
 
@@ -80,7 +84,6 @@ if boost is compiled with gcc, you cannot use clang to compile CTL and vice vers
 
 
 ## INSTALL ##
-
 OS/X:
  `brew tap appliedtopology/software`
  `brew install ctl`
@@ -97,7 +100,7 @@ Ubuntu:  (coming soon)
 This sticks the headers into the default location on your system and all the tools into the appropriate path/bin directory
 
 ## USING (coming soon) ##
-See tools/ or the unit tests for a number of examples of using the library. 
+See tools/ or tests/ for a number of examples of using the library. 
 We hope to write a tutorial soon.
 
 ## SUBMITTING PATCHES ##
