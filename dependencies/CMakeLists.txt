@@ -14,6 +14,7 @@ execute_process( COMMAND make
 		 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/dependencies/external/gtest)
 
 set(GTEST_ROOT ${CMAKE_SOURCE_DIR}/dependencies/gtest)
+
 find_package(GTest)
 
 
@@ -50,7 +51,6 @@ endif()
 if( Boost_FOUND)
 include_directories(${Boost_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIR})
-set(Boost_LIBRARIES ${Boost_LIBRARIES} )
 endif()
 
 #if( NOT MPI_FOUND)

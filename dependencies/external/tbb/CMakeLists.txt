@@ -13,7 +13,9 @@ STAMP_DIR         ${TBB_PREFIX}/stamp
 DOWNLOAD_DIR      ${TBB_PREFIX}/download
 URL http://www.threadingbuildingblocks.org/sites/default/files/software_releases/source/tbb${TBB_Version}_src.tgz
 SOURCE_DIR        ${TBB_PREFIX}/source
-BUILD_COMMAND     ./make -j ${TBB_VAR}
+CONFIGURE_COMMAND  ""
+UPDATE_COMMAND ""
+BUILD_COMMAND     make -j ${TBB_VAR}
 BUILD_IN_SOURCE 1
 INSTALL_COMMAND cp -r -p <SOURCE_DIR>/build <SOURCE_DIR>/include <INSTALL_DIR>/../tbb/
 )

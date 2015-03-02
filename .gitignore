@@ -1,9 +1,10 @@
+CTestTest*.cmake
 tests/ctl_test
 dependencies/ann
 dependencies/gtest
 dependencies/metis
 dependencies/boost
-
+dependencies/tbb
 **/test_multi
 deps/gtest
 deps/CMakeFiles
