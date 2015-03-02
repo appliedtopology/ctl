@@ -36,6 +36,7 @@ if (NOT APPLE)
 endif (NOT APPLE)
 
 #Handle dependencies
+set(CTL_DEPS ${CMAKE_SOURCE_DIR}/dependencies)
 include( dependencies/CMakeLists.txt)
 
 #Compile all the tools

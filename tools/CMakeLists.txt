@@ -24,7 +24,7 @@ install( TARGETS build_clique RUNTIME DESTINATION bin)
 
 if( Boost_FOUND)
 add_executable(euler euler_tool.cpp)
-target_link_libraries( euler ${Boost_LIBRARIES} ${DSO_FIX})
+target_link_libraries( euler ${Boost_LIBRARY_PATH} ${Boost_LIBRARIES} ${DSO_FIX})
 install( TARGETS euler RUNTIME DESTINATION bin)
 endif()
 
@@ -57,7 +57,8 @@ endif()
 
 if( Boost_FOUND AND METIS_FOUND AND TBB_FOUND)
 add_executable (concurrent_homology   concurrent_homology_tool)
-target_link_libraries (concurrent_homology ${Boost_LIBRARIES} ${TBB_LIBRARIES} ${METIS_LIBRARIES} ${DSO_FIX})
+target_link_libraries (concurrent_homology ${Boost_LIBRARY_PATH}
+${TBB_LIBRARY_PATH} ${Boost_LIBRARIES} ${TBB_LIBRARIES} ${METIS_LIBRARIES} ${DSO_FIX})
 install( TARGETS concurrent_homology RUNTIME DESTINATION bin)
 endif()
 
