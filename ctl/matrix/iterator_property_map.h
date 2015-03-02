@@ -77,12 +77,13 @@ namespace ctl {
     inline iterator_property_map(
       RandomAccessIterator cc = RandomAccessIterator(), 
       const IndexMap& _id = IndexMap() ) 
-      : iter(cc), index(_id) { }
+      : iter(cc), index_(_id) { }
     template< typename key_type_>
-    inline R operator[](key_type_ v) const { return *(iter + get(index, v)) ; }
+    inline R operator[](key_type_ v) const { return *(iter + get(index_, v)) ; }
+    IndexMap index() const { return index_; }
   protected:
     RandomAccessIterator iter;
-    IndexMap index;
+    IndexMap index_;
   };
 
 #if !defined BOOST_NO_STD_ITERATOR_TRAITS
