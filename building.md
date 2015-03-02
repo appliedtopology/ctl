@@ -11,15 +11,14 @@ CTL’s build system relies on [CMake](http://cmake.org) in order to manage a la
 
 **A relatively up-to-date C++11 compiler (e.g., g++ >= 4.7)** is required in all cases.
 
-CTL’s main dependencies are:
-
+CTL’s main dependencies are:    
 - [CMake](http://www.cmake.org)
 
-- [Boost](http://www.boost.org)
+- [Boost](http://www.boost.org)   
 
-- [GTest](https://code.google.com/p/googletest/)
+- [GTest](https://code.google.com/p/googletest/) 
 
-- [TBB](https://www.threadingbuildingblocks.org/)
+- [TBB](https://www.threadingbuildingblocks.org/) 
 
 CTL also depends upon:
 
