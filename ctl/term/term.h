@@ -179,16 +179,16 @@ class Term< Cell_, ctl::Finite_field< 2> > {
 }; //Class Term specialization for Z2
 
 namespace detail{
+template<typename T, typename = void>
+struct is_iterator { static constexpr bool value = false; };
+template<typename T>
+struct is_iterator<T, typename std::enable_if<!std::is_same<typename std::iterator_traits<T>::value_type, void>::value>::type>
+{ static constexpr bool value = true; };
 
-template<class T>
-struct is_iterator : std::integral_constant<
-                               bool,
-			      !std::is_same< typename std::iterator_traits<T>::value_type, void>::value> {};
-
+template<typename Stream, class T, typename std::enable_if<std::is_integral<T>::value>::type* = nullptr> 
+void  print_cell(Stream& out, T & t){ out << t; }
 template<typename Stream, class T, typename std::enable_if<is_iterator<T>::value, T>::type* = nullptr> 
 void  print_cell(Stream& out, T & t){ out << t->first; }
-template<typename Stream, class T, typename std::enable_if<!is_iterator<T>::value, T>::type* = nullptr> 
-void  print_cell(Stream& out, T & t){ out << t; }
 }
 
 template< typename Stream, typename Ce, typename Co>

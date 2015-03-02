@@ -13,8 +13,8 @@
 set(Boost_Found 0)
 #and uncomment these lines
 #set(Boost_FOUND 1)
-#set(Boost_INCLUDE_DIR /path/to/boost/include)
-#set(Boost_LIBRARY_DIR /path/to/boost/lib)
+#set(Boost_INCLUDE_DIR ${CTL_DEPS}/boost/include)
+#set(Boost_LIBRARY_DIR ${CTL_DEPS}/boost/lib)
 #set(Boost_LIBRARIES program_options boost_mpi serialization) 
 
 

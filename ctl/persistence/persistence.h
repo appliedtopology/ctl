@@ -125,7 +125,7 @@ void eliminate_boundaries( Persistence_data & data){
 	const Term& tau_term = data.cascade_boundary.youngest();
 	const Chain& bd_cascade_tau = data.cascade_boundary_map[ tau_term];
 	#ifdef DEBUG_PERSISTENCE
-	std::cerr << (*(tau_term.cell()))->first << " is youngest" << std::endl;
+	std::cerr << tau_term.cell() << " is youngest" << std::endl;
 	#endif
 	//tau is the partner
 	if( bd_cascade_tau.empty()){ return; }
@@ -275,10 +275,11 @@ void initialize_cascade_data( const Filtration_iterator sigma,
      Chain& cascade_boundary = data.cascade_boundary;
      cascade_boundary.reserve( data.bd.length( sigma));
      for( auto i = data.bd.begin( sigma); i != data.bd.end( sigma); ++i){
-         if( Remove_destroyers && is_creator( *i, data.cascade_boundary_map)){
+         if( !Remove_destroyers || is_creator( *i, data.cascade_boundary_map)){
 		cascade_boundary += *i; //insertion sort 
 	}
      }
+      
 }
 
 /**
@@ -429,7 +430,7 @@ pair_cells( Filtration_iterator begin, Filtration_iterator end,
 	    //make tau sigma's partner
 	    const Term& tau = data.cascade_boundary.youngest();
 	   #ifdef DEBUG_PERSISTENCE
-	    std::cerr << "Pairing to: " << (*(tau.cell()))->first << std::endl;
+	    std::cerr << "Pairing to: " << tau.cell() << std::endl;
 	   #endif
 	    store_scaled_cascade( data, sigma, output_policy);  
 	    //make sigma tau's partner
