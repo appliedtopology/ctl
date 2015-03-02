@@ -4,9 +4,7 @@ include(ExternalProject)
 ExternalProject_Add(metis_build
 PREFIX ../../metis
 URL http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/metis-${Metis_Version}.tar.gz
-URL_MD5 0
 BUILD_IN_SOURCE 1
-CONFIGURE_COMMAND cmake -DGKLIB_PATH=Gklib 
+CONFIGURE_COMMAND cmake -DSHARED=True -DGKLIB_PATH=GKlib 
 BUILD_COMMAND make -j
-INSTALL_COMMAND ${CMAKE_BUILD_TOOL} install
-INSTALL_COMMAND cp -r -p <SOURCE_DIR>/include <INSTALL_DIR>/../metis/)
+INSTALL_COMMAND cp -r -p <SOURCE_DIR>/libmetis <SOURCE_DIR>/include <INSTALL_DIR>/../metis)

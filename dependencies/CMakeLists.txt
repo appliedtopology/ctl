@@ -22,7 +22,14 @@ add_custom_target(ann COMMAND cmake . -DANN_Version=${ANN_Version}
 add_custom_target(boost COMMAND cmake . -DBoost_Version_Underscore=${Boost_Version_Underscore} -DBoost_Version=${Boost_Version} 
 		        COMMAND make WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/dependencies/external/boost)
 add_custom_target(metis COMMAND cmake . -DMetis_Version=${Metis_Version} COMMAND make 
-		 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/depedencies/external/metis)
+		 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/dependencies/external/metis)
+
+add_custom_target(tbb COMMAND cmake . -DTBB_Version=${TBB_Version} COMMAND make 
+		 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/dependencies/external/tbb)
+
+add_custom_target(dependencies)
+add_dependencies(dependencies ann boost metis tbb)
+
 if( APPLE)
 include_directories(/usr/local/include)
 link_directories(/usr/local/lib)
@@ -84,7 +91,8 @@ endif()
 if( NOT METIS_FOUND)
 	find_package(METIS QUIET)
 	if( NOT METIS_FOUND)
-	 message( "--- METIS not found. Install locally by typing 'make metis'")
+	 message( "--- METIS not found.")
+	 message( "--- Install locally by typing 'make metis'")
 	endif()
 elseif( METIS_FOUND)
 	message( "-- Using METIS specified by user")

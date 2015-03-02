@@ -9,13 +9,14 @@
 #			 'make <dependency-target-name>'
 #  This installs this the specified dependency for the user in dependencies
 
+
 #If providing BOOST comment out the line below 
 set(Boost_Found 0)
 #and uncomment these lines
-#set(Boost_FOUND 1)
-#set(Boost_INCLUDE_DIR /path/to/boost/include)
-#set(Boost_LIBRARY_DIR /path/to/boost/lib)
-#set(Boost_LIBRARIES program_options boost_mpi serialization) 
+set(Boost_FOUND 1)
+set(Boost_INCLUDE_DIR ${CTL_DEPS}/boost/include)
+set(Boost_LIBRARY_DIR ${CTL_DEPS}/boost/lib)
+set(Boost_LIBRARIES program_options boost_mpi serialization) 
 
 
 #We do not provide a build target for this. 
@@ -31,26 +32,26 @@ set(MPI_FOUND 0)
 #If providing TBB comment out the line below
 set(TBB_FOUND 0)
 #and uncomment these lines
-#set(TBB_FOUND 1)
-#set(TBB_INCLUDE_DIR /path/to/tbb/include)
-#set(TBB_LIBRARY_DIR /path/to/tbb/lib)
-#set(TBB_LIBRARIES ...) 
+set(TBB_FOUND 1)
+set(TBB_INCLUDE_DIR /path/to/tbb/include)
+set(TBB_LIBRARY_DIR /path/to/tbb/build)
+set(TBB_LIBRARIES tbb tbbmalloc) 
 
 #If providing ANN comment out the line below
 set(ANN_FOUND 0)
 #and uncomment these lines
-#set(ANN_FOUND 1)
-#set(ANN_INCLUDE_DIR ${CTL_DEPS}/ann/include)
-#set(ANN_LIBRARY_DIR ${CTL_DEPS}/ann/lib)
-#set(ANN_LIBRARIES ANN) 
+set(ANN_FOUND 1)
+set(ANN_INCLUDE_DIR ${CTL_DEPS}/ann/include)
+set(ANN_LIBRARY_DIR ${CTL_DEPS}/ann/lib)
+set(ANN_LIBRARIES ANN) 
 
 #If providing METIS comment out the line below
 set(METIS_FOUND 0)
 #and uncomment these lines
-#set(METIS_FOUND 1)
-#set(METIS_INCLUDE_DIR ${CTL_DEPS}/metis/include)
-#set(METIS_LIBRARY_DIR ${CTL_DEPS/metis/libmetis)
-#set(METIS_LIBRARIES metis)
+set(METIS_FOUND 1)
+set(METIS_INCLUDE_DIR ${CTL_DEPS}/metis/include)
+set(METIS_LIBRARY_DIR ${CTL_DEPS}/metis/libmetis)
+set(METIS_LIBRARIES libmetis.so)
 
 #If providing DOXYGEN comment out the line below
 set(DOXYGEN_FOUND 0)
@@ -65,6 +66,7 @@ set(DOXYGEN_FOUND 0)
 set(Boost_Version 1.57.0)
 set(Metis_Version 5.1.0)
 set(ANN_Version 1.1.2)
+set(TBB_Version 43_20150209oss)
 
 #Cant touch this .. na na na na..
 string( REPLACE "." "_" Boost_Version_Underscore ${Boost_Version} )
