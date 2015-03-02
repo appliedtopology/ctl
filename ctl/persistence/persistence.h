@@ -430,7 +430,7 @@ pair_cells( Filtration_iterator begin, Filtration_iterator end,
 	    //make tau sigma's partner
 	    const Term& tau = data.cascade_boundary.youngest();
 	   #ifdef DEBUG_PERSISTENCE
-	    std::cerr << "Pairing to: " << tau.cell() << std::endl;
+	    std::cerr << "Pairing to: " << fm[ tau.cell()] << std::endl;
 	   #endif
 	    store_scaled_cascade( data, sigma, output_policy);  
 	    //make sigma tau's partner

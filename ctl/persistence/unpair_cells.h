@@ -1,5 +1,5 @@
-#ifndef CTLIB_EXAMPLE_H
-#define CTLIB_EXAMPLE_H
+#ifndef CTLIB_UNPAIR_CELLS_H
+#define CTLIB_UNPAIR_CELLS_H
 /*******************************************************************************
 * -Academic Honesty-
 * Plagarism: The unauthorized use or close imitation of the language and 
@@ -40,14 +40,17 @@
 *
 *******************************************************************************/
 
+#include <ctl/io/io.h>
+
 //exported functionality
 namespace ctl{
-template< typename Iterator, typename Cell_to_chain_map>
+template< typename Iterator, typename Cell_to_chain_map, typename Filtration_map=ctl::identity>
 void unpair_cells( Iterator begin, Iterator end, 
-		   Cell_to_chain_map& cascade_boundaries){ 
+		   Cell_to_chain_map& boundary_matrix,
+		   Filtration_map fm = Filtration_map()){ 
        for( auto i = begin; i != end; ++i){
-             auto & c = cascade_boundaries[ i];
-             if ( (c.size() == 1) && (i < c.youngest().cell())){
+             auto & c = boundary_matrix[ i];
+             if ( (c.size() == 1) && (fm[ i] < c.youngest().cell())){
              	c.clear();
              } 
        }  
