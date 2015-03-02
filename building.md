@@ -1,3 +1,10 @@
+---
+layout: page
+title: Building
+permalink: /building/
+published: true
+---
+
 # The Build System
 
 CTL’s build system relies on [CMake](http://cmake.org) in order to manage a large number of configuration options in a platform-independent manner; it can be easily configured to build on Linux and Unix environments (including Darwin), and, at least in theory, various versions of Microsoft Windows. 
