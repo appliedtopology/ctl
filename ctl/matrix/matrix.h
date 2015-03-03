@@ -1,4 +1,5 @@
 #ifndef CTL_MATRIX_H
+#define CTL_MATRIX_H
 
 #include <vector>
 #include <ctl/chain/chain.h>

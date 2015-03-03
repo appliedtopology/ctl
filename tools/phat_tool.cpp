@@ -127,11 +127,12 @@ int main( int argc, char *argv[]){
 
   typedef ctl::Filtration_boundary< Complex_filtration> 
 				   Filtration_boundary;
-  typedef Complex_filtration::Term Filtration_term;
+  typedef Filtration_boundary::Term Filtration_term;
   typedef ctl::Chain< Filtration_term> Chain;
   std::cout << "Writing PHAT ASCII file To: " << output_name << std::endl;
   Filtration_boundary bd( complex_filtration);
-  for (Complex_filtration_iterator sigma = complex_filtration.begin(); sigma != complex_filtration.end(); ++sigma){
+  for (Complex_filtration_iterator sigma = complex_filtration.begin(); 
+				   sigma != complex_filtration.end(); ++sigma){
        Chain cascade_boundary;
        cascade_boundary.reserve( bd.length( sigma));
        for( auto i = bd.begin( sigma); i != bd.end( sigma); ++i){
@@ -140,7 +141,7 @@ int main( int argc, char *argv[]){
        cascade_boundary.sort();
        out << (*sigma)->first.dimension();
        for( auto term : cascade_boundary){
-       	out << " " << std::distance( complex_filtration.begin(), term.cell());
+       	out << " " << term.cell(); 
        }
        out << std::endl;
   }

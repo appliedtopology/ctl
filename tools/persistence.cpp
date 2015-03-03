@@ -77,6 +77,7 @@
 #include <ctl/persistence/persistence.h>
 #include <ctl/matrix/iterator_property_map.h>
 #include <ctl/matrix/offset_maps.h>
+#include <ctl/matrix/matrix.h>
 #include <ctl/persistence/compute_betti.h>
 #include <ctl/persistence/compute_barcodes.h>
 
@@ -120,21 +121,12 @@ void run_persistence( Complex & complex,
    //typedef typename Filtration::iterator Filtration_iterator;
    typedef ctl::Filtration_boundary< Filtration> Filtration_boundary;
    typedef typename Filtration::Term Filtration_term;
-   
-   //Chain Type
-   typedef ctl::Chain< Filtration_term> Complex_chain;
-   
-   //Sparse boundary matrix
-   typedef std::vector< Complex_chain> Complex_chains;
-   
-   //Generic wrapper to access the sparse matrix.
-   typedef ctl::Pos_offset_map< typename Filtration_term::Cell> 
-					 Complex_offset_map;
-   typedef ctl::iterator_property_map< typename Complex_chains::iterator, 
-                                       Complex_offset_map, 
-                                       Complex_chain, 
-                                       Complex_chain&> 
-				       Complex_chain_map;
+   typedef typename Filtration_term::Coefficient Coefficient;
+
+   typedef typename ctl::Sparse_matrix< Coefficient> Sparse_matrix;
+   typedef typename ctl::Offset_map< typename Filtration::iterator> Offset_map;
+   typedef typename ctl::Sparse_matrix_map< Coefficient, Offset_map> Chain_map;
+
    //produce a filtration
    timer.start();
    Filtration complex_filtration( complex);
@@ -146,17 +138,16 @@ void run_persistence( Complex & complex,
              << complex_filtration_time << std::endl;
    
    //begin instantiate our vector of cascades homology
-   Complex_chains complex_cascade_boundaries( complex.size(), Complex_chain());
+   Sparse_matrix R( complex.size());
    
-   Complex_offset_map offset_map( complex_filtration.begin());
+   Offset_map offset_map( complex_filtration.begin());
    //we hand persistence a property map for genericity!                        
-   Complex_chain_map cascade_bd_property_map( complex_cascade_boundaries.begin(),
-         				      offset_map);
+   Chain_map R_map( R.begin(), offset_map);
    timer.start();
    auto times = ctl::persistence( complex_filtration.begin(), 
 				  complex_filtration.end(),
   		    		  filtration_boundary, 
-				  cascade_bd_property_map);
+				  R_map, false, offset_map);
    timer.stop();
    double boundary_map_build = times.first;
    double complex_persistence = times.second;
@@ -167,10 +158,9 @@ void run_persistence( Complex & complex,
   std::cout << "total time : " << timer.elapsed() << std::endl;
 
    ctl::compute_barcodes( complex_filtration, 
-			  cascade_bd_property_map, 
-			  barcode, tag, true);
+			  R_map, barcode, tag, true);
   std::vector< std::size_t> bti;
-  compute_betti( complex_filtration, cascade_bd_property_map, bti, true);
+  compute_betti( complex_filtration, R_map, bti, true);
 }
 typedef ctl::parallel::Timer Timer;
 

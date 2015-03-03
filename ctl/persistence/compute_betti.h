@@ -64,6 +64,7 @@ void compute_betti( const Complex & complex,
        typedef typename Complex::iterator Cell_iterator;
        typedef typename Cell_chain_map::value_type Chain;
        Betti betti( complex.dimension()+1,0);
+       auto fm = cascade_boundary_map.index();
        for(Cell_iterator cell = complex.begin(); cell != complex.end(); ++cell){
                const Chain& bd = cascade_boundary_map[ cell];
                const bool c = bd.empty() || 
@@ -84,10 +85,11 @@ void compute_betti( Filtration & filtration,
        typedef typename Cell_chain_map::value_type Chain;
        const Complex & complex = filtration.complex();
        Betti betti( complex.dimension()+1,0);
+       auto fm = cascade_boundary_map.index();
        for( auto cell  = filtration.begin(); 
 			 cell != filtration.end(); ++cell){
                const Chain& bd = cascade_boundary_map[ cell];
-               const bool c = bd.empty() || (cell < bd.youngest().cell()); 
+               const bool c = bd.empty() || (cell < filtration.begin()+fm[bd.youngest().cell()]); 
 	       betti[ (*cell)->first.dimension()-(!c)] += (2*c -1);
        }
        ctl::write_betti( betti, std::cout);

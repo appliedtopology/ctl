@@ -80,6 +80,7 @@
 
 //Boundary matrix stuff
 #include <ctl/matrix/iterator_property_map.h>
+#include <ctl/matrix/matrix.h>
 #include <ctl/matrix/offset_maps.h>
 
 //Persistence

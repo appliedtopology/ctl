@@ -5,7 +5,7 @@
 * Plagarism: The unauthorized use or close imitation of the language and 
 * thoughts of another author and the representation of them as one's own 
 * original work, as by not crediting the author. 
-* (Encyclopedia Britannica, 2008.)
+ (Encyclopedia Britannica, 2008.)
 *
 * You are free to use the code according to the license below, but, please
 * do not commit acts of academic dishonesty. We strongly encourage and request 
@@ -70,6 +70,7 @@ void compute_barcodes( Filtration & filtration,
        typedef typename Barcodes::value_type Barcode;
        Cell_less less;
        barcodes.resize( filtration.complex().dimension()+1);
+       auto offset_map = cascade_boundary_map.index();
        for(Filtration_iterator sigma = filtration.begin();
 			       sigma != filtration.end(); ++sigma){
                const Chain& bd = cascade_boundary_map[ sigma];
@@ -77,9 +78,9 @@ void compute_barcodes( Filtration & filtration,
 	        Barcode & barcode = barcodes[ (*sigma)->first.dimension()];
 	      	barcode.emplace( (*sigma)->second.weight(), 
 				 std::numeric_limits< Weight>::infinity() );
-	       }else if( sigma < bd.youngest().cell()){
+	       }else if( cascade_boundary_map.index()[sigma] < bd.youngest().cell()){
 	          Barcode & barcode = barcodes[ (*sigma)->first.dimension()];
-	 	  const Filtration_iterator & destroyer = bd.youngest().cell();
+	 	  const Filtration_iterator destroyer = filtration.begin()+offset_map[bd.youngest().cell()];
 		  barcode.emplace( (*sigma)->second.weight(),
 				   (*destroyer)->second.weight());
 	       }
@@ -103,16 +104,17 @@ void compute_barcodes( Filtration & filtration,
        typedef typename Bar::first_type T;
        barcodes.resize( filtration.complex().dimension()+1);
        std::size_t pos=0;
+       auto offset_map = cascade_boundary_map.index();
        for(Filtration_iterator sigma = filtration.begin(); 
 			       sigma != filtration.end(); ++sigma, ++pos){
                const Chain& bd = cascade_boundary_map[ sigma];
 	       if( bd.empty()){
 	       Barcode & barcode = barcodes[ (*sigma)->first.dimension()];
 	       barcode.emplace( pos, std::numeric_limits< T>::infinity());
-	       }else if( sigma < bd.youngest().cell()){
+	       }else if( offset_map[sigma] < bd.youngest().cell()){
 	          Barcode & barcode = barcodes[ (*sigma)->first.dimension()];
-	 	  const Filtration_iterator & destroyer = bd.youngest().cell();
-		  barcode.emplace( pos, destroyer-filtration.begin());
+	 	  auto destroyer = offset_map[bd.youngest().cell()];
+		  barcode.emplace( pos, destroyer-pos);
 	       }
        }
        if( !include_last_dim){ barcodes.pop_back(); }

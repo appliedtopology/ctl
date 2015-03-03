@@ -67,6 +67,7 @@
 #include <ctl/persistence/persistence.h>
 #include <ctl/matrix/offset_maps.h>
 #include <ctl/matrix/iterator_property_map.h>
+#include <ctl/matrix/matrix.h>
 
 //Local Project Deps
 //#include <ctl/parallel/build_blowup_complex/build_blowup_complex.h>
@@ -89,29 +90,21 @@ void compute_homology( Complex & complex,
 	typedef typename ctl::parallel::Filtration< Complex, Cell_less, Complex_iterator,
 						    std::vector< Complex_iterator> > 
 								Filtration;
+	typedef typename Filtration::iterator Filtration_iterator;
 	//typedef typename Complex::Boundary Cell_boundary;
 	typedef typename ctl::Filtration_boundary< Filtration> 
 						Filtration_boundary;
-	typedef typename Filtration::iterator Filtration_iterator;
+	typedef typename Filtration_boundary::Coefficient Coefficient;
+
+	typedef typename ctl::Sparse_matrix< Coefficient> Sparse_matrix;
+        typedef typename ctl::Offset_map< Filtration_iterator> Offset_map;
+        typedef typename ctl::Sparse_matrix_map< Coefficient, Offset_map> Chain_map;
+
 	typedef typename Filtration::Term Filtration_term;
 	typedef typename std::pair< Filtration_iterator, Filtration_iterator> 
 							     Filtration_pair;
 	typedef typename std::vector< Filtration_pair> Iterator_pairs;
 	//Change this to filtration term
-	typedef typename  ctl::Chain< Filtration_term> Chain;
-	//This should be thread safe since we preallocate *before* threads 
-	// and threads never access the same vector at the same time
-	// even if they did, it's not *these* chains that have to be thread safe.
-	typedef typename  std::vector< Chain> Chains;
-	typedef typename  Chains::iterator Chains_iterator;
-	typedef ctl::Pos_offset_map< typename Filtration_term::Cell> Complex_offset_map;
-
-	typedef typename  ctl::iterator_property_map< Chains_iterator,
-						      Complex_offset_map, 
-						      Chain, 
-						      Chain&> 
-						      Complex_chain_map;
-
 	//typedef typename tbb::concurrent_vector< int> Betti;
 
 	stats.timer.start();
@@ -137,15 +130,15 @@ void compute_homology( Complex & complex,
 	stats.timer.stop();
 	stats.get_iterators = stats.timer.elapsed();
 
-	Chains cascades( complex.size());
-	Complex_chain_map cascade_prop_map( cascades.begin(), 
-				Complex_offset_map( filtration.begin()));
+	Sparse_matrix R( complex.size());
+	Offset_map offset_map( filtration.begin());
+	Chain_map R_map( R.begin(), offset_map);
 	Filtration_boundary filtration_boundary( filtration);
 
 	auto times = ctl::parallel::persistence( ranges,
 			           filtration_boundary,
-			           cascade_prop_map, 
-			           num_parts);
+			           R_map, 
+			           num_parts, offset_map);
 	stats.initialize_cascade_boundary = times.first;
 	stats.parallel_persistence = times.second;
 	#ifdef COMPUTE_BETTI
@@ -180,13 +173,12 @@ void do_blowup_homology( Blowup & blowup_complex,
 	typedef typename  std::vector< Chain> Chains;
 	typedef typename  Chains::iterator Chains_iterator;
 	typedef typename  Blowup_filtration_term::Cell Blowup_filtration_term_cell;
-	typedef ctl::Pos_offset_map< Blowup_filtration_term_cell> 
-						Blowup_offset_map;
-	typedef typename  ctl::iterator_property_map< Chains_iterator,
-						      Blowup_offset_map, 
-						      Chain, 
-						      Chain&> 
-						      Complex_chain_map;
+	typedef typename  Blowup_filtration_term::Coefficient Coefficient;
+
+        typedef typename ctl::Sparse_matrix< Coefficient> Sparse_matrix;
+        typedef typename ctl::Offset_map< Blowup_filtration_iterator> Offset_map;
+        typedef typename ctl::Sparse_matrix_map< Coefficient, Offset_map> Chain_map;
+
 	typedef typename std::pair< Blowup_filtration_iterator, 
 				    Blowup_filtration_iterator> Filtration_pair;
 	typedef typename std::vector< Filtration_pair> Iterator_pairs;
@@ -202,12 +194,12 @@ void do_blowup_homology( Blowup & blowup_complex,
 			current = beyond;
 	}
 	ranges.push_back( make_pair( current, blowup_filtration.end()));
-  	Chains cascades( blowup_complex.size()); 
-	Blowup_offset_map offset_map( blowup_filtration.begin());
-	Complex_chain_map cascade_prop_map( cascades.begin(), offset_map);
+  	Sparse_matrix R( blowup_complex.size()); 
+	Offset_map offset_map( blowup_filtration.begin());
+	Chain_map R_map( R.begin(), offset_map);
   	Blowup_boundary blowup_filtration_boundary( blowup_filtration); 
 	auto p = ctl::parallel::persistence( ranges, blowup_filtration_boundary, 
-				    	     cascade_prop_map, num_local_pieces );
+				    	     R_map, num_local_pieces, offset_map);
 	stats.initialize_cascade_boundary = p.first; 
 	stats.parallel_persistence = p.second;
 #ifdef COMPUTE_BETTI

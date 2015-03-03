@@ -10,36 +10,36 @@
 #  This installs this the specified dependency for the user in dependencies
 
 
-#If providing BOOST uncomment out the line below s
-set(Boost_FOUND 1) 
-set(Boost_INCLUDE_DIR ${CTL_DEPS}/boost/include)
-set(Boost_LIBRARY_DIR ${CTL_DEPS}/boost/lib)
-set(Boost_LIBRARIES ${Boost_LIBRARY_DIR}/libboost_program_options.so ${Boost_LIBRARY_DIR}/libboost_serialization.so) 
+##If providing BOOST uncomment out the line below s
+#set(Boost_FOUND 1) 
+#set(Boost_INCLUDE_DIR ${CTL_DEPS}/boost/include)
+#set(Boost_LIBRARY_DIR ${CTL_DEPS}/boost/lib)
+#set(Boost_LIBRARIES ${Boost_LIBRARY_DIR}/libboost_program_options.so ${Boost_LIBRARY_DIR}/libboost_serialization.so) 
 
-#If providing TBB uncomment out the line belows
-set(TBB_FOUND 1) 
-set(TBB_INCLUDE_DIR ${CTL_DEPS}/tbb/include)
-##You will likely need to modify these lines with the contents of dependencies/tbb/build/
-set(TBB_DEBUG_LIBDIR linux_intel64_gcc_cc4.8.1_libc2.12_kernel2.6.32_debug)
-set(TBB_RELEASE_LIBDIR linux_intel64_gcc_cc4.8.1_libc2.12_kernel2.6.32_release)
-set(TBB_RELEASE_LIBRARY_DIR ${CTL_DEPS}/tbb/build/${TBB_RELEASE_LIBDIR})
-set(TBB_DEBUG_LIBRARY_DIR ${CTL_DEPS}/tbb/build/${TBB_DEBUG_LIBDIR})
-set(TBB_LIBRARIES ${TBB_RELEASE_LIBRARY_DIR}/libtbb.so ${TBB_RELEASE_LIBRARY_DIR}/libtbbmalloc.so) 
-IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
-    set(TBB_LIBRARIES ${TBB_DEBUG_LIBRARY_DIR}/libtbb.so ${TBB_DEBUG_LIBRARY_DIR}/libtbbmalloc.so) 
-endif()
+##If providing TBB uncomment out the line belows
+#set(TBB_FOUND 1) 
+#set(TBB_INCLUDE_DIR ${CTL_DEPS}/tbb/include)
+###You will likely need to modify these lines with the contents of dependencies/tbb/build/
+#set(TBB_DEBUG_LIBDIR linux_intel64_gcc_cc4.8.1_libc2.12_kernel2.6.32_debug)
+#set(TBB_RELEASE_LIBDIR linux_intel64_gcc_cc4.8.1_libc2.12_kernel2.6.32_release)
+#set(TBB_RELEASE_LIBRARY_DIR ${CTL_DEPS}/tbb/build/${TBB_RELEASE_LIBDIR})
+#set(TBB_DEBUG_LIBRARY_DIR ${CTL_DEPS}/tbb/build/${TBB_DEBUG_LIBDIR})
+#set(TBB_LIBRARIES ${TBB_RELEASE_LIBRARY_DIR}/libtbb.so ${TBB_RELEASE_LIBRARY_DIR}/libtbbmalloc.so) 
+#IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
+#    set(TBB_LIBRARIES ${TBB_DEBUG_LIBRARY_DIR}/libtbb.so ${TBB_DEBUG_LIBRARY_DIR}/libtbbmalloc.so) 
+#endif()
 
-#If providing ANN comment out the lines below
-set(ANN_FOUND 1)
-set(ANN_INCLUDE_DIR ${CTL_DEPS}/ann/include)
-set(ANN_LIBRARY_DIR ${CTL_DEPS}/ann/lib)
-set(ANN_LIBRARIES libANN.so)
+##If providing ANN comment out the lines below
+#set(ANN_FOUND 1)
+#set(ANN_INCLUDE_DIR ${CTL_DEPS}/ann/include)
+#set(ANN_LIBRARY_DIR ${CTL_DEPS}/ann/lib)
+#set(ANN_LIBRARIES libANN.so)
 
-#If providing METIS uncomment out the lines below
-set(METIS_FOUND 1) 
-set(METIS_INCLUDE_DIR ${CTL_DEPS}/metis/include)
-set(METIS_LIBRARY_DIR ${CTL_DEPS}/metis/libmetis)
-set(METIS_LIBRARIES ${METIS_LIBRARY_DIR}/libmetis.so)
+##If providing METIS uncomment out the lines below
+#set(METIS_FOUND 1) 
+#set(METIS_INCLUDE_DIR ${CTL_DEPS}/metis/include)
+#set(METIS_LIBRARY_DIR ${CTL_DEPS}/metis/libmetis)
+#set(METIS_LIBRARIES ${METIS_LIBRARY_DIR}/libmetis.so)
 
 ##If providing DOXYGEN uncomment out the line below
 #set(DOXYGEN_FOUND 1)

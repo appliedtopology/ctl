@@ -51,6 +51,8 @@
 *
 *
 *******************************************************************************/
+//CTL
+#include <ctl/io/io.h>
 #include <ctl/persistence/persistence.h>
 #include <ctl/parallel/utility/timer.h>
 
@@ -119,7 +121,7 @@ class Persistence_body{
 		times.push_back( ctl::persistence( current->first,
 				  current->second,
 				  _boundary,
-		 		  _cascade_prop_map));
+		 		  _cascade_prop_map, false, _cascade_prop_map.index()));
 		}
         }
 
@@ -131,12 +133,13 @@ class Persistence_body{
 
 template< typename Iterator_pairs, 
 	  typename Boundary, 
-	  typename Cascade_map>
+	  typename Cascade_map, typename Filtration_map=ctl::identity>
 std::pair< double, double> 
 persistence( Iterator_pairs & ranges, 
  	     Boundary & complex_boundary,
  	     Cascade_map & cascade_prop_map,
- 	     size_t & num_parallel_ranges){
+ 	     size_t & num_parallel_ranges, 
+	     Filtration_map fm = Filtration_map()){
 	typedef typename Iterator_pairs::iterator Iterator;
 	typedef typename Iterator_pairs::value_type Pair;
 	typedef typename Pair::first_type Filtration_iterator;
@@ -157,7 +160,7 @@ persistence( Iterator_pairs & ranges,
 		Filtration_iterator end = ranges.rbegin()->second;
 	        result = ctl::persistence( begin, end, 
 				  complex_boundary, 
-				  cascade_prop_map);
+				  cascade_prop_map, false, fm);
 	}
 	double first_max = 0, second_max = 0;
 	for( Vector::const_iterator i = time_vector.begin(); i != time_vector.end(); ++i){
