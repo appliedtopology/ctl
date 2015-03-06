@@ -116,6 +116,9 @@ public:
 	const_reverse_iterator crbegin() const 	   { return _chain.begin(); }
 	const_reverse_iterator crend() const   	   { return _chain.end(); }
 
+	Term& data() { return _chain[ 0]; }
+	const Term& data() const { return _chain[ 0]; }
+
 	template< class... Args>	
 	void emplace( Args&&... args){ _chain.emplace_back( std::forward< Args>( args)...); }
 	reverse_iterator erase( reverse_iterator b, reverse_iterator e){
