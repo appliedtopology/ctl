@@ -150,7 +150,8 @@ public:
 	crit rbegin() const { return filtration_.rbegin(); }
 	crit rend()   const { return filtration_.rend();   }
 	Complex& complex() const { return complex_;}
-	std::size_t size() const { return filtration_.size(); } 
+	std::size_t size() const { return filtration_.size(); }
+	void clear() { filtration_.clear(); Vector().swap( filtration_); } 
  private:
   friend class boost::serialization::access; 
 

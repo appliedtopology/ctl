@@ -169,6 +169,11 @@ public:
 		Chain result;
 		return scaled_add( a, rhs, result, c);
 	}
+
+	template< typename Chain>
+	Chain& operator+=( const Chain& rhs){ 
+		return this->scaled_add( 1, rhs); 
+	}
 	private:
 	template< typename Iterator, typename Persistence_data, 
 					typename Compare>

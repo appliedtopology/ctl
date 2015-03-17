@@ -122,7 +122,8 @@ class Abstract_simplex {
 	iterator       begin()	        { return vertices.begin(); }
 	//! returns a const_iterator to the first vertex in the simplex
 	const_iterator begin()  const	{ return vertices.begin(); }
-	
+	T front() const { return vertices.front(); }
+	T back() const { return vertices.back(); }
 	/*!
 	* @brief  returns an iterator to the past-the-end vertex in the simplex
 	* @return iterator

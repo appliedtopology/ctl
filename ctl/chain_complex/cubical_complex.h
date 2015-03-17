@@ -428,6 +428,7 @@ public:
    }
    Coordinate base() const { return cells.base(); }
    std::size_t base( std::size_t i) const { return cells.base( i); }
+   std::size_t vertex_base( std::size_t i) const { return (cells.base( i)+1)/2; }
    std::size_t id( std::size_t i) const{ return index_data[ i]; }
    std::size_t offset( std::size_t i) const { if( i){ return cells.offsets( i-1); } return 1; }
 //Private functions

@@ -108,6 +108,7 @@ class Cube {
 	//TODO: IMPLEMENT insert/remove?
 	
 	Self lower_left_vertex() const{ return Self( data_ & ~( (1 << D)-1));}
+	std::size_t lower_left_vertex_id() const{ return data_ >> D; }
 	/**
 	* @brief Copy assignment operator
 	* @param Cube & b
