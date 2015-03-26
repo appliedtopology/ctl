@@ -52,9 +52,9 @@
 *
 *******************************************************************************/
 //CTL
-#include <ctl/io/io.h>
-#include <ctl/persistence/persistence.h>
-#include <ctl/parallel/utility/timer.h>
+#include <ctl/io/io.hpp>
+#include <ctl/persistence/persistence.hpp>
+#include <ctl/parallel/utility/timer.hpp>
 
 #include <tbb/blocked_range.h>
 #include <tbb/parallel_for.h>

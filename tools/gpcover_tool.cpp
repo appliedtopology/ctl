@@ -34,17 +34,17 @@
 *******************************************************************************
 *******************************************************************************/
 //CTL
-#include <ctl/abstract_simplex/abstract_simplex.h>
-#include <ctl/abstract_simplex/simplex_boundary.h>
-#include <ctl/chain_complex/chain_complex.h>
-#include <ctl/chain_complex/complex_boundary.h>
-#include <ctl/parallel/filtration/filtration.h>
-#include <ctl/io/io.h>
-#include <ctl/term/term.h>
-#include <ctl/utility/timer.h>
+#include <ctl/abstract_simplex/abstract_simplex.hpp>
+#include <ctl/abstract_simplex/simplex_boundary.hpp>
+#include <ctl/chain_complex/chain_complex.hpp>
+#include <ctl/chain_complex/complex_boundary.hpp>
+#include <ctl/parallel/filtration/filtration.hpp>
+#include <ctl/io/io.hpp>
+#include <ctl/term/term.hpp>
+#include <ctl/utility/timer.hpp>
 
-#include <ctl/parallel/partition_covers/covers.h>
-#include <ctl/parallel/partition_covers/cover_data.h>
+#include <ctl/parallel/partition_covers/covers.hpp>
+#include <ctl/parallel/partition_covers/cover_data.hpp>
 
 //BOOST
 #include <boost/program_options.hpp>

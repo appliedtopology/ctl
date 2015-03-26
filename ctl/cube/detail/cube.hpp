@@ -47,7 +47,7 @@
 #include <initializer_list>  // std::initializer_list
 #include <iostream> //cout (debug only)
 #include <algorithm> //swap, sort, unique
-#include <ctl/cube/cube_boundary.h>
+#include <ctl/cube/cube_boundary.hpp>
 
 /*! \namespace ctl
 Namespace where all library functionality resides

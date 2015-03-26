@@ -61,8 +61,8 @@
 #include <boost/graph/properties.hpp>
 
 // PROJECT
-#include <ctl/io/io.h> 
-#include <ctl/nbhd_graph/nbhd_graph.h>
+#include <ctl/io/io.hpp> 
+#include <ctl/nbhd_graph/nbhd_graph.hpp>
 
 namespace ctl {
 

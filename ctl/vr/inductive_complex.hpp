@@ -51,7 +51,7 @@
 #include <boost/graph/adjacency_list.hpp>
 
 //CTL
-#include <ctl/vr/incremental_complex.h>
+#include <ctl/vr/incremental_complex.hpp>
 
 namespace ctl {
 

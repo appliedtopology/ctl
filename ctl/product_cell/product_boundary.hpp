@@ -51,8 +51,8 @@
 #include <cassert>
 
 //CTL
-#include <ctl/term/term.h>
-#include <ctl/finite_field/finite_field.h>
+#include <ctl/term/term.hpp>
+#include <ctl/finite_field/finite_field.hpp>
 
 //non-exported functionality
 namespace {

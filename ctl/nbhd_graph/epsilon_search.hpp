@@ -63,7 +63,7 @@
 #include <boost/graph/adjacency_list.hpp>
 
 //CTL
-#include <ctl/metrics/metric.h>
+#include <ctl/metrics/metric.hpp>
 
 namespace ctl{
 namespace epsilon_search{

@@ -34,11 +34,11 @@
 *******************************************************************************
 *******************************************************************************/
 // Global Project Deps
-#include <ctl/abstract_simplex/abstract_simplex.h>
-#include <ctl/abstract_simplex/simplex_boundary.h>
-#include <ctl/chain_complex/chain_complex.h>
-#include <ctl/io/io.h> 
-#include <ctl/utility/timer.h>
+#include <ctl/abstract_simplex/abstract_simplex.hpp>
+#include <ctl/abstract_simplex/simplex_boundary.hpp>
+#include <ctl/chain_complex/chain_complex.hpp>
+#include <ctl/io/io.hpp> 
+#include <ctl/utility/timer.hpp>
 
 //boost
 #include <boost/program_options.hpp>

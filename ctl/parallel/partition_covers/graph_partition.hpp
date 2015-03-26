@@ -50,7 +50,7 @@
 
 //TIMER
 #include <iomanip>
-#include <ctl/utility/timer.h>
+#include <ctl/utility/timer.hpp>
 
 //STL
 #include <algorithm> //max & min_element

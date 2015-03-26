@@ -40,7 +40,7 @@
 *
 *******************************************************************************/
 
-#include <ctl/io/io.h>
+#include <ctl/io/io.hpp>
 
 //exported functionality
 namespace ctl{

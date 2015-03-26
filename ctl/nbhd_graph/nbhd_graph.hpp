@@ -56,7 +56,7 @@
 #include <boost/graph/adjacency_list.hpp>
 
 //CTL
-#include <ctl/io/io.h>
+#include <ctl/io/io.hpp>
 
 
 //non-exported functionality

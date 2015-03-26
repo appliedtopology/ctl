@@ -45,10 +45,10 @@
 #include <boost/graph/metis.hpp>
 
 // CTL
-#include <ctl/nbhd_graph/nbhd_graph.h>
-#include <ctl/io/io.h>
-#include <ctl/one_skeleton/graph_to_metis.h>
-#include <ctl/one_skeleton/complex_to_graph.h>
+#include <ctl/nbhd_graph/nbhd_graph.hpp>
+#include <ctl/io/io.hpp>
+#include <ctl/one_skeleton/graph_to_metis.hpp>
+#include <ctl/one_skeleton/complex_to_graph.hpp>
 
 typedef  ctl::Nbhd_graph<> Graph;
 typedef  boost::property_map< Graph,boost::vertex_name_t>::const_type 

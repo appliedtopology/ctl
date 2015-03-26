@@ -57,13 +57,13 @@
 #include <map>
 
 // PROJECT
-#include <ctl/parallel/partition_covers/cover_stats.h>
-#include <ctl/one_skeleton/one_skeleton.h> //one_skeleton 
-#include <ctl/parallel/partition_covers/graph_partition.h> //metis
-#include <ctl/chain_complex/complex_boundary.h> //Complex_boundary
+#include <ctl/parallel/partition_covers/cover_stats.hpp>
+#include <ctl/one_skeleton/one_skeleton.hpp> //one_skeleton 
+#include <ctl/parallel/partition_covers/graph_partition.hpp> //metis
+#include <ctl/chain_complex/complex_boundary.hpp> //Complex_boundary
 
 //TIMER
-#include <ctl/utility/timer.h>
+#include <ctl/utility/timer.hpp>
 
 
 //BOOST

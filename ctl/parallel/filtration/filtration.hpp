@@ -52,8 +52,8 @@
 #include <vector>
 #include <tbb/concurrent_vector.h>
 
-#include <ctl/filtration/less.h>
-#include <ctl/filtration/filtration_iterator.h>
+#include <ctl/filtration/less.hpp>
+#include <ctl/filtration/filtration_iterator.hpp>
 
 namespace ctl{
 //non-exported functionality 

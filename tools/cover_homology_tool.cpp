@@ -52,45 +52,45 @@
 //TBB 
 #include <tbb/task_scheduler_init.h> 
 
-#include <ctl/io/io.h>
-#include <ctl/utility/timer.h>
+#include <ctl/io/io.hpp>
+#include <ctl/utility/timer.hpp>
 //Chain Complex
-#include <ctl/finite_field/finite_field.h>
-#include <ctl/abstract_simplex/abstract_simplex.h>
-#include <ctl/abstract_simplex/simplex_boundary.h>
-#include <ctl/chain_complex/chain_complex.h>
-#include <ctl/chain_complex/complex_boundary.h>
-#include <ctl/filtration/filtration.h>
-#include <ctl/term/term.h>
+#include <ctl/finite_field/finite_field.hpp>
+#include <ctl/abstract_simplex/abstract_simplex.hpp>
+#include <ctl/abstract_simplex/simplex_boundary.hpp>
+#include <ctl/chain_complex/chain_complex.hpp>
+#include <ctl/chain_complex/complex_boundary.hpp>
+#include <ctl/filtration/filtration.hpp>
+#include <ctl/term/term.hpp>
 
 //Parallel Chain Complex
-#include <ctl/parallel/chain_complex/chain_complex.h>
-#include <ctl/parallel/filtration/filtration.h>
-#include <ctl/parallel/utility/timer.h>
+#include <ctl/parallel/chain_complex/chain_complex.hpp>
+#include <ctl/parallel/filtration/filtration.hpp>
+#include <ctl/parallel/utility/timer.hpp>
 
 //#include "point.h"
 //#include "point_vector.h"
 
 //Covers
-#include <ctl/parallel/partition_covers/covers.h>
-#include <ctl/parallel/partition_covers/cover_data.h>
+#include <ctl/parallel/partition_covers/covers.hpp>
+#include <ctl/parallel/partition_covers/cover_data.hpp>
 
 //Blowup
-#include <ctl/product_cell/product_boundary.h>
-#include <ctl/product_cell/product_cell.h>
-#include <ctl/parallel/build_blowup_complex/build_blowup_complex.h>
+#include <ctl/product_cell/product_boundary.hpp>
+#include <ctl/product_cell/product_cell.hpp>
+#include <ctl/parallel/build_blowup_complex/build_blowup_complex.hpp>
 
 //Persistence 
-#include <ctl/chain/chain.h>
-#include <ctl/persistence/compute_betti.h>
-#include <ctl/persistence/persistence.h>
-#include <ctl/matrix/iterator_property_map.h>
-#include <ctl/matrix/offset_maps.h>
-#include <ctl/persistence/compute_betti.h>
+#include <ctl/chain/chain.hpp>
+#include <ctl/persistence/compute_betti.hpp>
+#include <ctl/persistence/persistence.hpp>
+#include <ctl/matrix/iterator_property_map.hpp>
+#include <ctl/matrix/offset_maps.hpp>
+#include <ctl/persistence/compute_betti.hpp>
 
 //Parallel Homology 
-#include <ctl/parallel/homology/persistence.h>
-#include <ctl/parallel/homology/homology.h>
+#include <ctl/parallel/homology/persistence.hpp>
+#include <ctl/parallel/homology/homology.hpp>
 
 namespace po = boost::program_options;
 

@@ -48,13 +48,13 @@
 #endif
 //CTL
 //Types for Building a Simplicial Chain Complex and Filtration
-#include <ctl/finite_field/finite_field.h>
-#include <ctl/abstract_simplex/abstract_simplex.h>
-#include <ctl/abstract_simplex/simplex_boundary.h>
-#include <ctl/io/io.h>
-#include <ctl/chain_complex/chain_complex.h>
+#include <ctl/finite_field/finite_field.hpp>
+#include <ctl/abstract_simplex/abstract_simplex.hpp>
+#include <ctl/abstract_simplex/simplex_boundary.hpp>
+#include <ctl/io/io.hpp>
+#include <ctl/chain_complex/chain_complex.hpp>
 
-#include <ctl/utility/timer.h>
+#include <ctl/utility/timer.hpp>
 
 //STL
 #include <sstream>

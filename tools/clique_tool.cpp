@@ -42,9 +42,9 @@
 #include <sstream>
 
 //CTL
-#include <ctl/abstract_simplex/abstract_simplex.h>
-#include <ctl/chain_complex/chain_complex.h>
-#include <ctl/io/io.h>
+#include <ctl/abstract_simplex/abstract_simplex.hpp>
+#include <ctl/chain_complex/chain_complex.hpp>
+#include <ctl/io/io.hpp>
 
 typedef ctl::Abstract_simplex< int> Simplex;
 typedef ctl::Finite_field< 2> Z2;

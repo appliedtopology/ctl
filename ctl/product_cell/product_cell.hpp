@@ -56,8 +56,8 @@
 #include <utility> //std::pair, and piecewise_construct
 #include <tuple> //std::pair, and piecewise_construct
 #include <iostream> //cout (debug only)
-#include <ctl/product_cell/product_boundary.h>
-#include <ctl/hash/hash.h>
+#include <ctl/product_cell/product_boundary.hpp>
+#include <ctl/hash/hash.hpp>
 
 namespace ctl {
 

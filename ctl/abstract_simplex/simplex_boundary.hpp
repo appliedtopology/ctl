@@ -53,8 +53,8 @@
 #include <boost/serialization/base_object.hpp>
 
 //CTL
-#include <ctl/term/term.h>
-#include <ctl/finite_field/finite_field.h>
+#include <ctl/term/term.hpp>
+#include <ctl/finite_field/finite_field.hpp>
 namespace ctl {
 namespace detail {
 template< typename Term_>

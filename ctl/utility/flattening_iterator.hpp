@@ -77,21 +77,21 @@ private:
 
 
 template <typename Iterator>
-flattening_iterator<Iterator> flatten_end(Iterator end)
+detail::flattening_iterator<Iterator> flatten_end(Iterator end)
 {
-    return flattening_iterator<Iterator>(end, end);
+    return detail::flattening_iterator<Iterator>(end, end);
 }
 
 template <typename Iterator>
-flattening_iterator<Iterator> flatten_end(Iterator begin, Iterator end)
+detail::flattening_iterator<Iterator> flatten_end(Iterator begin, Iterator end)
 {
-    return flattening_iterator<Iterator>(end, end);
+    return detail::flattening_iterator<Iterator>(end, end);
 }
 
 template <typename Iterator>
-flattening_iterator<Iterator> flatten_begin(Iterator begin, Iterator end)
+detail::flattening_iterator<Iterator> flatten_begin(Iterator begin, Iterator end)
 {
-    return flattening_iterator<Iterator>(begin, end);
+    return detail::flattening_iterator<Iterator>(begin, end);
 }
 } //end namespace ctl
 

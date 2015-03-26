@@ -2,9 +2,9 @@
 #define CTL_MATRIX_H
 
 #include <vector>
-#include <ctl/chain/chain.h>
-#include <ctl/matrix/iterator_property_map.h>
-#include <ctl/matrix/offset_maps.h>
+#include <ctl/chain/chain.hpp>
+#include <ctl/matrix/iterator_property_map.hpp>
+#include <ctl/matrix/offset_maps.hpp>
 namespace ctl {
 
 /**

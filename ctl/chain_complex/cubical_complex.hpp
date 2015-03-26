@@ -51,9 +51,9 @@
 #include <boost/iterator/transform_iterator.hpp>
 
 //CTL
-#include <ctl/io/io.h>
-#include <ctl/cube/cube.h>
-#include <ctl/chain_complex/detail/cube_boundary_wrapper.h>
+#include <ctl/io/io.hpp>
+#include <ctl/cube/cube.hpp>
+#include <ctl/chain_complex/detail/cube_boundary_wrapper.hpp>
 
 //BOOST
 #include <boost/iterator/transform_iterator.hpp>

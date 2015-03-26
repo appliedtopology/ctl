@@ -50,10 +50,10 @@
 #include <unordered_map>
 
 //CTL
-#include <ctl/utility/recombine.h>
-#include <ctl/chain_complex/detail/multi_array.h>
-#include <ctl/cube/cube.h>
-#include <ctl/cube/detail/cube.h>
+#include <ctl/utility/recombine.hpp>
+#include <ctl/chain_complex/detail/multi_array.hpp>
+#include <ctl/cube/cube.hpp>
+#include <ctl/cube/detail/cube.hpp>
 
 namespace ctl {
 namespace detail {

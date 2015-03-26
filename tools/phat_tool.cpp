@@ -37,17 +37,17 @@
 //#define TESTS_ON
 
 // Global Project Deps
-#include <ctl/finite_field/finite_field.h>
-#include <ctl/abstract_simplex/abstract_simplex.h>
-#include <ctl/abstract_simplex/simplex_boundary.h>
-#include <ctl/chain_complex/complex_boundary.h>
-#include <ctl/chain_complex/chain_complex.h>
-#include <ctl/filtration/filtration.h>
-#include <ctl/filtration/filtration_boundary.h>
-#include <ctl/io/io.h> 
-#include <ctl/utility/timer.h>
+#include <ctl/finite_field/finite_field.hpp>
+#include <ctl/abstract_simplex/abstract_simplex.hpp>
+#include <ctl/abstract_simplex/simplex_boundary.hpp>
+#include <ctl/chain_complex/complex_boundary.hpp>
+#include <ctl/chain_complex/chain_complex.hpp>
+#include <ctl/filtration/filtration.hpp>
+#include <ctl/filtration/filtration_boundary.hpp>
+#include <ctl/io/io.hpp> 
+#include <ctl/utility/timer.hpp>
 
-#include <ctl/chain/chain.h>
+#include <ctl/chain/chain.hpp>
 
 //BOOST
 #include <boost/program_options.hpp>

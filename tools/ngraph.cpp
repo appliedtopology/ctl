@@ -4,28 +4,28 @@
 
 //CTL 
 //Utility 
-#include <ctl/io/io.h>
-#include <ctl/utility/timer.h>
+#include <ctl/io/io.hpp>
+#include <ctl/utility/timer.hpp>
 
 
 //Types for Points
 //#include <ctl/points/points.h>
 
 //Types for Graphs
-#include <ctl/nbhd_graph/nbhd_graph.h>
-#include <ctl/nbhd_graph/epsilon_search.h>
-#include <ctl/nbhd_graph/all_pairs.h>
+#include <ctl/nbhd_graph/nbhd_graph.hpp>
+#include <ctl/nbhd_graph/epsilon_search.hpp>
+#include <ctl/nbhd_graph/all_pairs.hpp>
 
 //Types for Building a Simplicial Chain Complex 
 //Abstract Simplex
-#include <ctl/finite_field/finite_field.h>
-#include <ctl/abstract_simplex/abstract_simplex.h>
-#include <ctl/abstract_simplex/simplex_boundary.h>
+#include <ctl/finite_field/finite_field.hpp>
+#include <ctl/abstract_simplex/abstract_simplex.hpp>
+#include <ctl/abstract_simplex/simplex_boundary.hpp>
 
 //Chain Complex
-#include <ctl/chain_complex/chain_complex.h>
-#include <ctl/chain_complex/complex_boundary.h>
-#include <ctl/term/term.h>
+#include <ctl/chain_complex/chain_complex.hpp>
+#include <ctl/chain_complex/complex_boundary.hpp>
+#include <ctl/term/term.hpp>
 
 //Graph
 typedef typename ctl::Nbhd_graph<> Graph;

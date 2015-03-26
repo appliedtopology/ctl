@@ -57,7 +57,7 @@
 #include <boost/serialization/base_object.hpp>
 
 //CTL
-#include <ctl/abstract_simplex/simplex_boundary.h>
+#include <ctl/abstract_simplex/simplex_boundary.hpp>
 
 
 /*! \namespace ctl

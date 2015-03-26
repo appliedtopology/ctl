@@ -80,9 +80,9 @@
 #include <sstream>
 
 //CTL
-#include <ctl/hash/hash.h>
-#include <ctl/io/io.h>
-#include <ctl/abstract_simplex/abstract_simplex.h>
+#include <ctl/hash/hash.hpp>
+#include <ctl/io/io.hpp>
+#include <ctl/abstract_simplex/abstract_simplex.hpp>
 
 #include <tbb/concurrent_unordered_map.h>
 #include <tbb/atomic.h>

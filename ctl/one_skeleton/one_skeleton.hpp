@@ -53,7 +53,7 @@
 #include <unordered_map>
 
 // Project
-#include <ctl/utility/timer.h>
+#include <ctl/utility/timer.hpp>
 
 namespace ctl{
 

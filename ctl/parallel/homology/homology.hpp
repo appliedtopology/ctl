@@ -52,26 +52,26 @@
 *
 *******************************************************************************/
 // Global Project Deps
-#include <ctl/io/io.h> 
-#include <ctl/term/term.h>
-#include <ctl/utility/timer.h>
-#include <ctl/parallel/utility/timer.h>
-#include <ctl/filtration/filtration_boundary.h>
+#include <ctl/io/io.hpp> 
+#include <ctl/term/term.hpp>
+#include <ctl/utility/timer.hpp>
+#include <ctl/parallel/utility/timer.hpp>
+#include <ctl/filtration/filtration_boundary.hpp>
 
 //Persistence 
 // Boost
 #include <boost/property_map/property_map.hpp>
 #include <boost/unordered_map.hpp>
-#include <ctl/finite_field/finite_field.h>
-#include <ctl/chain/chain.h>
-#include <ctl/persistence/persistence.h>
-#include <ctl/matrix/offset_maps.h>
-#include <ctl/matrix/iterator_property_map.h>
-#include <ctl/matrix/matrix.h>
+#include <ctl/finite_field/finite_field.hpp>
+#include <ctl/chain/chain.hpp>
+#include <ctl/persistence/persistence.hpp>
+#include <ctl/matrix/offset_maps.hpp>
+#include <ctl/matrix/iterator_property_map.hpp>
+#include <ctl/matrix/matrix.hpp>
 
 //Local Project Deps
 //#include <ctl/parallel/build_blowup_complex/build_blowup_complex.h>
-#include <ctl/parallel/homology/persistence.h>
+#include <ctl/parallel/homology/persistence.hpp>
 
 //TBB
 #include <tbb/concurrent_vector.h>

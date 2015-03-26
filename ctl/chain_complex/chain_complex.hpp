@@ -52,12 +52,12 @@
 #include <type_traits>
 
 //CTL
-#include <ctl/utility/recombine.h>
-#include <ctl/hash/hash.h>
-#include <ctl/chain_complex/detail/data_wrapper.h>
-#include <ctl/chain_complex/detail/default_complex_storage.h>
-#include <ctl/chain_complex/cubical_complex.h>
-#include <ctl/chain_complex/simplicial_chain_complex.h>
+#include <ctl/utility/recombine.hpp>
+#include <ctl/hash/hash.hpp>
+#include <ctl/chain_complex/detail/data_wrapper.hpp>
+#include <ctl/chain_complex/detail/default_complex_storage.hpp>
+#include <ctl/chain_complex/cubical_complex.hpp>
+#include <ctl/chain_complex/simplicial_chain_complex.hpp>
 
 namespace ctl {
 
@@ -144,8 +144,7 @@ std::is_same< typename detail::recombine< Cell, detail::Dummy>::type,
  ctl::detail::Simplicial_chain_complex< Cell, 
 			        Boundary, 
 			        detail::Data_wrapper< Data>, 
-			        Hash, 
-			        Storage> 
+			        Hash> 
 	    >::type;
 
 

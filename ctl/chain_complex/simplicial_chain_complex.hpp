@@ -33,9 +33,6 @@
 namespace ctl {
 namespace detail{
 
-template< typename Map>
-
-
 template< typename Cell_,
 	  typename Boundary_,
 	  typename Data_,
@@ -329,7 +326,7 @@ template< typename Cell_,
           typename Boundary_,
           typename Data_,
           typename Hash_> 
-Stream& operator<<( std::ostream& out, 
+std::ostream& operator<<( std::ostream& out, 
    const ctl::detail::Simplicial_chain_complex< Cell_, Boundary_, Data_, Hash_> & c){ 
 	for(auto i = c.begin(); i != c.end(); ++i){
 		      const std::size_t id = i->second.id();
@@ -340,11 +337,11 @@ Stream& operator<<( std::ostream& out,
 	return out;
 }
 
-template< typename Stream, typename Cell_,
+template< typename Cell_,
           typename Boundary_,
           typename Data_,
           typename Hash_> 
-Stream& operator<<( std::ostream& out, 
+std::ostream& operator<<( std::ostream& out, 
 		    const ctl::detail::Simplicial_chain_complex< Cell_, Boundary_, Data_, Hash_>&& c){
 	out << c;
 	return out;
@@ -352,9 +349,8 @@ Stream& operator<<( std::ostream& out,
 template< typename Stream, typename Cell_,
           typename Boundary_,
           typename Data_,
-          typename Hash_, 
-          template< typename ...> class Storage_> 
-Stream& operator>>( Stream& in, ctl::detail::Simplicial_chain_complex< Cell_, Boundary_, Data_, Hash_, Storage_> & c){  
+          typename Hash_>
+Stream& operator>>( Stream& in, ctl::detail::Simplicial_chain_complex< Cell_, Boundary_, Data_, Hash_> & c){  
 	return c.read( in); 
 }
 

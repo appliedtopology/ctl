@@ -35,8 +35,8 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 *******************************************************************************/
-#include <ctl/term/term.h>
-#include <ctl/finite_field/finite_field.h>
+#include <ctl/term/term.hpp>
+#include <ctl/finite_field/finite_field.hpp>
 #include <cassert>
 namespace ctl {
 namespace detail {

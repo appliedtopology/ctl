@@ -36,9 +36,9 @@
 //CTL Headers
 
 //Utility 
-#include <ctl/io/io.h>
-#include <ctl/utility/timer.h>
-#include <ctl/parallel/utility/timer.h>
+#include <ctl/io/io.hpp>
+#include <ctl/utility/timer.hpp>
+#include <ctl/parallel/utility/timer.hpp>
 
 //#define COMPUTE_BETTI
 //#define CTL_USE_MURMUR
@@ -53,36 +53,36 @@
 //CTL 
 //Types for Building a Simplicial Chain Complex and Filtration
 //Abstract Simplex
-#include <ctl/finite_field/finite_field.h>
-#include <ctl/abstract_simplex/abstract_simplex.h>
-#include <ctl/abstract_simplex/simplex_boundary.h>
+#include <ctl/finite_field/finite_field.hpp>
+#include <ctl/abstract_simplex/abstract_simplex.hpp>
+#include <ctl/abstract_simplex/simplex_boundary.hpp>
 
 //Filtration & Filtration Boundary Operator
-#include <ctl/filtration/filtration.h>
-#include <ctl/filtration/filtration_boundary.h>
-#include <ctl/filtration/less.h>
+#include <ctl/filtration/filtration.hpp>
+#include <ctl/filtration/filtration_boundary.hpp>
+#include <ctl/filtration/less.hpp>
 
 //Weights
-#include <ctl/weight_data/weight_data.h>
-#include <ctl/weight_data/weight_functor.h>
+#include <ctl/weight_data/weight_data.hpp>
+#include <ctl/weight_data/weight_functor.hpp>
 
 //Chain Complex
-#include <ctl/chain_complex/chain_complex.h>
-#include <ctl/chain_complex/complex_boundary.h>
-#include <ctl/term/term.h>
+#include <ctl/chain_complex/chain_complex.hpp>
+#include <ctl/chain_complex/complex_boundary.hpp>
+#include <ctl/term/term.hpp>
 
 
 //Chains & Persistence 
-#include <ctl/chain/chain.h>
-#include <ctl/persistence/persistence.h>
-#include <ctl/matrix/iterator_property_map.h>
-#include <ctl/matrix/offset_maps.h>
-#include <ctl/matrix/matrix.h>
-#include <ctl/persistence/compute_betti.h>
-#include <ctl/persistence/compute_barcodes.h>
+#include <ctl/chain/chain.hpp>
+#include <ctl/persistence/persistence.hpp>
+#include <ctl/matrix/iterator_property_map.hpp>
+#include <ctl/matrix/offset_maps.hpp>
+#include <ctl/matrix/matrix.hpp>
+#include <ctl/persistence/compute_betti.hpp>
+#include <ctl/persistence/compute_barcodes.hpp>
 
 //Barcodes
-#include <ctl/barcodes/barcodes.h>
+#include <ctl/barcodes/barcodes.hpp>
 
 //STL
 #include <sstream>

@@ -54,10 +54,10 @@
 #include <vector>
 
 //CTL
-#include <ctl/chain/chain_add.h>
-#include <ctl/term/term_less.h>
-#include <ctl/term/term_tags.h>
-#include <ctl/io/io.h>
+#include <ctl/chain/chain_add.hpp>
+#include <ctl/term/term_less.hpp>
+#include <ctl/term/term_tags.hpp>
+#include <ctl/io/io.hpp>
 
 namespace ctl{
 //exported functionality

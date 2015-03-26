@@ -48,8 +48,8 @@
 ********************************************************************************
 *******************************************************************************/
 
-#include <ctl/finite_field/finite_field.h>
-#include <ctl/term/term_tags.h>
+#include <ctl/finite_field/finite_field.hpp>
+#include <ctl/term/term_tags.hpp>
 
 //exported functionality
 namespace ctl{

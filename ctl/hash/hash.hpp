@@ -56,8 +56,8 @@
 //CTL
 namespace ctl{
 namespace hash{
-#include <ctl/hash/city.h>
-#include <ctl/hash/MurmurHash3.h>
+#include <ctl/hash/city.hpp>
+#include <ctl/hash/MurmurHash3.hpp>
 } //end namespace hash
 } //end namespace ctl
 //non-exported functionality 

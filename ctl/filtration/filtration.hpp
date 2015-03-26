@@ -51,8 +51,8 @@
 //STL
 
 //CTL
-#include <ctl/filtration/less.h>
-#include <ctl/filtration/filtration_iterator.h>
+#include <ctl/filtration/less.hpp>
+#include <ctl/filtration/filtration_iterator.hpp>
 
 //BOOST
 #include <boost/serialization/base_object.hpp>

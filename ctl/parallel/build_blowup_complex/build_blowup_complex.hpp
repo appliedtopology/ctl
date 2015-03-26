@@ -60,8 +60,8 @@
 #include <tbb/parallel_scan.h>
 
 //CTL
-#include <ctl/chain_complex/complex_boundary.h>
-#include <ctl/utility/timer.h>
+#include <ctl/chain_complex/complex_boundary.hpp>
+#include <ctl/utility/timer.hpp>
 
 
 namespace ctl{

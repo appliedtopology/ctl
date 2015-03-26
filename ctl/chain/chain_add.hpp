@@ -51,7 +51,7 @@
 #include <algorithm> 
 
 //CTL
-#include <ctl/term/term_tags.h>
+#include <ctl/term/term_tags.hpp>
 
 //exported, but, internal functionality
 namespace ctl{

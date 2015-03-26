@@ -47,86 +47,86 @@
 * POSSIBILITY OF SUCH DAMAGE.
 ********************************************************************************
 *******************************************************************************/
-#include <ctl/abstract_simplex/abstract_simplex.h>
-#include <ctl/abstract_simplex/simplex_boundary.h>
+#include <ctl/abstract_simplex/abstract_simplex.hpp>
+#include <ctl/abstract_simplex/simplex_boundary.hpp>
 
 //Abstract Cube 
 //TODO
 
 //IO
-#include <ctl/io/io.h>
+#include <ctl/io/io.hpp>
 
 //Product Cell
-#include <ctl/product_cell/product_boundary.h>
-#include <ctl/product_cell/product_cell.h>
-#include <ctl/product_cell/product_cell_less.h>
+#include <ctl/product_cell/product_boundary.hpp>
+#include <ctl/product_cell/product_cell.hpp>
+#include <ctl/product_cell/product_cell_less.hpp>
 
 //Coefficients
 //Finite Fields
-#include <ctl/finite_field/finite_field.h>
+#include <ctl/finite_field/finite_field.hpp>
 
 //Chain Complex
-#include <ctl/chain_complex/chain_complex.h>
-#include <ctl/chain_complex/complex_boundary.h>
+#include <ctl/chain_complex/chain_complex.hpp>
+#include <ctl/chain_complex/complex_boundary.hpp>
 
 //Weight Data
-#include <ctl/weight_data/weight_data.h>
-#include <ctl/weight_data/weight_functor.h>
+#include <ctl/weight_data/weight_data.hpp>
+#include <ctl/weight_data/weight_functor.hpp>
 
 
 //Term 
-#include <ctl/term/term.h>
-#include <ctl/term/term_less.h>
-#include <ctl/term/term_tags.h>
+#include <ctl/term/term.hpp>
+#include <ctl/term/term_less.hpp>
+#include <ctl/term/term_tags.hpp>
 
 //Chain
-#include <ctl/chain/chain.h>
-#include <ctl/chain/chain_add.h>
+#include <ctl/chain/chain.hpp>
+#include <ctl/chain/chain_add.hpp>
 
 //Barcodes
-#include <ctl/barcodes/barcodes.h>
+#include <ctl/barcodes/barcodes.hpp>
 
 //Filtration
-#include <ctl/filtration/filtration_boundary.h>
-#include <ctl/filtration/filtration.h>
-#include <ctl/filtration/less.h>
+#include <ctl/filtration/filtration_boundary.hpp>
+#include <ctl/filtration/filtration.hpp>
+#include <ctl/filtration/less.hpp>
 
 //Graphs & metrics
-#include <ctl/points/points.h>
-#include <ctl/metrics/metric.h>
-#include <ctl/nbhd_graph/all_pairs.h>
-#include <ctl/nbhd_graph/epsilon_search.h>
-#include <ctl/nbhd_graph/nbhd_graph.h>
+#include <ctl/points/points.hpp>
+#include <ctl/metrics/metric.hpp>
+#include <ctl/nbhd_graph/all_pairs.hpp>
+#include <ctl/nbhd_graph/epsilon_search.hpp>
+#include <ctl/nbhd_graph/nbhd_graph.hpp>
 
 //VR
-#include <ctl/vr/incremental_complex.h>
+#include <ctl/vr/incremental_complex.hpp>
 
 //Facilities for extracting the one_skeleton
-#include <ctl/one_skeleton/complex_to_graph.h>
-#include <ctl/one_skeleton/graph_to_metis.h>
-#include <ctl/one_skeleton/one_skeleton.h>
+#include <ctl/one_skeleton/complex_to_graph.hpp>
+#include <ctl/one_skeleton/graph_to_metis.hpp>
+#include <ctl/one_skeleton/one_skeleton.hpp>
 
 //Parallel library (multithreaded)
-#include <ctl/parallel/build_blowup_complex/build_blowup_complex.h>
-#include <ctl/parallel/chain_complex/chain_complex.h>
-#include <ctl/parallel/filtration/filtration.h>
-#include <ctl/parallel/homology/persistence.h>
-#include <ctl/parallel/partition_covers/cover_data.h>
-#include <ctl/parallel/partition_covers/covers.h>
-#include <ctl/parallel/partition_covers/cover_stats.h>
-#include <ctl/parallel/partition_covers/graph_partition.h>
-#include <ctl/parallel/utility/timer.h>
-#include <ctl/parallel/homology/homology.h>
+#include <ctl/parallel/build_blowup_complex/build_blowup_complex.hpp>
+#include <ctl/parallel/chain_complex/chain_complex.hpp>
+#include <ctl/parallel/filtration/filtration.hpp>
+#include <ctl/parallel/homology/persistence.hpp>
+#include <ctl/parallel/partition_covers/cover_data.hpp>
+#include <ctl/parallel/partition_covers/covers.hpp>
+#include <ctl/parallel/partition_covers/cover_stats.hpp>
+#include <ctl/parallel/partition_covers/graph_partition.hpp>
+#include <ctl/parallel/utility/timer.hpp>
+#include <ctl/parallel/homology/homology.hpp>
 
-#include <ctl/matrix/iterator_property_map.h>
-#include <ctl/matrix/offset_maps.h>
-#include <ctl/matrix/matrix.h>
+#include <ctl/matrix/iterator_property_map.hpp>
+#include <ctl/matrix/offset_maps.hpp>
+#include <ctl/matrix/matrix.hpp>
 
 //Persistence 
-#include <ctl/persistence/compute_barcodes.h>
-#include <ctl/persistence/compute_betti.h>
-#include <ctl/persistence/persistence_data.h>
-#include <ctl/persistence/persistence.h>
+#include <ctl/persistence/compute_barcodes.hpp>
+#include <ctl/persistence/compute_betti.hpp>
+#include <ctl/persistence/persistence_data.hpp>
+#include <ctl/persistence/persistence.hpp>
 
 //Not implemented
 //#include <ctl/zigzag/persistence.h>

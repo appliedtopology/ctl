@@ -58,7 +58,7 @@
 #include <vector>
 #include <utility>
 #include <functional>
-#include <ctl/hash/hash.h>
+#include <ctl/hash/hash.hpp>
 
 //exported functionality
 namespace ctl{
