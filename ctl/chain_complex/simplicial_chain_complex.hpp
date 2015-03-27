@@ -149,9 +149,9 @@ public:
      }
      return std::make_pair( iterator(c.first, cells.begin(), cells.end()), c.second);
    }
-
+   private:
    std::pair< iterator, std::size_t>
-   insert_closed_cell( const Cell & s, 
+   insert_closed_cell_( const Cell & s, 
 		       const bool closed=false,
    		       const Data&  data = Data()){
    	typedef typename std::pair< iterator, std::size_t> Pair;
@@ -178,6 +178,34 @@ public:
 	return p;
    }
 
+   unsigned nChoosek( unsigned n, unsigned k )
+   {
+       if (k > n) return 0;
+       if (k * 2 > n){ k = n-k ; }
+       if (k == 0) return 1;
+   
+       int result = n;
+       for( int i = 2; i <= k; ++i ) {
+           result *= (n-i+1);
+           result /= i;
+       }
+       return result;
+   }
+
+   public:
+   std::pair< iterator, std::size_t>
+   insert_closed_cell( const Cell & s, 
+		       const bool closed=false,
+   		       const Data&  data = Data()){
+	//before we begin we resize the outer table
+	if( cells.size() < s.size()){ cells.resize( s.size()); }
+	//and reserve all the necessary new space
+	for( auto i = 0; i < s.size(); ++i){
+		auto& map = cells[ i];
+		map.reserve( map.size() + nChoosek( s.size(), i+1));
+	}
+	return insert_closed_cell_( s, closed, data);
+   }
    template< typename Stream, typename Functor>
    Stream& write( Stream& out, const Functor & f) const {
    	out << "size " << cells.size() << std::endl;
@@ -291,9 +319,10 @@ public:
   * @brief Returns the size of the simplicial complex
   * @return std::size_t holding the number of simplices 
   */
-   const std::size_t size() const { 
+   std::size_t size() const { 
 	std::size_t size=0;
 	for( auto& i : cells){ size+= i.size(); }
+	std::cerr << size << std::endl;
 	return size; 
    }
 

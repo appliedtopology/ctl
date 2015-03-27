@@ -22,6 +22,7 @@
 * Released under BSD-3 License. See LICENSE for more details
 *******************************************************************************/
 #include <iterator>
+#include <boost/iterator/iterator_facade.hpp>
 namespace ctl{ 
 namespace detail{
 // A forward iterator that "flattens" a container of containers.  For example,
@@ -56,23 +57,8 @@ public:
           outer_end_(end){ 
         if (outer_it_ == outer_end_) { return; }
         inner_it_ = outer_it_->begin();
-        increment(); 
+        skip_empty(); 
     }
-    template< typename O, typename I>
-    flattening_iterator_base& operator=(const flattening_iterator_base< O, I>& o){
-	outer_it_ = o.outer_it_;
-	outer_end_ = o.outer_end_;
-	inner_it_ = o.inner_it_;
-	return *this;
-    }
- 
-    template< typename O, typename I>
-    flattening_iterator_base& operator=(flattening_iterator_base< O, I>&& o){
-	outer_it_ = std::move( o.outer_it_);
-	outer_end_ = std::move( o.outer_end_);
-	inner_it_ = std::move( o.inner_it_);
-	return *this;
-    } 
 
 private:
    friend class boost::iterator_core_access;
@@ -91,12 +77,16 @@ private:
     }
 
     void increment(){
-      while (outer_it_ != outer_end_ && inner_it_ == outer_it_->end()){
-            ++outer_it_;
-            if (outer_it_ != outer_end_){
-                inner_it_ = outer_it_->begin();
-	    } 
+      ++inner_it_;
+      skip_empty(); 
     }
+    void skip_empty(){ 
+      while (outer_it_ != outer_end_ && inner_it_ == outer_it_->end()){ 
+	++outer_it_;
+        if (outer_it_ != outer_end_){
+          inner_it_ = outer_it_->begin();
+        }
+      }
     }
 
     inner_iterator inner_it_;
@@ -136,11 +126,6 @@ detail::const_flattening_iterator<Iterator> const_flatten(Iterator begin, Iterat
 {
     return detail::const_flattening_iterator<Iterator>(begin, end);
 }
-
-
-
-
-
 
 } //end namespace ctl
 

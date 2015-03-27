@@ -18,25 +18,29 @@
 * Copyright (C) Ryan H. Lewis 2014 <me@ryanlewis.net>
 *******************************************************************************
 *******************************************************************************/
+//STL
+#include <iostream>
+#include <vector>
+#include <unordered_map>
+//CTL
+#include <ctl/utility/flattening_iterator.hpp>
 
 //GTest
 #include "gtest/gtest.h"
-#include "test_flattened_iterator.hpp"
-#include "test_abstract_simplex.hpp"
-#include "test_chain.hpp"
-#include "test_cube.hpp"
-#include "test_cubical_chain_complex.hpp"
-//#include <test_simplicial_chain_complex.hpp>
-//#include <test_vr.hpp>
-#include "test_filtration.hpp"
-#include "test_finite_field.hpp"
-#include "test_multi_array.hpp"
-#include "test_one_skeleton.hpp"
-//#include "test_product_cell.hpp"
-//#include <test_cover_tool.hpp>
-//#include <test_blowup_tool.hpp>
 
-int main(int argc, char **argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+TEST(FlatteningIterator, Constructs){
+	typedef std::vector< std::unordered_map< int, bool> > Container;
+	Container c;
+	c.resize( 5);
+	std::size_t count=0;
+	for( auto i = 0; i < 5; ++i){
+		for( auto j = 0; j <= i; ++j){ 
+			c[ i].insert( std::make_pair( j, 1));
+			++count;
+		}
+	}
+ 	auto begin = ctl::flatten( c.begin(), c.end());
+	auto end = ctl::flatten( c.end());
+	std::size_t distance= std::distance( begin, end);
+	ASSERT_EQ( count, distance);
 }
