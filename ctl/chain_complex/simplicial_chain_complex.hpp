@@ -135,9 +135,9 @@ public:
    const_iterator begin() const { return const_iterator( cells.begin(), cells.end()); }
    const_iterator   end() const { return const_iterator( cells.end(), cells.end());   }
 
-   std::pair< iterator, bool> insert_open_cell( const Cell & s,
+  private:
+   std::pair< iterator, bool> insert_open_cell_( const Cell & s,
    					     const Data& data=Data()){
-     if( cells.size() < s.size()){ cells.resize( s.size()); }
      auto c =  cells[ s.dimension()].emplace( s, data);
      if( c.second) { //this outer if is probably unnecessary
        max_dim = std::max( max_dim, s.dimension());
@@ -148,6 +148,13 @@ public:
        }
      }
      return std::make_pair( iterator(c.first, cells.begin(), cells.end()), c.second);
+   }
+
+   public:
+   std::pair< iterator, bool> insert_open_cell( const Cell & s,
+   					     const Data& data=Data()){
+     if( cells.size() < s.size()){ cells.resize( s.size()); }
+     return insert_open_cell_( s, data); 
    }
    private:
    std::pair< iterator, std::size_t>
@@ -167,13 +174,13 @@ public:
    	Data face_data( data);
    	face_data.id(  0);
    	for( auto face = bd.begin( s); face != bd.end( s); ++face){
-   	 const Pair & p = insert_closed_cell( face->cell(),
+   	 const Pair & p = insert_closed_cell_( face->cell(),
    					      closed, face_data);
    	 num_faces_inserted+=p.second;
    	}
 
   	//then you add yourself.
-   	std::pair< iterator, bool> p = insert_open_cell( s, data);
+   	std::pair< iterator, bool> p = insert_open_cell_( s, data);
 	p.second += num_faces_inserted;
 	return p;
    }
@@ -322,7 +329,6 @@ public:
    std::size_t size() const { 
 	std::size_t size=0;
 	for( auto& i : cells){ size+= i.size(); }
-	std::cerr << size << std::endl;
 	return size; 
    }
 
