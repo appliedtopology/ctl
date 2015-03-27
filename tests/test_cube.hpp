@@ -37,9 +37,9 @@
 #include <iostream>
 
 //CTL
-#include <ctl/cube/cube.h>
-#include <ctl/cube/cube_boundary.h>
-#include <ctl/term/term.h>
+#include <ctl/cube/cube.hpp>
+#include <ctl/cube/cube_boundary.hpp>
+#include <ctl/term/term.hpp>
 
 #include "gtest/gtest.h"
 

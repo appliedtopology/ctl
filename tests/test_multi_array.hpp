@@ -17,28 +17,14 @@
 *******************************************************************************
 * Copyright (C) Ryan H. Lewis 2014 <me@ryanlewis.net>
 *
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-* 
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-* 
-* You should have received a copy of the GNU General Public License
-* along with this program in a file entitled COPYING; if not, write to the 
-* Free Software Foundation, Inc., 
-* 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 *******************************************************************************/
 //STL
 #include <iostream>
 
 //CTL 
-#include <ctl/chain_complex/detail/data_wrapper.h>
-#include <ctl/chain_complex/detail/multi_array.h>
+#include <ctl/chain_complex/detail/data_wrapper.hpp>
+#include <ctl/chain_complex/detail/multi_array.hpp>
 
 //Gtest
 #include <gtest/gtest.h>

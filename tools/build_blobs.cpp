@@ -85,7 +85,6 @@ int main(int argc, char *argv[]) {
   typedef typename Complex::Cell Cell;
   typedef typename Cell::value_type Value;
   //compute num_vertices
-  output_complex.reserve( (num-1)*input_complex.size());
   Value max_vertex_name= *(input_complex.begin()->first.rbegin());
   std::size_t num_vertices=0;
   for(auto cell: input_complex){

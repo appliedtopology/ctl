@@ -16,40 +16,25 @@
 * !!! DO NOT CITE THE USER MANUAL !!!
 *******************************************************************************
 * Copyright (C) Ryan H. Lewis 2014 <me@ryanlewis.net>
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-* 
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-* 
-* You should have received a copy of the GNU General Public License
-* along with this program in a file entitled COPYING; if not, write to the 
-* Free Software Foundation, Inc., 
-* 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 *******************************************************************************/
 
 //GTest
 #include "gtest/gtest.h"
 
-#include "test_abstract_simplex.h"
-#include "test_chain.h"
-#include "test_cube.h"
-#include "test_cubical_chain_complex.h"
-//#include <test_simplicial_chain_complex.h>
-//#include <test_vr.h>
-#include "test_filtration.h"
-#include "test_finite_field.h"
-#include "test_multi_array.h"
-#include "test_one_skeleton.h"
-//#include "test_product_cell.h"
-//#include <test_cover_tool.h>
-//#include <test_blowup_tool.h>
+#include "test_abstract_simplex.hpp"
+#include "test_chain.hpp"
+#include "test_cube.hpp"
+#include "test_cubical_chain_complex.hpp"
+//#include <test_simplicial_chain_complex.hpp>
+//#include <test_vr.hpp>
+#include "test_filtration.hpp"
+#include "test_finite_field.hpp"
+#include "test_multi_array.hpp"
+#include "test_one_skeleton.hpp"
+//#include "test_product_cell.hpp"
+//#include <test_cover_tool.hpp>
+//#include <test_blowup_tool.hpp>
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);

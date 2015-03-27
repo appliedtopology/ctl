@@ -33,10 +33,8 @@
 namespace ctl {
 namespace detail{
 
-template< typename Cell_,
-	  typename Boundary_,
-	  typename Data_,
-	  typename Hash_> 
+template< typename Cell_, typename Boundary_,
+	  typename Data_, typename Hash_> 
 class Simplicial_chain_complex{
 public:
    typedef Cell_ Cell; //Describes a fundamental object,
@@ -50,12 +48,14 @@ public:
 private:
    typedef std::unordered_map< Cell, Data, Hash> Map;
    typedef std::vector< Map> Storage;
+   typedef typename Storage::iterator outer_iterator;
+   typedef typename Storage::const_iterator const_outer_iterator;
    
 public:
    typedef typename Storage::size_type size_type;
-   typedef typename Storage::iterator iterator;
-   typedef typename Storage::const_iterator const_iterator;
-   typedef typename Storage::value_type value_type;
+   typedef typename Map::value_type value_type;
+   typedef typename ctl::detail::flattening_iterator< outer_iterator> iterator;
+   typedef typename ctl::detail::const_flattening_iterator< const_outer_iterator> const_iterator;
 
 public:
 
@@ -126,18 +126,18 @@ public:
    * @param Cell s 
    * @return [const_]iterator
    */
-   iterator       find_cell( const Cell & s)       { return cells[ s.dimension()].find( s); }
-   const_iterator find_cell( const Cell & s) const { return cells[ s.dimension()].find( s); }
+   iterator       find_cell( const Cell & s)       { return iterator( cells[ s.dimension()].find( s), cells.begin(), cells.end()); }
+   const_iterator find_cell( const Cell & s) const { return const_iterator( cells[ s.dimension()].find( s), cells.begin(), cells.end()); }
 
-   iterator       begin()       { return cells.begin(); }
-   iterator         end()       { return cells.end();   }
+   iterator       begin()       { return iterator( cells.begin(), cells.end()); }
+   iterator         end()       { return iterator( cells.end(), cells.end());   }
 
-   const_iterator begin() const { return cells.begin(); }
-   const_iterator   end() const { return cells.end();   }
+   const_iterator begin() const { return const_iterator( cells.begin(), cells.end()); }
+   const_iterator   end() const { return const_iterator( cells.end(), cells.end());   }
 
    std::pair< iterator, bool> insert_open_cell( const Cell & s,
    					     const Data& data=Data()){
-     std::pair< iterator, bool> c =  cells[ s.dimension()].emplace( s, data);
+     auto c =  cells[ s.dimension()].emplace( s, data);
      if( c.second) { //this outer if is probably unnecessary
        max_dim = std::max( max_dim, s.dimension());
        if( c.first->second.id() == 0){
@@ -146,7 +146,7 @@ public:
         max_id=std::max( max_id, c.first->second.id());
        }
      }
-     return c;
+     return std::make_pair( iterator(c.first, cells.begin(), cells.end()), c.second);
    }
 
    std::pair< iterator, std::size_t>
@@ -154,11 +154,11 @@ public:
 		       const bool closed=false,
    		       const Data&  data = Data()){
    	typedef typename std::pair< iterator, std::size_t> Pair;
-   	iterator iter = cells.find( s);
+   	iterator iter = find_cell( s);
    	std::size_t num_faces_inserted=0;
    	//if cell exists, and we assume
    	//we are closed then we are done.
-   	if( closed && iter != cells.end()){
+   	if( closed && iter != end()){
    	 return std::make_pair( iter, num_faces_inserted);
    	}
 
@@ -170,15 +170,17 @@ public:
    					      closed, face_data);
    	 num_faces_inserted+=p.second;
    	}
+
   	//then you add yourself.
-   	const std::pair< iterator, bool> p(insert_open_cell( s, data));
-   	return std::make_pair( p.first, p.second+num_faces_inserted);
+   	std::pair< iterator, bool> p = insert_open_cell( s, data);
+	p.second += num_faces_inserted;
+	return p;
    }
 
    template< typename Stream, typename Functor>
    Stream& write( Stream& out, const Functor & f) const {
    	out << "size " << cells.size() << std::endl;
-   	for( const auto & cell: cells){
+   	for( auto & cell: *this){
    	  out << cell.first.size() << " " << std::flush;
 	  cell.first.write( out);
 	  out << std::flush;
@@ -191,7 +193,7 @@ public:
    template< typename Stream>
    inline Stream& write( Stream& out) const { 
 	out << "size " << cells.size() << std::endl;
-   	for( const auto & cell: cells){
+   	for( auto & cell: *this){
    	  out << cell.first.size() << " " << std::flush;
 	  cell.first.write( out);
 	  out << std::flush;
@@ -221,9 +223,15 @@ public:
         std::istringstream ss( line);
         std::string the_word_size;
         ss >> the_word_size;
-        std::size_t the_number_of_cells;
-        ss >> the_number_of_cells;
-	reserve( the_number_of_cells);
+	std::vector< std::size_t> the_number_of_cells;
+	std::size_t cells_in_dimension_i;
+	std::size_t i = 0;
+	do{
+        ss >> cells_in_dimension_i;
+        reserve( i, cells_in_dimension_i);
+	++i;
+	}while( ss.good());
+
 	std::size_t size;
 	while( ctl::get_line(in, line, line_num)){
 	     std::istringstream ss( line);
@@ -255,7 +263,7 @@ public:
 		ss >> value;
 		values[ id] = value;
 	}
-	for (auto & sigma: cells) { 
+	for (auto & sigma: *this) { 
 		f( sigma.second) = values[ sigma.second.id()]; 
 	}
 	return in;
@@ -305,7 +313,7 @@ public:
    * @return true if closed false otherwise 
    */
    bool is_closed() const{
-    for( auto sigma : cells){
+    for( auto sigma : *this){
     	for( auto tau = bd.begin( sigma.first);
     		  tau != bd.end( sigma.first); ++tau){
     		if( find_cell( tau->cell()) == end()){
