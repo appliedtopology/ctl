@@ -46,7 +46,6 @@ Complex complex;
 ctl::Timer timer;
 Cell s( {1,2,3,4,5,6} );
 Cell t( {1,2,3,4,5,11} );
-
 complex.insert_closed_cell( s);
 complex.insert_closed_cell( t);
 

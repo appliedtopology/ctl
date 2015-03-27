@@ -137,6 +137,7 @@ public:
 
    std::pair< iterator, bool> insert_open_cell( const Cell & s,
    					     const Data& data=Data()){
+     if( cells.size() < s.size()){ cells.resize( s.size()); }
      auto c =  cells[ s.dimension()].emplace( s, data);
      if( c.second) { //this outer if is probably unnecessary
        max_dim = std::max( max_dim, s.dimension());
