@@ -18,6 +18,7 @@
 * !!! DO NOT CITE THE USER MANUAL !!!
 *******************************************************************************
 * Copyright (C) Ryan H. Lewis 2014 <me@ryanlewis.net>
+* Released under BSD-3 License. See LICENSE
 *******************************************************************************/
 #include <ctl/term/term.hpp>
 #include <ctl/finite_field/finite_field.hpp>
