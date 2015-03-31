@@ -12,31 +12,17 @@
 * that for any [academic] use of this source code one should cite one the
 * following works:
 *
-* \cite{hatcher, z-ct-10}
+* \cite{PTR-Wagner10a}
 *
 * See ct.bib for the corresponding bibtex entries.
 * !!! DO NOT CITE THE USER MANUAL !!!
 *******************************************************************************
 * Copyright (C) Ryan H. Lewis 2014 <me@ryanlewis.net>
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program in a file entitled COPYING; if not, write to the
-* Free Software Foundation, Inc.,
-* 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+* Released under the BSD-3 License. See LICENSE for MORE
 *******************************************************************************
 * August 29, 2014
 * Initial implementation of cubical complexes. 
-* Based on PHAT/Hubert Wagners work.
+* Based on Hubert Wagners work.
 *******************************************************************************/
 
 //STL
@@ -47,7 +33,6 @@
 #include <functional>
 
 //BOOST
-#include <boost/serialization/base_object.hpp>
 #include <boost/iterator/transform_iterator.hpp>
 
 //CTL
@@ -75,8 +60,7 @@ struct two: public std::unary_function<std::size_t, std::size_t> {
 template< typename Cell_,
 	  typename Boundary_,
 	  typename Data_,
-	  typename Hash_, 
-	  template< typename ...> class Storage_> 
+	  typename Hash_> 
 class Cubical_complex  {
 public: //Public types
    typedef detail::Cube_boundary_wrapper< Boundary_, 
@@ -90,7 +74,7 @@ public: //Public types
 
 private: //Private types
    //Usually this is multi_array< Data> 
-   typedef Storage_< Cell_, Data, Hash> Storage;
+   typedef ctl::detail::multi_array< Cell_, Data, Hash> Storage;
    typedef typename Storage::Coordinate  Vector;
 public: //Public Types
    typedef typename std::size_t size_type;

@@ -59,7 +59,7 @@ public:
         inner_it_ = outer_it_->begin();
         skip_empty(); 
     }
-
+    inner_iterator base(){ return inner_it_; }
 private:
    friend class boost::iterator_core_access;
    template< typename T, typename O>

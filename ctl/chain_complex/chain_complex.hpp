@@ -124,9 +124,8 @@ namespace ctl {
 template< typename Cell, 
 	  typename Boundary, 
 	  typename Data = detail::Default_data, 
-	  typename Hash = ctl::Hash< Cell>, 
-	  template<class ...> 
-	  class Storage = ctl::detail::Default_complex_storage >
+	  typename Hash = ctl::Hash< Cell> 
+	>
 //meta code for the Chain_complex type.
 //This metacode creates a type, Chain_complex< C, B, D, H, S>
 using Chain_complex = 
@@ -137,14 +136,13 @@ std::is_same< typename detail::recombine< Cell, detail::Dummy>::type,
 //then we create a Cubical_complex which optimizes storage.
  ctl::detail::Cubical_complex< Cell,
 		       Boundary, 
-		       Data, 
-		       Hash, 
-		       Storage>,
+		       detail::Data_wrapper< Data>, 
+		       Hash> 
 //Otherwise all other cell types are stored generically
  ctl::detail::Simplicial_chain_complex< Cell, 
-			        Boundary, 
-			        detail::Data_wrapper< Data>, 
-			        Hash> 
+			        	Boundary, 
+			        	detail::Data_wrapper< Data>, 
+			        	Hash> 
 	    >::type;
 
 
