@@ -132,12 +132,12 @@ using Chain_complex =
 typename std::conditional<
 //If C is a type of the form ctl::Cube< T> for any T, 
 std::is_same< typename detail::recombine< Cell, detail::Dummy>::type, 
-	      ctl::Cube< detail::Dummy> >::value, 
+	      ctl::Cube< detail::Dummy, 1> >::value, 
 //then we create a Cubical_complex which optimizes storage.
  ctl::detail::Cubical_complex< Cell,
 		       Boundary, 
 		       detail::Data_wrapper< Data>, 
-		       Hash> 
+		       Hash>, 
 //Otherwise all other cell types are stored generically
  ctl::detail::Simplicial_chain_complex< Cell, 
 			        	Boundary, 

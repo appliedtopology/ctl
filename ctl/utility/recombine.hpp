@@ -37,6 +37,10 @@ namespace detail{
 */
 template <typename T, typename R>  
 struct recombine{ using type = T; }; //recombine struct
+
+template < template <typename, std::size_t> class TT, 
+           typename T, std::size_t D, typename R>  
+struct recombine<TT<T,D>,R> { using type = TT<R,1>; }; 
  
 template < template <typename> class TT, 
            typename T, typename R>  
