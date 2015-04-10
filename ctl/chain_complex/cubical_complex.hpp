@@ -69,12 +69,11 @@ public: //Public types
 		       //e.g. Simplex, Cube, Polygon, etc..
    //Arbitrary data associated to space.
    typedef Data_ Data;
-   typedef Hash_ Hash;
    typedef typename detail::Cube< Cube, 3> Cell;
 
 private: //Private types
    //Usually this is multi_array< Data> 
-   typedef ctl::detail::multi_array< Cell_, Data, Hash> Storage;
+   typedef ctl::detail::multi_array< std::pair< Cell, Data> > Storage;
    typedef typename Storage::Coordinate  Vector;
 public: //Public Types
    typedef typename std::size_t size_type;
@@ -536,12 +535,6 @@ public:
 
 //Private members
 private:
-  friend class boost::serialization::access;
-  template<class Archive>
-  void serialize(Archive & ar, const std::size_t version){
-     ar & cells;
-     ar & index_data; 
-  }
   Storage cells;
   //precomputed products for offsets into the array
   Vector index_data;

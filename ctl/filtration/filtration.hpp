@@ -118,13 +118,6 @@ public:
 	std::size_t size() const { return filtration_.size(); }
 	void clear() { filtration_.clear(); Vector().swap( filtration_); } 
  private:
-  friend class boost::serialization::access; 
-
-  //template <typename Archive> 
-  //friend void serialize(Archive &ar, const unsigned int version){
-  //   	ar & filtration_;
-  //   	ar & complex_;
-  //}
   Vector filtration_;
   Complex& complex_;
 }; //class Filtration

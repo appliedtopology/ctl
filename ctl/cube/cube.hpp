@@ -65,11 +65,10 @@ class Cube {
 	static constexpr int Dimension=D; 
 	typedef typename ctl::detail::Interval< T> Interval;
 	private:
-	typedef typename std::array< Interval, D> Vector;
+	typedef typename std::vector< Interval> Vector;
 	typedef Cube< T> Self;
 	typedef std::initializer_list< Interval> Init_list;
 	public:
-	constexpr std::size_t Dimension=D; 
 	//! \typedef  
 	typedef std::size_t size_t;
 	//! \typedef synonomous with vertex_type  
