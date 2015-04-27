@@ -53,9 +53,6 @@
 #include <iostream> //cout (debug only)
 #include <algorithm> //sort, unique
 
-//BOOST
-#include <boost/serialization/base_object.hpp>
-
 //CTL
 #include <ctl/abstract_simplex/simplex_boundary.hpp>
 
@@ -360,13 +357,6 @@ class Abstract_simplex {
 
 	private:
 	Vector vertices;
-
-	friend class boost::serialization::access;
-
-	template<class Archive>
-    	void serialize(Archive & ar, const std::size_t version){
-           ar & vertices; 
-        }
 
 	//typename Self since the compiler complains
 	template< typename Term> 
