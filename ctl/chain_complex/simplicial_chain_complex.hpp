@@ -50,7 +50,9 @@ private:
    typedef std::vector< Map> Storage;
    typedef typename Storage::iterator outer_iterator;
    typedef typename Storage::const_iterator const_outer_iterator;
-   
+   typedef typename Map::iterator inner_iterator;   
+   typedef typename Map::const_iterator inner_const_iterator;   
+
 public:
    typedef typename Storage::size_type size_type;
    typedef typename Map::value_type value_type;
@@ -135,52 +137,55 @@ public:
    const_iterator begin() const { return const_iterator( cells.begin(), cells.end()); }
    const_iterator   end() const { return const_iterator( cells.end(), cells.end());   }
 
+   iterator       begin( std::size_t d)       { return iterator( cells[ d].begin(), cells.begin(), cells.end()); }
+   iterator         end( std::size_t d)       { return iterator( cells[ d].end(), cells.end(), cells.end());   }
+
+   const_iterator begin( std::size_t d) const { return const_iterator( cells[ d].begin(), cells.begin(), cells.end()); }
+   const_iterator   end( std::size_t d) const { return const_iterator( cells[ d].end(), cells.end(), cells.end());   }
+
   private:
-   std::pair< iterator, bool> insert_open_cell_( const Cell & s,
+   std::pair< inner_iterator, bool> insert_open_cell_( const Cell & s,
    					     const Data& data=Data()){
      auto c =  cells[ s.dimension()].emplace( s, data);
-     if( c.second) { //this outer if is probably unnecessary
-       max_dim = std::max( max_dim, s.dimension());
-       if( c.first->second.id() == 0){
-        c.first->second.id( ++max_id);
-       } else{
-        max_id=std::max( max_id, c.first->second.id());
-       }
+     if( c.first->second.id() == 0){
+      c.first->second.id( ++max_id);
+     } else{
+      max_id=std::max( max_id, c.first->second.id());
      }
-     return std::make_pair( iterator(c.first, cells.begin(), cells.end()), c.second);
+     return c; 
    }
 
    public:
    std::pair< iterator, bool> insert_open_cell( const Cell & s,
    					     const Data& data=Data()){
      if( cells.size() < s.size()){ cells.resize( s.size()); }
-     return insert_open_cell_( s, data); 
+     auto c = insert_open_cell_( s, data);
+     return std::make_pair( iterator(c.first, cells.begin(), cells.end()), c.second);
    }
    private:
-   std::pair< iterator, std::size_t>
+   std::pair< inner_iterator, std::size_t>
    insert_closed_cell_( const Cell & s, 
 		       const bool closed=false,
    		       const Data&  data = Data()){
-   	typedef typename std::pair< iterator, std::size_t> Pair;
-   	iterator iter = find_cell( s);
+   	auto iter = find_cell( s);
    	std::size_t num_faces_inserted=0;
    	//if cell exists, and we assume
    	//we are closed then we are done.
    	if( closed && iter != end()){
-   	 return std::make_pair( iter, num_faces_inserted);
+   	 return std::make_pair( iter.base(), num_faces_inserted);
    	}
 
    	//first you add the boundary
    	Data face_data( data);
    	face_data.id(  0);
    	for( auto face = bd.begin( s); face != bd.end( s); ++face){
-   	 const Pair & p = insert_closed_cell_( face->cell(),
+   	 const auto & p = insert_closed_cell_( face->cell(),
    					      closed, face_data);
    	 num_faces_inserted+=p.second;
    	}
 
   	//then you add yourself.
-   	std::pair< iterator, bool> p = insert_open_cell_( s, data);
+   	auto p = insert_open_cell_( s, data);
 	p.second += num_faces_inserted;
 	return p;
    }
@@ -211,7 +216,8 @@ public:
 		auto& map = cells[ i];
 		map.reserve( map.size() + nChoosek( s.size(), i+1));
 	}
-	return insert_closed_cell_( s, closed, data);
+	auto c = insert_closed_cell_( s, closed, data);
+        return std::make_pair( iterator(c.first, cells.begin(), cells.end()), c.second);
    }
    template< typename Stream, typename Functor>
    Stream& write( Stream& out, const Functor & f) const {
