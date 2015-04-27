@@ -27,7 +27,7 @@ set(CMAKE_BUILD_TYPE Release)
 
 #Frame pointers are useful for profiling. 
 #Complaints and pedantry accepted here.
-add_definitions("-fno-omit-frame-pointer -Wall -ansi -std=c++11")
+add_definitions("-fno-omit-frame-pointer -pedantic -Wall -ansi -std=c++11")
 
 #Fix issues on LINUX
 if (NOT APPLE)
