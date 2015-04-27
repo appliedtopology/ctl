@@ -18,21 +18,6 @@
 * !!! DO NOT CITE THE USER MANUAL !!!
 *******************************************************************************
 * Copyright (C) Ryan H. Lewis 2014 <me@ryanlewis.net>
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-* 
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-* 
-* You should have received a copy of the GNU General Public License
-* along with this program in a file entitled COPYING; if not, write to the 
-* Free Software Foundation, Inc., 
-* 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
 * Notes: 
 * August 27, 2014
@@ -73,15 +58,17 @@ namespace detail{
 * This object does not itself have the facility for a boundary, this is handled
 * by a separate boundary operator.
 */
-template< typename T>
+template< typename T, std::size_t D=3>
 class Cube {
 	public:
+	static constexpr int Dimension=D; 
 	typedef typename ctl::detail::Interval< T> Interval;
 	private:
-	typedef typename std::vector< Interval> Vector;
+	typedef typename std::array< Interval, D> Vector;
 	typedef Cube< T> Self;
 	typedef std::initializer_list< Interval> Init_list;
 	public:
+	constexpr std::size_t Dimension=D; 
 	//! \typedef  
 	typedef std::size_t size_t;
 	//! \typedef synonomous with vertex_type  
@@ -328,6 +315,7 @@ class Cube {
 	template< typename Term> 
 	friend class ctl::detail::const_cube_boundary_iterator;
 }; //Cube
+
 template< typename Stream, typename T>
 Stream& operator<<( Stream & out, const ctl::Cube< T> & c){
     for( auto i = c.begin(); i != c.end(); ++i){
