@@ -18,8 +18,51 @@
 * !!! DO NOT CITE THE USER MANUAL !!!
 *******************************************************************************
 * Copyright (C) Ryan H. Lewis 2014 <me@ryanlewis.net>
-* Released under BSD. See LICENSE
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public License
+* as published by the Free Software Foundation; either version 2
+* of the License, or (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program in a file entitled COPYING; if not, write to the
+* Free Software Foundation, Inc.,
+* 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+*******************************************************************************
 *******************************************************************************/
+/*********************
+* April 5th, 2014
+* Notes: presently we wrap the std::unordered_map a.k.a Storage type.
+* We fail to have perfect hashing, and we have collisions between
+* cells of various different dimensions.
+* A relatively easy optimization to explore is to  have something like
+* vector< Storage> where array element i stores cells of dimension i.
+* Aside from certainly having less collisions,
+* this has the benefit that the skeletal filtration will now be available with
+* zero extra work after complex construction.
+* We don't even need to worry about resizing time, since, copying a map is done
+* via a swap of ~4 pointers, and in c++11 they are moves.
+* Also this only happens at most O(log(d)) or something..
+* the only thing to be careful of is the begin() and end() needs to be the
+* original begin() and end() iterators concatenated together.
+* This is somewhat frustrating because the naive implementation will require a
+* 5x space bloat for each iterator, so less iterators fit on a cache line.
+* A massive sort might have 5x more cache misses, for example.
+* We would save space by forcing a single hash table to hash cells of different
+* dimensions to different places, but, this seems overly optimistic.
+* This also makes iterators
+* invalid less often then they were before.
+* In particular, iterators are only invalidated in one dimension at a time,
+* AND rehashing will be marginally less expensive.
+* begin()/end() would be overloaded to take a dimension as well.
+* in particular this means that a filtration sorting could be implemented
+* to avoid this craziness of pointers..  
+**********************/
 
 //STL
 #include <unordered_map>
@@ -27,14 +70,16 @@
 #include <sstream>
 #include <fstream>
 
-//CTL
-#include <ctl/utility/flattening_iterator.hpp>
+//BOOST
+#include <boost/serialization/base_object.hpp>
+
 
 namespace ctl {
 namespace detail{
-
-template< typename Cell_, typename Boundary_,
-	  typename Data_, typename Hash_> 
+template< typename Cell_,
+	  typename Boundary_,
+	  typename Data_,
+	  typename Hash_> 
 class Simplicial_chain_complex{
 public:
    typedef Cell_ Cell; //Describes a fundamental object,
@@ -44,66 +89,47 @@ public:
    //Arbitrary data associated to space.
    typedef Data_ Data;
    typedef Hash_ Hash;
-
 private:
-   typedef std::unordered_map< Cell, Data, Hash> Map;
-   typedef std::vector< Map> Storage;
-   typedef typename Storage::iterator outer_iterator;
-   typedef typename Storage::const_iterator const_outer_iterator;
-   typedef typename Map::iterator inner_iterator;   
-   typedef typename Map::const_iterator inner_const_iterator;   
-
+   typedef std::unordered_map<Cell, Data, Hash> Storage;
+   
 public:
    typedef typename Storage::size_type size_type;
-   typedef typename Map::value_type value_type;
-   typedef typename ctl::detail::flattening_iterator< outer_iterator> iterator;
-   typedef typename ctl::detail::const_flattening_iterator< const_outer_iterator> const_iterator;
+   typedef typename Storage::iterator iterator;
+   typedef typename Storage::const_iterator const_iterator;
+   typedef typename Storage::value_type value_type;
 
 public:
-
-    
-   /**
-   * @brief Default constructor
-   */
-   Simplicial_chain_complex(): max_id( 0), max_dim( 0) {}
-
-
-   /**
-   * @brief Initialized Cell_boundary constructor
-   * If the second parameter is given the complex will present with 
-   * dimension = sizes.size()-1 and space for dimension k cells will
-   * be reserved up to the amount specified
-   * @param Cell_boundary boundary
-   * @param Size_by_dimension sizes (e.g. std::vector< int> sizes = {3, 3, 1})
-   */
-   template< typename Size_by_dimension>
-   Simplicial_chain_complex( Cell_boundary & bd_, 
-			     const Size_by_dimension sizes=Size_by_dimension()): 
-    cells( sizes.size()),
-    bd( bd_), max_id( 0), max_dim( 0) {
-	cells.max_load_factor( 1);
-	for( auto i = 0; i < sizes.size(); ++i){cells[ i].reserve( sizes[ i]);} 
+   //Constructors
+   //Default
+   Simplicial_chain_complex(): max_id( 0), max_dim( 0) { 
+	cells.max_load_factor( 1); 
    }
 
-   
-   /**
-   * @brief Copy constructor
-   */
+   Simplicial_chain_complex( Cell_boundary & bd_, const std::size_t num_cells): 
+   cells( num_cells), bd( bd_), max_id( 0), max_dim( 0) {
+	cells.max_load_factor( 1); 
+   }
+
+   //TODO: Expand complex structure to store cells of a fixed dimension
+   //in different containers. glue together objects with a crazy iterator
+   template< typename Size_by_dimension>
+   Simplicial_chain_complex( Cell_boundary & bd_, const Size_by_dimension d): 
+    cells( std::accumulate( d.begin(), d.end(), 0)),
+    bd( bd_), max_id( 0), max_dim( 0) {
+	cells.max_load_factor( 1); 
+   }
+
+   //Copy
    Simplicial_chain_complex( const Simplicial_chain_complex & b): 
    cells( b.cells), bd( b.bd), max_id( b.max_id), max_dim( b.max_dim)
    { cells.max_load_factor( 1); }
 
-   /**
-   * @brief Move constructor
-   */
+   //Move
    Simplicial_chain_complex( Simplicial_chain_complex && b): 
    cells( std::move( b.cells)), bd( std::move( b.bd)),
    max_id( std::move(b.max_id)), max_dim( std::move( b.max_dim)) {}
 
-
-   /**
-   * @brief Assignment operator 
-   */
+   // assignment operator
    Simplicial_chain_complex& operator=( const Simplicial_chain_complex& b){
    	bd = b.bd;
    	max_id = b.max_id;
@@ -112,9 +138,7 @@ public:
    	return *this;
    }
 
-   /**
-   * @brief Move assignment operator 
-   */
+   // move assignment operator
    Simplicial_chain_complex& operator=( Simplicial_chain_complex&& b){
    	bd      = std::move( b.bd);
    	max_id  = std::move( b.max_id);
@@ -123,106 +147,60 @@ public:
    	return *this;
    }
 
-   /**
-   * @brief Searches for a Cell s and returns an iterator to it.
-   * @param Cell s 
-   * @return [const_]iterator
-   */
-   iterator       find_cell( const Cell & s)       { return iterator( cells[ s.dimension()].find( s), cells.begin(), cells.end()); }
-   const_iterator find_cell( const Cell & s) const { return const_iterator( cells[ s.dimension()].find( s), cells.begin(), cells.end()); }
+   iterator       find_cell( const Cell & s)       { return cells.find( s); }
+   const_iterator find_cell( const Cell & s) const { return cells.find( s); }
 
-   iterator       begin()       { return iterator( cells.begin(), cells.end()); }
-   iterator         end()       { return iterator( cells.end(), cells.end());   }
+   iterator       begin()       { return cells.begin(); }
+   iterator         end()       { return cells.end();   }
 
-   const_iterator begin() const { return const_iterator( cells.begin(), cells.end()); }
-   const_iterator   end() const { return const_iterator( cells.end(), cells.end());   }
+   const_iterator begin() const { return cells.begin(); }
+   const_iterator   end() const { return cells.end();   }
 
-   iterator       begin( std::size_t d)       { return iterator( cells[ d].begin(), cells.begin(), cells.end()); }
-   iterator         end( std::size_t d)       { return iterator( cells[ d].end(), cells.end(), cells.end());   }
-
-   const_iterator begin( std::size_t d) const { return const_iterator( cells[ d].begin(), cells.begin(), cells.end()); }
-   const_iterator   end( std::size_t d) const { return const_iterator( cells[ d].end(), cells.end(), cells.end());   }
-
-  private:
-   std::pair< inner_iterator, bool> insert_open_cell_( const Cell & s,
-   					     const Data& data=Data()){
-     auto c =  cells[ s.dimension()].emplace( s, data);
-     if( c.first->second.id() == 0){
-      c.first->second.id( ++max_id);
-     } else{
-      max_id=std::max( max_id, c.first->second.id());
-     }
-     return c; 
-   }
-
-   public:
    std::pair< iterator, bool> insert_open_cell( const Cell & s,
    					     const Data& data=Data()){
-     if( cells.size() < s.size()){ cells.resize( s.size()); }
-     auto c = insert_open_cell_( s, data);
-     return std::make_pair( iterator(c.first, cells.begin(), cells.end()), c.second);
+     std::pair< iterator, bool> c =  cells.emplace( s, data);
+     if( c.second) { //this outer if is probably unnecessary
+       max_dim = std::max( max_dim, s.dimension());
+       if( c.first->second.id() == 0){
+        c.first->second.id( ++max_id);
+       } else{
+        max_id=std::max( max_id, c.first->second.id());
+       }
+     }
+     return c;
    }
-   private:
-   std::pair< inner_iterator, std::size_t>
-   insert_closed_cell_( const Cell & s, 
+
+   std::pair< iterator, std::size_t>
+   insert_closed_cell( const Cell & s, 
 		       const bool closed=false,
    		       const Data&  data = Data()){
-   	auto iter = find_cell( s);
+   	typedef typename std::pair< iterator, std::size_t> Pair;
+   	iterator iter = cells.find( s);
    	std::size_t num_faces_inserted=0;
    	//if cell exists, and we assume
    	//we are closed then we are done.
-   	if( closed && iter != end()){
-   	 return std::make_pair( iter.base(), num_faces_inserted);
+   	if( closed && iter != cells.end()){
+   	 return std::make_pair( iter, num_faces_inserted);
    	}
 
    	//first you add the boundary
    	Data face_data( data);
    	face_data.id(  0);
    	for( auto face = bd.begin( s); face != bd.end( s); ++face){
-   	 const auto & p = insert_closed_cell_( face->cell(),
+   	 const Pair & p = insert_closed_cell( face->cell(),
    					      closed, face_data);
    	 num_faces_inserted+=p.second;
    	}
 
-  	//then you add yourself.
-   	auto p = insert_open_cell_( s, data);
-	p.second += num_faces_inserted;
-	return p;
+  	//ugly, but then you add yourself.
+   	const std::pair< iterator, bool> p(insert_open_cell( s, data));
+   	return std::make_pair( p.first, p.second+num_faces_inserted);
    }
 
-   unsigned nChoosek( unsigned n, unsigned k )
-   {
-       if (k > n) return 0;
-       if (k * 2 > n){ k = n-k ; }
-       if (k == 0) return 1;
-   
-       int result = n;
-       for( int i = 2; i <= k; ++i ) {
-           result *= (n-i+1);
-           result /= i;
-       }
-       return result;
-   }
-
-   public:
-   std::pair< iterator, std::size_t>
-   insert_closed_cell( const Cell & s, 
-		       const bool closed=false,
-   		       const Data&  data = Data()){
-	//before we begin we resize the outer table
-	if( cells.size() < s.size()){ cells.resize( s.size()); }
-	//and reserve all the necessary new space
-	for( auto i = 0; i < s.size(); ++i){
-		auto& map = cells[ i];
-		map.reserve( map.size() + nChoosek( s.size(), i+1));
-	}
-	auto c = insert_closed_cell_( s, closed, data);
-        return std::make_pair( iterator(c.first, cells.begin(), cells.end()), c.second);
-   }
    template< typename Stream, typename Functor>
    Stream& write( Stream& out, const Functor & f) const {
    	out << "size " << cells.size() << std::endl;
-   	for( auto & cell: *this){
+   	for( const auto & cell: cells){
    	  out << cell.first.size() << " " << std::flush;
 	  cell.first.write( out);
 	  out << std::flush;
@@ -235,7 +213,7 @@ public:
    template< typename Stream>
    inline Stream& write( Stream& out) const { 
 	out << "size " << cells.size() << std::endl;
-   	for( auto & cell: *this){
+   	for( const auto & cell: cells){
    	  out << cell.first.size() << " " << std::flush;
 	  cell.first.write( out);
 	  out << std::flush;
@@ -265,15 +243,9 @@ public:
         std::istringstream ss( line);
         std::string the_word_size;
         ss >> the_word_size;
-	std::vector< std::size_t> the_number_of_cells;
-	std::size_t cells_in_dimension_i;
-	std::size_t i = 0;
-	do{
-        ss >> cells_in_dimension_i;
-        reserve( i, cells_in_dimension_i);
-	++i;
-	}while( ss.good());
-
+        std::size_t the_number_of_cells;
+        ss >> the_number_of_cells;
+	reserve( the_number_of_cells);
 	std::size_t size;
 	while( ctl::get_line(in, line, line_num)){
 	     std::istringstream ss( line);
@@ -305,57 +277,18 @@ public:
 		ss >> value;
 		values[ id] = value;
 	}
-	for (auto & sigma: *this) { 
+	for (auto & sigma: cells) { 
 		f( sigma.second) = values[ sigma.second.id()]; 
 	}
 	return in;
    }
-   
-  /**
-  * @brief Reserves memory for n cells in dimension d
-  *
-  * @param d
-  * @param n
-  */
-   void reserve( const std::size_t d, const std::size_t n) { 
-	cells[ d].reserve(n); 
-   }
-   
-  /**
-  * @brief Returns the dimension of the simplicial complex
-  *
-  * @return the dimension of the complex 
-  */
-   const std::size_t dimension() const { return (cells.size() > 0)? cells.size()-1:0; }
-
-  /**
-  * @brief Returns the size of the simplicial complex
-  * @return std::size_t holding the number of simplices 
-  */
-   std::size_t size() const { 
-	std::size_t size=0;
-	for( auto& i : cells){ size+= i.size(); }
-	return size; 
-   }
-
-  /**
-  * @brief Returns the number of d simplices of the simplicial complex
-  * @return std::size_t holding the number of simplices 
-  */
-   const std::size_t size( std::size_t d) const { return cells[ d].size(); }
-
-   /**
-   * @brief Returns a reference to the underlying cell boundary
-   * @return Cell_boundary 
-   */
+   void reserve( const std::size_t n) { cells.reserve( n); }
+   const std::size_t dimension() const { return max_dim; }
+   const std::size_t size() const { return cells.size(); }
    Cell_boundary& cell_boundary() { return bd; }
- 
-   /**
-   * @brief Checks if the complex is closed under the face relation
-   * @return true if closed false otherwise 
-   */
+
    bool is_closed() const{
-    for( auto sigma : *this){
+    for( auto sigma : cells){
     	for( auto tau = bd.begin( sigma.first);
     		  tau != bd.end( sigma.first); ++tau){
     		if( find_cell( tau->cell()) == end()){
@@ -364,19 +297,47 @@ public:
     	}
     }
     return true;
-  }
+   }
 private:
+  friend class boost::serialization::access;
+  template<class Archive>
+  void serialize(Archive & ar, const std::size_t version){
+     ar & cells;
+     ar & max_id;
+     ar & max_dim;
+  }
+
    Storage cells;
    Cell_boundary bd;
    std::size_t max_id;
    std::size_t max_dim;
 }; //end class Simplicial_chain_complex
 
-template< typename Cell_,
+template< typename Stream, typename Cell_,
+          typename Boundary_,
+          typename Data_,
+          typename Hash_>
+Stream& operator<<( Stream& out, 
+   const typename ctl::detail::Simplicial_chain_complex< Cell_, Boundary_, Data_, Hash_>::iterator c){ 
+	out << c->first;
+	return out;	
+}
+
+template< typename Stream, typename Cell_,
           typename Boundary_,
           typename Data_,
           typename Hash_> 
-std::ostream& operator<<( std::ostream& out, 
+Stream& operator<<( Stream& out, 
+   const typename ctl::detail::Simplicial_chain_complex< Cell_, Boundary_, Data_, Hash_>::const_iterator c){ 
+	out << c->first;
+	return out;	
+}
+
+template< typename Stream, typename Cell_,
+          typename Boundary_,
+          typename Data_,
+          typename Hash_> 
+Stream& operator<<( Stream& out, 
    const ctl::detail::Simplicial_chain_complex< Cell_, Boundary_, Data_, Hash_> & c){ 
 	for(auto i = c.begin(); i != c.end(); ++i){
 		      const std::size_t id = i->second.id();
@@ -387,11 +348,11 @@ std::ostream& operator<<( std::ostream& out,
 	return out;
 }
 
-template< typename Cell_,
+template< typename Stream, typename Cell_,
           typename Boundary_,
           typename Data_,
           typename Hash_> 
-std::ostream& operator<<( std::ostream& out, 
+Stream& operator<<( Stream& out, 
 		    const ctl::detail::Simplicial_chain_complex< Cell_, Boundary_, Data_, Hash_>&& c){
 	out << c;
 	return out;
@@ -399,12 +360,11 @@ std::ostream& operator<<( std::ostream& out,
 template< typename Stream, typename Cell_,
           typename Boundary_,
           typename Data_,
-          typename Hash_>
+          typename Hash_> 
 Stream& operator>>( Stream& in, ctl::detail::Simplicial_chain_complex< Cell_, Boundary_, Data_, Hash_> & c){  
 	return c.read( in); 
 }
-
-} //end namespace detail
-} //end namespace ctl
+}
+} //namespace ctl
 
 #endif //CTL_SIMPLICIAL_CHAIN_COMPLEX_H
