@@ -30,13 +30,9 @@
 //CTL
 #include <ctl/abstract_simplex/simplex_boundary.hpp>
 
-
-/*! \namespace ctl
-Namespace where all library functionality resides
-*/
 namespace ctl {
 
-/**
+/*!
 * \class Abstract_simplex< T>
 * This class describes an abstract simplex for a simplicial chain complex.
 * It is implemeneted as a sorted std::vector< T> since 
@@ -45,6 +41,7 @@ namespace ctl {
 *
 * This object does not itself have the facility for a boundary, this is handled
 * by a separate boundary operator.
+* @tparam T the underlying vertex type. T must be totally ordered via <
 */
 template< typename T>
 class Abstract_simplex {

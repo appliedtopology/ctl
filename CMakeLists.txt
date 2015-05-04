@@ -1,5 +1,4 @@
 project(ctl CXX)
-
 #stop the whining
 cmake_minimum_required(VERSION 2.6.2)
 if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" VERSION_GREATER 2.6)
@@ -8,6 +7,13 @@ if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" VERSION_GREATER 2.6)
   else()
     cmake_policy(VERSION 2.6)
   endif()
+endif()
+
+
+# CTL must be built "out-of-source", so we start by ensuring that the
+# source and build directories are different.
+if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
+  message(FATAL_ERROR "In-source build attempted; please clean the CMake cache and then switch to an out-of-source build, e.g., rm CMakeCache.txt && rm -Rf CMakeFiles/ && mkdir build/ && cd build/ && cmake ..")
 endif()
 
 include(CheckCXXCompilerFlag)
