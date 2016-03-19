@@ -33,9 +33,9 @@
 namespace ctl {
 
 /*!
-* \class Abstract_simplex< T>
+* \class Abstract_simplex
 * This class describes an abstract simplex for a simplicial chain complex.
-* It is implemeneted as a sorted std::vector< T> since 
+* It is implemented as a sorted std::vector< T> since 
 * maintaining a sorted vector is faster than a std::set 
 * for a fixed large number.
 *
@@ -43,9 +43,9 @@ namespace ctl {
 * by a separate boundary operator.
 * @tparam T the underlying vertex type. T must be totally ordered via <
 */
-template< typename T>
 class Abstract_simplex {
 	private:
+	typedef std::size_t T;
 	typedef typename std::vector< T> Vector;
 	typedef Abstract_simplex< T> Self;
 	typedef std::initializer_list< T> Init_list;

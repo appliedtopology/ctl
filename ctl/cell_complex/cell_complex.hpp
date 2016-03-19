@@ -1,39 +1,7 @@
-#ifndef CTL_SIMPLICIAL_CHAIN_COMPLEX_H
-#define CTL_SIMPLICIAL_CHAIN_COMPLEX_H
+#ifndef CTL_CELL_COMPLEX_H
+#define CTL_CELL_COMPLEX_H
 /*******************************************************************************
-* -Academic Honesty-
-* Plagarism: The unauthorized use or close imitation of the language and
-* thoughts of another author and the representation of them as one's own
-* original work, as by not crediting the author.
-* (Encyclopedia Britannica, 2008.)
-*
-* You are free to use the code according to the license below, but, please
-* do not commit acts of academic dishonesty. We strongly encourage and request
-* that for any [academic] use of this source code one should cite one the
-* following works:
-*
-* \cite{hatcher, z-ct-10}
-*
-* See ct.bib for the corresponding bibtex entries.
-* !!! DO NOT CITE THE USER MANUAL !!!
-*******************************************************************************
-* Copyright (C) Ryan H. Lewis 2014 <me@ryanlewis.net>
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program in a file entitled COPYING; if not, write to the
-* Free Software Foundation, Inc.,
-* 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
-*******************************************************************************
+* BSD-3
 *******************************************************************************/
 /*********************
 * April 5th, 2014
@@ -70,25 +38,23 @@
 #include <sstream>
 #include <fstream>
 
+//CTL
+#include <detail/data_wrapper.hpp>
+
 //BOOST
 #include <boost/serialization/base_object.hpp>
-
-
 namespace ctl {
-namespace detail{
-template< typename Cell_,
-	  typename Boundary_,
-	  typename Data_,
-	  typename Hash_> 
-class Simplicial_chain_complex{
-public:
-   typedef Cell_ Cell; //Describes a fundamental object,
-		       //e.g. Simplex, Cube, Polygon, etc..
 
+template< typename Boundary_,
+	  typename Data_ = detail::Default_data,
+	  typename Hash_ = ctl::Hash< typename Boundary_::Cell> > 
+class Cell_complex{
+public:
    typedef Boundary_ Cell_boundary; //Describes how to take Cell boundary
    //Arbitrary data associated to space.
-   typedef Data_ Data;
+   typedef detail::Data_wrapper< Data_> Data;
    typedef Hash_ Hash;
+   typedef typename Cell_boundary::Cell Cell; //e.g. Simplex, Cube, Polygon, etc..
 private:
    typedef std::unordered_map<Cell, Data, Hash> Storage;
    
@@ -101,11 +67,11 @@ public:
 public:
    //Constructors
    //Default
-   Simplicial_chain_complex(): max_id( 0), max_dim( 0) { 
+   Cell_complex(): max_id( 0), max_dim( 0) { 
 	cells.max_load_factor( 1); 
    }
 
-   Simplicial_chain_complex( Cell_boundary & bd_, const std::size_t num_cells): 
+   Cell_complex( Cell_boundary & bd_, const std::size_t num_cells): 
    cells( num_cells), bd( bd_), max_id( 0), max_dim( 0) {
 	cells.max_load_factor( 1); 
    }
@@ -113,24 +79,24 @@ public:
    //TODO: Expand complex structure to store cells of a fixed dimension
    //in different containers. glue together objects with a crazy iterator
    template< typename Size_by_dimension>
-   Simplicial_chain_complex( Cell_boundary & bd_, const Size_by_dimension d): 
+   Cell_complex( Cell_boundary & bd_, const Size_by_dimension d): 
     cells( std::accumulate( d.begin(), d.end(), 0)),
     bd( bd_), max_id( 0), max_dim( 0) {
 	cells.max_load_factor( 1); 
    }
 
    //Copy
-   Simplicial_chain_complex( const Simplicial_chain_complex & b): 
+   Cell_complex( const Cell_complex & b): 
    cells( b.cells), bd( b.bd), max_id( b.max_id), max_dim( b.max_dim)
    { cells.max_load_factor( 1); }
 
    //Move
-   Simplicial_chain_complex( Simplicial_chain_complex && b): 
+   Cell_complex( Cell_complex && b): 
    cells( std::move( b.cells)), bd( std::move( b.bd)),
    max_id( std::move(b.max_id)), max_dim( std::move( b.max_dim)) {}
 
    // assignment operator
-   Simplicial_chain_complex& operator=( const Simplicial_chain_complex& b){
+   Cell_complex& operator=( const Cell_complex& b){
    	bd = b.bd;
    	max_id = b.max_id;
    	max_dim = b.max_dim;
@@ -139,7 +105,7 @@ public:
    }
 
    // move assignment operator
-   Simplicial_chain_complex& operator=( Simplicial_chain_complex&& b){
+   Cell_complex& operator=( Cell_complex&& b){
    	bd      = std::move( b.bd);
    	max_id  = std::move( b.max_id);
    	max_dim = std::move( b.max_dim);
@@ -311,14 +277,14 @@ private:
    Cell_boundary bd;
    std::size_t max_id;
    std::size_t max_dim;
-}; //end class Simplicial_chain_complex
+}; //end class Cell_complex
 
 template< typename Stream, typename Cell_,
           typename Boundary_,
           typename Data_,
           typename Hash_>
 Stream& operator<<( Stream& out, 
-   const typename ctl::detail::Simplicial_chain_complex< Cell_, Boundary_, Data_, Hash_>::iterator c){ 
+   const typename ctl::Cell_complex< Cell_, Boundary_, Data_, Hash_>::iterator c){ 
 	out << c->first;
 	return out;	
 }
@@ -328,7 +294,7 @@ template< typename Stream, typename Cell_,
           typename Data_,
           typename Hash_> 
 Stream& operator<<( Stream& out, 
-   const typename ctl::detail::Simplicial_chain_complex< Cell_, Boundary_, Data_, Hash_>::const_iterator c){ 
+   const typename ctl::Cell_complex< Cell_, Boundary_, Data_, Hash_>::const_iterator c){ 
 	out << c->first;
 	return out;	
 }
@@ -338,7 +304,7 @@ template< typename Stream, typename Cell_,
           typename Data_,
           typename Hash_> 
 Stream& operator<<( Stream& out, 
-   const ctl::detail::Simplicial_chain_complex< Cell_, Boundary_, Data_, Hash_> & c){ 
+   const ctl::Cell_complex< Cell_, Boundary_, Data_, Hash_> & c){ 
 	for(auto i = c.begin(); i != c.end(); ++i){
 		      const std::size_t id = i->second.id();
 		      out << id; 
@@ -353,7 +319,7 @@ template< typename Stream, typename Cell_,
           typename Data_,
           typename Hash_> 
 Stream& operator<<( Stream& out, 
-		    const ctl::detail::Simplicial_chain_complex< Cell_, Boundary_, Data_, Hash_>&& c){
+		    const ctl::Cell_complex< Cell_, Boundary_, Data_, Hash_>&& c){
 	out << c;
 	return out;
 }
@@ -361,10 +327,44 @@ template< typename Stream, typename Cell_,
           typename Boundary_,
           typename Data_,
           typename Hash_> 
-Stream& operator>>( Stream& in, ctl::detail::Simplicial_chain_complex< Cell_, Boundary_, Data_, Hash_> & c){  
+Stream& operator>>( Stream& in, ctl::Cell_complex< Cell_, Boundary_, Data_, Hash_> & c){  
 	return c.read( in); 
 }
+
+template< std::size_t N, typename D=ctl::Default_data>
+using Simplicial_complex = ctl::Chain_complex< ctl::Simplex_boundary< ctl::Finite_field< N> >, D>;
+
+template< std::size_t N, typename D=ctl::Default_data>
+using Cubical_complex = ctl::Chain_complex< ctl::Cube_boundary< ctl::Finite_field< N> >, D>;
+
+//! Utility to read a complex and any associated data 
+template<typename String, typename Complex, typename Functor>
+void read_complex_and_data(String & complex_name, String & data_file, 
+			   Complex & complex, Functor & f){
+	std::ifstream in;
+	std::cout << "File IO ..." << std::flush;
+	//first read the complex in
+	ctl::open_file( in, complex_name.c_str());
+	complex.read( in);
+	ctl::close_file( in);
+	//then read the data file in, e.g. weights, cover, etc..
+	ctl::open_file( in, data_file.c_str());
+	complex.read_data( in, f);	
+	ctl::close_file( in);
+	std::cout << "completed!" << std::endl;
 }
+
+//! Utility to read a complex 
+template<typename String, typename Complex>
+void read_complex(String & complex_name, Complex & complex){
+	std::ifstream in;
+	std::cout << "File IO ..." << std::flush;
+	ctl::open_file( in, complex_name.c_str());
+	complex.read( in);
+	ctl::close_file( in);
+	std::cout << "completed!" << std::endl;
+}
+
 } //namespace ctl
 
-#endif //CTL_SIMPLICIAL_CHAIN_COMPLEX_H
+#endif //CTL_CELL_COMPLEX_H

@@ -152,11 +152,13 @@ namespace ctl {
 * @tparam Simplex_
 * @tparam Coefficient_
 */
-template< typename Simplex_, typename Coefficient_>
+template< typename Coefficient_>
 class Simplex_boundary {
 public:
 	//! Underlying simplex type
 	typedef Simplex_ Simplex;
+	//! Underlying cell type
+	typedef Simplex_ Cell;
 	//! Underlying Coefficient type
 	typedef Coefficient_ Coefficient;
 	//! A term of the boundary operator

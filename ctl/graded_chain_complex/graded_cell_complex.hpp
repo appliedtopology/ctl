@@ -31,7 +31,7 @@
 namespace ctl{
 template< typename Complex_, 
 	  typename Less_ = ctl::Cell_less>
-class Filtration {
+class Graded_cell_complex {
  public:
 	typedef  Complex_ Complex;
 	typedef  Less_ Less;
@@ -75,30 +75,28 @@ private:
 	typedef const_reverse_iterator crit;
 	typedef reverse_iterator rit;
 public:
-	Filtration( const Filtration & f): 
+	Graded_cell_complex( const Graded_cell_complex & f): 
 		filtration_( f), complex_( f.complex_) {}
-	Filtration( const Filtration && f): 
+	Graded_cell_complex( const Graded_cell_complex && f): 
 		filtration_( std::move( f)), complex_( f.complex_) {}	
+	
 	//create a noncorrect filtration first.
 	//useful if we are going to create a filtration inside another
 	//algorithm
-	Filtration( Complex & c, bool flag): filtration_( c.size()), 
+	Graded_cell_complex( Complex & c, bool flag): filtration_( c.size()), 
 					     complex_( c) {}
 	//maybe we have an empty complex, but we know its size in advance	
-	Filtration( Complex & c, std::size_t s, bool flag): filtration_( s), 
+	Graded_cell_complex( Complex & c, std::size_t s, bool flag): filtration_( s), 
 							    complex_( c) {}
 	//default constructor	
-	Filtration( Complex & c): filtration_( c.size()), complex_( c){
+	Graded_cell_complex( Complex & c): filtration_( c.size()), complex_( c){
 		std::size_t pos = 0;
 		for( auto i= c.begin(); i != c.end(); ++i, ++pos){ 
 			 filtration_[ pos] = i;
 		}
 		std::sort( filtration_.begin(), filtration_.end(), Less());
 	}
-	reference operator[] ( std::size_t n) { return filtration_[ n]; }
-	const_reference operator[] ( std::size_t n) const { 
-		return filtration_[ n]; 
-	}
+
 	//used typedefs above since the names were getting to long
 	it  begin() { return filtration_.begin();    }
 	it  end()   { return filtration_.end(); }
@@ -114,16 +112,17 @@ public:
 	
 	crit rbegin() const { return filtration_.rbegin(); }
 	crit rend()   const { return filtration_.rend();   }
-	Complex& complex() const { return complex_;}
+
+	Complex& cell_complex() const { return complex_; }
 	std::size_t size() const { return filtration_.size(); }
 	void clear() { filtration_.clear(); Vector().swap( filtration_); } 
  private:
   Vector filtration_;
   Complex& complex_;
-}; //class Filtration
+}; //class Graded_cell_complex
 
 template< typename Stream, typename Complex, typename L>
-Stream& operator<<( Stream& out, const Filtration< Complex, L>& f){
+Stream& operator<<( Stream& out, const Graded_cell_complex< Complex, L>& f){
 	for ( auto & i : f){
 		out << i->second.id() << ": " << i->first << std::endl;
 	}
@@ -131,34 +130,34 @@ Stream& operator<<( Stream& out, const Filtration< Complex, L>& f){
 }
 
 template< typename Stream, typename Complex, typename L>
-Stream& operator<<( Stream& out, const Filtration< Complex, L>&& f){
+Stream& operator<<( Stream& out, const Graded_cell_complex< Complex, L>&& f){
 	out << f;
 	return out;
 }
 
 template< typename Stream, typename Complex, typename L>
 Stream& operator<<( Stream& out, 
-		    const typename Filtration< Complex, L>::const_reverse_iterator f){
+		    const typename Graded_cell_complex< Complex, L>::const_reverse_iterator f){
 	out << (*f)->first;
 	return out;
 }
 template< typename Stream, typename Complex, typename L>
 Stream& operator<<( Stream& out, 
-		    const typename Filtration< Complex, L>::reverse_iterator f){
-	out << (*f)->first;
-	return out;
-}
-
-template< typename Stream, typename Complex, typename L>
-Stream& operator<<( Stream& out, 
-		    const typename Filtration< Complex, L>::iterator f){
+		    const typename Graded_cell_complex< Complex, L>::reverse_iterator f){
 	out << (*f)->first;
 	return out;
 }
 
 template< typename Stream, typename Complex, typename L>
 Stream& operator<<( Stream& out, 
-		    const typename Filtration< Complex, L>::const_iterator f){
+		    const typename Graded_cell_complex< Complex, L>::iterator f){
+	out << (*f)->first;
+	return out;
+}
+
+template< typename Stream, typename Complex, typename L>
+Stream& operator<<( Stream& out, 
+		    const typename Graded_cell_complex< Complex, L>::const_iterator f){
 	out << (*f)->first;
 	return out;
 }

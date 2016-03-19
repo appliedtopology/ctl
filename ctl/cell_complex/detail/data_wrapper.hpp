@@ -1,21 +1,7 @@
 #ifndef CTL_DATA_WRAPPER_H
 #define CTL_DATA_WRAPPER_H
 /*******************************************************************************
-* -Academic Honesty-
-* Plagarism: The unauthorized use or close imitation of the language and
-* thoughts of another author and the representation of them as one's own
-* original work, as by not crediting the author.
-* (Encyclopedia Britannica, 2008.)
-*
-* You are free to use the code according to the license below, but, please
-* do not commit acts of academic dishonesty. We strongly encourage and request
-* that for any [academic] use of this source code one should cite one the
-* following works:
-*
-* \cite{hatcher, z-ct-10}
-*
-* See ct.bib for the corresponding bibtex entries.
-* !!! DO NOT CITE THE USER MANUAL !!!
+* BSD-3
 *******************************************************************************
 * Copyright (C) Ryan H. Lewis 2014 <me@ryanlewis.net>
 *******************************************************************************
@@ -31,43 +17,9 @@ constexpr bool operator==( const Default_data & d) const{ return true; }
 constexpr bool operator<( const Default_data & d) const { return false; }
 }; //class Default_data for complex.
 
-//template< typename Data1_, typename Data2_=Default_data>
-//class Data_wrapper : public Data1_ , public Data2_ {
-//   private:
-//   typedef Data_wrapper< Data1_, Data2_> Self;
-//   public:
-//   //default
-//   Data_wrapper(): Data1_(), Data2_(){}
-//   //copy
-//   Data_wrapper( const Data_wrapper & from) : Data1_( from), Data2_( from){} 
-//   //move
-//   Data_wrapper( const Data_wrapper && from): Data1_( std::forward( from)), 
-//					      Data2_( std::forward( from)){}
-//
-//   Self& operator=( const Self & from){
-//   	Data1_::operator=( from);
-//   	Data2_::operator=( from);
-//   	return *this;
-//   }
-//
-//   Self& operator=( Self && from){
-//   	Data1_::operator=( from);
-//   	Data2_::operator=( from);
-//   	return *this;
-//   }
-//
-//   bool operator==( const Self & b) const {
-//	return     Data1_::operator==( b)
-//		&& Data2_::operator==( b);
-//   }
-//   bool operator!= (const Self & b) const { return !((*this)==b); }
-//}; // class Data_wrapper< D1, D2> 
-
 template< typename Data_>
-//class Data_wrapper< Data_, Default_data> : public Data_ {
 class Data_wrapper : public Data_ {
    private:
-  // typedef Data_wrapper< Data_, Default_data> Self;
    typedef Data_wrapper< Data_> Self;
    public:
    typedef std::size_t Id;
@@ -81,7 +33,6 @@ class Data_wrapper : public Data_ {
    Data_wrapper( const Data_wrapper && from): Data_( std::forward( from)),
    	id_( std::move( from.id_)){
    }
-
 
    Self& operator=( const Self & from){
    	Data_::operator=( from);
