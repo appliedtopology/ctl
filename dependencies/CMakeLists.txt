@@ -20,6 +20,8 @@ set(TBB_LIBRARIES ${TBB_LIBRARIES} )
 include_directories(${METIS_INCLUDE_DIR})
 link_directories(${METIS_LIBRARY_DIR})
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
 if(DOXYGEN_FOUND)
 configure_file(${CMAKE_SOURCE_DIR}/doc/Doxyfile.in 
 	       ${CMAKE_BINARY_DIR}/Doxyfile @ONLY)

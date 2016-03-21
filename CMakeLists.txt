@@ -33,6 +33,7 @@ endif (NOT APPLE)
 set(CTL_DEPS ${CMAKE_SOURCE_DIR}/dependencies)
 include( dependencies/CMakeLists.txt)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies)
 #Compile all the tools
 add_subdirectory( tools)
 

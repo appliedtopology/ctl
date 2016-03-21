@@ -91,8 +91,8 @@ class const_cube_boundary_iterator :
     	return *this;
     }
     //return removed vertex, get rid of another one
-    auto& s = face.cell().intervals[ pos].second;
-    auto& f = face.cell().intervals[ pos].first;
+    auto& s = face.cell().begin()[ pos].second;
+    auto& f = face.cell().begin()[ pos].first;
   
     if(  s > removed){
        std::swap( f, removed);
@@ -101,8 +101,8 @@ class const_cube_boundary_iterator :
        s = removed;
        pos++;
        if( pos != face.cell().size()){
- 	removed = face.cell().intervals[ pos].first;
-        face.cell().intervals[ pos].first = face.cell().intervals[ pos].second; 
+ 	removed = face.cell().begin()[ pos].first;
+        face.cell().begin()[ pos].first = face.cell().begin()[ pos].second; 
        }
     }
     face.coefficient( -1*face.coefficient());
@@ -168,6 +168,8 @@ class Cube_boundary {
 public:
     //! Underlying cube type
     typedef ctl::Cube Cube;
+    //! Underyling cell type
+    typedef ctl::Cube Cell;
     //! Underlying Coefficient type
     typedef Coefficient_ Coefficient;
     //! A term of the boundary operator

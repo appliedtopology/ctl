@@ -75,7 +75,7 @@ bool check_multi_indexing( const M & m){
 } 
 
 
-TEST(MultiArray, VanillaMultiIndexing){
+TEST_CASE(MultiArray, VanillaMultiIndexing){
 	typedef ctl::detail::Data_wrapper< Filter_function_value > Data;
 	typedef ctl::detail::multi_array< Data> multi_array;
 
@@ -86,7 +86,7 @@ TEST(MultiArray, VanillaMultiIndexing){
 	ASSERT_EQ( check_multi_indexing( m), true);
 }
 
-TEST(MultiArray, OffsetMultiIndexing){
+TEST_CASE(MultiArray, OffsetMultiIndexing){
 typedef ctl::detail::Data_wrapper< Filter_function_value > Data;
 typedef ctl::detail::multi_array< Data> multi_array;
 
@@ -101,7 +101,7 @@ typedef ctl::detail::multi_array< Data> multi_array;
 	ASSERT_EQ( check_multi_indexing( m2), true);
 }
 
-TEST(MultiArray, ConstructorTest){
+TEST_CASE(MultiArray, ConstructorTest){
 typedef ctl::detail::Data_wrapper< Filter_function_value > Data;
 typedef ctl::detail::multi_array< Data> multi_array;
 	std::vector< std::size_t> extents{5,4,3};

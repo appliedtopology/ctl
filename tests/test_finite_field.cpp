@@ -9,13 +9,13 @@
 //GTest
 #include <catch/catch.hpp>
 
-TEST(FiniteField,Z2){
+TEST_CASE(FiniteField,Z2){
 typedef ctl::Finite_field< 2> Z2;
 Z2  a( 1);
 ASSERT_EQ(a+a,Z2(0));
 }	
 
-TEST(FiniteField,Z3){
+TEST_CASE(FiniteField,Z3){
 	typedef ctl::Finite_field< 3> Z3;
 	Z3  b( 1);	
 	REQUIRE (b+b+b == Z3( 0));
@@ -23,7 +23,7 @@ TEST(FiniteField,Z3){
 	REQUIRE (-1*b == bneg);
 }
 
-TEST(FiniteField,Z11){
+TEST_CASE(FiniteField,Z11){
 	typedef ctl::Finite_field< 11> Z11;
 	Z11 c( 1);
 	REQUIRE(c*11 == Z11(0));

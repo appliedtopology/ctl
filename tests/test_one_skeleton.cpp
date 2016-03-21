@@ -32,8 +32,8 @@
 
 #include <gtest/gtest.h>
 
-TEST(OneSkeleton, GrabsOnlyGraph){ 
-typedef ctl::Abstract_simplex< int> Simplex;
+TEST_CASE(OneSkeleton, GrabsOnlyGraph){ 
+typedef ctl::Abstract_simplex Simplex;
 typedef ctl::Finite_field< 2> Z2; 
 typedef ctl::Simplex_boundary< Simplex, Z2> Simplex_boundary;
 typedef ctl::Chain_complex< Simplex, Simplex_boundary> Complex;

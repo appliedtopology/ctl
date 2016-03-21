@@ -89,7 +89,7 @@ void eliminate_boundaries( Persistence_data & data){
 	if( bd_cascade_tau.empty()){ return; }
 	//otherwise tau has a partner
 	const Term& tau_partner_term = bd_cascade_tau.youngest();
-   	const Coefficient& scalar = tau_partner_term.coefficient().inverse();
+   	const Coefficient& scalar = inverse( tau_partner_term.coefficient());
 	const Chain& bd_cascade_tau_partner = 
 				data.cascade_boundary_map[ tau_partner_term];
 	#ifdef DEBUG_PERSISTENCE

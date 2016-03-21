@@ -47,11 +47,46 @@
 
 //BOOST
 #include <boost/serialization/base_object.hpp>
+
+//TBB
+#include <tbb/concurrent_unordered_map.h>
+
 namespace ctl {
+
+namespace detail {
+template<typename T>
+void update_maximum(T& maximum_value, const T & value) noexcept
+{
+  if(value > maximum_value) maximum_value = value;
+}
+
+
+template<typename T>
+void update_maximum(std::atomic<T>& maximum_value, T const& value) noexcept
+{
+    T prev_value = maximum_value;
+    while(prev_value < value &&
+            !maximum_value.compare_exchange_weak(prev_value, value))
+        ;
+}
+
+template< typename C, 
+	  typename D,
+	  typename H,
+	  bool is_concurrent
+	>
+//meta code for the Chain_complex type.
+//This metacode creates a type, Chain_complex< C, B, D, H, S>
+using Storage = typename std::conditional< is_concurrent, 
+	tbb::concurrent_unordered_map<C,D,H>, 
+	std::unordered_map< C,D,H>
+	>::type; 
+} //end namespace detail
 
 template< typename Boundary_,
 	  typename Data_ = detail::Default_data,
-	  typename Hash_ = ctl::Hash< typename Boundary_::Cell> > 
+	  typename Hash_ = ctl::Hash< typename Boundary_::Cell>,
+	  bool Concurrent= false> 
 class Cell_complex{
 public:
    typedef Boundary_ Cell_boundary; //Describes how to take Cell boundary
@@ -60,7 +95,7 @@ public:
    typedef Hash_ Hash;
    typedef typename Cell_boundary::Cell Cell; //e.g. Simplex, Cube, Polygon, etc..
 private:
-   typedef std::unordered_map<Cell, Data, Hash> Storage;
+   typedef detail::Storage<Cell, Data, Hash, Concurrent> Storage;
    
 public:
    typedef typename Storage::size_type size_type;
@@ -130,9 +165,9 @@ public:
    					     const Data& data=Data()){
      std::pair< iterator, bool> c =  cells.emplace( s, data);
      if( c.second) { //this outer if is probably unnecessary
-       max_dim = std::max( max_dim, s.dimension());
+       detail::update_maximum( max_dim, s.dimension());
        if( c.first->second.id() == 0){
-        c.first->second.id( ++max_id);
+        c.first->second.id( ++max_id) ;
        } else{
         max_id=std::max( max_id, c.first->second.id());
        }
@@ -221,14 +256,12 @@ Stream& operator<<( Stream& out,
 template< typename Stream, 
           typename Boundary_,
           typename Data_,
-          typename Hash_> 
+          typename Hash_,
+	  bool Concurrent> 
 Stream& operator<<( Stream& out, 
-   const ctl::Cell_complex< Boundary_, Data_, Hash_> & c){ 
+   const ctl::Cell_complex< Boundary_, Data_, Hash_, Concurrent> & c){ 
 	for(auto i = c.begin(); i != c.end(); ++i){
-		      const std::size_t id = i->second.id();
-		      out << id; 
-		      out << ": ";
-		      out << i->first << std::endl; 
+		out << i->second.id() << ": " << i->first << std::endl; 
 	}
 	return out;
 }
@@ -236,9 +269,10 @@ Stream& operator<<( Stream& out,
 template< typename Stream, 
           typename Boundary_,
           typename Data_,
-          typename Hash_> 
+          typename Hash_,
+	  bool Concurrent> 
 Stream& operator<<( Stream& out, 
-		    const ctl::Cell_complex< Boundary_, Data_, Hash_>&& c){
+		    const ctl::Cell_complex< Boundary_, Data_, Hash_, Concurrent>&& c){
 	out << c;
 	return out;
 }

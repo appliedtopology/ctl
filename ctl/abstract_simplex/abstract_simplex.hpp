@@ -341,27 +341,20 @@ Stream& operator>>( Stream & in, ctl::Abstract_simplex & simplex){ return simple
 * Writes a simplex to this output stream
 * @return Stream&
 */
-template< typename Stream>
-Stream& operator<<(Stream& out, const ctl::Abstract_simplex & simplex){
-	typedef typename ctl::Abstract_simplex::const_iterator iterator;
+std::ostream& operator<<(std::ostream& out, const ctl::Abstract_simplex& simplex){
 	out << "[";
-	for(iterator i = simplex.begin(); i != simplex.end(); ++i){
-		out << *i;
-		if ( i+1 != simplex.end()) { out << ", "; } else { out << "]";}
+	for(auto i = simplex.begin(); i != simplex.begin()+simplex.dimension(); ++i){
+		out << *i << ", ";
 	}
+	out << *(simplex.rbegin()) << "]";
 	return out;
 }
-/**
-* @brief Output stream operator for an x-value simplex
-* @tparam Stream
-* @tparam T
-* @param out
-* @param simplex
-* Writes a simplex to this output stream
-* @return Stream&
-*/
-template< typename Stream>
-Stream& operator<<(Stream& out, const ctl::Abstract_simplex&& simplex){ out << simplex; }
+
+/*template< typename Stream>
+Stream& operator<<(Stream& out, ctl::Abstract_simplex&& simplex){ 
+	out << simplex; 
+	return out;
+}*/
 } //namespace ctl
 
 #endif // ABSTRACT_SIMPLEX_H

@@ -123,7 +123,7 @@ class Build_blowup_body{
 		Product p( sigma, tau);
 		Data d(id+1);
 		auto result = blowup.insert_open_cell( p,d);
-		filtration[ id] = result.first;
+		filtration.begin()[ id] = result.first;
 	}
 
 

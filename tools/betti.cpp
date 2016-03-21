@@ -58,17 +58,17 @@
 #include <ctl/abstract_simplex/simplex_boundary.hpp>
 
 //Filtration & Filtration Boundary Operator
-#include <ctl/filtration/filtration.hpp>
-#include <ctl/filtration/filtration_boundary.hpp>
-#include <ctl/filtration/less.hpp>
+#include <ctl/graded_chain_complex/graded_cell_complex.hpp>
+#include <ctl/graded_chain_complex/filtration_boundary.hpp>
+#include <ctl/graded_chain_complex/less.hpp>
 
 //Weights
 #include <ctl/weight_data/weight_data.hpp>
 #include <ctl/weight_data/weight_functor.hpp>
 
 //Chain Complex
-#include <ctl/chain_complex/chain_complex.hpp>
-#include <ctl/chain_complex/complex_boundary.hpp>
+#include <ctl/cell_complex/cell_complex.hpp>
+#include <ctl/cell_complex/complex_boundary.hpp>
 #include <ctl/term/term.hpp>
 
 
@@ -88,7 +88,7 @@
 
 
 //Simplex
-typedef ctl::Abstract_simplex< int> Simplex;
+typedef ctl::Abstract_simplex Simplex;
 typedef ctl::Finite_field< 2> Z2;
 typedef ctl::Simplex_boundary< Simplex, Z2> Simplex_boundary;
 

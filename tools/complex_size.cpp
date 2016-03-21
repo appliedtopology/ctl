@@ -44,8 +44,8 @@ int main(int argc, char *argv[]){
                                        
   // Read the cell_set in  
   timer.start();
-  ctl::read_complex( full_complex_name, complex); 
-  timer.stop();
+  //ctl::read_complex( full_complex_name, complex); 
+  timer.elapsed();
   std::cout << "I/O Time: " << timer.elapsed() << std::endl;
   std::cout << "number of simplices: " << complex.size() << std::endl; 
   std::cout << "complex dimension: " << complex.dimension() << std::endl;

@@ -36,10 +36,9 @@ inline std::size_t inverse(const std::size_t a, const std::size_t prime){
     return x;
 }
 
-template< std::size_t N>
-std::size_t inverse( const ctl::Finite_field< N> & x, const std::size_t prime){ 
-	return inverse( x.value(), prime); 
-}
+template< std::size_t prime>
+ctl::Finite_field< prime> 
+inverse(const ctl::Finite_field< prime>& y){ return inverse(y.to_integral(), prime); }
 
 template <typename T>
 constexpr T sqrt_helper(T x, T lo, T hi)
@@ -169,15 +168,15 @@ class Finite_field{
 
 	template< typename T>
 	Self operator/(const T& rhs) const{ 
-		return *this*ctl::detail::inverse( rhs, _prime); 
+		return *this*ctl::detail::inverse( rhs); 
 	}
 
 	template< typename T>
 	Self& operator/=(const T& rhs){ 
-		*this= *this*ctl::detail::inverse( rhs, _prime); 
+		*this= *this*ctl::detail::inverse( rhs); 
 		return *this;
 	}
-	
+	std::size_t to_integral() const { return x; }	
 	private:
 	std::size_t x;	
 }; //class Finite_field

@@ -1,25 +1,12 @@
 #ifndef _CTL_COVER_TEST_H_
 #define _CTL_COVER_TEST_H_
 /*******************************************************************************
-* -Academic Honesty-
-* Plagarism: The unauthorized use or close imitation of the language and 
-* thoughts of another author and the representation of them as one's own 
-* original work, as by not crediting the author. 
-* (Encyclopedia Britannica, 2008.)
-*
-* You are free to use the code according to the license below, but, please
-* do not commit acts of academic dishonesty. We strongly encourage and request 
-* that for any [academic] use of this source code one should cite one the 
-* following works:
-* 
-* \cite{hatcher, z-ct-10}
-* 
-* See ct.bib for the corresponding bibtex entries. 
-* !!! DO NOT CITE THE USER MANUAL !!!
-*******************************************************************************
 * Copyright (C) Ryan H. Lewis 2011 <me@ryanlewis.net>
-*******************************************************************************/
-#include "gtest/gtest.h"
+*******************************************************************************
+* BSD-3
+******************************************************************************/
+#include <catch/catch.hpp>
+#include <ctl/ctl.hpp>
 
 namespace ctl{
 namespace parallel { 
@@ -31,7 +18,7 @@ void covered_complex(Complex & complex){
         for (cell_iterator it = complex.begin(); it != complex.end(); ++it){
                 const Cell & cell = it->first;
 		Data & data = it->second;
-		ASSERT_NEQ(data.data(), Data().data());
+		REQUIRE(data.data() != Data().data());
         }
 }
 
@@ -51,8 +38,8 @@ void sheets_closed(Complex & complex){
 			const Data & face_data = j->get_cell()->second;
 			const Cell & face = face_data.data()->first;
 			const Cell & face_cell = j->get_cell()->first;
-			ASSERT_TRUE(std::includes(face.begin(), face.end(),
-				      		  data.begin(), data.end()));
+			REQUIRE(std::includes(face.begin(), face.end(),
+				      		  data.begin(), data.end())==true);
 		}
 	} 
 }

@@ -24,7 +24,7 @@
 #include <catch/catch.hpp>
 
 //We build a simplicial chain complex with Z2 coefficients
-typedef ctl::Abstract_simplex< int> Simplex;
+typedef ctl::Abstract_simplex Simplex;
 typedef ctl::Finite_field< 2> Z2;
 typedef ctl::Simplex_boundary< Simplex, Z2 > Boundary;
 typedef ctl::Chain_complex< Simplex, Boundary> Complex;
@@ -44,7 +44,7 @@ bool is_sorted( const Filtration & f){
 	return true;
 }
 
-TEST( Filtration_cell_less, TotalOrderWorking){
+TEST_CASE( Filtration_cell_less, TotalOrderWorking){
 	Complex c;
 	Timer t;
 	t.start();
@@ -56,7 +56,7 @@ TEST( Filtration_cell_less, TotalOrderWorking){
 	t.stop();
 	ASSERT_TRUE( is_sorted( f1));
 }
-TEST( Filtration_id_less, TotalOrderWorking){ 
+TEST_CASE( Filtration_id_less, TotalOrderWorking){ 
 	Complex c;
 	Timer t;
 	t.start();

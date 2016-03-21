@@ -51,7 +51,7 @@ void compute_homology( Complex & complex,
 								Filtration;
 	typedef typename Filtration::iterator Filtration_iterator;
 	//typedef typename Complex::Boundary Cell_boundary;
-	typedef typename ctl::Filtration_boundary< Filtration> 
+	typedef typename ctl::Graded_boundary< Filtration> 
 						Filtration_boundary;
 	typedef typename Filtration_boundary::Coefficient Coefficient;
 
@@ -59,7 +59,6 @@ void compute_homology( Complex & complex,
         typedef typename ctl::Offset_map< Filtration_iterator> Offset_map;
         typedef typename ctl::Sparse_matrix_map< Coefficient, Offset_map> Chain_map;
 
-	typedef typename Filtration::Term Filtration_term;
 	typedef typename std::pair< Filtration_iterator, Filtration_iterator> 
 							     Filtration_pair;
 	typedef typename std::vector< Filtration_pair> Iterator_pairs;
@@ -120,7 +119,7 @@ void do_blowup_homology( Blowup & blowup_complex,
 			 Stats & stats){
 
 	//typedef typename Blowup::iterator Blowup_iterator;
-	typedef typename ctl::Filtration_boundary< Blowup_filtration> 
+	typedef typename ctl::Graded_boundary< Blowup_filtration> 
 						      Blowup_boundary;
 	typedef typename  Blowup_filtration::iterator 
 						Blowup_filtration_iterator;
@@ -128,10 +127,6 @@ void do_blowup_homology( Blowup & blowup_complex,
 	
       	//typedef typename  Blowup_boundary::Term Blowup_term;
 	typedef typename  Blowup_filtration::Term Blowup_filtration_term;	
-	typedef typename  ctl::Chain< Blowup_filtration_term> Chain;
-	typedef typename  std::vector< Chain> Chains;
-	typedef typename  Chains::iterator Chains_iterator;
-	typedef typename  Blowup_filtration_term::Cell Blowup_filtration_term_cell;
 	typedef typename  Blowup_filtration_term::Coefficient Coefficient;
 
         typedef typename ctl::Sparse_matrix< Coefficient> Sparse_matrix;

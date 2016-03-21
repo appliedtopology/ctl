@@ -73,11 +73,6 @@ add_executable (vr vr.cpp)
 target_link_libraries( vr ${Boost_LIBRARIES} ${ANN_LIBRARIES} ${DSO_FIX})
 endif()
 
-if( Boost_FOUND)
-add_executable (convert_asc_format add_header_to_complex.cpp)
-target_link_libraries( convert_asc_format ${Boost_LIBRARIES} ${DSO_FIX})
-endif()
-
 if (Boost_FOUND)
 add_executable (write_filtration write_filtration_tool.cpp)
 target_link_libraries( write_filtration ${Boost_LIBRARIES} ${DSO_FIX})

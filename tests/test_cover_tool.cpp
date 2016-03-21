@@ -1,40 +1,13 @@
 /*******************************************************************************
-* -Academic Honesty-
-* Plagarism: The unauthorized use or close imitation of the language and 
-* thoughts of another author and the representation of them as one's own 
-* original work, as by not crediting the author. 
-* (Encyclopedia Britannica, 2008.)
-*
-* You are free to use the code according to the license below, but, please
-* do not commit acts of academic dishonesty. We strongly encourage and request 
-* that for any [academic] use of this source code one should cite one the 
-* following works:
-* 
-* \cite{hatcher, z-ct-10}
-* 
-* See ct.bib for the corresponding bibtex entries. 
-* !!! DO NOT CITE THE USER MANUAL !!!
-*******************************************************************************
 * Copyright (C) Ryan H. Lewis 2010 <me@ryanlewis.net>
 *******************************************************************************
+* BSD-3
+******************************************************************************
 * NOTES
 *******************************************************************************/
 
 //CTL
-#include <ctl/abstract_simplex/abstract_simplex.hpp>
-#include <ctl/abstract_simplex/simplex_boundary.hpp>
-#include <ctl/chain_complex/complex_boundary.hpp>
-#include <ctl/parallel/filtration/filtration.hpp>
-#include <ctl/chain_complex/chain_complex.hpp>
-#include <ctl/io/io.hpp>
-#include <ctl/term/term.hpp>
-
-//Local Project Deps
-#include <ctl/parallel/partition_covers/covers.hpp>
-#include <ctl/parallel/partition_covers/cover_tests.hpp>
-#include <ctl/parallel/partition_covers/cover_data.hpp>
-#include <ctl/parallel/chain_complex/chain_complex.hpp>
-#include <ctl/parallel/build_blowup_complex/build_blowup_complex.hpp>
+#include <ctl/ctl.hpp>
 
 //BOOST
 #include <boost/program_options.hpp>
@@ -50,7 +23,7 @@
 namespace po = boost::program_options;
 
 // Complex type
-typedef ctl::Abstract_simplex< int> Cell;
+typedef ctl::Abstract_simplex Cell;
 typedef ctl::Finite_field< 2> Z2;
 typedef ctl::Simplex_boundary< Cell, Z2> Simplex_boundary;
 typedef ctl::parallel::Chain_complex< Cell, Simplex_boundary, 

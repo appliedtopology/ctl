@@ -14,14 +14,14 @@
 //Catch
 #include <catch/catch.hpp>
 
-TEST(Simplex, DefaultConstruct){
+TEST_CASE("DefaultConstruct", "[simplex]"){
 	typedef ctl::Abstract_simplex Simplex;
 
 	Simplex s;
 	REQUIRE(s.size() == 0);
 }
 
-TEST(Simplex, InsertCopyTest){
+TEST_CASE("InsertCopy", "[simplex]"){
 	typedef ctl::Abstract_simplex Simplex;
 
 	Simplex s;
@@ -33,13 +33,13 @@ TEST(Simplex, InsertCopyTest){
 	REQUIRE( c == s);
 }
 
-TEST(Simplex,InitializerListAndRemove){
+TEST_CASE("InitializerListAndRemove", "[simplex]"){
 	typedef ctl::Abstract_simplex Simplex;
 
 	Simplex t( {1,2,5,5,4});
 	Simplex s;
 	s.insert( 1); s.insert( 2); s.insert( 4); s.insert( 5);
-	REQUIRE( s, t);
+	REQUIRE( s==t);
 	t.insert( {8,9,10} );
 	t.remove( 5);
 	REQUIRE(t.size() == 6);
@@ -47,9 +47,9 @@ TEST(Simplex,InitializerListAndRemove){
 	REQUIRE(t.size() == 4);
 }
 	
-TEST(Simplex, SimplexBoundary){
+TEST_CASE("SimplexBoundary", "[simplex]"){
 	typedef ctl::Abstract_simplex Simplex;
-	typedef ctl::Simplex_boundary< Simplex, int> Boundary;
+	typedef ctl::Simplex_boundary< int> Boundary;
 
 	Boundary b;
 	Simplex s{1,2,3};
@@ -59,7 +59,7 @@ TEST(Simplex, SimplexBoundary){
 	}
 }
 
-TEST(Simplex, SelfAssignmentComparison){
+TEST_CASE("SelfAssignmentComparison", "[simplex]"){
 	typedef ctl::Abstract_simplex Simplex;
 
 	Simplex s{ 3,4,5};

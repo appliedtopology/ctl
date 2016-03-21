@@ -1,22 +1,7 @@
 /*******************************************************************************
-* -Academic Honesty-
-* Plagarism: The unauthorized use or close imitation of the language and 
-* thoughts of another author and the representation of them as one's own 
-* original work, as by not crediting the author. 
-* (Encyclopedia Britannica, 2008.)
-*
-* You are free to use the code according to the license below, but, please
-* do not commit acts of academic dishonesty. We strongly encourage and request 
-* that for any [academic] use of this source code one should cite one the 
-* following works:
-* 
-* \cite{hatcher, z-ct-10}
-* 
-* See ct.bib for the corresponding bibtex entries. 
-* !!! DO NOT CITE THE USER MANUAL !!!
-*******************************************************************************
 * Copyright (C) Ryan H. Lewis 2014 <me@ryanlewis.net>
 *******************************************************************************
+* BSD-3
 *******************************************************************************/
 //STL
 #include <iostream>
@@ -26,16 +11,17 @@
 //CTL
 #include <ctl/ctl.hpp>
 
-//GTest
-#include "gtest/gtest.h"
+//Catch 
+#include <catch/catch.hpp>
 
 
-TEST(Chain,ChainTest){
+TEST_CASE("ChainTest","[chain]"){
+
 //We build a simplicial chain complex with Z2 coefficients
-typedef ctl::Abstract_simplex< int> Simplex;
+typedef ctl::Abstract_simplex Simplex;
 typedef ctl::Finite_field< 2> Z2;
-typedef ctl::Simplex_boundary< Simplex, Z2 > Boundary;
-typedef ctl::Chain_complex< Simplex, Boundary> Complex;
+typedef ctl::Simplex_boundary< Z2 > Boundary;
+typedef ctl::Cell_complex< Boundary> Complex;
 typedef Complex::Cell Cell;
 typedef ctl::Complex_boundary< Complex> Complex_boundary;
 typedef Complex_boundary::Term Term;
@@ -55,7 +41,7 @@ auto complex_t = complex.find_cell( t);
 Chain bds( bd.begin( complex_s), bd.end( complex_s));
 Chain bdt( bd.begin( complex_t), bd.end( complex_t));
 auto bdsandt = bds+bdt;
-ASSERT_EQ(bdsandt.size(),10);
+REQUIRE(bdsandt.size()==10);
 
 constexpr int N = 600000;
 Chain temp;

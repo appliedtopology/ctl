@@ -1,44 +1,14 @@
 /*******************************************************************************
-* -Academic Honesty-
-* Plagarism: The unauthorized use or close imitation of the language and 
-* thoughts of another author and the representation of them as one's own 
-* original work, as by not crediting the author. 
-* (Encyclopedia Britannica, 2008.)
-*
-* You are free to use the code according to the license below, but, please
-* do not commit acts of academic dishonesty. We strongly encourage and request 
-* that for any [academic] use of this source code one should cite one the 
-* following works:
-* 
-* \cite{hatcher, z-fcv-10a}
-* 
-* See ct.bib for the corresponding bibtex entries. 
-* !!! DO NOT CITE THE USER MANUAL !!!
-*******************************************************************************
 * Copyright (C) Ryan H. Lewis 2011 <me@ryanlewis.net>
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-* 
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-* 
-* You should have received a copy of the GNU General Public License
-* along with this program in a file entitled COPYING; if not, write to the 
-* Free Software Foundation, Inc., 
-* 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *******************************************************************************
+* BSD-3
 *******************************************************************************/
 //CTL
 #include <ctl/abstract_simplex/abstract_simplex.hpp>
 #include <ctl/abstract_simplex/simplex_boundary.hpp>
-#include <ctl/chain_complex/chain_complex.hpp>
-#include <ctl/chain_complex/complex_boundary.hpp>
-#include <ctl/parallel/filtration/filtration.hpp>
+#include <ctl/cell_complex/cell_complex.hpp>
+#include <ctl/cell_complex/complex_boundary.hpp>
+#include <ctl/graded_chain_complex/graded_cell_complex.hpp>
 #include <ctl/io/io.hpp>
 #include <ctl/term/term.hpp>
 #include <ctl/utility/timer.hpp>
@@ -59,18 +29,17 @@
 namespace po = boost::program_options;
 
 // Complex type
-typedef ctl::Abstract_simplex<int> Cell;
+typedef ctl::Abstract_simplex Cell;
 typedef ctl::Finite_field< 2> Z2;
-typedef ctl::Simplex_boundary< Cell, Z2> Simplex_boundary;
-typedef ctl::Chain_complex< Cell, 
-			    Simplex_boundary, 
+typedef ctl::Simplex_boundary< Z2> Simplex_boundary;
+typedef ctl::Cell_complex< Simplex_boundary, 
 			    ctl::parallel::Nerve_data> Nerve;
 typedef Nerve::iterator Nerve_iterator;
 typedef ctl::parallel::Cover_data< Nerve_iterator > Cover_data;
-typedef ctl::Chain_complex< Cell, Simplex_boundary, Cover_data> Complex;
+typedef ctl::Cell_complex< Simplex_boundary, Cover_data> Complex;
 typedef Complex::iterator Complex_iterator;
 typedef ctl::Cell_less Cell_less;
-typedef ctl::parallel::Filtration< Complex, Cell_less> Filtration;
+typedef ctl::Graded_cell_complex< Complex, Cell_less> Filtration;
 
 typedef ctl::Timer Timer;
 typedef ctl::parallel::Cover_stats< Timer> Stats;
@@ -121,7 +90,7 @@ int main( int argc, char *argv[]){
   Nerve nerve;
 
   // Read the cell_set in
-  read_complex( full_complex_name, complex);
+  //read_complex( full_complex_name, complex);
   if (!complex.is_closed()){
 	  std::cout << "complex is not closed" << std::endl;
   }
@@ -131,7 +100,7 @@ int main( int argc, char *argv[]){
   timer.start();
   ctl::parallel::init_cover_complex( nerve, num_parts);
   ctl::parallel::graph_partition_cover( filtration, nerve);
-  timer.stop();
+  timer.elapsed();
   double cover_time = timer.elapsed();
   std::cout << "cover compute time: " << cover_time << std::endl;
   std::string cover_name ( full_complex_name);
@@ -153,12 +122,12 @@ int main( int argc, char *argv[]){
 
   std::ofstream out; 
   ctl::open_file( out, nerve_name.c_str());
-  out << nerve;
+  //out << nerve;
   ctl::close_file( out);
 
   ctl::open_file( out, cover_name.c_str());
   typedef ctl::parallel::Get_cover< Complex::Data> Cover_functor;
-  complex.write( out, Cover_functor());
-  ctl::close_file( out);
+  //complex.write( out, Cover_functor());
+  //ctl::close_file( out);
   return 0;
 }
