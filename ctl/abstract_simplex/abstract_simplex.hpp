@@ -1,22 +1,6 @@
 #ifndef ABSTRACT_SIMPLEX_H
 #define ABSTRACT_SIMPLEX_H
 /*******************************************************************************
-* -Academic Honesty-
-* Plagarism: The unauthorized use or close imitation of the language and 
-* thoughts of another author and the representation of them as one's own 
-* original work, as by not crediting the author. 
-* (Encyclopedia Britannica, 2008.)
-*
-* You are free to use the code according to the license below, but, please
-* do not commit acts of academic dishonesty. We strongly encourage and request 
-* that for any [academic] use of this source code one should cite one the 
-* following works:
-* 
-* \cite{hatcher, z-ct-10}
-* 
-* See ct.bib for the corresponding bibtex entries. 
-* !!! DO NOT CITE THE USER MANUAL !!!
-*******************************************************************************
 * Copyright (C) Ryan H. Lewis 2014 <me@ryanlewis.net>
 *******************************************************************************
 * Code release under BSD-3 License. See LICENSE.
@@ -27,8 +11,6 @@
 #include <iostream> //cout (debug only)
 #include <algorithm> //sort, unique
 
-//CTL
-#include <ctl/abstract_simplex/simplex_boundary.hpp>
 
 namespace ctl {
 
@@ -47,7 +29,7 @@ class Abstract_simplex {
 	private:
 	typedef std::size_t T;
 	typedef typename std::vector< T> Vector;
-	typedef Abstract_simplex< T> Self;
+	typedef Abstract_simplex Self;
 	typedef std::initializer_list< T> Init_list;
 	public:
 	//! \typedef  
@@ -134,7 +116,11 @@ class Abstract_simplex {
 	 * @return size_t
 	 */
 	size_t  dimension() const	{ return size()-1; 	  	}
-
+	/*!
+	 * Reserves as much capacity as is necessary to store
+	 * at least d elements.
+ 	 */
+	void reserve( std::size_t d){ vertices.reserve(d); }
 	/*! Returns the capacity of the simplex
 	* @return size_t
 	*/
@@ -329,9 +315,6 @@ class Abstract_simplex {
 	private:
 	Vector vertices;
 
-	//typename Self since the compiler complains
-	template< typename Term> 
-	friend class ctl::detail::const_simplex_boundary_iterator;
 }; //Abstract_simplex
 
 
@@ -345,8 +328,8 @@ class Abstract_simplex {
 *  Reads a simplex from the input stream
 * @return in
 */
-template< typename Stream, typename T>
-Stream& operator>>( Stream & in, ctl::Abstract_simplex< T> & simplex){ return simplex.read( in); }
+template< typename Stream>
+Stream& operator>>( Stream & in, ctl::Abstract_simplex & simplex){ return simplex.read( in); }
 	
 /**
 * @brief Output stream operator for a simplex
@@ -358,9 +341,9 @@ Stream& operator>>( Stream & in, ctl::Abstract_simplex< T> & simplex){ return si
 * Writes a simplex to this output stream
 * @return Stream&
 */
-template< typename Stream, typename T>
-Stream& operator<<(Stream& out, const ctl::Abstract_simplex< T>& simplex){
-	typedef typename ctl::Abstract_simplex< T>::const_iterator iterator;
+template< typename Stream>
+Stream& operator<<(Stream& out, const ctl::Abstract_simplex & simplex){
+	typedef typename ctl::Abstract_simplex::const_iterator iterator;
 	out << "[";
 	for(iterator i = simplex.begin(); i != simplex.end(); ++i){
 		out << *i;
@@ -377,8 +360,8 @@ Stream& operator<<(Stream& out, const ctl::Abstract_simplex< T>& simplex){
 * Writes a simplex to this output stream
 * @return Stream&
 */
-template< typename Stream, typename T>
-Stream& operator<<(Stream& out, const ctl::Abstract_simplex< T>&& simplex){ out << simplex; }
+template< typename Stream>
+Stream& operator<<(Stream& out, const ctl::Abstract_simplex&& simplex){ out << simplex; }
 } //namespace ctl
 
 #endif // ABSTRACT_SIMPLEX_H

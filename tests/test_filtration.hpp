@@ -1,22 +1,7 @@
 /*******************************************************************************
-* -Academic Honesty-
-* Plagarism: The unauthorized use or close imitation of the language and 
-* thoughts of another author and the representation of them as one's own 
-* original work, as by not crediting the author. 
-* (Encyclopedia Britannica, 2008.)
-*
-* You are free to use the code according to the license below, but, please
-* do not commit acts of academic dishonesty. We strongly encourage and request 
-* that for any [academic] use of this source code one should cite one the 
-* following works:
-* 
-* \cite{hatcher, z-ct-10}
-* 
-* See ct.bib for the corresponding bibtex entries. 
-* !!! DO NOT CITE THE USER MANUAL !!!
-*******************************************************************************
 * Copyright (C) Ryan H. Lewis 2014 <me@ryanlewis.net>
 *******************************************************************************
+* BSD-3
 *******************************************************************************/
 //STL
 #include <iostream>
@@ -36,7 +21,7 @@
 #include <ctl/utility/timer.hpp>
 
 //GTest
-#include <gtest/gtest.h>
+#include <catch/catch.hpp>
 
 //We build a simplicial chain complex with Z2 coefficients
 typedef ctl::Abstract_simplex< int> Simplex;
@@ -46,7 +31,7 @@ typedef ctl::Chain_complex< Simplex, Boundary> Complex;
 typedef Complex::Cell Cell;
 typedef ctl::Filtration< Complex> Filtration_cell_less;
 typedef ctl::Timer Timer;
-typedef ctl::Filtration< Complex, ctl::Id_less> Filtration_id_less;
+typedef ctl::Graded_chain_complex< Complex, ctl::Id_less> Filtration_id_less;
 
 template< typename Filtration>
 bool is_sorted( const Filtration & f){

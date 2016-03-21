@@ -1,28 +1,14 @@
 #ifndef SIMPLEX_BOUNDARY_H
 #define SIMPLEX_BOUNDARY_H
 /*******************************************************************************
-* -Academic Honesty-
-* Plagarism: The unauthorized use or close imitation of the language and 
-* thoughts of another author and the representation of them as one's own 
-* original work, as by not crediting the author. 
-* (Encyclopedia Britannica, 2008.)
-*
-* You are free to use the code according to the license below, but, please
-* do not commit acts of academic dishonesty. We strongly encourage and request 
-* that for any [academic] use of this source code one should cite one the 
-* following works:
-* 
-* \cite{hatcher, z-ct-10}
-* 
-* See ct.bib for the corresponding bibtex entries. 
-* !!! DO NOT CITE THE USER MANUAL !!!
-*******************************************************************************
 * Copyright (C) Ryan H. Lewis 2014 <me@ryanlewis.net>
 *******************************************************************************/
 //CLIB
 #include <cassert>
 
 //CTL
+#include <ctl/abstract_simplex/abstract_simplex.hpp>
+
 #include <ctl/term/term.hpp>
 #include <ctl/finite_field/finite_field.hpp>
 namespace ctl {
@@ -46,11 +32,10 @@ class const_simplex_boundary_iterator :
 		if( s.dimension()){
 		    //begin by removing first vertex
 		    cellptr = &s;
-		    removed = s.vertices[ 0];
+		    removed = s.front();
 		    face.coefficient( 1);
-		    face.cell().vertices.resize( s.dimension());
-		    std::copy( s.begin()+1, s.end(), 
-			       face.cell().vertices.begin()); 
+		    face.cell().reserve( s.dimension());
+		    face.cell().insert( s.begin()+1, s.end());  
 		}else{ cellptr = 0; } //\partial(vertex) = 0
 	}
 	//copy constructor
@@ -92,6 +77,7 @@ class const_simplex_boundary_iterator :
 		assert( cellptr != 0); 
 		return face; 
 	}
+
 	const Term* operator->() const { return &face; }
 	bool operator!=( const const_simplex_boundary_iterator & b) const { 
 		return (b.cellptr != cellptr) || (b.pos != pos); 
@@ -104,7 +90,7 @@ class const_simplex_boundary_iterator :
 			return *this;
 		}
 		//return removed vertex, get rid of another one
-		std::swap( face.cell().vertices[ pos++], removed);
+		std::swap( *(face.cell().begin()+(pos++)), removed);
 		face.coefficient( -1*face.coefficient());
 		return *this;	
 	}
@@ -115,7 +101,7 @@ class const_simplex_boundary_iterator :
 			return *this;
 		}
 		//return removed vertex, get rid of another one
-		std::swap( face.cell().vertices[ --pos], removed);
+		std::swap( *(face.cell().begin() + (--pos)), removed);
 		face.coefficient( -1*face.coefficient());
 		return *this;	
 	}
@@ -154,6 +140,8 @@ namespace ctl {
 */
 template< typename Coefficient_>
 class Simplex_boundary {
+	typedef ctl::Abstract_simplex Simplex_;
+	typedef Simplex_boundary< Coefficient_> Self;
 public:
 	//! Underlying simplex type
 	typedef Simplex_ Simplex;

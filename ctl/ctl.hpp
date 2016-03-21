@@ -24,8 +24,8 @@
 #include <ctl/finite_field/finite_field.hpp>
 
 //Chain Complex
-#include <ctl/chain_complex/chain_complex.hpp>
-#include <ctl/chain_complex/complex_boundary.hpp>
+#include <ctl/cell_complex/cell_complex.hpp>
+#include <ctl/cell_complex/complex_boundary.hpp>
 
 //Weight Data
 #include <ctl/weight_data/weight_data.hpp>
@@ -42,12 +42,12 @@
 #include <ctl/chain/chain_add.hpp>
 
 //Barcodes
-#include <ctl/barcodes/barcodes.hpp>
+//#include <ctl/barcodes/barcodes.hpp>
 
 //Filtration
-#include <ctl/filtration/filtration_boundary.hpp>
-#include <ctl/filtration/filtration.hpp>
-#include <ctl/filtration/less.hpp>
+#include <ctl/graded_chain_complex/graded_boundary.hpp>
+#include <ctl/graded_chain_complex/graded_cell_complex.hpp>
+#include <ctl/graded_chain_complex/less.hpp>
 
 //Graphs & metrics
 #include <ctl/points/points.hpp>

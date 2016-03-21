@@ -37,9 +37,13 @@
 #include <vector>
 #include <sstream>
 #include <fstream>
+#include <numeric>
 
 //CTL
-#include <detail/data_wrapper.hpp>
+#include <ctl/abstract_simplex/simplex_boundary.hpp>
+#include <ctl/cube/cube_boundary.hpp>
+#include <ctl/cell_complex/detail/data_wrapper.hpp>
+#include <ctl/hash/hash.hpp>
 
 //BOOST
 #include <boost/serialization/base_object.hpp>
@@ -163,91 +167,6 @@ public:
    	return std::make_pair( p.first, p.second+num_faces_inserted);
    }
 
-   template< typename Stream, typename Functor>
-   Stream& write( Stream& out, const Functor & f) const {
-   	out << "size " << cells.size() << std::endl;
-   	for( const auto & cell: cells){
-   	  out << cell.first.size() << " " << std::flush;
-	  cell.first.write( out);
-	  out << std::flush;
-   	  out << f( cell.second)  << std::flush;
-   	  out << std::endl;
-   	}
-	return out;
-   }
-
-   template< typename Stream>
-   inline Stream& write( Stream& out) const { 
-	out << "size " << cells.size() << std::endl;
-   	for( const auto & cell: cells){
-   	  out << cell.first.size() << " " << std::flush;
-	  cell.first.write( out);
-	  out << std::flush;
-   	  out << cell.second.id()  << std::flush;
-	  out << std::endl;  
- 	}
-	return out;
- 
-
-	ctl::identity i;
-	return write( out, i);
-   }
-   
-   template< typename Stream> 
-   Stream& read( Stream & in){
-	std::size_t line_num = 0;
-	std::string line;
-	std::size_t id=0;
-        char the_first_character = in.peek();
-	const bool headers_enabled = (the_first_character == 's');
-	if( !headers_enabled) { 
-		std::cerr << "Error: reading a file without appropriate header."
-			  << "Bailing out." << std::endl;
-	}
-	//Read the header and reserve appropriately
-        ctl::get_line( in, line, line_num);
-        std::istringstream ss( line);
-        std::string the_word_size;
-        ss >> the_word_size;
-        std::size_t the_number_of_cells;
-        ss >> the_number_of_cells;
-	reserve( the_number_of_cells);
-	std::size_t size;
-	while( ctl::get_line(in, line, line_num)){
-	     std::istringstream ss( line);
-	     Cell cell;
-	     //header enabled so read size first
-	     ss >> size;
-	     //then get the cell
-	     cell.read( ss, size);
-	     //and it's id
-	     ss >> id;
-	     Data d( id);
-	     insert_open_cell( cell, d);
-	}
-	return in;
-   }
-   template< typename Stream, typename Functor>
-   Stream& read_data( Stream & in, Functor & f){
-	typedef typename Data::Id Id;
-	typedef typename Functor::result_type Value;
-	typedef std::unordered_map< Id, Value> Value_map; 
-	std::string line;
-	std::size_t line_num = 0;
-	Value_map values( size());
-	Id id;
-	Value value;
-	while( ctl::get_line( in, line, line_num)){
-		std::istringstream ss( line);
-		ss >> id;
-		ss >> value;
-		values[ id] = value;
-	}
-	for (auto & sigma: cells) { 
-		f( sigma.second) = values[ sigma.second.id()]; 
-	}
-	return in;
-   }
    void reserve( const std::size_t n) { cells.reserve( n); }
    const std::size_t dimension() const { return max_dim; }
    const std::size_t size() const { return cells.size(); }
@@ -279,32 +198,32 @@ private:
    std::size_t max_dim;
 }; //end class Cell_complex
 
-template< typename Stream, typename Cell_,
+template< typename Stream, 
           typename Boundary_,
           typename Data_,
           typename Hash_>
 Stream& operator<<( Stream& out, 
-   const typename ctl::Cell_complex< Cell_, Boundary_, Data_, Hash_>::iterator c){ 
+   const typename ctl::Cell_complex< Boundary_, Data_, Hash_>::iterator c){ 
 	out << c->first;
 	return out;	
 }
 
-template< typename Stream, typename Cell_,
+template< typename Stream, 
           typename Boundary_,
           typename Data_,
           typename Hash_> 
 Stream& operator<<( Stream& out, 
-   const typename ctl::Cell_complex< Cell_, Boundary_, Data_, Hash_>::const_iterator c){ 
+   const typename ctl::Cell_complex< Boundary_, Data_, Hash_>::const_iterator c){ 
 	out << c->first;
 	return out;	
 }
 
-template< typename Stream, typename Cell_,
+template< typename Stream, 
           typename Boundary_,
           typename Data_,
           typename Hash_> 
 Stream& operator<<( Stream& out, 
-   const ctl::Cell_complex< Cell_, Boundary_, Data_, Hash_> & c){ 
+   const ctl::Cell_complex< Boundary_, Data_, Hash_> & c){ 
 	for(auto i = c.begin(); i != c.end(); ++i){
 		      const std::size_t id = i->second.id();
 		      out << id; 
@@ -314,56 +233,21 @@ Stream& operator<<( Stream& out,
 	return out;
 }
 
-template< typename Stream, typename Cell_,
+template< typename Stream, 
           typename Boundary_,
           typename Data_,
           typename Hash_> 
 Stream& operator<<( Stream& out, 
-		    const ctl::Cell_complex< Cell_, Boundary_, Data_, Hash_>&& c){
+		    const ctl::Cell_complex< Boundary_, Data_, Hash_>&& c){
 	out << c;
 	return out;
 }
-template< typename Stream, typename Cell_,
-          typename Boundary_,
-          typename Data_,
-          typename Hash_> 
-Stream& operator>>( Stream& in, ctl::Cell_complex< Cell_, Boundary_, Data_, Hash_> & c){  
-	return c.read( in); 
-}
 
-template< std::size_t N, typename D=ctl::Default_data>
-using Simplicial_complex = ctl::Chain_complex< ctl::Simplex_boundary< ctl::Finite_field< N> >, D>;
+template< std::size_t N, typename D=ctl::detail::Default_data>
+using Simplicial_complex = ctl::Cell_complex< ctl::Simplex_boundary< ctl::Finite_field< N> >, D>;
 
-template< std::size_t N, typename D=ctl::Default_data>
-using Cubical_complex = ctl::Chain_complex< ctl::Cube_boundary< ctl::Finite_field< N> >, D>;
-
-//! Utility to read a complex and any associated data 
-template<typename String, typename Complex, typename Functor>
-void read_complex_and_data(String & complex_name, String & data_file, 
-			   Complex & complex, Functor & f){
-	std::ifstream in;
-	std::cout << "File IO ..." << std::flush;
-	//first read the complex in
-	ctl::open_file( in, complex_name.c_str());
-	complex.read( in);
-	ctl::close_file( in);
-	//then read the data file in, e.g. weights, cover, etc..
-	ctl::open_file( in, data_file.c_str());
-	complex.read_data( in, f);	
-	ctl::close_file( in);
-	std::cout << "completed!" << std::endl;
-}
-
-//! Utility to read a complex 
-template<typename String, typename Complex>
-void read_complex(String & complex_name, Complex & complex){
-	std::ifstream in;
-	std::cout << "File IO ..." << std::flush;
-	ctl::open_file( in, complex_name.c_str());
-	complex.read( in);
-	ctl::close_file( in);
-	std::cout << "completed!" << std::endl;
-}
+template< std::size_t N, typename D=ctl::detail::Default_data>
+using Cubical_complex = ctl::Cell_complex< ctl::Cube_boundary< ctl::Finite_field< N> >, D>;
 
 } //namespace ctl
 

@@ -16,24 +16,12 @@ if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
   message(FATAL_ERROR "In-source build attempted; please clean the CMake cache and then switch to an out-of-source build, e.g., rm CMakeCache.txt && rm -Rf CMakeFiles/ && mkdir build/ && cd build/ && cmake ..")
 endif()
 
-include(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("-std=c++1y" COMPILER_SUPPORTS_CXX1y)
-CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
-CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
-if(COMPILER_SUPPORTS_CXX11)
-	add_definitions("-std=c++11")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-        message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has C++11 support.")
-else()
-        message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
-endif()
 
-#zoom zoom
 set(CMAKE_BUILD_TYPE Release)
 
 #Frame pointers are useful for profiling. 
 #Complaints and pedantry accepted here.
-add_definitions("-fno-omit-frame-pointer -pedantic -Wall -ansi -std=c++11")
+add_definitions("-fno-omit-frame-pointer -pedantic -Wall -ansi -std=c++14")
 
 #Fix issues on LINUX
 if (NOT APPLE)
@@ -44,15 +32,12 @@ endif (NOT APPLE)
 #Handle dependencies
 set(CTL_DEPS ${CMAKE_SOURCE_DIR}/dependencies)
 include( dependencies/CMakeLists.txt)
-
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 #Compile all the tools
 add_subdirectory( tools)
 
 #Compile all the tools
 add_subdirectory( tests)
-
-enable_testing()
-add_test(gtest tests/ctl_test)
 
 #All of this is for make install
 set(CTL_INCLUDE_INSTALL_DIR ${CMAKE_SOURCE_DIR}/include)

@@ -25,8 +25,8 @@
 //STL
 
 //CTL
-#include <ctl/filtration/less.hpp>
-#include <ctl/filtration/filtration_iterator.hpp>
+#include <ctl/graded_chain_complex/less.hpp>
+#include <ctl/graded_chain_complex/filtration_iterator.hpp>
 
 namespace ctl{
 template< typename Complex_, 

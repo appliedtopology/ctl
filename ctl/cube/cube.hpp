@@ -1,22 +1,6 @@
 #ifndef CUBE_H
 #define CUBE_H
 /*******************************************************************************
-* -Academic Honesty-
-* Plagarism: The unauthorized use or close imitation of the language and 
-* thoughts of another author and the representation of them as one's own 
-* original work, as by not crediting the author. 
-* (Encyclopedia Britannica, 2008.)
-*
-* You are free to use the code according to the license below, but, please
-* do not commit acts of academic dishonesty. We strongly encourage and request 
-* that for any [academic] use of this source code one should cite one the 
-* following works:
-* 
-* \cite{hatcher, z-ct-10}
-* 
-* See ct.bib for the corresponding bibtex entries. 
-* !!! DO NOT CITE THE USER MANUAL !!!
-*******************************************************************************
 * Copyright (C) Ryan H. Lewis 2014 <me@ryanlewis.net>
 * Released under BSD-3 License. See LICENSE
 *******************************************************************************
@@ -33,8 +17,6 @@
 #include <initializer_list>  // std::initializer_list
 #include <iostream> //cout (debug only)
 #include <algorithm> //swap, sort, unique
-#include <ctl/cube/cube_boundary.hpp>
-#include <ctl/cube/detail/cube.hpp>
 
 /*! \namespace ctl
 Namespace where all library functionality resides
@@ -42,12 +24,10 @@ Namespace where all library functionality resides
 namespace ctl {
 
 namespace detail{ 
-	template< typename T>
-	using Interval = std::pair< T, T>;
 } //end namespace detail
 
 /**
-* \class Cube< T>
+* \class Cube
 * This class describes an cube for a cubical chain complex.
 * While a cube is defined as a product of intervals, a cubical complex
 * does not store a vector of these. A cube is infact stored implicitly
@@ -59,14 +39,12 @@ namespace detail{
 * This object does not itself have the facility for a boundary, this is handled
 * by a separate boundary operator.
 */
-template< typename T, std::size_t D=3>
 class Cube {
 	public:
-	static constexpr int Dimension=D; 
-	typedef typename ctl::detail::Interval< T> Interval;
+	typedef typename std::pair< std::size_t, std::size_t> Interval;
 	private:
 	typedef typename std::vector< Interval> Vector;
-	typedef Cube< T> Self;
+	typedef Cube Self;
 	typedef std::initializer_list< Interval> Init_list;
 	public:
 	//! \typedef  
@@ -74,7 +52,7 @@ class Cube {
 	//! \typedef synonomous with vertex_type  
 	typedef typename Vector::value_type value_type;
 	//! \typedef The vertex type of the cube  
-	typedef T vertex_type;
+	typedef std::size_t vertex_type;
 	//! \typedef const_iterator to the cube
 	typedef typename Vector::const_iterator const_iterator;
 	//! \typedef const_reverse_iterator to the cube
@@ -89,7 +67,7 @@ class Cube {
 	//! Reserves space for at least d intervals.
 	Cube( size_t d) : dimension_(0){ intervals.reserve( d); }
 	//! Creates a vertex [t,t]
-	Cube( size_t d, const T & t): intervals( 1, Interval( t, t)), dimension_( 0){}
+	Cube( size_t d, const std::size_t & t): intervals( 1, Interval( t, t)), dimension_( 0){}
 	//! Initializer list constructor
 	Cube( const Init_list & il) : intervals( il), dimension_( 0) {
 		sort( intervals.begin(), intervals.end() );
@@ -311,13 +289,10 @@ class Cube {
 	Vector intervals;
 	size_t dimension_;
 
-	//typename Self since the compiler complains
-	template< typename Term> 
-	friend class ctl::detail::const_cube_boundary_iterator;
 }; //Cube
 
 template< typename Stream, typename T>
-Stream& operator<<( Stream & out, const ctl::Cube< T> & c){
+Stream& operator<<( Stream & out, const ctl::Cube & c){
     for( auto i = c.begin(); i != c.end(); ++i){
 	
     	out << "[" << i->first;
