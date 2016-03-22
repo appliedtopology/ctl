@@ -3,6 +3,8 @@
 *******************************************************************************
 * BSD-3
 *******************************************************************************/
+
+#include <catch/catch.hpp>
 //STL
 #include <iostream>
 
@@ -11,8 +13,10 @@
 #include <ctl/cube/cube_boundary.hpp>
 #include <ctl/term/term.hpp>
 
-/*
-TEST_CASE("FooBarCubeTest","[cube]"){
+TEST_CASE("a","b"){
+}
+	/*
+TEST_CASE("Cube", "[cube]"){
 	typedef ctl::Cube Cube;
 	typedef Cube::Interval Interval;
 	typedef ctl::Finite_field< 2> Z2;

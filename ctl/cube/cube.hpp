@@ -23,8 +23,6 @@ Namespace where all library functionality resides
 */
 namespace ctl {
 
-namespace detail{ 
-} //end namespace detail
 
 /**
 * \class Cube

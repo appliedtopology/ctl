@@ -8,6 +8,7 @@
 *
 *******************************************************************************/
 
+#include <catch/catch.hpp>
 //STL
 #include <sstream>
 #include <iostream>

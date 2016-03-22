@@ -6,6 +6,7 @@
 * BSD-3
 ******************************************************************************/
 
+#include <catch/catch.hpp>
 #include <ctl/ctl.hpp>
 
 namespace ctl{

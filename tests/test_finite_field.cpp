@@ -3,10 +3,11 @@
 * Copyright (C) Ryan H. Lewis 2014 <me@ryanlewis.net>
 *******************************************************************************
 *******************************************************************************/
+
+#include <catch/catch.hpp>
 #include <ctl/finite_field/finite_field.hpp>
 #include <iostream>
 
-//GTest
 TEST_CASE("Z2", "[finite-field]"){
 	typedef ctl::Finite_field< 2> Z2;
 	Z2  a( 1);

@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 
+#include <catch/catch.hpp>
 // Project
 #include <ctl/ctl.hpp>
 
