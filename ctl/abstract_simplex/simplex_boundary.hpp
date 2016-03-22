@@ -111,6 +111,7 @@ class const_simplex_boundary_iterator :
 		++(*this); //now call previous operator
 		return tmp;
 	}
+
 	const_simplex_boundary_iterator operator--( int){
 	 	const_simplex_boundary_iterator tmp( *this); 
 		--(*this); //now call previous operator
@@ -138,10 +139,11 @@ namespace ctl {
 * @tparam Simplex_
 * @tparam Coefficient_
 */
-template< typename Coefficient_>
+//template< typename Coefficient_>
 class Simplex_boundary {
+	typedef ctl::Finite_field<2> Coefficient_;
 	typedef ctl::Abstract_simplex Simplex_;
-	typedef Simplex_boundary< Coefficient_> Self;
+	typedef Simplex_boundary Self;
 public:
 	//! Underlying simplex type
 	typedef Simplex_ Simplex;

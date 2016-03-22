@@ -277,11 +277,11 @@ Stream& operator<<( Stream& out,
 	return out;
 }
 
-template< std::size_t N, typename D=ctl::detail::Default_data>
-using Simplicial_complex = ctl::Cell_complex< ctl::Simplex_boundary< ctl::Finite_field< N> >, D>;
+template< typename D=ctl::detail::Default_data>
+using Simplicial_complex = ctl::Cell_complex< ctl::Simplex_boundary, D>;
 
-template< std::size_t N, typename D=ctl::detail::Default_data>
-using Cubical_complex = ctl::Cell_complex< ctl::Cube_boundary< ctl::Finite_field< N> >, D>;
+template< typename D=ctl::detail::Default_data>
+using Cubical_complex = ctl::Cell_complex< ctl::Cube_boundary, D>;
 
 } //namespace ctl
 

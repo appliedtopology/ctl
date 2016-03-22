@@ -163,8 +163,9 @@ namespace ctl {
 * @tparam Cube_
 * @tparam Coefficient_
 */
-template< typename Coefficient_>
+//template< typename Coefficient_>
 class Cube_boundary {
+    typedef int Coefficient_;
 public:
     //! Underlying cube type
     typedef ctl::Cube Cube;

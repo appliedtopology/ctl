@@ -18,7 +18,7 @@
 
 typedef ctl::Abstract_simplex Simplex;
 typedef ctl::Finite_field< 2> Z2;
-typedef ctl::Simplex_boundary<Z2> Simplex_Boundary;
+typedef ctl::Simplex_boundary Simplex_Boundary;
 typedef ctl::Cell_complex< Simplex_Boundary> Complex;
 
 void usage( const char* argv){

@@ -10,8 +10,7 @@
 TEST_CASE( "Constructors", "[product-cell]"){
 
   //typedef ctl::Abstract_simplex Simplex;
-  typedef ctl::Finite_field< 2> Z2;
-  typedef ctl::Simplex_boundary< Z2> Boundary;
+  typedef ctl::Simplex_boundary Boundary;
   typedef ctl::Cell_complex< Boundary> Complex;
   // product type
   typedef ctl::Product_cell< Complex::iterator, Complex::iterator> Product;
@@ -54,8 +53,7 @@ TEST_CASE( "Constructors", "[product-cell]"){
 
 TEST_CASE("ProductBoundary", "[product-cell]"){ 
   //typedef ctl::Abstract_simplex Simplex;
-  typedef ctl::Finite_field< 2> Z2;
-  typedef ctl::Simplex_boundary<Z2> Simplex_boundary;
+  typedef ctl::Simplex_boundary Simplex_boundary;
   typedef ctl::Cell_complex< Simplex_boundary> Complex;
   // product type
   typedef ctl::Product_cell< Complex::iterator, Complex::iterator> Product;

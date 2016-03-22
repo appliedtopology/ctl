@@ -31,7 +31,7 @@ namespace po = boost::program_options;
 // Complex type
 typedef ctl::Abstract_simplex Cell;
 typedef ctl::Finite_field< 2> Z2;
-typedef ctl::Simplex_boundary< Z2> Simplex_boundary;
+typedef ctl::Simplex_boundary Simplex_boundary;
 typedef ctl::Cell_complex< Simplex_boundary, 
 			    ctl::parallel::Nerve_data> Nerve;
 typedef Nerve::iterator Nerve_iterator;

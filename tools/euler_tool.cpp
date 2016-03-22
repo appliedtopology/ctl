@@ -17,7 +17,7 @@ namespace po = boost::program_options;
 // Complex type
 typedef ctl::Abstract_simplex Simplex;
 typedef ctl::Finite_field< 2> Z2; 
-typedef ctl::Simplex_boundary< Z2> Simplex_boundary;
+typedef ctl::Simplex_boundary Simplex_boundary;
 typedef ctl::Cell_complex< Simplex_boundary> Complex;
 typedef Complex::iterator Complex_iterator;
 typedef ctl::Timer Timer;

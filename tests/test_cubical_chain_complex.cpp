@@ -21,7 +21,7 @@
 
 typedef ctl::Finite_field< 3> Z3;
 typedef ctl::Cube Cube;
-typedef ctl::Cube_boundary< Z3 > Cube_boundary;
+typedef ctl::Cube_boundary Cube_boundary;
 typedef ctl::Cell_complex< Cube_boundary> Cubical_complex;
 typedef Cubical_complex::Cell_boundary Cubical_cell_boundary;
 typedef ctl::Complex_boundary< Cubical_complex> Cubical_complex_boundary;

@@ -8,6 +8,7 @@
 #include <ctl/persistence/persistence_data.hpp>
 #include <ctl/io/io.hpp>
 #include <ctl/parallel/utility/timer.hpp>
+#include <ctl/finite_field/finite_field.hpp>
 
 //exported functionality
 namespace ctl{
@@ -89,7 +90,7 @@ void eliminate_boundaries( Persistence_data & data){
 	if( bd_cascade_tau.empty()){ return; }
 	//otherwise tau has a partner
 	const Term& tau_partner_term = bd_cascade_tau.youngest();
-   	const Coefficient& scalar = inverse( tau_partner_term.coefficient());
+   	const Coefficient& scalar = ctl::inverse( tau_partner_term.coefficient());
 	const Chain& bd_cascade_tau_partner = 
 				data.cascade_boundary_map[ tau_partner_term];
 	#ifdef DEBUG_PERSISTENCE

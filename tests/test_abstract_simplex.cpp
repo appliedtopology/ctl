@@ -48,7 +48,7 @@ TEST_CASE("InitializerListAndRemove", "[simplex]"){
 	
 TEST_CASE("SimplexBoundary", "[simplex]"){
 	typedef ctl::Abstract_simplex Simplex;
-	typedef ctl::Simplex_boundary< int> Boundary;
+	typedef ctl::Simplex_boundary Boundary;
 
 	Boundary b;
 	Simplex s{1,2,3};

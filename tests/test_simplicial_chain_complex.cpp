@@ -19,7 +19,7 @@
 
 typedef ctl::Abstract_simplex Simplex;
 typedef ctl::Finite_field< 3> Z3;
-typedef ctl::Simplex_boundary< Simplex, Z3 > Simplex_boundary;
+typedef ctl::Simplex_boundary Simplex_boundary;
 typedef ctl::Chain_complex< Simplex, Simplex_boundary> Simplicial_complex;
 typedef Simplicial_complex::Cell Cell;
 typedef ctl::Complex_boundary< Simplicial_complex> Simplicial_complex_boundary;
