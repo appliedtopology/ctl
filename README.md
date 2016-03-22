@@ -18,7 +18,7 @@ CTL has a number of dependencies. We have listed them below.
 We have made an effort to make getting an using these dependencies simple.
 
 In particular, we strongly recommend installing them on your system either
-as root or with the help of your system adminstrator via your operating systems
+as root or with the help of your system administrator via your operating systems
 package manager e.g. apt on debian based systems, yum on RHEL systems, or 
 brew/port/fink on OSX.
 
