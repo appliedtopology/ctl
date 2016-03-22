@@ -16,24 +16,17 @@ if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
   message(FATAL_ERROR "In-source build attempted; please clean the CMake cache and then switch to an out-of-source build, e.g., rm CMakeCache.txt && rm -Rf CMakeFiles/ && mkdir build/ && cd build/ && cmake ..")
 endif()
 
-
 set(CMAKE_BUILD_TYPE Release)
 
 #Frame pointers are useful for profiling. 
 #Complaints and pedantry accepted here.
 add_definitions("-fno-omit-frame-pointer -pedantic -Wall -ansi -std=c++14")
 
-#Fix issues on LINUX
-if (NOT APPLE)
-	set(DSO_FIX rt)
-	set(PTHREAD_LIBRARY pthread)
-endif (NOT APPLE)
-
 #Handle dependencies
 set(CTL_DEPS ${CMAKE_SOURCE_DIR}/dependencies)
 include( dependencies/CMakeLists.txt)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies)
+include_directories(${CTL_DEPS})
 #Compile all the tools
 add_subdirectory( tools)
 

@@ -19,7 +19,7 @@
 //CTL
 #include <ctl/ctl.hpp>
 
-#include <catch/catch.hpp>
+
 
 template<typename Blowup, typename Nerve, typename Complex>
 void factor_blowup(const Blowup & blowup,

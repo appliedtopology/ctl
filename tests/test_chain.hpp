@@ -12,13 +12,13 @@
 #include <ctl/ctl.hpp>
 
 //Catch 
-#include <catch/catch.hpp>
+
 
 
 TEST_CASE("ChainTest","[chain]"){
 
 //We build a simplicial chain complex with Z2 coefficients
-typedef ctl::Abstract_simplex Simplex;
+//typedef ctl::Abstract_simplex Simplex;
 typedef ctl::Finite_field< 2> Z2;
 typedef ctl::Simplex_boundary< Z2 > Boundary;
 typedef ctl::Cell_complex< Boundary> Complex;

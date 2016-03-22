@@ -4,16 +4,14 @@
 #include <sstream>
 
 // Project
-#include <ctl/ctl.h>
+#include <ctl/ctl.hpp>
 
-#include "gtest/gtest.h"
+TEST_CASE( "Constructors", "[product-cell]"){
 
-
-TEST_CASE( ProductCell, Constructors){
-  typedef ctl::Abstract_simplex Simplex;
+  //typedef ctl::Abstract_simplex Simplex;
   typedef ctl::Finite_field< 2> Z2;
-  typedef ctl::Simplex_boundary< Simplex, Z2> Boundary;
-  typedef ctl::Chain_complex< Simplex, Boundary> Complex;
+  typedef ctl::Simplex_boundary< Z2> Boundary;
+  typedef ctl::Cell_complex< Boundary> Complex;
   // product type
   typedef ctl::Product_cell< Complex::iterator, Complex::iterator> Product;
 
@@ -36,28 +34,28 @@ TEST_CASE( ProductCell, Constructors){
 
   // first product
   Product p1( i1, i2);
-  ASSERT_EQ( p1.dimension(), 3);
+  REQUIRE( p1.dimension() == 3);
   // copy constructor
   Product p2( p1);
-  ASSERT_EQ(p2, p1);
+  REQUIRE(p2 == p1);
 
   // assignment 
   Product p3 = p1;
-  ASSERT_EQ(p3, p1);
-  ASSERT_EQ(p2, p3);
-  ASSERT_EQ(p3.dimension(), 3);
+  REQUIRE(p3== p1);
+  REQUIRE(p2== p3);
+  REQUIRE(p3.dimension() == 3);
 
   // second one
   Product p4( i2, i1);
 
-  ASSERT_LT( p4, p2);
+  REQUIRE( p4<  p2);
 }
 
-TEST_CASE(ProductCell, ProductBoundary){ 
-  typedef ctl::Abstract_simplex Simplex;
+TEST_CASE("ProductBoundary", "[product-cell]"){ 
+  //typedef ctl::Abstract_simplex Simplex;
   typedef ctl::Finite_field< 2> Z2;
-  typedef ctl::Simplex_boundary< Simplex, Z2> Simplex_boundary;
-  typedef ctl::Chain_complex< Simplex, Simplex_boundary> Complex;
+  typedef ctl::Simplex_boundary<Z2> Simplex_boundary;
+  typedef ctl::Cell_complex< Simplex_boundary> Complex;
   // product type
   typedef ctl::Product_cell< Complex::iterator, Complex::iterator> Product;
 
@@ -96,5 +94,5 @@ TEST_CASE(ProductCell, ProductBoundary){
   // regularity
   Product_boundary::const_iterator j; // default
   j = boundary.begin( p1);  // assignable
-  ASSERT_EQ(j, boundary.begin( p1));
+  REQUIRE(j == boundary.begin( p1));
 }

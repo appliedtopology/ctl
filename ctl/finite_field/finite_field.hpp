@@ -36,9 +36,6 @@ inline std::size_t inverse(const std::size_t a, const std::size_t prime){
     return x;
 }
 
-template< std::size_t prime>
-ctl::Finite_field< prime> 
-inverse(const ctl::Finite_field< prime>& y){ return inverse(y.to_integral(), prime); }
 
 template <typename T>
 constexpr T sqrt_helper(T x, T lo, T hi)
@@ -72,9 +69,11 @@ constexpr bool is_prime_number(std::size_t i){
 }
 
 } //detail namespace
+template< std::size_t prime> 
+ctl::Finite_field< prime>
+inverse(const ctl::Finite_field< prime>& y){ return detail::inverse(y.to_integral(), prime); }
+
 } //ctl namespace
-
-
 
 //exported functionality
 namespace ctl{
@@ -108,7 +107,7 @@ class Finite_field{
 	
 	template< std::size_t N>
 	std::size_t get_number_data( const ctl::Finite_field< N> & rhs) const {
-		return mod( rhs.value());
+		return mod( rhs.to_integral());
 	}
 
 	public:
@@ -145,6 +144,11 @@ class Finite_field{
 		return *this; 
 	}
 
+	template< std::size_t N>
+	Self operator*( const ctl::Finite_field< N>& rhs) const { 
+		return Self( x*get_number_data(rhs)); 
+	}
+
 	template< typename T>
 	Self operator*( const T& rhs) const { 
 		return Self( x*get_number_data(rhs)); 
@@ -168,12 +172,12 @@ class Finite_field{
 
 	template< typename T>
 	Self operator/(const T& rhs) const{ 
-		return *this*ctl::detail::inverse( rhs); 
+		return this->operator*(ctl::inverse( rhs)); 
 	}
 
 	template< typename T>
 	Self& operator/=(const T& rhs){ 
-		*this= *this*ctl::detail::inverse( rhs); 
+		*this= this->operator*(ctl::inverse( rhs)); 
 		return *this;
 	}
 	std::size_t to_integral() const { return x; }	
@@ -195,8 +199,10 @@ Stream& operator<<( Stream & out, const Finite_field< N> && x ){
 } //namespace ctl
 
 template<typename T, std::size_t N> 
-ctl::Finite_field< N> operator* (T k, const ctl::Finite_field< N> &m) { 
-	return m * k; 
+ctl::Finite_field< N> 
+operator*(const T& k, ctl::Finite_field<N> rhs) {
+	 return rhs *= k; 
 }
+
 
 #endif //FINITE_FIELD_H

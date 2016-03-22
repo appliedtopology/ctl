@@ -11,9 +11,6 @@
 #include <ctl/abstract_simplex/simplex_boundary.hpp>
 #include <ctl/term/term.hpp>
 
-//Catch
-#include <catch/catch.hpp>
-
 TEST_CASE("DefaultConstruct", "[simplex]"){
 	typedef ctl::Abstract_simplex Simplex;
 

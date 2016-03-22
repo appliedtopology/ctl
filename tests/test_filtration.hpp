@@ -21,7 +21,7 @@
 #include <ctl/utility/timer.hpp>
 
 //GTest
-#include <catch/catch.hpp>
+
 
 //We build a simplicial chain complex with Z2 coefficients
 typedef ctl::Abstract_simplex Simplex;
