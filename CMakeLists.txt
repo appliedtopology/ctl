@@ -27,11 +27,13 @@ set(CTL_DEPS ${CMAKE_SOURCE_DIR}/dependencies)
 include( dependencies/CMakeLists.txt)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CTL_DEPS})
+include_directories(${CTL_DEPS}/pybind11-1.3/include/)
 #Compile all the tools
 add_subdirectory( tools)
 
 #Compile all the tools
 add_subdirectory( tests)
+add_subdirectory( python)
 
 #All of this is for make install
 set(CTL_INCLUDE_INSTALL_DIR ${CMAKE_SOURCE_DIR}/include)
