@@ -86,22 +86,6 @@ public:
     }
 };
 
-class iterator : public object {
-public:
-    iterator(handle obj, bool borrowed = false) : object(obj, borrowed) { ++*this; }
-    iterator& operator++() {
-        if (ptr())
-            value = object(PyIter_Next(m_ptr), false);
-        return *this;
-    }
-    bool operator==(const iterator &it) const { return *it == **this; }
-    bool operator!=(const iterator &it) const { return *it != **this; }
-    const handle &operator*() const { return value; }
-    bool check() const { return PyIter_Check(ptr()); }
-private:
-    object value;
-};
-
 NAMESPACE_BEGIN(detail)
 inline handle get_function(handle value) {
     if (value) {
@@ -142,6 +126,8 @@ public:
         return result;
     }
 
+    template <typename T> inline T cast() const { return operator object().cast<T>(); }
+
     operator bool() const {
         if (attr) {
             return (bool) PyObject_HasAttr(obj.ptr(), key.ptr());
@@ -161,18 +147,23 @@ private:
 struct list_accessor {
 public:
     list_accessor(handle list, size_t index) : list(list), index(index) { }
+
     void operator=(list_accessor o) { return operator=(object(o)); }
+
     void operator=(const handle &o) {
         // PyList_SetItem steals a reference to 'o'
         if (PyList_SetItem(list.ptr(), (ssize_t) index, o.inc_ref().ptr()) < 0)
             pybind11_fail("Unable to assign value in Python list!");
     }
+
     operator object() const {
         PyObject *result = PyList_GetItem(list.ptr(), (ssize_t) index);
         if (!result)
             pybind11_fail("Unable to retrieve value from Python list!");
         return object(result, true);
     }
+
+    template <typename T> inline T cast() const { return operator object().cast<T>(); }
 private:
     handle list;
     size_t index;
@@ -181,18 +172,23 @@ private:
 struct tuple_accessor {
 public:
     tuple_accessor(handle tuple, size_t index) : tuple(tuple), index(index) { }
+
     void operator=(tuple_accessor o) { return operator=(object(o)); }
+
     void operator=(const handle &o) {
         // PyTuple_SetItem steals a referenceto 'o'
         if (PyTuple_SetItem(tuple.ptr(), (ssize_t) index, o.inc_ref().ptr()) < 0)
             pybind11_fail("Unable to assign value in Python tuple!");
     }
+
     operator object() const {
         PyObject *result = PyTuple_GetItem(tuple.ptr(), (ssize_t) index);
         if (!result)
             pybind11_fail("Unable to retrieve value from Python tuple!");
         return object(result, true);
     }
+
+    template <typename T> inline T cast() const { return operator object().cast<T>(); }
 private:
     handle tuple;
     size_t index;
@@ -218,12 +214,6 @@ private:
 
 NAMESPACE_END(detail)
 
-inline detail::accessor handle::operator[](handle key) const { return detail::accessor(ptr(), key.ptr(), false); }
-inline detail::accessor handle::operator[](const char *key) const { return detail::accessor(ptr(), key, false); }
-inline detail::accessor handle::attr(handle key) const { return detail::accessor(ptr(), key.ptr(), true); }
-inline detail::accessor handle::attr(const char *key) const { return detail::accessor(ptr(), key, true); }
-inline iterator handle::begin() const { return iterator(PyObject_GetIter(ptr())); }
-inline iterator handle::end() const { return iterator(nullptr); }
 
 #define PYBIND11_OBJECT_CVT(Name, Parent, CheckFun, CvtStmt) \
     Name(const handle &h, bool borrowed) : Parent(h, borrowed) { CvtStmt; } \
@@ -239,6 +229,33 @@ inline iterator handle::end() const { return iterator(nullptr); }
 #define PYBIND11_OBJECT_DEFAULT(Name, Parent, CheckFun) \
     PYBIND11_OBJECT(Name, Parent, CheckFun) \
     Name() : Parent() { }
+
+class iterator : public object {
+public:
+    PYBIND11_OBJECT_DEFAULT(iterator, object, PyIter_Check)
+    iterator(handle obj, bool borrowed = false) : object(obj, borrowed) { }
+    iterator& operator++() {
+        if (ptr())
+            value = object(PyIter_Next(m_ptr), false);
+        return *this;
+    }
+    bool operator==(const iterator &it) const { return *it == **this; }
+    bool operator!=(const iterator &it) const { return *it != **this; }
+    const handle &operator*() const {
+        if (m_ptr && !value)
+            value = object(PyIter_Next(m_ptr), false);
+        return value;
+    }
+private:
+    mutable object value;
+};
+
+inline detail::accessor handle::operator[](handle key) const { return detail::accessor(ptr(), key.ptr(), false); }
+inline detail::accessor handle::operator[](const char *key) const { return detail::accessor(ptr(), key, false); }
+inline detail::accessor handle::attr(handle key) const { return detail::accessor(ptr(), key.ptr(), true); }
+inline detail::accessor handle::attr(const char *key) const { return detail::accessor(ptr(), key, true); }
+inline iterator handle::begin() const { return iterator(PyObject_GetIter(ptr())); }
+inline iterator handle::end() const { return iterator(nullptr); }
 
 class str : public object {
 public:
@@ -428,7 +445,7 @@ public:
 
 class function : public object {
 public:
-    PYBIND11_OBJECT_DEFAULT(function, object, PyFunction_Check)
+    PYBIND11_OBJECT_DEFAULT(function, object, PyCallable_Check)
     bool is_cpp_function() const {
         handle fun = detail::get_function(m_ptr);
         return fun && PyCFunction_Check(fun.ptr());
@@ -448,5 +465,12 @@ public:
         return buffer_info(view);
     }
 };
+
+inline size_t len(handle h) {
+    ssize_t result = PyObject_Length(h.ptr());
+    if (result < 0)
+        pybind11_fail("Unable to compute length of object");
+    return (size_t) result;
+}
 
 NAMESPACE_END(pybind11)

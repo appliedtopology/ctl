@@ -31,7 +31,7 @@
 #endif
 
 #define PYBIND11_VERSION_MAJOR 1
-#define PYBIND11_VERSION_MINOR 3
+#define PYBIND11_VERSION_MINOR 5
 
 /// Include Python header, disable linking to pythonX_d.lib on Windows in debug mode
 #if defined(_MSC_VER)
@@ -137,6 +137,9 @@ enum class return_value_policy : int {
     /** Automatic: copy objects returned as values and take ownership of objects
         returned as pointers */
     automatic = 0,
+    /** Automatic variant 2: copy objects returned as values and reference objects
+        returned as pointers */
+    automatic_reference,
     /** Reference the object and take ownership. Python will call the
         destructor and delete operator when the reference count reaches zero */
     take_ownership,
