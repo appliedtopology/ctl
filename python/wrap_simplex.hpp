@@ -14,16 +14,13 @@ void wrap_simplex(py::module &mod){
     .def("front", &s::front, "front vertex")
     .def("reserve", &s::reserve, "reserve capacity", py::arg("n"))
     .def("clear", &s::clear, "clear the simplex")
-    .def("dimension", &s::dimension, "dimension of simplex");
-/*  Functions left to wrap
-    'begin',
-    'end',
-    'operator!=',
-    'operator<',
-    'operator=',
-    'operator==',
-    'rbegin',
-    'read',
-    'rend',
-    'write'*/
+    .def("dimension", &s::dimension, "dimension of simplex")
+   /*
+    .def("__iter__", [](py::object obj) {
+	const s &smplx = obj.cast<const s&>();
+	return py::make_iterator(smplx.begin(), smplx.end(), obj /* <- for reference counting*/ //); 
+   // })*/
+
+    .def(py::self == py::self)
+    .def(py::self != py::self);
 }

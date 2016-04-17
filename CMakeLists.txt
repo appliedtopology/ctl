@@ -27,7 +27,7 @@ set(CTL_DEPS ${CMAKE_SOURCE_DIR}/dependencies)
 include( dependencies/CMakeLists.txt)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CTL_DEPS})
-include_directories(${CTL_DEPS}/pybind11-1.3/include/)
+include_directories(${CTL_DEPS}/pybind11/include/)
 #Compile all the tools
 add_subdirectory( tools)
 
