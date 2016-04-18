@@ -1,51 +1,9 @@
 #ifndef CTLIB_CHAIN_H
 #define CTLIB_CHAIN_H
 /*******************************************************************************
-* -Academic Honesty-
-* Plagarism: The unauthorized use or close imitation of the language and 
-* thoughts of another author and the representation of them as one's own 
-* original work, as by not crediting the author. 
-* (Encyclopedia Britannica, 2008.)
-*
-* You are free to use the code according to the license below, but, please
-* do not commit acts of academic dishonesty. We strongly encourage and request 
-* that for any [academic] use of this source code one should cite one the 
-* following works:
-* 
-* \cite{hatcher, z-ct-10}
-* 
-* See ct.bib for the corresponding bibtex entries. 
-* !!! DO NOT CITE THE USER MANUAL !!!
-*******************************************************************************
 * Copyright (C) Ryan H. Lewis 2014 <me@ryanlewis.net>
 *******************************************************************************
 * ********** BSD-3 License ****************
-* Redistribution and use in source and binary forms, with or without 
-* modification, are permitted provided that the following conditions are met:
-* 
-* 1. Redistributions of source code must retain the above copyright notice, 
-* this list of conditions and the following disclaimer.
-* 
-* 2. Redistributions in binary form must reproduce the above copyright notice, 
-* this list of conditions and the following disclaimer in the documentation 
-* and/or other materials provided with the distribution.
-* 
-* 3. Neither the name of the copyright holder nor the names of its contributors 
-* may be used to endorse or promote products derived from this software without 
-* specific prior written permission.
-* 
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
-* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
-* POSSIBILITY OF SUCH DAMAGE.
-********************************************************************************
 *******************************************************************************/
 //STL
 #include <algorithm>
@@ -158,8 +116,8 @@ public:
 		return *this;
 	}
 	
-	Coefficient& normalize() { return normalize( coeff_tag()); }
-	Coefficient& normalize( bool) const { 
+	Coefficient normalize() { return normalize( coeff_tag()); }
+	Coefficient normalize( bool) const { 
 		return normalize( coeff_tag(), 1); 
 	}
 
@@ -173,6 +131,13 @@ public:
 	template< typename Chain>
 	Chain& operator+=( const Chain& rhs){ 
 		return this->scaled_add( 1, rhs); 
+	}
+	template< typename Coeff>
+	Chain& operator*=( const Coeff& rhs){ 
+		for( Term& elt: _chain){
+			elt*=rhs;
+		}
+		return *this;
 	}
 	private:
 	template< typename Iterator, typename Persistence_data, 
@@ -293,10 +258,10 @@ public:
 	   return result;
 	}
  private:
-   Coefficient& normalize( ctl::detail::term_z2_tag) const { 
+   constexpr Coefficient normalize( ctl::detail::term_z2_tag) const { 
 	return Coefficient( 1); 
    }
-   Coefficient& normalize( ctl::detail::term_z2_tag, bool) const { 
+   constexpr Coefficient normalize( ctl::detail::term_z2_tag, bool) const { 
 	return Coefficient( 1); 
    }
    Coefficient& normalize( ctl::detail::term_non_z2_tag, bool) const  {
@@ -318,13 +283,11 @@ template< typename T, typename L>
 Chain< T, L>& operator+( const typename Chain< T, L>::Term & b, 
 				Chain< T, L> & a){ return a+b; }
 
-} //namespace ctl
 
 //\alpha*[chain] = [chain]*\alpha
 template< typename T, typename L>
 inline ctl::Chain< T, L>& operator*( const typename T::Coefficient & s, 
 			   	ctl::Chain< T, L>& c){ return c*s; }
-namespace ctl{
 template< typename Stream, typename T, typename L>
 Stream& operator<<( Stream& out, const Chain< T, L> & c){
 	if( c.empty()){

@@ -45,7 +45,7 @@ class bd_init {};
 */
 template< typename Persistence_data, typename Term, typename Scalar>
 void update_cascade( Persistence_data& data, const Term & tau, 
-		     Scalar & scalar, partner){}
+		     Scalar & scalar, detail::partner){}
 
 /**
 * @brief Updates the cascade
@@ -60,9 +60,9 @@ void update_cascade( Persistence_data& data, const Term & tau,
 */
 template< typename Persistence_data, typename Term, typename Scalar>
 void update_cascade( Persistence_data& data, const Term & tau, 
-		     Scalar & scalar, partner_and_cascade){
+		     Scalar & scalar, detail::partner_and_cascade){
    typedef typename Persistence_data::Chain Chain;
-   Chain& tau_cascade = data.cascade[ tau]; 
+   Chain& tau_cascade = data.cascade_map[ tau]; 
    data.cascade.scaled_add( scalar,  tau_cascade, data.temporary_chain);
 }
 
@@ -162,7 +162,7 @@ template< bool Remove_destroyers,
 	  typename Filtration_iterator, 
 	  typename Persistence_data>
 void initialize_cascade_data( const Filtration_iterator sigma,
-			      Persistence_data & data, bd_init, partner){
+			      Persistence_data & data, bd_init, detail::partner){
  //typedef typename Filtration_iterator::value_type Cell;
  typedef typename Persistence_data::Chain Chain;
  typedef typename Persistence_data::Cell_chain_map Cell_chain_map;
@@ -187,6 +187,36 @@ void initialize_cascade_data( const Filtration_iterator sigma,
 * @tparam Persistence_data
 * @param sigma
 * @param data
+* @param empty_bd
+* @param partner
+*/
+template< bool Remove_destroyers,
+          typename Filtration_iterator, 
+	  typename Persistence_data>
+void initialize_cascade_data( const Filtration_iterator sigma, 
+			      Persistence_data & data, empty_bd, detail::partner){
+     //typedef typename Filtration_iterator::value_type Cell;
+     typedef typename Persistence_data::Chain Chain;
+     //typedef typename Chain::value_type Term;
+     Chain& cascade_boundary = data.cascade_boundary;
+     cascade_boundary.reserve( data.bd.length( sigma));
+     for( auto i = data.bd.begin( sigma); i != data.bd.end( sigma); ++i){
+         if( !Remove_destroyers || is_creator( *i, data.cascade_boundary_map)){
+		cascade_boundary += *i; //insertion sort 
+	}
+     }
+      
+}
+
+
+/**
+* @brief Initializes cascade data
+*
+* @tparam Remove_destroyers
+* @tparam Filtration_iterator
+* @tparam Persistence_data
+* @param sigma
+* @param data
 * @param bd_init
 * @param partner_and_cascade
 */
@@ -195,7 +225,7 @@ template< bool Remove_destroyers,
 	  typename Persistence_data>
 void initialize_cascade_data( const Filtration_iterator sigma, 
 			      Persistence_data & data,
-			      bd_init, partner_and_cascade){ 
+			      bd_init, detail::partner_and_cascade){ 
   //typedef typename Filtration_iterator::value_type Cell;
   typedef typename Persistence_data::Chain Chain;
   typedef typename Persistence_data::Cell_chain_map Cell_chain_map;
@@ -209,37 +239,12 @@ void initialize_cascade_data( const Filtration_iterator sigma,
     auto i=std::remove_if( cascade.rbegin(), cascade.rend(), is_not_creator);
     cascade.erase( i, cascade.rend());
   }
-  initialize_cascade_data< Remove_destroyers>( sigma, data, bd_init(), partner());
+  initialize_cascade_data< Remove_destroyers, Filtration_iterator, Persistence_data>( sigma, data, bd_init(), detail::partner());
+
 }
 
-/**
-* @brief Initializes cascade data
-*
-* @tparam Remove_destroyers
-* @tparam Filtration_iterator
-* @tparam Persistence_data
-* @param sigma
-* @param data
-* @param empty_bd
-* @param partner
-*/
-template< bool Remove_destroyers,
-          typename Filtration_iterator, 
-	  typename Persistence_data>
-void initialize_cascade_data( const Filtration_iterator sigma, 
-			      Persistence_data & data, empty_bd, partner){
-     //typedef typename Filtration_iterator::value_type Cell;
-     typedef typename Persistence_data::Chain Chain;
-     //typedef typename Chain::value_type Term;
-     Chain& cascade_boundary = data.cascade_boundary;
-     cascade_boundary.reserve( data.bd.length( sigma));
-     for( auto i = data.bd.begin( sigma); i != data.bd.end( sigma); ++i){
-         if( !Remove_destroyers || is_creator( *i, data.cascade_boundary_map)){
-		cascade_boundary += *i; //insertion sort 
-	}
-     }
-      
-}
+
+
 
 /**
 * @brief Initializes cascade data
@@ -257,10 +262,10 @@ template< bool Remove_destroyers,
 	  typename Persistence_data>
 void initialize_cascade_data( const Filtration_iterator & cell, 
 			      Persistence_data & data, empty_bd, 
-			      partner_and_cascade){
+			      detail::partner_and_cascade){
 	typedef typename Persistence_data::Chain::Term Term;
 	data.cascade.add( Term( cell, 1)); 
-	initialize_cascade_data( Remove_destroyers, cell, data, partner());
+	initialize_cascade_data<Remove_destroyers, Filtration_iterator, Persistence_data>(cell, data, empty_bd(), detail::partner());
 }
 
 /**
@@ -274,7 +279,7 @@ void initialize_cascade_data( const Filtration_iterator & cell,
 */
 template< typename Persistence_data, typename Filtration_iterator>
 void store_cascade( const Persistence_data & data, 
-		    const Filtration_iterator & cell, partner){}	
+		    const Filtration_iterator & cell, detail::partner){}	
 
 /**
 * @brief Stores the cascade nothing to store when we don't store cascades.
@@ -286,8 +291,8 @@ void store_cascade( const Persistence_data & data,
 * @param partner
 */
 template< typename Persistence_data, typename Filtration_iterator>
-void store_scaled_cascade( Persistence_data & data, 
-			   const Filtration_iterator sigma, partner){}	
+void store_scaled_cascade( Persistence_data& data, 
+			   const Filtration_iterator sigma, detail::partner p){}	
 
 
 /**
@@ -301,7 +306,7 @@ void store_scaled_cascade( Persistence_data & data,
 */
 template< typename Persistence_data, typename Filtration_iterator>
 void store_cascade( Persistence_data & data, 
-		    const Filtration_iterator sigma, partner_and_cascade){
+		    const Filtration_iterator sigma, detail::partner_and_cascade pc){
 	data.cascade_map[ sigma].swap( data.cascade);
 }
 
@@ -317,7 +322,7 @@ void store_cascade( Persistence_data & data,
 template< typename Persistence_data, typename Filtration_iterator>
 void store_scaled_cascade( Persistence_data & data, 
 			   const Filtration_iterator sigma, 
-		           partner_and_cascade){
+		           detail::partner_and_cascade pc){
 	const auto scalar = data.cascade_boundary.normalize();
 	data.cascade *= scalar;
 	data.cascade_map[ sigma].swap( data.cascade);
@@ -375,7 +380,7 @@ pair_cells( Filtration_iterator begin, Filtration_iterator end,
 	   timer.start();
 	   //hand the column we want to operate on to our temporary.
 	   cascade_boundary_map[ sigma ].swap( data.cascade_boundary);
-	   initialize_cascade_data< Remove_destroyers>( fm[sigma], data, 
+	   initialize_cascade_data< Remove_destroyers >( fm[sigma], data, 
 						   input_policy, output_policy);
 	   #ifdef DEBUG_PERSISTENCE
 	   std::cerr << ctl::delta << "(cascade(" << (*sigma)->first << ")"

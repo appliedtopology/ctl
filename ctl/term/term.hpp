@@ -50,6 +50,11 @@ class Term {
 			coeff_ = std::move( from.coeff_);
 			return *this; 
 		}
+		template< typename Coeff>
+		Self& operator*=( const Coeff& c){
+			coeff_ *= c;
+			return *this;
+		}
 		bool operator==( const Self & from) const { 
 			return cell_ == from.cell_;
 		}
@@ -104,7 +109,8 @@ class Term< Cell_, ctl::Finite_field< 2> > {
 
 		template< typename T>
 		bool operator< ( const T & t) const { return cell_ < t.cell(); }
-	
+
+
 		Self& operator=( const Self & from) { 
 			cell_=from.cell_;
 			return *this; 
@@ -113,7 +119,13 @@ class Term< Cell_, ctl::Finite_field< 2> > {
 			cell_= std::move( from.cell_);
 			return *this; 
 		}
-
+		/**
+		 * These things aren't strictly speaking correct.
+		 */
+		template< typename T>
+		Self& operator*=( const T& c){
+			return *this;
+		}
 		template< typename T>
 		inline Self operator*( T k) const{
 			return *this;
