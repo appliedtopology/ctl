@@ -163,8 +163,12 @@ void  print_cell(Stream& out, T & t){ out << t->first; }
 
 template< typename Stream, typename Ce, typename Co>
 Stream& operator<<(Stream&out, const Term<Ce, Co>&term){
-	out << term.coefficient() << "*";
-	detail::print_cell( out, term.cell()); 
+	if( term.coefficient() != Ce(1)){
+		out << term.coefficient() << "*";
+	}
+	out << "[";
+	detail::print_cell( out, term.cell());
+        out << "]";	
 	return out;
 }
 } //namespace ctl

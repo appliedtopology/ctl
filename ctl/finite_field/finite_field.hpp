@@ -188,9 +188,9 @@ class Finite_field{
 
 template< typename Stream, std::size_t N>
 Stream& operator<<( Stream & out, const Finite_field< N> && x ){
-	int value = x.value();
-	if( x.prime()>2 && value >= x.prime()/2.0){ 
-		value = -1*(x.prime() -value);  
+	int value = x.to_integral();
+	if(N>2 && value >= N/2){ 
+		value = -1*(N -value);  
 	}
 	out << value; 
 	return out;

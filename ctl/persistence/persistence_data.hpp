@@ -32,7 +32,7 @@ struct Persistence_data {
 			  Output_policy p):
 	term_less( t), bd( bd_), cascade_boundary_map( bd_map_), 
 	cascade_map( map_), policy( p), 
-	cascade( 1), cascade_boundary(), temporary_chain() {};
+	cascade(), cascade_boundary(), temporary_chain() {};
 
 	Term_less term_less;
 	Boundary_operator bd;
