@@ -34,6 +34,10 @@ void wrap_simplex(py::module &mod){
     .def("reserve", &s::reserve, "reserve capacity", py::arg("n"))
     .def("clear", &s::clear, "clear the simplex")
     .def("dimension", &s::dimension, "dimension of simplex")
+    .def("__contains__", [](const s &smplx, const v& vtx){ 
+         return std::binary_search(smplx.begin(), smplx.end(), vtx); 
+     })
+     .def("__str__", stream_to_string<s>())
      // Essential: keep object alive while iterator exists  
     .def("__iter__", [](const s &smplx) { return py::make_iterator(smplx.begin(), smplx.end());}, py::keep_alive<0, 1>()) 
     .def(py::self == py::self)
@@ -42,4 +46,19 @@ void wrap_simplex(py::module &mod){
     py::implicitly_convertible<std::list<v>, s >();
     py::implicitly_convertible<std::set<v>, s >();
     py::implicitly_convertible<std::vector<v>, s >();
+
+    wrap_term<s, ctl::Finite_field<2>>(mod, "Term_Simplex_Z2");
+    wrap_term<s, ctl::Finite_field<3>>(mod, "Term_Simplex_Z3");
+    wrap_term<s, ctl::Finite_field<5>>(mod, "Term_Simplex_Z5");
+    
+    using b = ctl::Simplex_boundary;
+    py::class_<b>(mod, std::string("Simplex_boundary").c_str())
+    //Default no-args constructor
+    .def(py::init())
+    .def("__call__", [](const b &bd, const s& smplx) { 
+        return py::make_iterator(bd.begin(smplx), bd.end(smplx)); 
+    }, py::keep_alive<0, 1>())
+    .def("length", [](const b& bd, const s& smplx){
+        return bd.length( smplx);
+    }, "length of the boundary");
 }

@@ -121,6 +121,11 @@ class Finite_field{
 	Self& operator++(){
         	return ((*this)+=1);
 	}
+
+        Self& operator--(){
+        	return ((*this)-=1);
+	}
+
 	template< typename T>
 	Self operator+( const T& rhs) const { 
 		return Self( x+get_number_data(rhs)); 
@@ -175,6 +180,20 @@ class Finite_field{
 		return this->operator*(ctl::inverse( rhs)); 
 	}
 
+        bool operator<(const Self& rhs) const {
+            return x < rhs.x;
+        }
+        bool operator<=(const Self& rhs) const {
+            return x < rhs.x;
+        }
+        bool operator>(const Self& rhs) const {
+            return x > rhs.x;
+        }
+        bool operator>=(const Self& rhs) const {
+            return x >= rhs.x;
+        }
+
+
 	template< typename T>
 	Self& operator/=(const T& rhs){ 
 		*this= this->operator*(ctl::inverse( rhs)); 
@@ -188,6 +207,16 @@ class Finite_field{
 
 template< typename Stream, std::size_t N>
 Stream& operator<<( Stream & out, const Finite_field< N> && x ){
+	int value = x.to_integral();
+	if(N>2 && value >= N/2){ 
+		value = -1*(N -value);  
+	}
+	out << value; 
+	return out;
+}
+
+template< typename Stream, std::size_t N>
+Stream& operator<<( Stream & out, const Finite_field< N> & x ){
 	int value = x.to_integral();
 	if(N>2 && value >= N/2){ 
 		value = -1*(N -value);  

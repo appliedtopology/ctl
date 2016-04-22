@@ -15,7 +15,6 @@ run_persistence( Complex & complex, Cell_less & less, bool compute_cascade = fal
    typedef typename ctl::Offset_map< typename Filtration::iterator> Offset_map;
    typedef typename ctl::Sparse_matrix_map< Coefficient, Offset_map> Chain_map;
    
-   
    //produce a filtration
    Filtration complex_filtration( complex);
    Filtration_boundary filtration_boundary( complex_filtration);
@@ -32,13 +31,6 @@ run_persistence( Complex & complex, Cell_less & less, bool compute_cascade = fal
    ctl::persistence<Remove_destroyers>( complex_filtration.begin(), complex_filtration.end(),
                             filtration_boundary,
                             R_map, D_map, false, offset_map);
-   
-   for( auto cell_itr = complex_filtration.begin(); cell_itr != complex_filtration.end(); ++cell_itr){
-	//std::size_t offset = std::distance(complex_filtration.begin(), cell_itr);
-	std::cout << D_map[cell_itr] << std::endl;
-	std::cout << R_map[cell_itr] << std::endl;
-	std::cout << std::endl;
-   }
    } else {
 	ctl::persistence<Remove_destroyers>( complex_filtration.begin(), complex_filtration.end(),
                             		     filtration_boundary,
@@ -50,28 +42,16 @@ run_persistence( Complex & complex, Cell_less & less, bool compute_cascade = fal
 }
 
 
-template< typename Complex, bool Remove_destroyers>
-std::vector<std::size_t> 
-compute_homology( Complex & complex, bool compute_cascade=false){
+std::vector< std::size_t> 
+homology( ctl::Simplicial_complex<>& complex, bool compute_cascade=false, bool remove_destroyers=true){
+  typedef ctl::Simplicial_complex<> Complex;
   typedef ctl::Cell_less Complex_cell_less;
   Complex_cell_less less;
-  return run_persistence<Complex, Complex_cell_less, Remove_destroyers>( complex, less, compute_cascade);
+  if( remove_destroyers){
+      return run_persistence<Complex, Complex_cell_less, true>( complex, less, compute_cascade);
+  }
+  return run_persistence<Complex, Complex_cell_less, false>( complex, less, compute_cascade);
 }
-
-std::vector< std::size_t> homology( const std::list< std::list< int>>& simplices, bool compute_cascade = false, bool remove_destroyers=true){
-	typedef ctl::Cell_complex< ctl::Simplex_boundary> Complex;
-	Complex cell_complex;
-        for( auto& s : simplices){
-		ctl::Abstract_simplex sigma( s.begin(), s.end());
-		cell_complex.insert_closed_cell( sigma);
-	}
-	if( remove_destroyers){
-		return compute_homology<Complex, true>(cell_complex, compute_cascade);
-	} else {
-		return compute_homology<Complex, false>(cell_complex, compute_cascade);
-	}
-}
-
 
 // Creates a Python class for an `Abstract_simplex`. 
 void wrap_persistence(py::module &mod){

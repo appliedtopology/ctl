@@ -109,6 +109,18 @@ public:
    Cell_complex(): max_id( 0), max_dim( 0) { 
 	cells.max_load_factor( 1); 
    }
+   template< typename Iterator>
+   Cell_complex( Iterator begin, Iterator end, bool construct_closed=false): cells(), max_id(0), max_dim( 0){
+      if( construct_closed){
+        for(Iterator i = begin; i != end; ++i){
+          insert_closed_cell( *i);
+        }
+      } else {
+        for(Iterator i = begin; i != end; ++i){
+          insert_open_cell( *i);
+        }
+      }
+   }
 
    Cell_complex( Cell_boundary & bd_, const std::size_t num_cells): 
    cells( num_cells), bd( bd_), max_id( 0), max_dim( 0) {

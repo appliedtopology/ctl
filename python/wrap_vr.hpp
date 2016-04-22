@@ -34,5 +34,5 @@ vr_wrapper(py::buffer b, double epsilon, std::size_t dimension) {
 
 // Creates a Python class for an `Abstract_simplex`. 
 void wrap_vr(py::module &mod){
-  mod.def("vr", &vr_wrapper, "compute the vr complex of a set of points. returns list of simplices",  py::return_value_policy::copy);
+  mod.def("vr", &vr_wrapper, "compute the vr complex of a set of points. returns list of simplices",  py::keep_alive<0,1>());
 }

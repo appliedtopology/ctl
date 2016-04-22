@@ -26,7 +26,9 @@ class Term {
 		Term( const Cell & cell, 
 		      const Coefficient & coeff):
 			cell_( cell), coeff_( coeff) {}
-		Term( const Term & from): cell_( from.cell_),
+		Term( std::pair<Cell, Coefficient> &pair): cell_( pair.first), coeff_( pair.second) {}
+	
+                Term( const Term & from): cell_( from.cell_),
 					  coeff_( from.coeff_) {}
 
 		Term( Term && from): cell_( std::move( from.cell_)), 
@@ -99,7 +101,9 @@ class Term< Cell_, ctl::Finite_field< 2> > {
 		Term( const Self & from): cell_( from.cell_){}
 		Term( const Self && from): cell_( std::move( from.cell_)){}
 		Term( const Cell & cell): cell_( cell) {}	
-		Term( const Cell & cell, const Coefficient & coeff): 
+
+		Term( std::pair<Cell, Coefficient> &pair): cell_( pair.first) {}
+                Term( const Cell & cell, const Coefficient & coeff): 
 		cell_( cell) {}	
 		Cell& cell() { return cell_; }
 		const Cell& cell() const { return cell_; }
@@ -155,15 +159,16 @@ template<typename T>
 struct is_iterator<T, typename std::enable_if<!std::is_same<typename std::iterator_traits<T>::value_type, void>::value>::type>
 { static constexpr bool value = true; };
 
-template<typename Stream, class T, typename std::enable_if<std::is_integral<T>::value>::type* = nullptr> 
-void  print_cell(Stream& out, T & t){ out << t; }
+template<typename Stream, class T, typename std::enable_if<!is_iterator<T>::value, T>::type* = nullptr> 
+void  print_cell(Stream& out, const T & t){ out << t; }
 template<typename Stream, class T, typename std::enable_if<is_iterator<T>::value, T>::type* = nullptr> 
-void  print_cell(Stream& out, T & t){ out << t->first; }
+void  print_cell(Stream& out, const T & t){ out << t->first; }
 }
 
 template< typename Stream, typename Ce, typename Co>
-Stream& operator<<(Stream&out, const Term<Ce, Co>&term){
-	if( term.coefficient() != Ce(1)){
+Stream& 
+operator<<(Stream&out, const Term<Ce, Co>&term){
+	if( term.coefficient() != Co(1)){
 		out << term.coefficient() << "*";
 	}
 	out << "[";
