@@ -32,6 +32,13 @@ run_persistence( Complex & complex, Cell_less & less, bool compute_cascade = fal
    ctl::persistence<Remove_destroyers>( complex_filtration.begin(), complex_filtration.end(),
                             filtration_boundary,
                             R_map, D_map, false, offset_map);
+   
+   for( auto cell_itr = complex_filtration.begin(); cell_itr != complex_filtration.end(); ++cell_itr){
+	std::size_t offset = std::distance(complex_filtration.begin(), cell_itr);
+	std::cout << D_map[cell_itr] << std::endl;
+	std::cout << R_map[cell_itr] << std::endl;
+	std::cout << std::endl;
+   }
    } else {
 	ctl::persistence<Remove_destroyers>( complex_filtration.begin(), complex_filtration.end(),
                             		     filtration_boundary,

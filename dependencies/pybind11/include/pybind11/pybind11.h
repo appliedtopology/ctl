@@ -2,7 +2,7 @@
     pybind11/pybind11.h: Main header file of the C++11 python
     binding generator library
 
-    Copyright (c) 2015 Wenzel Jakob <wenzel@inf.ethz.ch>
+    Copyright (c) 2016 Wenzel Jakob <wenzel.jakob@epfl.ch>
 
     All rights reserved. Use of this source code is governed by a
     BSD-style license that can be found in the LICENSE file.
@@ -1011,6 +1011,10 @@ template <typename Iterator, typename... Extra> iterator make_iterator(Iterator 
     }
 
     return (iterator) cast(state { first, last });
+}
+
+template <typename Type, typename... Extra> iterator make_iterator(Type &value, Extra&&... extra) {
+    return make_iterator(std::begin(value), std::end(value), extra...);
 }
 
 template <typename InputType, typename OutputType> void implicitly_convertible() {

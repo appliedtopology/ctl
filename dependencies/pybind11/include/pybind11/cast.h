@@ -2,7 +2,7 @@
     pybind11/cast.h: Partial template specializations to cast between
     C++ and Python types
 
-    Copyright (c) 2015 Wenzel Jakob <wenzel@inf.ethz.ch>
+    Copyright (c) 2016 Wenzel Jakob <wenzel.jakob@epfl.ch>
 
     All rights reserved. Use of this source code is governed by a
     BSD-style license that can be found in the LICENSE file.
@@ -207,7 +207,7 @@ protected:
 
 /* Determine suitable casting operator */
 template <typename T>
-using cast_op_type = typename std::conditional<std::is_pointer<T>::value,
+using cast_op_type = typename std::conditional<std::is_pointer<typename std::remove_reference<T>::type>::value,
     typename std::add_pointer<typename intrinsic_type<T>::type>::type,
     typename std::add_lvalue_reference<typename intrinsic_type<T>::type>::type>::type;
 
@@ -241,6 +241,15 @@ protected:
     static void *copy_constructor(const void *) { return nullptr; }
 };
 
+template <typename type> class type_caster<std::reference_wrapper<type>> : public type_caster<type> {
+public:
+    static handle cast(const std::reference_wrapper<type> &src, return_value_policy policy, handle parent) {
+        return type_caster<type>::cast(&src.get(), policy, parent);
+    }
+    template <typename T> using cast_op_type = std::reference_wrapper<type>;
+    operator std::reference_wrapper<type>() { return std::ref(*((type *) this->value)); }
+};
+
 #define PYBIND11_TYPE_CASTER(type, py_name) \
     protected: \
         type value; \
@@ -251,7 +260,7 @@ protected:
         } \
         operator type*() { return &value; } \
         operator type&() { return value; } \
-        template <typename _T> using cast_op_type = pybind11::detail::cast_op_type<_T>;
+        template <typename _T> using cast_op_type = pybind11::detail::cast_op_type<_T>
 
 #define PYBIND11_DECLARE_HOLDER_TYPE(type, holder_type) \
     namespace pybind11 { namespace detail { \

@@ -6,6 +6,7 @@ find_package( MPI REQUIRED)
 find_package( TBB REQUIRED) 
 find_package( METIS REQUIRED)
 find_package( Doxygen)
+find_package( ANN)
 
 include_directories(${Boost_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIR})
@@ -19,6 +20,11 @@ set(TBB_LIBRARIES ${TBB_LIBRARIES} )
 
 include_directories(${METIS_INCLUDE_DIR})
 link_directories(${METIS_LIBRARY_DIR})
+
+include_directories(${ANN_INCLUDE_DIR})
+link_directories(${ANN_LIBRARY_DIR})
+
+
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 

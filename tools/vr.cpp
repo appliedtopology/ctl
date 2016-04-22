@@ -31,16 +31,23 @@
 #include <ctl/vr/incremental_complex.hpp> 
 
 //Graph
-typedef typename ctl::Nbhd_graph<> Graph;
 
-//Simplex
-typedef ctl::Abstract_simplex Simplex;
-typedef ctl::Finite_field< 2> Z2; 
-typedef ctl::Simplex_boundary Simplex_boundary;
-
-//Chain Complex
-typedef ctl::Chain_complex< Simplex, Simplex_boundary> Complex;
-
+template< typename Points>
+Complex compute_vr_complex(Points, double epsilon){
+	//Simplex
+	typedef typename ctl::Nbhd_graph<> Graph;
+	typedef ctl::Abstract_simplex Simplex;
+	typedef ctl::Finite_field< 2> Z2; 
+	typedef ctl::Simplex_boundary Simplex_boundary;
+	
+	//Chain Complex
+	typedef ctl::Chain_complex< Simplex, Simplex_boundary> Complex;
+	Graph graph;
+	Complex complex; 
+	ctl::epsilon_search::construct_graph(points, epsilon, graph);
+	ctl::incremental_vr( graph, complex, dimension);
+}
+ 
 
 // temporary solution until we build points.h
 typedef std::vector<double> Point;
@@ -83,13 +90,8 @@ int main (int argc, char* argv[]) {
     }
     clock.start();
     Graph graph;
-    ctl::epsilon_search::construct_graph(points, epsilon, graph);
-    clock.stop();
-    std::cerr << "# vertices = " <<  boost::num_vertices( graph) << std::endl;
-    std::cerr << "# edges = " << boost:: num_edges( graph) << std::endl;
-    std::cerr << "Graph construction: " << clock.elapsed() << std::endl;
-    clock.start();
     Complex complex; 
+    ctl::epsilon_search::construct_graph(points, epsilon, graph);
     ctl::incremental_vr( graph, complex, dimension);
     clock.stop();
     std::ofstream out( output_file.c_str());
