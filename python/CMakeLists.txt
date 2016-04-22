@@ -56,6 +56,7 @@ include_directories(${PYTHON_INCLUDE_DIR})
 
 # Create the binding library
 add_library(ctl SHARED ctl.cpp)
+target_link_libraries(ctl ${ANN_LIBRARIES})
 # Don't add a 'lib' prefix to the shared library
 set_target_properties(ctl PROPERTIES PREFIX "")
 

@@ -17,6 +17,7 @@ namespace py = pybind11;
 //#include "wrap_boundary.hpp"
 //#include "wrap_complex.hpp"
 #include "wrap_persistence.hpp"
+#include "wrap_vr.hpp"
 //## Define the module
 //This is where we actually define the `ctl` module. We'll also have a `phat` module that's written
 PYBIND11_PLUGIN(ctl) {
@@ -25,6 +26,7 @@ PYBIND11_PLUGIN(ctl) {
   //Wrap the `persistence_pairs` class
   wrap_simplex(m);
   wrap_persistence(m);
+  wrap_vr(m);
   //We're done!
   return m.ptr();
 

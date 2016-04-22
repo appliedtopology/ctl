@@ -9,7 +9,6 @@
 #include <ctl/io/io.hpp>
 #include <ctl/parallel/utility/timer.hpp>
 #include <ctl/finite_field/finite_field.hpp>
-
 //exported functionality
 namespace ctl{
 namespace detail{
@@ -62,7 +61,7 @@ template< typename Persistence_data, typename Term, typename Scalar>
 void update_cascade( Persistence_data& data, const Term & tau, 
 		     Scalar & scalar, detail::partner_and_cascade){
    typedef typename Persistence_data::Chain Chain;
-   Chain& tau_cascade = data.cascade_map[ tau]; 
+   Chain& tau_cascade = data.cascade_map[ tau];
    data.cascade.scaled_add( scalar,  tau_cascade, data.temporary_chain);
 }
 
@@ -383,7 +382,7 @@ pair_cells( Filtration_iterator begin, Filtration_iterator end,
 	   initialize_cascade_data< Remove_destroyers >( fm[sigma], data, 
 						   input_policy, output_policy);
 	   #ifdef DEBUG_PERSISTENCE
-	   std::cerr << ctl::delta << "(cascade(" << (*sigma)->first << ")"
+	   std::cerr << ctl::delta << "(cascade(" << cascade_map[sigma] << ")"
 	   	  << " = " << data.cascade_boundary << std::endl;
 	   #endif
 	   timer.stop();
