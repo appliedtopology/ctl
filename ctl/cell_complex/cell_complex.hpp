@@ -152,6 +152,16 @@ public:
    	return *this;
    }
 
+   // move assignment operator
+   bool operator==( const Cell_complex& b) const {
+        return (b.max_dim == max_dim) && (cells == b.cells);
+   }
+  // move assignment operator
+   bool operator!=( const Cell_complex& b) const {
+   	return !(b == *this);
+   }
+
+
    iterator       find_cell( const Cell & s)       { return cells.find( s); }
    const_iterator find_cell( const Cell & s) const { return cells.find( s); }
 

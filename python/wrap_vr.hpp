@@ -12,22 +12,15 @@ stupid_copy( py::buffer_info info){
 }
 
 template< typename T>
-std::list< ctl::Abstract_simplex> 
+ctl::Simplicial_complex<>
 vr_wrapper_helper(py::buffer_info info, double epsilon, std::size_t dimension){
 		auto p = stupid_copy<T>( info);
-		std::cout << "here."<< std::endl;
-		auto c = ctl::vr( p, epsilon, dimension);
-		std::list< ctl::Abstract_simplex> stupider_copy; 
-		//stupider_copy.reserve(c.size());
-		for( auto& s : c){
-			stupider_copy.push_back(s.first);
-		}
-	       return stupider_copy;	
+		return ctl::vr( p, epsilon, dimension);
 }
 
-std::list< ctl::Abstract_simplex> 
-vr_wrapper(py::buffer b, double epsilon, std::size_t dimension){
-	 py::buffer_info info = b.request();
+ctl::Simplicial_complex<>
+vr_wrapper(py::buffer b, double epsilon, std::size_t dimension) { 
+         py::buffer_info info = b.request();
 	 //TODO: ..don't copy the dataset..
 	 if (info.format == py::format_descriptor<float>::value()){
 	 	return vr_wrapper_helper< float>( info, epsilon, dimension);	
@@ -35,9 +28,7 @@ vr_wrapper(py::buffer b, double epsilon, std::size_t dimension){
 	 	return vr_wrapper_helper< double>( info, epsilon, dimension);	
 	 }else if (info.format == py::format_descriptor<int>::value()){
 	 	return vr_wrapper_helper< int>( info, epsilon, dimension);	
-	 }else if (info.format == py::format_descriptor<long>::value()){
-	 	return vr_wrapper_helper< long>( info, epsilon, dimension);	
-	 } 
+	 }
 	 throw std::runtime_error("Incompatible buffer format!"); 
 }
 
