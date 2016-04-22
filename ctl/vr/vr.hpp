@@ -36,17 +36,16 @@ ctl::Cell_complex< ctl::Simplex_boundary>
 vr(const Points& points, double epsilon, std::size_t dimension){
 	//Simplex
 	typedef typename ctl::Nbhd_graph<> Graph;
-	typedef ctl::Abstract_simplex Simplex;
-	typedef ctl::Finite_field< 2> Z2; 
-	typedef ctl::Simplex_boundary Simplex_boundary;
 	
 	//Chain Complex
 	typedef ctl::Cell_complex< ctl::Simplex_boundary> Complex;
 	Graph graph;
 	Complex complex; 
 	ctl::epsilon_search::construct_graph(points, epsilon, graph);
+	std::cout << "constructed graph." << std::endl;
 	//TODO: glue in other algorithms
 	ctl::incremental_vr( graph, complex, dimension);
+	std::cout << "vr done." << complex << std::endl;
 	return complex;
 }
 
