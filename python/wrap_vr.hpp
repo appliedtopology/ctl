@@ -1,35 +1,63 @@
 #include <ctl/vr/vr.hpp>
-template< typename T>
-std::vector< std::vector< T>> 
-stupid_copy( py::buffer_info info){
-  std::vector< std::vector< T>> p;
-  p.reserve( info.shape[0]);
-  for( int i = 0; i < info.shape[0]; ++i){
-  	std::vector< T> pt( (T*)info.ptr + i*info.shape[1], (T*)info.ptr + i*info.shape[1]);
-  	p.emplace_back( pt);
-  }
-  return p;
-}
 
 template< typename T>
-ctl::Simplicial_complex<>
-vr_wrapper_helper(py::buffer_info info, double epsilon, std::size_t dimension){
-		auto p = stupid_copy<T>( info);
-		return ctl::vr( p, epsilon, dimension);
-}
+class Matrix_view {
+    typedef T* pointer;
+    typedef T* const const_pointer;
+    public:
+    typedef T value_type;	
+    typedef pointer iterator;
+    typedef const_pointer const_iterator;    
+    typedef T& reference;
+    typedef typename std::add_const< reference>::type const_reference;
+    typedef typename std::size_t size_t;
+ 
+    public:
+    
+    Matrix_view( pointer d, size_t m, size_t n):
+    m_( m), n_( n), data_( d){}
+
+    reference operator() (size_t i, size_t j) { return data_[ at( i, j)]; }
+    const_reference operator() (size_t i, size_t j) const { return data_[ at( i, j)]; }
+
+    iterator 	   begin() { return data_; }
+    const_iterator begin() const { return data_; }
+  
+    iterator 	   end() { return data_ + m_*n_; }
+    const_iterator end() const { return data_ + m_*n_; }
+
+    iterator 	   begin( std::size_t i) { return begin() + at( i) ; }
+    const_iterator begin( std::size_t i) const { return begin() + at( i); }
+  
+    iterator 	   end( std::size_t i) { return begin() + at( i+1); }
+    const_iterator end( std::size_t i) const { return begin() + at( i+1); }
+
+    size_t m() const { return m_; }			
+    size_t n() const { return n_; }
+    
+    size_t size() const { return m_; } 
+    size_t capacity() const { return m_*n_; }
+    pointer data() { return data_; }
+    const_pointer data() const { return data_; }
+
+    private:
+    inline size_t at( size_t i, size_t j) const { return i*n_ + j; }
+    inline size_t at( size_t i) const { return i*n_; }
+
+    private:
+    size_t m_;
+    size_t n_;
+    pointer data_;
+}; //end Matrix_view class
 
 ctl::Simplicial_complex<>
-vr_wrapper(py::buffer b, double epsilon, std::size_t dimension) { 
-         py::buffer_info info = b.request();
-	 //TODO: ..don't copy the dataset..
-	 if (info.format == py::format_descriptor<float>::value()){
-	 	return vr_wrapper_helper< float>( info, epsilon, dimension);	
-	 }else if (info.format == py::format_descriptor<double>::value()){
-	 	return vr_wrapper_helper< double>( info, epsilon, dimension);	
-	 }else if (info.format == py::format_descriptor<int>::value()){
-	 	return vr_wrapper_helper< int>( info, epsilon, dimension);	
-	 }
-	 throw std::runtime_error("Incompatible buffer format!"); 
+vr_wrapper(py::array_t<double> array, double epsilon, std::size_t dimension) { 
+   auto info = array.request();
+   if( info.ndim != 2){
+    throw std::runtime_error("Number of dimensions must be two");
+   }
+   Matrix_view<double> view( (double*)info.ptr, info.shape[0], info.shape[1]);
+   return ctl::vr( view, epsilon, dimension);
 }
 
 // Creates a Python class for an `Abstract_simplex`. 

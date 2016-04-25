@@ -26,10 +26,20 @@
 
 //VR Construction
 #include <ctl/nbhd_graph/all_pairs.hpp>
-#include <ctl/nbhd_graph/epsilon_search.hpp>
+//#include <ctl/nbhd_graph/epsilon_search.hpp>
 #include <ctl/vr/incremental_complex.hpp> 
 
 namespace ctl {
+
+template< typename It1, typename It2>
+double lp( It1 begin1, It1 end1, It2 begin2, It2 end2){
+	double r = 0.0;
+	for( ; begin1 != end1; ++begin2, ++begin2){
+		double v = (*begin1 - *begin2);
+		r += v*v;
+	}
+	return r;
+}
 
 template< typename Points>
 ctl::Cell_complex< ctl::Simplex_boundary> 
@@ -41,11 +51,9 @@ vr(const Points& points, double epsilon, std::size_t dimension){
 	typedef ctl::Cell_complex< ctl::Simplex_boundary> Complex;
 	Graph graph;
 	Complex complex; 
-	ctl::epsilon_search::construct_graph(points, epsilon, graph);
-	std::cout << "constructed graph." << std::endl;
+	ctl::all_pairs::construct_graph(points, epsilon, graph);
 	//TODO: glue in other algorithms
 	ctl::incremental_vr( graph, complex, dimension);
-	std::cout << "vr done." << complex << std::endl;
 	return complex;
 }
 
