@@ -1,5 +1,6 @@
 #ifndef CTL_DATA_WRAPPER_H
 #define CTL_DATA_WRAPPER_H
+#include <utility>
 /*******************************************************************************
 * BSD-3
 *******************************************************************************
@@ -30,7 +31,7 @@ class Data_wrapper : public Data_ {
    //copy
    Data_wrapper( const Data_wrapper & from) : Data_( from), id_( from.id_){}
    //move
-   Data_wrapper( const Data_wrapper && from): Data_( std::forward( from)),
+   Data_wrapper( Data_wrapper && from): Data_( std::forward<Data_wrapper>( from)),
    	id_( std::move( from.id_)){
    }
 

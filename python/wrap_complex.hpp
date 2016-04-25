@@ -2,7 +2,12 @@
 void wrap_complex(py::module &mod){
   using s = ctl::Simplicial_complex<>;
   typedef typename s::Cell c;
-   py::class_<s>(mod, std::string("Simplicial_complex").c_str())
+  py::class_<typename s::Data>(mod, std::string("Cell_data").c_str())
+   	.def(py::init())
+        .def(py::init< typename s::Data>())
+	.def("__str__", stream_to_string< typename s::Data>());	
+ 
+  py::class_<s>(mod, std::string("Simplicial_complex").c_str())
     //Default no-args constructor
     .def(py::init())
     .def("__init__",

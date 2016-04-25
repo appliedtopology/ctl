@@ -41,9 +41,11 @@ run_persistence( Complex & complex, Cell_less & less, bool compute_cascade = fal
    return bti;
 }
 
+ 
+
 
 std::vector< std::size_t> 
-homology( ctl::Simplicial_complex<>& complex, bool compute_cascade=false, bool remove_destroyers=true){
+homology_two( ctl::Simplicial_complex<>& complex, bool compute_cascade=false, bool remove_destroyers=true){
   typedef ctl::Simplicial_complex<> Complex;
   typedef ctl::Cell_less Complex_cell_less;
   Complex_cell_less less;
@@ -53,7 +55,23 @@ homology( ctl::Simplicial_complex<>& complex, bool compute_cascade=false, bool r
   return run_persistence<Complex, Complex_cell_less, false>( complex, less, compute_cascade);
 }
 
+std::vector< std::size_t> 
+homology_one( ctl::Simplicial_complex<>& complex, bool compute_cascade=false){
+	return homology_two( complex, compute_cascade, true);
+}
+
+std::vector< std::size_t> 
+homology( ctl::Simplicial_complex<>& complex){
+	return homology_two( complex, false, true);
+}
+
+
+
+
+
 // Creates a Python class for an `Abstract_simplex`. 
 void wrap_persistence(py::module &mod){
+  mod.def("homology", &homology_two, "compute the homology of the list of simplices");
+  mod.def("homology", &homology_one, "compute the homology of the list of simplices");
   mod.def("homology", &homology, "compute the homology of the list of simplices");
 }
