@@ -45,11 +45,6 @@
 #include <ctl/parallel/partition_covers/covers.hpp>
 #include <ctl/parallel/partition_covers/cover_data.hpp>
 
-//Blowup
-#include <ctl/product_cell/product_boundary.hpp>
-#include <ctl/product_cell/product_cell.hpp>
-#include <ctl/parallel/build_blowup_complex/build_blowup_complex.hpp>
-
 //Persistence 
 #include <ctl/chain/chain.hpp>
 #include <ctl/persistence/compute_betti.hpp>

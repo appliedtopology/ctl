@@ -43,8 +43,8 @@
 #include <ctl/parallel/partition_covers/cover_data.hpp>
 
 //Blowup
-#include <ctl/product_cell/product_boundary.hpp>
-#include <ctl/product_cell/product_cell.hpp>
+#include <ctl/product_cell/iterator_product_boundary.hpp>
+#include <ctl/product_cell/iterator_product_cell.hpp>
 #include <ctl/product_cell/product_cell_less.hpp>
 #include <ctl/parallel/build_blowup_complex/build_blowup_complex.hpp>
 
@@ -96,9 +96,10 @@ typedef ctl::Complex_boundary< Complex> Complex_boundary;
 
 typedef ctl::Complex_boundary< Nerve> Nerve_boundary;
 
-typedef ctl::Product_cell< Nerve_iterator,  Complex_iterator> Product;
+typedef ctl::Iterator_product_cell< Nerve_iterator,  Complex_iterator> Product;
 
-typedef ctl::Product_boundary< Product, Nerve_boundary, Complex_boundary> 
+
+typedef ctl::Iterator_product_boundary< Product, Nerve_boundary, Complex_boundary> 
 							 Product_boundary;
 
 typedef ctl::parallel::Cell_complex< Product_boundary, 

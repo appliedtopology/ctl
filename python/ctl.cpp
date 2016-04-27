@@ -30,6 +30,7 @@ stream_to_string(){
 #include "wrap_complex.hpp"
 #include "wrap_persistence.hpp"
 #include "wrap_vr.hpp"
+#include "wrap_product.hpp"
 
 //## Define the module
 //This is where we actually define the `ctl` module. We'll also have a `phat` module that's written
@@ -44,6 +45,7 @@ PYBIND11_PLUGIN(ctl) {
   wrap_ff<11>(m);
   wrap_simplex(m);
   //wrap_cube(m);
+  wrap_product(m);
   wrap_complex(m);
   wrap_persistence(m);
   wrap_vr(m);
