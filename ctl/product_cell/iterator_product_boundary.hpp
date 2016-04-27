@@ -154,7 +154,7 @@ class const_product_boundary_iterator :
 namespace ctl { 
 template< typename Product_, typename Boundary1_, typename Boundary2_, 
 	  typename Coefficient = typename Boundary1_::Coefficient>
-class Product_boundary {
+class Iterator_product_boundary {
 public:
 	typedef Product_ Product;
 	typedef Product Cell;
@@ -168,26 +168,26 @@ public:
 	//none since we store references.
 
 	//initialization constructor
-	Product_boundary( const Boundary1 & b1, const Boundary2 & b2): 
+	Iterator_product_boundary( const Boundary1 & b1, const Boundary2 & b2): 
 	bd1( b1), bd2( b2) {};	
 
 	//copy constructor	
-	Product_boundary( const Product_boundary & from): 
+	Iterator_product_boundary( const Iterator_product_boundary & from): 
 	bd1( from.bd1), bd2( from.bd2) {};
 	
 	//copy constructor	
-	Product_boundary( const Product_boundary && from): 
+	Iterator_product_boundary( const Iterator_product_boundary && from): 
 	bd1( std::move( from.bd1)), 
 	bd2( std::move( from.bd2)) {};
 	
 	//assignment operator
-	Product_boundary& operator=( const Product_boundary & from){
+	Iterator_product_boundary& operator=( const Iterator_product_boundary & from){
 		bd1 = from.bd1;
 		bd2 = from.bd2;
 		return *this;
 	}
 	//move operator
-	Product_boundary& operator=( Product_boundary && from){
+	Iterator_product_boundary& operator=( Iterator_product_boundary && from){
 		std::swap( bd1, from.bd1);
 		std::swap( bd2, from.bd2);
 		return *this;
@@ -208,7 +208,7 @@ public:
 	private:
 	const Boundary1& bd1;
 	const Boundary2& bd2;
-}; //Product_boundary
+}; //Iterator_product_boundary
 
 } // namespace ctl
 
