@@ -112,7 +112,7 @@ public:
    }
    template< typename Iterator,
 	   typename std::enable_if< std::is_default_constructible<Cell_boundary>::value , int>::type = 0>
-   Cell_complex( Iterator begin, Iterator end, bool construct_closed=false): cells(), max_id(0), max_dim( 0){
+   Cell_complex( Iterator begin, Iterator end, bool construct_closed=true): cells(), max_id(0), max_dim( 0){
       if( construct_closed){
         for(Iterator i = begin; i != end; ++i){
           insert_closed_cell( *i);
