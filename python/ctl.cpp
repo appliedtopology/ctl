@@ -26,7 +26,7 @@ stream_to_string(){
 #include "wrap_ff.hpp"
 #include "wrap_term.hpp"
 #include "wrap_simplex.hpp"
-#include "wrap_cube.hpp"
+//#include "wrap_cube.hpp"
 #include "wrap_complex.hpp"
 #include "wrap_persistence.hpp"
 #include "wrap_vr.hpp"
@@ -43,7 +43,7 @@ PYBIND11_PLUGIN(ctl) {
   wrap_ff<7>(m);
   wrap_ff<11>(m);
   wrap_simplex(m);
-  wrap_cube(m);
+  //wrap_cube(m);
   wrap_complex(m);
   wrap_persistence(m);
   wrap_vr(m);

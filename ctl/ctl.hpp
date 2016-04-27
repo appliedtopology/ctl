@@ -50,8 +50,6 @@
 #include <ctl/graded_chain_complex/less.hpp>
 
 //Graphs & metrics
-#include <ctl/points/points.hpp>
-#include <ctl/metrics/metric.hpp>
 #include <ctl/nbhd_graph/all_pairs.hpp>
 #include <ctl/nbhd_graph/epsilon_search.hpp>
 #include <ctl/nbhd_graph/nbhd_graph.hpp>

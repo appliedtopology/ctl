@@ -30,7 +30,6 @@ void compute_betti( const Complex & complex,
 		betti[ cell->first.dimension()-(!c)] += (2*c -1);
        }
        _betti.swap( betti);
-	_betti.resize(complex.dimension());
 }
 
 template< typename Betti, 
@@ -51,7 +50,6 @@ void compute_betti( Filtration & filtration,
 	       betti[ (*cell)->first.dimension()-(!c)] += (2*c -1);
        }
 	_betti.swap( betti);
-	_betti.resize(complex.dimension());
 }
 
 

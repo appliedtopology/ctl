@@ -63,7 +63,11 @@ class Abstract_simplex {
 	//!  Range constructor 
 	template< typename Iterator>
 	Abstract_simplex( const Iterator begin, 
-			  const Iterator end): vertices( begin, end){}
+			  const Iterator end): vertices( begin, end){
+		sort( vertices.begin(), vertices.end() );
+		vertices.erase( unique( vertices.begin(), vertices.end() ), 
+				vertices.end() );
+	}
 	//! Copies the data from one simplex to another
 	Abstract_simplex( const Self & from): vertices( from.vertices){}
 	//! Moves the data from one simplex to another

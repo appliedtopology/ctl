@@ -289,8 +289,7 @@ class Cube {
 
 }; //Cube
 
-template< typename Stream, typename T>
-Stream& operator<<( Stream & out, const ctl::Cube & c){
+std::ostream& operator<<( std::ostream & out, const ctl::Cube & c){
     for( auto i = c.begin(); i != c.end(); ++i){
 	
     	out << "[" << i->first;
