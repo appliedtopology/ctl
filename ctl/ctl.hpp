@@ -59,6 +59,8 @@
 //VR
 #include <ctl/vr/incremental_complex.hpp>
 
+#include <ctl/cover/cover.hpp>
+
 //Facilities for extracting the one_skeleton
 #include <ctl/one_skeleton/complex_to_graph.hpp>
 #include <ctl/one_skeleton/graph_to_metis.hpp>

@@ -14,7 +14,7 @@
 #include <utility> //std::pair, and piecewise_construct
 #include <tuple> //std::pair, and piecewise_construct
 #include <iostream> //cout (debug only)
-#include <ctl/product_cell/product_boundary.hpp>
+#include <ctl/product_cell/iterator_product_boundary.hpp>
 #include <ctl/hash/hash.hpp>
 
 namespace ctl {

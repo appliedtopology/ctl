@@ -9,7 +9,7 @@ void wrap_product(py::module &mod){
     .def("dimension", &s::dimension, "dimension")
     .def("__str__", stream_to_string<s>())
     .def("first_cell", &s::first_cell, "first cell")
-    .def("second_cell", &s::first_cell, "second cell")
+    .def("second_cell", &s::second_cell, "second cell")
     .def(py::self == py::self)
     .def(py::self != py::self)
     .def(py::self < py::self);
@@ -18,7 +18,7 @@ void wrap_product(py::module &mod){
     wrap_term<s, ctl::Finite_field<3>>(mod, "Term_Product_Z3");
     wrap_term<s, ctl::Finite_field<5>>(mod, "Term_Product_Z5");
     
-    using b = ctl::Product_boundary< s, ctl::Simplex_boundary, ctl::Simplex_boundary> ;
+    using b = ctl::Product_boundary< ctl::Simplex_boundary, ctl::Simplex_boundary> ;
     py::class_<b>(mod, std::string("Simplex_product_boundary").c_str())
     //Default no-args constructor
     .def(py::init())

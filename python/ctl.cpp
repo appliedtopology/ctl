@@ -7,34 +7,12 @@
 //Additional support for operators and numpy
 #include <pybind11/operators.h>
 #include <pybind11/numpy.h>
+#include <pybind11/functional.h>
 
 //All the things we're going to wrap
 #include <ctl/ctl.hpp>
 
 namespace py = pybind11;
-std::string hex( unsigned int c )
-{
-    std::ostringstream stm ;
-    stm << '%' << std::hex << std::uppercase << c ;
-    return stm.str() ;
-}
-
-std::string encode( const std::string& str )
-{
-    static const std::string unreserved = "0123456789"
-                                            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                            "abcdefghijklmnopqrstuvwxyz"
-                                            "-_.~" ;
-    std::string result ;
-
-    for( unsigned char c : str )
-    {
-        if( unreserved.find(c) != std::string::npos ) result += c ;
-        else result += hex(c) ;
-    }
-    return result;
-
-}
 
 template< typename T>
 std::function<std::string(const T&)> 
@@ -54,6 +32,36 @@ stream_to_string(){
 #include "wrap_persistence.hpp"
 #include "wrap_vr.hpp"
 #include "wrap_product.hpp"
+#include "wrap_prod_complex.hpp"
+
+decltype(auto)
+sc_open_star_cover( ctl::Simplicial_complex<>& sc, 
+		    std::function< std::size_t(std::size_t)>& f){
+	return ctl::open_star_cover( sc, f);
+}
+
+decltype(auto)
+make_blowup_impl( ctl::Simplicial_complex<>& K,  std::vector< ctl::Abstract_simplex>& sc){
+	typedef ctl::Prod_simplicial_complex Blowup;
+	typedef typename Blowup::Cell Product_cell;
+	Blowup blowup;
+	std::size_t index = 0;
+	//std::cout << K.size() << " " << sc.size() << std::endl; 
+	for( const auto & sigma : K){
+		const auto& tau = sc[index];
+		//std::cout << "sigma: " << sigma.first << " " << "tau: " << tau << std::endl;
+		Product_cell pd( sigma.first, tau);
+		blowup.insert_closed_cell( pd);
+	        index++;	
+	}
+	return blowup;
+}
+
+decltype(auto)
+make_blowup( ctl::Simplicial_complex<>& K,  std::list< ctl::Abstract_simplex>& sc){
+	std::vector< ctl::Abstract_simplex> wtf( std::begin(sc), std::end(sc));
+	return make_blowup_impl(K, wtf);
+}
 
 //## Define the module
 //This is where we actually define the `ctl` module. We'll also have a `phat` module that's written
@@ -70,8 +78,11 @@ PYBIND11_PLUGIN(ctl) {
   //wrap_cube(m);
   wrap_product(m);
   wrap_complex(m);
+  wrap_prod_complex(m);
   wrap_persistence(m);
   wrap_vr(m);
+  m.def("open_star_vtx_cover", &sc_open_star_cover, "produce a cover and nerve where the open star of vertex `i` in the complex is put into set f[i]");
+  m.def("make_blowup", &make_blowup, "produce a blowup of the input complex and corresponding nerve");
   //We're done!
   return m.ptr();
 

@@ -13,6 +13,7 @@
 //CTL
 #include <ctl/term/term.hpp>
 #include <ctl/finite_field/finite_field.hpp>
+#include <ctl/product_cell/product_cell.hpp>
 
 //non-exported functionality
 namespace {
@@ -86,6 +87,7 @@ class const_product_boundary_iterator :
 	const_product_boundary_iterator operator++( int){
 	 	const_product_boundary_iterator tmp( *this); 
 		++(*this); //now call previous operator
+		std::cout << &(tmp->cell().first_cell()) << " " << &(tmp->cell().second_cell()) << std::endl;
 		return tmp;
 	}
 	protected: 
@@ -109,8 +111,8 @@ class const_product_boundary_iterator :
 		cellptr = 0;
 		face1 = end1;
 		face2 = end2;
-		face.cell().first  = end1->cell();
-		face.cell().second = end2->cell();
+		face.cell().first.clear();
+		face.cell().second.clear();
 		sign = 0;
 		face.coefficient( 1);
 	}
@@ -126,14 +128,17 @@ class const_product_boundary_iterator :
 } //END private namespace
 
 namespace ctl { 
-template< typename Product_, typename Boundary1_, typename Boundary2_, 
+template< typename Boundary1_, typename Boundary2_, 
 	  typename Coefficient = typename Boundary1_::Coefficient>
 class Product_boundary {
 public:
-	typedef Product_ Product;
-	typedef Product Cell;
 	typedef Boundary1_ Boundary1;
 	typedef Boundary2_ Boundary2;
+	typedef ctl::Product_cell< typename Boundary1::Cell, 
+				   typename Boundary2::Cell> Product;
+	typedef typename Product::Hash Hash;
+
+	typedef Product Cell;
 	typedef typename Boundary1::Term::template 
 			rebind< Product, Coefficient>::T Term;
 	typedef const_product_boundary_iterator< Term, Boundary1, Boundary2, Coefficient> const_iterator;

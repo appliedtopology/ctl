@@ -59,8 +59,8 @@ run_persistence( Complex & complex, Cell_less & less, bool compute_cascade = fal
    }
 }
 
-decltype(auto) homology_two( ctl::Simplicial_complex<>& complex, bool compute_cascade=false, bool remove_destroyers=true){
-  typedef ctl::Simplicial_complex<> Complex;
+template< typename Complex>
+decltype(auto) homology_two_impl( Complex& complex, bool compute_cascade=false, bool remove_destroyers=true){
   typedef ctl::Cell_less Complex_cell_less;
   Complex_cell_less less;
   if( remove_destroyers){
@@ -68,13 +68,52 @@ decltype(auto) homology_two( ctl::Simplicial_complex<>& complex, bool compute_ca
   }
   return run_persistence<Complex, Complex_cell_less, false>( complex, less, compute_cascade);
 }
-decltype(auto) homology_one( ctl::Simplicial_complex<>& complex, bool compute_cascade=false) { return homology_two( complex, compute_cascade, true); }
 
-std::vector< std::size_t> homology( ctl::Simplicial_complex<>& complex){ return homology_two( complex, false, true).first; }
+template< typename Complex>
+decltype(auto) homology_one_impl( Complex& complex, bool compute_cascade=false) 
+{ return homology_two_impl( complex, compute_cascade, true); }
+
+
+template< typename Complex>
+decltype(auto) 
+homology_impl( Complex& complex) 
+{ return homology_two_impl( complex, false, true).first; }
+
+
+decltype(auto) 
+homology_sc( ctl::Simplicial_complex<>& complex)
+{ return homology_impl( complex); }
+
+decltype(auto) 
+homology_one_sc( ctl::Simplicial_complex<>& complex, bool cc)
+{ return homology_one_impl( complex, cc); }
+
+
+decltype(auto) 
+homology_two_sc( ctl::Simplicial_complex<>& complex, bool cc, bool rd)
+{ return homology_two_impl( complex, cc, rd); }
+
+decltype(auto) 
+homology_pd( ctl::Prod_simplicial_complex& complex)
+{ return homology_impl( complex); }
+
+decltype(auto) 
+homology_one_pd( ctl::Prod_simplicial_complex& complex, bool cc)
+{ return homology_one_impl( complex, cc); }
+
+
+decltype(auto) 
+homology_two_pd( ctl::Prod_simplicial_complex& complex, bool cc, bool rd)
+{ return homology_two_impl( complex, cc, rd); }
+
 
 // Creates a Python class for an `Abstract_simplex`. 
 void wrap_persistence(py::module &mod){
-  mod.def("homology", &homology_two, "compute the homology of the list of simplices");
-  mod.def("homology", &homology_one, "compute the homology of the list of simplices");
-  mod.def("homology", &homology, "compute the homology of the list of simplices");
+  mod.def("homology", &homology_two_sc, "compute the homology of the list of simplices");
+  mod.def("homology", &homology_one_sc, "compute the homology of the list of simplices");
+  mod.def("homology", &homology_sc, "compute the homology of the list of simplices");
+
+  mod.def("homology", &homology_two_pd, "compute the homology of the list of products of simplices");
+  mod.def("homology", &homology_one_pd, "compute the homology of the list of products of simplices");
+  mod.def("homology", &homology_pd, "compute the homology of the list of products of simplices");
 }

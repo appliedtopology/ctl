@@ -306,6 +306,12 @@ using Simplicial_complex = ctl::Cell_complex< ctl::Simplex_boundary, D>;
 
 template< typename D=ctl::detail::Default_data>
 using Cubical_complex = ctl::Cell_complex< ctl::Cube_boundary, D>;
+template< typename Bd1, typename Bd2>
+using Product_complex = ctl::Cell_complex< ctl::Product_boundary< Bd1, Bd2>, 
+      					   ctl::detail::Default_data, 
+					   typename ctl::Product_boundary< Bd1, Bd2>::Hash >;
+using Prod_simplicial_complex = Product_complex< ctl::Simplex_boundary, ctl::Simplex_boundary>;
+using Cube_simplicial_product_complex = Product_complex< ctl::Cube_boundary, ctl::Simplex_boundary>;
 
 } //namespace ctl
 
