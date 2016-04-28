@@ -80,7 +80,7 @@ class const_simplex_boundary_iterator :
 
 	const Term* operator->() const { return &face; }
 	bool operator!=( const const_simplex_boundary_iterator & b) const { 
-		return (b.cellptr != cellptr) || (b.pos != pos); 
+		return !(*this == b);
 	}
 
 	const_simplex_boundary_iterator& operator++(){

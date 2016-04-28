@@ -36,7 +36,7 @@ void wrap_complex(py::module &mod){
     .def("size", &s::size, "number of simplices")
     .def("__len__", &s::size)
      .def("__contains__", [](const s &cmplx, const s::Cell& c){ 
-         return (cmplx.find_cell( c) == cmplx.end()); 
+         return (cmplx.find_cell( c) != cmplx.end()); 
      })
     .def("is_closed", &s::is_closed, "check if all faces of all simplices exist")
     .def("__iter__", [](const s &c) { 

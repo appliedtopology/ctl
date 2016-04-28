@@ -346,11 +346,16 @@ Stream& operator>>( Stream & in, ctl::Abstract_simplex & simplex){ return simple
 * @return Stream&
 */
 std::ostream& operator<<(std::ostream& out, const ctl::Abstract_simplex& simplex){
-	out << "[";
-	for(auto i = simplex.begin(); i != simplex.begin()+simplex.dimension(); ++i){
-		out << *i << ", ";
+	out << "[" << std::flush;
+	if( simplex.size() != 0) {
+		for(auto i = simplex.begin(); i != simplex.begin()+simplex.dimension(); ++i){
+			out << *i << ", ";
+		}
+		if( simplex.rbegin() != simplex.rend()){
+			out << *(simplex.rbegin()); 
+		}
 	}
-	out << *(simplex.rbegin()) << "]";
+	out << "]" << std::flush;
 	return out;
 }
 

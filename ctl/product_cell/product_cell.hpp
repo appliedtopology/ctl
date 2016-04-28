@@ -7,9 +7,7 @@
 ******************************************************************************/
 /* NOTES:
 * This product cell design is a pair< Cell1, Cell2>
-* For space concerns, we represent Cell1 and Cell2 as _iterators_
-* - Of course, stylistically, it would be good for Product_cell, to allow for Cell1/Cell2 to truly be 
-    the value type of these iterators
+* This product_cell stores explicit factor cells, if space is a concern, consider Iterator_product_cell< Cell1, Cell2>
 */
 #include <utility> //std::pair, and piecewise_construct
 #include <tuple> //std::pair, and piecewise_construct
@@ -30,10 +28,10 @@ class Product_cell : public std::pair< Cell1_ , Cell2_> {
 	public:
 
 	//default
-	Product_cell() {};
+	Product_cell() : Pair() {};
 
 	//copy
-	Product_cell( const Product_cell & from) : Pair( from) {}	
+	Product_cell( const Product_cell & from) : Pair( from) { }
 
 	//standard
 	Product_cell( const Cell1 & cell1, 
@@ -56,7 +54,7 @@ class Product_cell : public std::pair< Cell1_ , Cell2_> {
 
 	//Assignment
 	Self& operator=( const Self & b) { 
-		Pair::operator=( b); 
+		Pair::operator=( b);
 		return *this;
 	}
 

@@ -1,5 +1,5 @@
-#ifndef PRODUCT_CELL_H
-#define PRODUCT_CELL_H
+#ifndef ITERATOR_PRODUCT_CELL_H
+#define ITERATOR_PRODUCT_CELL_H
 /*******************************************************************************
 * Copyright (C) Ryan H. Lewis 2014 <me@ryanlewis.net>
 *******************************************************************************
@@ -121,4 +121,4 @@ Stream& operator<<(Stream& out, const Iterator_product_cell< T1, T2> & alpha){
 
 } // namespace ctl
 
-#endif //PRODUCT_CELL_H
+#endif //ITERATOR_PRODUCT_CELL_H

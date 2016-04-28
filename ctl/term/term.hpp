@@ -170,10 +170,12 @@ Stream&
 operator<<(Stream&out, const Term<Ce, Co>&term){
 	if( term.coefficient() != Co(1)){
 		out << term.coefficient() << "*";
+        	out << "[";	
 	}
-	out << "[";
 	detail::print_cell( out, term.cell());
-        out << "]";	
+	if( term.coefficient() != Co(1)){
+        	out << "]";	
+	}
 	return out;
 }
 } //namespace ctl

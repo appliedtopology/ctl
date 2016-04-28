@@ -12,6 +12,29 @@
 #include <ctl/ctl.hpp>
 
 namespace py = pybind11;
+std::string hex( unsigned int c )
+{
+    std::ostringstream stm ;
+    stm << '%' << std::hex << std::uppercase << c ;
+    return stm.str() ;
+}
+
+std::string encode( const std::string& str )
+{
+    static const std::string unreserved = "0123456789"
+                                            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                            "abcdefghijklmnopqrstuvwxyz"
+                                            "-_.~" ;
+    std::string result ;
+
+    for( unsigned char c : str )
+    {
+        if( unreserved.find(c) != std::string::npos ) result += c ;
+        else result += hex(c) ;
+    }
+    return result;
+
+}
 
 template< typename T>
 std::function<std::string(const T&)> 

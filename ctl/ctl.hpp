@@ -15,6 +15,8 @@
 #include <ctl/io/io.hpp>
 
 //Product Cell
+#include <ctl/product_cell/iterator_product_boundary.hpp>
+#include <ctl/product_cell/iterator_product_cell.hpp>
 #include <ctl/product_cell/product_boundary.hpp>
 #include <ctl/product_cell/product_cell.hpp>
 #include <ctl/product_cell/product_cell_less.hpp>
