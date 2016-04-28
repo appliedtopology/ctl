@@ -8,8 +8,15 @@ void wrap_product(py::module &mod){
 
     .def("dimension", &s::dimension, "dimension")
     .def("__str__", stream_to_string<s>())
-    .def("first_cell", &s::first_cell, "first cell")
-    .def("second_cell", &s::second_cell, "second cell")
+    .def("first_cell", [](const s& product){
+			return product.first_cell();
+ 	 },
+	"first cell", py::keep_alive<0,1>())
+    
+    .def("second_cell", [](const s& product){
+			return product.second_cell();
+ 	 },
+	"second cell", py::keep_alive<0,1>())
     .def(py::self == py::self)
     .def(py::self != py::self)
     .def(py::self < py::self);
