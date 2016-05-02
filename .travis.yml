@@ -59,6 +59,7 @@ matrix:
       env: CCOMPILER='clang' CXXCOMPILER='clang++' 
 
 before_install:
+    - |
     if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
       sudo apt-get install libann-dev
     elif [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
