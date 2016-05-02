@@ -72,7 +72,7 @@ before_install:
                 export CC=${COMPILER} CXX=${COMPILER}
         elif [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
                 brew tap homebrew/science
-                brew install cmake mpich tbb boost ann
+                brew install cmake mpich tbb boost ann metis
                 export CC=${CCOMPILER} CXX=${CXXCOMPILER}
         fi
 
