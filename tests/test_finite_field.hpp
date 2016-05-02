@@ -51,3 +51,8 @@ TEST(FiniteField,Z11){
 		ASSERT_EQ(c/c,Z11(1));
 	}
 }
+
+TEST(FiniteField,InverterClass) {
+  ctl::detail::Inverter< 3 > inverter;
+  ASSERT_EQ(inverter.inverse(2), 2);
+}

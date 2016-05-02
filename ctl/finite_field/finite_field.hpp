@@ -18,13 +18,14 @@
 * !!! DO NOT CITE THE USER MANUAL !!!
 *******************************************************************************
 * Copyright (C) Ryan H. Lewis 2014 <me@ryanlewis.net>
+*               Mikael Vejdemo-Johansson 2016 <mikael@johanssons.org>
 *******************************************************************************
 * Released under BSD-3 License. See LICENSE
 *******************************************************************************/
 #include <iostream>
+#include <array>
 
 //TODO: Ensure things here are efficient.
-//TODO: possibly provide a generic multiplication table 
 //TODO: Specialize for N=2
 
 //forward declarations
@@ -57,6 +58,43 @@ std::size_t inverse( const ctl::Finite_field< N> & x, const std::size_t prime){
 	return inverse( x.value(), prime); 
 }
 
+  // Singleton carrying the inversion lookup table
+  template< std::size_t _prime>
+  class InverterTable {
+  private:
+    std::array< std::size_t, _prime > _inversion_table = {{0}};
+
+    InverterTable< _prime >( ) {
+      for(std::size_t i=1; i<_prime; i++) {
+        _inversion_table[i] = ctl::detail::inverse(i, _prime);
+      }
+    };
+
+    InverterTable< _prime >(InverterTable< _prime > const&);
+    void operator=(InverterTable< _prime > const&);
+
+  public:
+    static InverterTable< _prime >& getInstance() {
+      static InverterTable< _prime > instance;
+      return instance;
+    }
+    std::size_t inverse(std::size_t x) const {
+      return _inversion_table[x % _inversion_table.size()];
+    }
+  };
+
+  // Wrapper allowing us to Just Instantiate something to call
+  template< std::size_t _prime>
+  class Inverter {
+  public:
+    Inverter< _prime >( ) { }
+    std::size_t inverse(std::size_t x) const {
+      return InverterTable< _prime >::getInstance().inverse(x);
+    }
+    std::size_t inverse(const ctl::Finite_field< _prime >& x) const {
+      return this->inverse(x.value());
+    }
+  };
 } //detail namespace
 } //ctl namespace
 
@@ -66,6 +104,7 @@ template< std::size_t _prime>
 class Finite_field{
 	private:
 	typedef Finite_field< _prime> Self;
+        const detail::Inverter< _prime > inverter;
 	public:
 	Finite_field(){}
 
@@ -152,16 +191,16 @@ class Finite_field{
 
 	template< typename T>
 	Self operator/(const T& rhs) const{ 
-		return *this*ctl::detail::inverse( rhs, _prime); 
+		return *this*inverter.inverse( rhs ); 
 	}
 
 	template< typename T>
 	Self& operator/=(const T& rhs){ 
-		*this= *this*ctl::detail::inverse( rhs, _prime); 
+		*this= *this*inverter.inverse( rhs ); 
 		return *this;
 	}
 	
-	Self inverse() const{ return Self( ctl::detail::inverse( x, _prime)); }
+	Self inverse() const{ return Self( inverter.inverse( x )); }
 
 	const std::size_t prime() const { return _prime; }
 	const std::size_t value() const { return x; } 
