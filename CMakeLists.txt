@@ -16,7 +16,7 @@ if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
   message(FATAL_ERROR "In-source build attempted; please clean the CMake cache and then switch to an out-of-source build, e.g., rm CMakeCache.txt && rm -Rf CMakeFiles/ && mkdir build/ && cd build/ && cmake ..")
 endif()
 
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
 
 #Frame pointers are useful for profiling. 
 #Complaints and pedantry accepted here.
@@ -32,6 +32,7 @@ include_directories(${CTL_DEPS}/pybind11/include/)
 add_subdirectory( tools)
 
 #Compile all the tools
+enable_testing()
 add_subdirectory( tests)
 add_subdirectory( python)
 

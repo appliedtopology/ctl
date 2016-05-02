@@ -153,6 +153,7 @@ class Finite_field{
 	Self operator*( const T& rhs) const { 
 		return Self( x*get_number_data(rhs)); 
 	}
+
 	template< typename T>
 	Self& operator*=( const T& rhs){ 
 		x*=get_number_data(rhs); 
@@ -219,9 +220,9 @@ Stream& operator<<( Stream & out, const Finite_field< N> && x ){
 
 } //namespace ctl
 
-template<typename T, std::size_t N> 
-ctl::Finite_field< N> 
-operator*(const T k, ctl::Finite_field<N> rhs) { return rhs *= k;  }
+template<typename T, std::size_t N, 
+	 typename = std::enable_if_t<!std::is_same< T, ctl::Finite_field<N>>::value> >
+decltype(auto) operator*(const T k, ctl::Finite_field<N>& rhs) { return rhs *= k;  }
 
 
 #endif //FINITE_FIELD_H
