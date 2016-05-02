@@ -173,7 +173,7 @@ int main(int argc, char *argv[]){
   Timer timer;
   timer.start();
   if( can_read_weights( filtration_file)){
- 	ctl::Weight_data_functor< Weighted_complex> weight_functor;
+ 	//ctl::Weight_data_functor< Weighted_complex> weight_functor;
 	typedef typename ctl::Barcodes< double> Barcodes;
 	Barcodes barcodes;
   	Weighted_complex complex;

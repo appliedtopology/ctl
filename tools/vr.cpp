@@ -33,19 +33,20 @@
 //Graph
 
 template< typename Points>
-Complex compute_vr_complex(Points, double epsilon){
+decltype(auto) compute_vr_complex(Points points, double epsilon, std::size_t dimension){
 	//Simplex
 	typedef typename ctl::Nbhd_graph<> Graph;
-	typedef ctl::Abstract_simplex Simplex;
-	typedef ctl::Finite_field< 2> Z2; 
+	//typedef ctl::Abstract_simplex Simplex;
+	//typedef ctl::Finite_field< 2> Z2; 
 	typedef ctl::Simplex_boundary Simplex_boundary;
 	
 	//Chain Complex
-	typedef ctl::Chain_complex< Simplex, Simplex_boundary> Complex;
+	typedef ctl::Cell_complex< Simplex_boundary> Complex;
 	Graph graph;
 	Complex complex; 
 	ctl::epsilon_search::construct_graph(points, epsilon, graph);
 	ctl::incremental_vr( graph, complex, dimension);
+	return complex;
 }
  
 
@@ -89,16 +90,15 @@ int main (int argc, char* argv[]) {
 	point.clear();
     }
     clock.start();
-    Graph graph;
-    Complex complex; 
+    ctl::Nbhd_graph<> graph;
+    ctl::Simplicial_complex<> complex; 
     ctl::epsilon_search::construct_graph(points, epsilon, graph);
     ctl::incremental_vr( graph, complex, dimension);
-    clock.stop();
-    std::ofstream out( output_file.c_str());
     std::cerr << "Complex construction: " << clock.elapsed() << std::endl;
+    std::ofstream out( output_file.c_str());
     std::cerr << "|K| = " << complex.size() << std::endl;
     std::cout << "Writing to disk ... " << std::flush;
-    complex.write( out);
+    //complex.write( out);
     std::cout << " complete!" << std::endl;
 
     return 0;	

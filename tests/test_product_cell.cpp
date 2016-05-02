@@ -111,7 +111,7 @@ TEST_CASE("ProductBoundary", "[product-cell]"){
   // copy constructor
   Product p2( p1);
 
-  typedef ctl::Product_boundary< Product, Simplex_boundary, Simplex_boundary> Product_boundary;
+  typedef ctl::Product_boundary< Simplex_boundary, Simplex_boundary> Product_boundary;
 
   // now the product
   Product_boundary boundary;

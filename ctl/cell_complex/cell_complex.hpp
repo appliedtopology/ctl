@@ -108,12 +108,12 @@ public:
 public:
    //Constructors
    //Default
-   template<typename std::enable_if< std::is_default_constructible<Cell_boundary>::value , int>::type = 0>
+   //template<typename std::enable_if< std::is_default_constructible<Cell_boundary>::value , int>::type = 0>
    Cell_complex(): max_id( 0), max_dim( 0) { 
 	cells.max_load_factor( 1); 
    }
-   template< typename Iterator,
-	   typename std::enable_if< std::is_default_constructible<Cell_boundary>::value , int>::type = 0>
+   template< typename Iterator>
+   //template< typename Iterator, typename std::enable_if< std::is_default_constructible<Cell_boundary>::value , int>::type = 0>
    Cell_complex( Iterator begin, Iterator end, bool construct_closed=true): cells(), max_id(0), max_dim( 0){
       if( construct_closed){
         for(Iterator i = begin; i != end; ++i){

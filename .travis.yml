@@ -82,3 +82,4 @@ script:
  - cmake ..
  - make VERBOSE=1
  - make test
+ - ./build/tests/ctl_test

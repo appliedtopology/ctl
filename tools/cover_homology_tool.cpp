@@ -57,6 +57,8 @@
 #include <ctl/parallel/homology/persistence.hpp>
 #include <ctl/parallel/homology/homology.hpp>
 
+#include <ctl/parallel/build_blowup_complex/build_blowup_complex.hpp>
+
 namespace po = boost::program_options;
 
 // Complex type
