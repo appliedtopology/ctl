@@ -268,7 +268,7 @@ int main( int argc, char *argv[]){
 		++num_edges; 
 		//are you an impure edge? if so, you are a cut -edge
 		if ( (*i)->second.data()->first.dimension() == 0 && 
-		     *((*i)->second.data()->first.begin()) == (int)num_parts){
+		     *((*i)->second.data()->first.begin()) == num_parts){
 			++edgecut;
 		}
 	}

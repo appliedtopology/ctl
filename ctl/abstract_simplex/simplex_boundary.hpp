@@ -91,7 +91,7 @@ class const_simplex_boundary_iterator :
 		}
 		//return removed vertex, get rid of another one
 		std::swap( *(face.cell().begin()+(pos++)), removed);
-		face.coefficient( -1*face.coefficient());
+		face.coefficient( Coefficient(-1)*face.coefficient());
 		return *this;	
 	}
 
