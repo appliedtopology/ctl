@@ -62,7 +62,7 @@ constexpr bool is_prime_number(std::size_t i){
         return true;
     else if (i % 2 == 0)
         return false;
-    for (auto div = 3; div <= ctl::detail::sqrt(i); div += 2)
+    for (std::size_t div = 3; div <= ctl::detail::sqrt(i); div += 2)
         if (i % div == 0)
             return false;
     return true;

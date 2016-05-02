@@ -38,10 +38,12 @@
 #include <sstream>
 #include <fstream>
 #include <numeric>
+#include <atomic>
 
 //CTL
 #include <ctl/abstract_simplex/simplex_boundary.hpp>
 #include <ctl/cube/cube_boundary.hpp>
+#include <ctl/product_cell/product_boundary.hpp>
 #include <ctl/cell_complex/detail/data_wrapper.hpp>
 #include <ctl/hash/hash.hpp>
 
