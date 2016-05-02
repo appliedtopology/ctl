@@ -71,7 +71,7 @@ before_install:
                 sudo apt-get install --yes libann-dev
         elif [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
                 brew tap homebrew/science
-                brew install cmake tbb boost ann
+                brew install cmake mpich tbb boost ann
         fi
     - export CC=${CCOMPILER} CXX=${CXXCOMPILER}
 
