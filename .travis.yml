@@ -1,9 +1,10 @@
+dist: trusty
 language: cpp
-sudo: false
 
 matrix:
   include:
-    - compiler: gcc
+    - os: linux
+      compiler: gcc
       addons:
         apt:
           sources:
@@ -14,7 +15,8 @@ matrix:
             - libboost1.55-all-dev 
             - libtbb-dev
       env: COMPILER=g++-4.9
-    - compiler: gcc
+    - os: linux
+      compiler: gcc
       addons:
         apt:
           sources:
@@ -25,7 +27,8 @@ matrix:
             - libboost1.55-all-dev 
             - libtbb-dev
       env: COMPILER=g++-5
-    - compiler: clang
+    - os: linux
+      compiler: clang
       addons:
         apt:
           sources:
@@ -37,7 +40,8 @@ matrix:
             - libboost1.55-all-dev 
             - libtbb-dev
       env: COMPILER=clang++-3.6
-    - compiler: clang
+    - os: linux
+      compiler: clang
       addons:
         apt:
           sources:
@@ -47,13 +51,19 @@ matrix:
             - clang-3.7
             - libann-dev 
             - libboost1.55-all-dev 
-            - libtbb-dev
- 
+            - libtbb-dev 
       env: COMPILER=clang++-3.7
+    - os: osx
+      osx_image: xcode7.3
+      compiler: clang
+      env: CCOMPILER='clang' CXXCOMPILER='clang++' 
 
-#before_install:
-#  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then chmod 777 ./travis/ci_osx.sh ; fi
-#  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then ./travis/ci_osx.sh ; fi
+before_install:
+    if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
+      sudo apt-get install libann-dev
+    elif [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
+      brew install cmake tbb boost ann
+    fi
 
 script: 
  - mkdir build
