@@ -1,6 +1,4 @@
-dist: trusty
 language: cpp
-
 
 # sudo:required is needed for trusty images
 sudo: required
