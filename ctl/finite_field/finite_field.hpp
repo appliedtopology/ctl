@@ -149,11 +149,6 @@ class Finite_field{
 		return *this; 
 	}
 
-	template< std::size_t N>
-	Self operator*( const ctl::Finite_field< N>& rhs) const { 
-		return Self( x*get_number_data(rhs)); 
-	}
-
 	template< typename T>
 	Self operator*( const T& rhs) const { 
 		return Self( x*get_number_data(rhs)); 
@@ -204,26 +199,23 @@ class Finite_field{
 	std::size_t x;	
 }; //class Finite_field
 
+template< typename Stream, std::size_t N>
+Stream& operator<<( Stream & out, const Finite_field< N> & x ){
+	std::size_t value = x.to_integral();
+	if(N>(std::size_t)2 && (std::size_t)value >= N/2){ 
+		value = -1*(N -value);  
+	}
+	out << value; 
+	return out;
+}
 
 template< typename Stream, std::size_t N>
 Stream& operator<<( Stream & out, const Finite_field< N> && x ){
-	int value = x.to_integral();
-	if(N>2 && value >= N/2){ 
-		value = -1*(N -value);  
-	}
-	out << value; 
+	out << x; 
 	return out;
 }
 
-template< typename Stream, std::size_t N>
-Stream& operator<<( Stream & out, const Finite_field< N> & x ){
-	int value = x.to_integral();
-	if(N>2 && value >= N/2){ 
-		value = -1*(N -value);  
-	}
-	out << value; 
-	return out;
-}
+
 
 } //namespace ctl
 
