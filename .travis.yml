@@ -1,6 +1,5 @@
 dist: trusty
 language: cpp
-language: generic
 
 
 # sudo:required is needed for trusty images
