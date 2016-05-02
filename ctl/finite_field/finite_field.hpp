@@ -229,9 +229,7 @@ Stream& operator<<( Stream & out, const Finite_field< N> & x ){
 
 template<typename T, std::size_t N> 
 ctl::Finite_field< N> 
-operator*(const T& k, ctl::Finite_field<N> rhs) {
-	 return rhs *= k; 
-}
+operator*(const T k, ctl::Finite_field<N> rhs) { return rhs *= k;  }
 
 
 #endif //FINITE_FIELD_H

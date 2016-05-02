@@ -126,7 +126,7 @@ int main( int argc, char *argv[]){
   ctl::close_file( out);
 
   ctl::open_file( out, cover_name.c_str());
-  typedef ctl::parallel::Get_cover< Complex::Data> Cover_functor;
+  //typedef ctl::parallel::Get_cover< Complex::Data> Cover_functor;
   //complex.write( out, Cover_functor());
   //ctl::close_file( out);
   return 0;

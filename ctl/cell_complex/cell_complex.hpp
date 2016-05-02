@@ -71,6 +71,14 @@ void update_maximum(std::atomic<T>& maximum_value, T const& value) noexcept
             !maximum_value.compare_exchange_weak(prev_value, value))
         ;
 }
+/***
+ * This is a hack until we remove TBB dependency because not all versions of tbb support emplace(_)
+ * We will move to use std::experimental where they hopefully have concurrent containers by now
+ */
+template< typename Cell, typename Data, typename Hash>
+decltype(auto) emplace_cell( tbb::concurrent_unordered_map< Cell, Data, Hash>& cells, const Cell& cell, const Data& d){ return cells.insert( std::make_pair( cell, d)); }
+template< typename Cell, typename Data, typename Hash>
+decltype(auto) emplace_cell( std::unordered_map< Cell, Data, Hash>& cells, const Cell& cell, const Data& d){ return cells.emplace( cell, d); }
 
 template< typename C, 
 	  typename D,
@@ -189,7 +197,7 @@ public:
 
    std::pair< iterator, bool> insert_open_cell( const Cell & s,
    					     const Data& data=Data()){
-     std::pair< iterator, bool> c =  cells.emplace( s, data);
+     std::pair< iterator, bool> c =  emplace_cell( cells, s, data);
      if( c.second) { //this outer if is probably unnecessary
        detail::update_maximum( max_dim, s.dimension());
        if( c.first->second.id() == 0){
