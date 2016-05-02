@@ -76,6 +76,7 @@ before_install:
                 brew tap homebrew/science
                 brew install cmake tbb boost ann
         fi
+  - export CC=${CCOMPILER} CXX=${CXXCOMPILER}
 
 script: 
  - mkdir build
