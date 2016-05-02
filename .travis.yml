@@ -2,7 +2,7 @@ language: cpp
 sudo: required
 
 os:
- - linux
+ - ubuntu
  - osx
 
 compiler:
@@ -10,10 +10,10 @@ compiler:
   - clang
 
 before_install:
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then chmod 777 ./dependencies/ci_linux.sh ; fi
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then chmod 777 ./dependencies/ci_osx.sh ; fi
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then ./dependencies/ci_linux.sh ; fi
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then ./dependencies/ci_osx.sh ; fi
+  - if [ "$TRAVIS_OS_NAME" = "ubuntu" ]; then chmod 777 ./travis/ci_ubuntu.sh ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then chmod 777 ./travis/ci_osx.sh ; fi
+  - if [ "$TRAVIS_OS_NAME" = "ubuntu" ]; then ./travis/ci_ubuntu.sh ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then ./travis/ci_osx.sh ; fi
 
 script: 
  - mkdir build
