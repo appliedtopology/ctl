@@ -72,7 +72,9 @@ public:
 		return tmp;
 	}
 	Term& operator*(){ return term; }
+	const Term& operator*() const { return term; }
 	Term* operator->(){ return &term; }
+	Term const* operator->() const { return &term; }
 protected:
   void _next_term(){
 	if( next_term != end_term){

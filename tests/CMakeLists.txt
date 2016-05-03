@@ -21,5 +21,9 @@ add_executable( os ctl_test.cpp test_one_skeleton.cpp)
 add_test( "os" os)
 add_executable( pc ctl_test.cpp test_product_cell.cpp)
 add_test( "pc" pc)
+add_executable( rc ctl_test.cpp test_relative_chains.cpp)
+add_test( "rc" rc)
+#
+
 #add_executable( scc ctl_test.cpp test_simplicial_chain_complex.cpp)
 #add_executable( vr ctl_test.cpp test_vr.cpp)

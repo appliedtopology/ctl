@@ -1,5 +1,5 @@
-#ifndef CTLIB_FILTRATION_COMPLEX_BOUNDARY_H
-#define CTLIB_FILTRATION_COMPLEX_BOUNDARY_H
+#ifndef CTLIB_RELATIVE_COMPLEX_BOUNDARY_H
+#define CTLIB_RELATIVE_COMPLEX_BOUNDARY_H
 /*******************************************************************************
 * Copyright (C) Ryan H. Lewis 2014 <me@ryanlewis.net>
 *******************************************************************************
@@ -15,39 +15,47 @@
 //STL
 #include <iterator>     // std::iterator, std::input_iterator_tag
 #include <ctl/io/io.hpp> //ctl::identity
+#include <boost/iterator/filter_iterator.hpp> 
 
 namespace ctl{
 template< typename Relative_cell_complex, typename Complex_boundary>
-class Relative_boundary{
-	typedef Relative_boundary< Relative_cell_complex> Complex;
-	typedef typename Complex_boundary::Cell_term Cell_term;
+class Relative_complex_boundary{
+	typedef Relative_complex_boundary< Relative_cell_complex, Complex_boundary> Complex;
 	public:
 	typedef typename Complex_boundary::Coefficient Coefficient;
-	typedef	Complex_boundary::Cell_boundary Cell_boundary;
+	typedef	typename Complex_boundary::Cell_boundary Cell_boundary;
 	typedef typename Complex_boundary::size_type size_type;
 	//Complex boundary terms are iterators
-	typedef typename Complex_boundary::Term Term;
+	typedef typename Complex_boundary::Term Underlying_term;
+	typedef typename Complex_boundary::Term::template 
+			rebind< typename Relative_cell_complex::iterator, Coefficient>::T Term;
+ 	
+	typedef std::function<bool(const Underlying_term& t)> Predicate;
 
-	//copy constructor
-	Relative_boundary( Relative_boundary & f): 
-	_filtration( f._filtration) {};
+	Relative_complex_boundary( const Relative_cell_complex& c_, const Complex_boundary& bd_): 
+		complex( c_), bd( bd_) {}
 
-	//move constructor, we don't care since we store references
-	Relative_boundary( Relative_boundary && f): 
-	_filtration( f._filtration) {};
-	
-	const_iterator begin( const typename Term::Cell & c) const {}
 
-	const_iterator begin( const Iterator & c) const {}
+	decltype(auto) begin( const typename Relative_cell_complex::iterator c) const {
+	  return boost::make_filter_iterator( predicate,  bd.begin( c.base()), bd.end( c.base())); 
+	}
 
-	template< typename T>
-	const_iterator end( const T & c) const { return const_iterator( _filtration); }
+	decltype(auto) end( const typename Relative_cell_complex::iterator c) const {
+	  return boost::make_filter_iterator( predicate,  bd.end( c.base()), bd.end( c.base())); 
+	}
 
-	size_type length( const typename Term::Cell & c) const {}
-	size_type length( const Iterator& c) const {}
+	/**
+	 * Not so efficient.
+	 */
+	size_type length( const typename Term::Cell & c) const {
+		return std::distance( begin( c), end(c));
+	}
 
-	private:		
-}; // class Relative_boundary
+	private:
+	const Relative_cell_complex& complex;
+	const Complex_boundary& bd;
+	const Predicate predicate = [&](const Underlying_term& t){ return complex.contains(*(t.cell())); }; 
+}; // class Relative_complex_boundary
 
 } //namespace ctl
 
