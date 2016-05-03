@@ -18,9 +18,7 @@ BuildRequires: tbb
 BuildRequires: metis
 BuildRequires: doxygen 
 
-Source: ctl.zip
-
-%description
+%description 
 A computational topology library
 %prep
 %autosetup -n %{name}-%{shortcommit0}
