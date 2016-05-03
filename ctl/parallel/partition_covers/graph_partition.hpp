@@ -100,8 +100,8 @@ void metis_to_complex( Complex & complex,
 	for( Index_iterator i = index_to_vertex.begin(); 
 			    i < index_to_vertex.end(); ++i){
 		const int j = std::distance( index_to_vertex.begin(), i);
-		Cell cell = { (int)*i };
-		Nerve_cell part_cell = { (int)part[ j] };
+		Cell cell = { (std::size_t)*i };
+		Nerve_cell part_cell = { (std::size_t)part[ j] };
 		Nerve_iterator iterator = nerve.find_cell( part_cell);
 		vertex_to_nerve.insert( make_pair( *i,  iterator) );
 		complex.find_cell( cell)->second.data() = iterator;

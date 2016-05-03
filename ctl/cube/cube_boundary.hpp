@@ -1,28 +1,14 @@
 #ifndef CUBE_BOUNDARY_H
 #define CUBE_BOUNDARY_H
 /*******************************************************************************
-* -Academic Honesty-
-* Plagarism: The unauthorized use or close imitation of the language and 
-* thoughts of another author and the representation of them as one's own 
-* original work, as by not crediting the author. 
-* (Encyclopedia Britannica, 2008.)
-*
-* You are free to use the code according to the license below, but, please
-* do not commit acts of academic dishonesty. We strongly encourage and request 
-* that for any [academic] use of this source code one should cite one the 
-* following works:
-* 
-* \cite{hatcher, z-ct-10}
-* 
-* See ct.bib for the corresponding bibtex entries. 
-* !!! DO NOT CITE THE USER MANUAL !!!
-*******************************************************************************
 * Copyright (C) Ryan H. Lewis 2014 <me@ryanlewis.net>
 * Released under BSD-3 License. See LICENSE
 *******************************************************************************/
 #include <ctl/term/term.hpp>
 #include <ctl/finite_field/finite_field.hpp>
 #include <cassert>
+#include <ctl/cube/cube.hpp>
+
 namespace ctl {
 namespace detail {
 template< typename Term_>
@@ -105,8 +91,8 @@ class const_cube_boundary_iterator :
     	return *this;
     }
     //return removed vertex, get rid of another one
-    auto& s = face.cell().intervals[ pos].second;
-    auto& f = face.cell().intervals[ pos].first;
+    auto& s = face.cell().begin()[ pos].second;
+    auto& f = face.cell().begin()[ pos].first;
   
     if(  s > removed){
        std::swap( f, removed);
@@ -115,8 +101,8 @@ class const_cube_boundary_iterator :
        s = removed;
        pos++;
        if( pos != face.cell().size()){
- 	removed = face.cell().intervals[ pos].first;
-        face.cell().intervals[ pos].first = face.cell().intervals[ pos].second; 
+ 	removed = face.cell().begin()[ pos].first;
+        face.cell().begin()[ pos].first = face.cell().begin()[ pos].second; 
        }
     }
     face.coefficient( -1*face.coefficient());
@@ -177,11 +163,14 @@ namespace ctl {
 * @tparam Cube_
 * @tparam Coefficient_
 */
-template< typename Cube_, typename Coefficient_>
+//template< typename Coefficient_>
 class Cube_boundary {
+    typedef int Coefficient_;
 public:
     //! Underlying cube type
-    typedef Cube_ Cube;
+    typedef ctl::Cube Cube;
+    //! Underyling cell type
+    typedef ctl::Cube Cell;
     //! Underlying Coefficient type
     typedef Coefficient_ Coefficient;
     //! A term of the boundary operator

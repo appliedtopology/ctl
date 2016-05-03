@@ -1,37 +1,8 @@
 /*******************************************************************************
-* -Academic Honesty-
-* Plagarism: The unauthorized use or close imitation of the language and 
-* thoughts of another author and the representation of them as one's own 
-* original work, as by not crediting the author. 
-* (Encyclopedia Britannica, 2008.)
-*
-* You are free to use the code according to the license below, but, please
-* do not commit acts of academic dishonesty. We strongly encourage and request 
-* that for any [academic] use of this source code one should cite one the 
-* following works:
-* 
-* \cite{hatcher, z-ct-10}
-* 
-* See ct.bib for the corresponding bibtex entries. 
-* !!! DO NOT CITE THE USER MANUAL !!!
-*******************************************************************************
+******************************************************************************
 * Copyright (C) Ryan H. Lewis 2014 <me@ryanlewis.net>
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-* 
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-* 
-* You should have received a copy of the GNU General Public License
-* along with this program in a file entitled COPYING; if not, write to the 
-* Free Software Foundation, Inc., 
-* 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
-*******************************************************************************
+******************************************************************************
+* BSD-3
 *******************************************************************************/
 //CTL Headers
 
@@ -58,17 +29,17 @@
 #include <ctl/abstract_simplex/simplex_boundary.hpp>
 
 //Filtration & Filtration Boundary Operator
-#include <ctl/filtration/filtration.hpp>
-#include <ctl/filtration/filtration_boundary.hpp>
-#include <ctl/filtration/less.hpp>
+#include <ctl/graded_chain_complex/graded_cell_complex.hpp>
+#include <ctl/graded_chain_complex/graded_boundary.hpp>
+#include <ctl/graded_chain_complex/less.hpp>
 
 //Weights
 #include <ctl/weight_data/weight_data.hpp>
 #include <ctl/weight_data/weight_functor.hpp>
 
 //Chain Complex
-#include <ctl/chain_complex/chain_complex.hpp>
-#include <ctl/chain_complex/complex_boundary.hpp>
+#include <ctl/cell_complex/cell_complex.hpp>
+#include <ctl/cell_complex/complex_boundary.hpp>
 #include <ctl/term/term.hpp>
 
 
@@ -82,24 +53,23 @@
 #include <ctl/persistence/compute_barcodes.hpp>
 
 //Barcodes
-#include <ctl/barcodes/barcodes.hpp>
+#include <ctl/persistence/barcodes/barcodes.hpp>
 
 //STL
 #include <sstream>
 
 
 //Simplex
-typedef ctl::Abstract_simplex< int> Simplex;
+typedef ctl::Abstract_simplex Simplex;
 typedef ctl::Finite_field< 2> Z2;
-typedef ctl::Simplex_boundary< Simplex, Z2> Simplex_boundary;
+typedef ctl::Simplex_boundary Simplex_boundary;
 
 //Chain Complex
-typedef ctl::Chain_complex< Simplex, Simplex_boundary> Complex;
+typedef ctl::Cell_complex< Simplex_boundary> Complex;
 
 //Chain Complex with weights
 typedef ctl::Weight_data< double> Weight_data;
-typedef ctl::Chain_complex< Simplex, Simplex_boundary, Weight_data> 
-							Weighted_complex;
+typedef ctl::Cell_complex< Simplex_boundary, Weight_data> Weighted_complex;
 
 //Filtration order
 typedef ctl::Cell_less Complex_cell_less;
@@ -113,13 +83,13 @@ void run_persistence( Complex & complex,
 		      Barcode & barcode,
  		      Timer & timer,
 		      const Tag tag){
-   typedef ctl::Filtration< Complex, Cell_less > Filtration;
+   typedef ctl::Graded_cell_complex< Complex, Cell_less > Filtration;
    //Boundary Operator
    //NOTE: This is not a general purpose boundary operator.
    //It works correctly only when successive 
    //boundaries are taken in a filtration order
    //typedef typename Filtration::iterator Filtration_iterator;
-   typedef ctl::Filtration_boundary< Filtration> Filtration_boundary;
+   typedef ctl::Graded_boundary< Filtration> Filtration_boundary;
    typedef typename Filtration::Term Filtration_term;
    typedef typename Filtration_term::Coefficient Coefficient;
 
@@ -158,7 +128,7 @@ void run_persistence( Complex & complex,
   std::cout << "total time : " << timer.elapsed() << std::endl;
 
    ctl::compute_barcodes( complex_filtration, 
-			  R_map, barcode, tag, true);
+  			  R_map, barcode, tag, true);
   std::vector< std::size_t> bti;
   compute_betti( complex_filtration, R_map, bti, true);
 }
@@ -203,12 +173,12 @@ int main(int argc, char *argv[]){
   Timer timer;
   timer.start();
   if( can_read_weights( filtration_file)){
- 	ctl::Weight_data_functor< Weighted_complex> weight_functor;
+ 	//ctl::Weight_data_functor< Weighted_complex> weight_functor;
 	typedef typename ctl::Barcodes< double> Barcodes;
 	Barcodes barcodes;
   	Weighted_complex complex;
-  	ctl::read_complex_and_data( full_complex_name, filtration_file, 
-				    complex, weight_functor); 
+  	//ctl::read_complex_and_data( full_complex_name, filtration_file, 
+	//			    complex, weight_functor); 
   	timer.stop();
   	std::cout << "I/O Time: " << timer.elapsed() << std::endl;
   	std::cout << "complex size: " << complex.size() << std::endl; 
@@ -222,7 +192,7 @@ int main(int argc, char *argv[]){
 	typedef typename ctl::Barcodes< double> Barcodes;
 	Barcodes barcodes;
   	Complex complex;
-  	ctl::read_complex( full_complex_name, complex);
+  	//ctl::read_complex( full_complex_name, complex);
   	timer.stop();
   	std::cout << "I/O Time: " << timer.elapsed() << std::endl;
 	std::cout << "complex size: " << complex.size() << std::endl; 

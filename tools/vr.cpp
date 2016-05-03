@@ -21,8 +21,8 @@
 #include <ctl/abstract_simplex/simplex_boundary.hpp>
 
 //Chain Complex
-#include <ctl/chain_complex/chain_complex.hpp>
-#include <ctl/chain_complex/complex_boundary.hpp>
+#include <ctl/cell_complex/cell_complex.hpp>
+#include <ctl/cell_complex/complex_boundary.hpp>
 #include <ctl/term/term.hpp>
 
 //VR Construction
@@ -31,16 +31,24 @@
 #include <ctl/vr/incremental_complex.hpp> 
 
 //Graph
-typedef typename ctl::Nbhd_graph<> Graph;
 
-//Simplex
-typedef ctl::Abstract_simplex< int> Simplex;
-typedef ctl::Finite_field< 2> Z2; 
-typedef ctl::Simplex_boundary< Simplex, Z2> Simplex_boundary;
-
-//Chain Complex
-typedef ctl::Chain_complex< Simplex, Simplex_boundary> Complex;
-
+template< typename Points>
+decltype(auto) compute_vr_complex(Points points, double epsilon, std::size_t dimension){
+	//Simplex
+	typedef typename ctl::Nbhd_graph<> Graph;
+	//typedef ctl::Abstract_simplex Simplex;
+	//typedef ctl::Finite_field< 2> Z2; 
+	typedef ctl::Simplex_boundary Simplex_boundary;
+	
+	//Chain Complex
+	typedef ctl::Cell_complex< Simplex_boundary> Complex;
+	Graph graph;
+	Complex complex; 
+	ctl::epsilon_search::construct_graph(points, epsilon, graph);
+	ctl::incremental_vr( graph, complex, dimension);
+	return complex;
+}
+ 
 
 // temporary solution until we build points.h
 typedef std::vector<double> Point;
@@ -82,21 +90,15 @@ int main (int argc, char* argv[]) {
 	point.clear();
     }
     clock.start();
-    Graph graph;
+    ctl::Nbhd_graph<> graph;
+    ctl::Simplicial_complex<> complex; 
     ctl::epsilon_search::construct_graph(points, epsilon, graph);
-    clock.stop();
-    std::cerr << "# vertices = " <<  boost::num_vertices( graph) << std::endl;
-    std::cerr << "# edges = " << boost:: num_edges( graph) << std::endl;
-    std::cerr << "Graph construction: " << clock.elapsed() << std::endl;
-    clock.start();
-    Complex complex; 
     ctl::incremental_vr( graph, complex, dimension);
-    clock.stop();
-    std::ofstream out( output_file.c_str());
     std::cerr << "Complex construction: " << clock.elapsed() << std::endl;
+    std::ofstream out( output_file.c_str());
     std::cerr << "|K| = " << complex.size() << std::endl;
     std::cout << "Writing to disk ... " << std::flush;
-    complex.write( out);
+    //complex.write( out);
     std::cout << " complete!" << std::endl;
 
     return 0;	

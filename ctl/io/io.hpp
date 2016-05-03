@@ -1,22 +1,6 @@
 #ifndef CTLIB_IO_H
 #define CTLIB_IO_H
 /*******************************************************************************
-* -Academic Honesty-
-* Plagarism: The unauthorized use or close imitation of the language and 
-* thoughts of another author and the representation of them as one's own 
-* original work, as by not crediting the author. 
-* (Encyclopedia Britannica, 2008.)
-*
-* You are free to use the code according to the below liscence, but please
-* do not commit acts of academic dishonesty. We encourage and request that 
-* for any academic use of this source code one should cite the following 
-* papers:
-* 
-* \cite{$bibtex_names_here}
-* 
-* See ct.bib for the corresponding bibtex entries. 
-* !!! DO NOT CITE THE USER MANUAL !!!
-*******************************************************************************
 * Copyright (C) Ryan H. Lewis 2011 <me@ryanlewis.net>
 *******************************************************************************
 * Released under BSD-3 License. See LICENSE

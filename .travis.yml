@@ -1,21 +1,85 @@
 language: cpp
+
+# sudo:required is needed for trusty images
 sudo: required
+dist: trusty
 
-os:
- - linux
- - osx
-
-compiler:
-  - gcc
-  - clang
+matrix:
+  include:
+    #Disable this until we figure out how to deal with constexpr function bug in gcc 4.9
+    #- os: linux
+    #  compiler: gcc
+    #  addons:
+    #    apt:
+    #      sources:
+    #        - ubuntu-toolchain-r-test
+    #      packages:
+    #        - g++-4.9
+    #        - libann-dev 
+    #        - libboost-all-dev 
+    #        - libtbb-dev
+    #        - libmetis-dev
+    #  env: COMPILER=g++-4.9
+    - os: linux
+      compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+            - libann-dev 
+            - libboost-all-dev 
+            - libtbb-dev
+            - libmetis-dev
+      env: COMPILER=g++-5
+    - os: linux
+      compiler: clang
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.6
+          packages:
+            - clang-3.6
+            - libann-dev 
+            - libboost-all-dev 
+            - libtbb-dev
+            - libmetis-dev
+      env: COMPILER=clang++-3.6
+    - os: linux
+      compiler: clang
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.7
+          packages:
+            - clang-3.7
+            - libann-dev 
+            - libboost-all-dev 
+            - libtbb-dev 
+            - libmetis-dev
+      env: COMPILER=clang++-3.7
+    - os: osx
+      osx_image: xcode7.3
+      compiler: clang
+      env: CCOMPILER='clang' CXXCOMPILER='clang++' 
 
 before_install:
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then chmod 777 ./dependencies/ci_linux.sh ; fi
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then chmod 777 ./dependencies/ci_osx.sh ; fi
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then ./dependencies/ci_linux.sh ; fi
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then ./dependencies/ci_osx.sh ; fi
+    - |
+        if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
+                sudo apt-get install --yes libann-dev
+                export CC=${COMPILER} CXX=${COMPILER}
+        elif [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
+                brew tap homebrew/science
+                brew install cmake mpich tbb boost ann metis
+                export CC=${CCOMPILER} CXX=${CXXCOMPILER}
+        fi
 
 script: 
- - cmake .
+ - mkdir build
+ - cd build
+ - cmake ..
  - make VERBOSE=1
  - make test

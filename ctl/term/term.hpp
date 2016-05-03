@@ -1,51 +1,9 @@
 #ifndef CTLIB_TERM_H
 #define CTLIB_TERM_H
 /*******************************************************************************
-* -Academic Honesty-
-* Plagarism: The unauthorized use or close imitation of the language and 
-* thoughts of another author and the representation of them as one's own 
-* original work, as by not crediting the author. 
-* (Encyclopedia Britannica, 2008.)
-*
-* You are free to use the code according to the license below, but, please
-* do not commit acts of academic dishonesty. We strongly encourage and request 
-* that for any [academic] use of this source code one should cite one the 
-* following works:
-* 
-* \cite{hatcher, z-ct-10}
-* 
-* See ct.bib for the corresponding bibtex entries. 
-* !!! DO NOT CITE THE USER MANUAL !!!
-*******************************************************************************
 * Copyright (C) Ryan H. Lewis 2014 <me@ryanlewis.net>
 *******************************************************************************
 * ********** BSD-3 License ****************
-* Redistribution and use in source and binary forms, with or without 
-* modification, are permitted provided that the following conditions are met:
-* 
-* 1. Redistributions of source code must retain the above copyright notice, 
-* this list of conditions and the following disclaimer.
-* 
-* 2. Redistributions in binary form must reproduce the above copyright notice, 
-* this list of conditions and the following disclaimer in the documentation 
-* and/or other materials provided with the distribution.
-* 
-* 3. Neither the name of the copyright holder nor the names of its contributors 
-* may be used to endorse or promote products derived from this software without 
-* specific prior written permission.
-* 
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
-* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
-* POSSIBILITY OF SUCH DAMAGE.
-********************************************************************************
 *******************************************************************************/
 
 #include <ctl/finite_field/finite_field.hpp>
@@ -68,7 +26,9 @@ class Term {
 		Term( const Cell & cell, 
 		      const Coefficient & coeff):
 			cell_( cell), coeff_( coeff) {}
-		Term( const Term & from): cell_( from.cell_),
+		Term( std::pair<Cell, Coefficient> &pair): cell_( pair.first), coeff_( pair.second) {}
+	
+                Term( const Term & from): cell_( from.cell_),
 					  coeff_( from.coeff_) {}
 
 		Term( Term && from): cell_( std::move( from.cell_)), 
@@ -91,6 +51,11 @@ class Term {
 			cell_= std::move( from.cell_);
 			coeff_ = std::move( from.coeff_);
 			return *this; 
+		}
+		template< typename Coeff>
+		Self& operator*=( const Coeff& c){
+			coeff_ *= c;
+			return *this;
 		}
 		bool operator==( const Self & from) const { 
 			return cell_ == from.cell_;
@@ -136,7 +101,9 @@ class Term< Cell_, ctl::Finite_field< 2> > {
 		Term( const Self & from): cell_( from.cell_){}
 		Term( const Self && from): cell_( std::move( from.cell_)){}
 		Term( const Cell & cell): cell_( cell) {}	
-		Term( const Cell & cell, const Coefficient & coeff): 
+
+		Term( std::pair<Cell, Coefficient> &pair): cell_( pair.first) {}
+                Term( const Cell & cell, const Coefficient & coeff): 
 		cell_( cell) {}	
 		Cell& cell() { return cell_; }
 		const Cell& cell() const { return cell_; }
@@ -146,7 +113,8 @@ class Term< Cell_, ctl::Finite_field< 2> > {
 
 		template< typename T>
 		bool operator< ( const T & t) const { return cell_ < t.cell(); }
-	
+
+
 		Self& operator=( const Self & from) { 
 			cell_=from.cell_;
 			return *this; 
@@ -155,7 +123,13 @@ class Term< Cell_, ctl::Finite_field< 2> > {
 			cell_= std::move( from.cell_);
 			return *this; 
 		}
-
+		/**
+		 * These things aren't strictly speaking correct.
+		 */
+		template< typename T>
+		Self& operator*=( const T& c){
+			return *this;
+		}
 		template< typename T>
 		inline Self operator*( T k) const{
 			return *this;
@@ -185,16 +159,23 @@ template<typename T>
 struct is_iterator<T, typename std::enable_if<!std::is_same<typename std::iterator_traits<T>::value_type, void>::value>::type>
 { static constexpr bool value = true; };
 
-template<typename Stream, class T, typename std::enable_if<std::is_integral<T>::value>::type* = nullptr> 
-void  print_cell(Stream& out, T & t){ out << t; }
+template<typename Stream, class T, typename std::enable_if<!is_iterator<T>::value, T>::type* = nullptr> 
+void  print_cell(Stream& out, const T & t){ out << t; }
 template<typename Stream, class T, typename std::enable_if<is_iterator<T>::value, T>::type* = nullptr> 
-void  print_cell(Stream& out, T & t){ out << t->first; }
+void  print_cell(Stream& out, const T & t){ out << t->first; }
 }
 
 template< typename Stream, typename Ce, typename Co>
-Stream& operator<<(Stream&out, const Term<Ce, Co>&term){
-	out << term.coefficient() << "*";
-	detail::print_cell( out, term.cell()); 
+Stream& 
+operator<<(Stream&out, const Term<Ce, Co>&term){
+	if( term.coefficient() != Co(1)){
+		out << term.coefficient() << "*";
+        	out << "[";	
+	}
+	detail::print_cell( out, term.cell());
+	if( term.coefficient() != Co(1)){
+        	out << "]";	
+	}
 	return out;
 }
 } //namespace ctl

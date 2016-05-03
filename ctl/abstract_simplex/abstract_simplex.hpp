@@ -1,22 +1,6 @@
 #ifndef ABSTRACT_SIMPLEX_H
 #define ABSTRACT_SIMPLEX_H
 /*******************************************************************************
-* -Academic Honesty-
-* Plagarism: The unauthorized use or close imitation of the language and 
-* thoughts of another author and the representation of them as one's own 
-* original work, as by not crediting the author. 
-* (Encyclopedia Britannica, 2008.)
-*
-* You are free to use the code according to the license below, but, please
-* do not commit acts of academic dishonesty. We strongly encourage and request 
-* that for any [academic] use of this source code one should cite one the 
-* following works:
-* 
-* \cite{hatcher, z-ct-10}
-* 
-* See ct.bib for the corresponding bibtex entries. 
-* !!! DO NOT CITE THE USER MANUAL !!!
-*******************************************************************************
 * Copyright (C) Ryan H. Lewis 2014 <me@ryanlewis.net>
 *******************************************************************************
 * Code release under BSD-3 License. See LICENSE.
@@ -27,30 +11,25 @@
 #include <iostream> //cout (debug only)
 #include <algorithm> //sort, unique
 
-//CTL
-#include <ctl/abstract_simplex/simplex_boundary.hpp>
 
-
-/*! \namespace ctl
-Namespace where all library functionality resides
-*/
 namespace ctl {
 
-/**
-* \class Abstract_simplex< T>
+/*!
+* \class Abstract_simplex
 * This class describes an abstract simplex for a simplicial chain complex.
-* It is implemeneted as a sorted std::vector< T> since 
+* It is implemented as a sorted std::vector< T> since 
 * maintaining a sorted vector is faster than a std::set 
 * for a fixed large number.
 *
 * This object does not itself have the facility for a boundary, this is handled
 * by a separate boundary operator.
+* @tparam T the underlying vertex type. T must be totally ordered via <
 */
-template< typename T>
 class Abstract_simplex {
 	private:
+	typedef std::size_t T;
 	typedef typename std::vector< T> Vector;
-	typedef Abstract_simplex< T> Self;
+	typedef Abstract_simplex Self;
 	typedef std::initializer_list< T> Init_list;
 	public:
 	//! \typedef  
@@ -84,7 +63,11 @@ class Abstract_simplex {
 	//!  Range constructor 
 	template< typename Iterator>
 	Abstract_simplex( const Iterator begin, 
-			  const Iterator end): vertices( begin, end){}
+			  const Iterator end): vertices( begin, end){
+		sort( vertices.begin(), vertices.end() );
+		vertices.erase( unique( vertices.begin(), vertices.end() ), 
+				vertices.end() );
+	}
 	//! Copies the data from one simplex to another
 	Abstract_simplex( const Self & from): vertices( from.vertices){}
 	//! Moves the data from one simplex to another
@@ -137,7 +120,11 @@ class Abstract_simplex {
 	 * @return size_t
 	 */
 	size_t  dimension() const	{ return size()-1; 	  	}
-
+	/*!
+	 * Reserves as much capacity as is necessary to store
+	 * at least d elements.
+ 	 */
+	void reserve( std::size_t d){ vertices.reserve(d); }
 	/*! Returns the capacity of the simplex
 	* @return size_t
 	*/
@@ -332,9 +319,6 @@ class Abstract_simplex {
 	private:
 	Vector vertices;
 
-	//typename Self since the compiler complains
-	template< typename Term> 
-	friend class ctl::detail::const_simplex_boundary_iterator;
 }; //Abstract_simplex
 
 
@@ -348,8 +332,8 @@ class Abstract_simplex {
 *  Reads a simplex from the input stream
 * @return in
 */
-template< typename Stream, typename T>
-Stream& operator>>( Stream & in, ctl::Abstract_simplex< T> & simplex){ return simplex.read( in); }
+template< typename Stream>
+Stream& operator>>( Stream & in, ctl::Abstract_simplex & simplex){ return simplex.read( in); }
 	
 /**
 * @brief Output stream operator for a simplex
@@ -361,27 +345,25 @@ Stream& operator>>( Stream & in, ctl::Abstract_simplex< T> & simplex){ return si
 * Writes a simplex to this output stream
 * @return Stream&
 */
-template< typename Stream, typename T>
-Stream& operator<<(Stream& out, const ctl::Abstract_simplex< T>& simplex){
-	typedef typename ctl::Abstract_simplex< T>::const_iterator iterator;
-	out << "[";
-	for(iterator i = simplex.begin(); i != simplex.end(); ++i){
-		out << *i;
-		if ( i+1 != simplex.end()) { out << ", "; } else { out << "]";}
+std::ostream& operator<<(std::ostream& out, const ctl::Abstract_simplex& simplex){
+	out << "[" << std::flush;
+	if( simplex.size() != 0) {
+		for(auto i = simplex.begin(); i != simplex.begin()+simplex.dimension(); ++i){
+			out << *i << ", ";
+		}
+		if( simplex.rbegin() != simplex.rend()){
+			out << *(simplex.rbegin()); 
+		}
 	}
+	out << "]" << std::flush;
 	return out;
 }
-/**
-* @brief Output stream operator for an x-value simplex
-* @tparam Stream
-* @tparam T
-* @param out
-* @param simplex
-* Writes a simplex to this output stream
-* @return Stream&
-*/
-template< typename Stream, typename T>
-Stream& operator<<(Stream& out, const ctl::Abstract_simplex< T>&& simplex){ out << simplex; }
+
+/*template< typename Stream>
+Stream& operator<<(Stream& out, ctl::Abstract_simplex&& simplex){ 
+	out << simplex; 
+	return out;
+}*/
 } //namespace ctl
 
 #endif // ABSTRACT_SIMPLEX_H

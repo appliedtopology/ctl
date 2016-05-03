@@ -23,20 +23,20 @@
 #include <ctl/abstract_simplex/simplex_boundary.hpp>
 
 //Chain Complex
-#include <ctl/chain_complex/chain_complex.hpp>
-#include <ctl/chain_complex/complex_boundary.hpp>
+#include <ctl/cell_complex/cell_complex.hpp>
+#include <ctl/cell_complex/complex_boundary.hpp>
 #include <ctl/term/term.hpp>
 
 //Graph
 typedef typename ctl::Nbhd_graph<> Graph;
 
 //Simplex
-typedef ctl::Abstract_simplex< int> Simplex;
+typedef ctl::Abstract_simplex Simplex;
 typedef ctl::Finite_field< 2> Z2; 
-typedef ctl::Simplex_boundary< Simplex, Z2> Simplex_boundary;
+typedef ctl::Simplex_boundary Simplex_boundary;
 
 //Chain Complex
-typedef ctl::Chain_complex< Simplex, Simplex_boundary> Complex;
+typedef ctl::Cell_complex< Simplex_boundary> Complex;
 
 
 // temporary solution until we build points.h
@@ -80,10 +80,9 @@ int main (int argc, char* argv[]) {
     clock.start();
     Graph graph;
     ctl::epsilon_search::construct_graph(points, epsilon, graph);
-    clock.stop();
+    std::cerr << "Graph construction: " << clock.elapsed() << std::endl;
     std::cerr << "# vertices = " <<  boost::num_vertices( graph) << std::endl;
     std::cerr << "# edges = " << boost:: num_edges( graph) << std::endl;
-    std::cerr << "Graph construction: " << clock.elapsed() << std::endl;
     std::ofstream out( output_file.c_str());
     out << graph;
     out.close();
