@@ -24,10 +24,8 @@ TEST_CASE("Construct & Iterate", "[relative complex]"){
 	std::cout << "X/A = " << R << std::endl;
 	REQUIRE( std::distance( std::begin(R), std::end(R)) == 1);
 	REQUIRE( std::begin(R)->first == sigma);
-        typedef ctl::Complex_boundary< decltype(X)> Cb;
-	typedef ctl::Relative_complex_boundary< Rcx, Cb> Rcb;
-	Cb cb( X);
-	Rcb rbd( R, cb);
+	typedef ctl::Relative_complex_boundary< Rcx> Rcb;
+	Rcb rbd( R);
 	for( auto rel_sigma = R.begin(); rel_sigma != R.end(); ++rel_sigma){
 		REQUIRE( std::distance( rbd.begin(rel_sigma), rbd.end(rel_sigma)) == 0);
 	}
@@ -47,7 +45,7 @@ TEST_CASE("Construct & Iterate", "[relative complex]"){
 	std::cout << "X/B" << X_rel_B << std::endl;
 	auto sigma_in_X_rel_B = X_rel_B.find_cell( sigma);
 	REQUIRE( sigma_in_X_rel_B != X_rel_B.end());
-	Rcb rbd1( X_rel_B, cb);
+	Rcb rbd1( X_rel_B);
 
 	for( auto i = rbd1.begin( sigma_in_X_rel_B); i != rbd1.end( sigma_in_X_rel_B); ++i){ 
 		std::cout << i->cell()->first << " " << std::endl;
