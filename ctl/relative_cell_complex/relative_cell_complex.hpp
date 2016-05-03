@@ -20,6 +20,7 @@ class Relative_cell_complex {
  public:
 	typedef  Complex_ Complex;
 	typedef  typename Complex::Cell Cell;
+	typedef  typename Complex::Data Data;
  private:
 	typedef Relative_cell_complex< Complex> Self;
 	typedef typename std::iterator_traits<typename Complex::const_iterator>::value_type vt;
@@ -45,8 +46,8 @@ class Relative_cell_complex {
 		return boost::make_filter_iterator( pred, x, X.end()); 
 	}
 	std::size_t size() { return X.size() - A.size(); }
-	const Complex& super_complex() const  { return X; }
-	const Complex&   sub_complex() const  { return A; }
+	//const Complex& super_complex() const  { return X; }
+	//const Complex&   sub_complex() const  { return A; }
 	Complex& super_complex() { return X; }
 	Complex&   sub_complex() { return A; }
 	

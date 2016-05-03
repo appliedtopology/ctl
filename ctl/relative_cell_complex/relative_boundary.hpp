@@ -32,29 +32,28 @@ class Relative_complex_boundary{
  	
 	typedef std::function<bool(const Underlying_term& t)> Predicate;
 
-	Relative_complex_boundary( const Relative_cell_complex& c_, const Complex_boundary& bd_): 
-		complex( c_), bd( bd_) {}
+	Relative_complex_boundary( Relative_cell_complex& c_, Complex_boundary& bd_): 
+		_complex( c_), bd( bd_) {}
 
 
-	decltype(auto) begin( const typename Relative_cell_complex::iterator c) const {
+	decltype(auto) begin( typename Relative_cell_complex::iterator c) const {
 	  return boost::make_filter_iterator( predicate,  bd.begin( c.base()), bd.end( c.base())); 
 	}
 
-	decltype(auto) end( const typename Relative_cell_complex::iterator c) const {
+	decltype(auto) end( typename Relative_cell_complex::iterator c) const {
 	  return boost::make_filter_iterator( predicate,  bd.end( c.base()), bd.end( c.base())); 
 	}
 
 	/**
 	 * Not so efficient.
 	 */
-	size_type length( const typename Term::Cell & c) const {
-		return std::distance( begin( c), end(c));
-	}
+	size_type length( const typename Term::Cell & c) const { return std::distance( begin( c), end(c)); }
+	decltype(auto) complex() { return _complex; }
 
 	private:
-	const Relative_cell_complex& complex;
-	const Complex_boundary& bd;
-	const Predicate predicate = [&](const Underlying_term& t){ return complex.contains(*(t.cell())); }; 
+	 Relative_cell_complex& _complex;
+	 Complex_boundary& bd;
+	 Predicate predicate = [&](const Underlying_term& t){ return _complex.contains(*(t.cell())); }; 
 }; // class Relative_complex_boundary
 
 } //namespace ctl

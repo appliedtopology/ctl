@@ -44,4 +44,16 @@ void wrap_prod_complex(py::module &mod){
     py::implicitly_convertible<std::list<c>, s >();
     py::implicitly_convertible<std::set<c>, s >();
     py::implicitly_convertible<std::vector<c>, s >();
+
+    using b = ctl::Complex_boundary< s>;
+    //Default no-args constructor
+    py::class_<b>(mod, "Prod_simplicial_complex_boundary")
+    .def("__init__", [](b &instance, s& X) { new (&instance) b(X); })
+    .def("__call__", [](const b &bd, const typename std::pair< typename s::Cell, typename s::Data>& t) {
+	auto i = bd.complex().find_cell( t.first);
+        return py::make_iterator(bd.begin(i), bd.end(i)); 
+    }, py::keep_alive<0, 1>())
+    .def("length", [](const b& bd, const typename s::iterator& smplx){
+        return bd.length( smplx);
+    }, "length of the boundary");
 }

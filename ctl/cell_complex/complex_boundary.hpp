@@ -135,7 +135,7 @@ class Complex_boundary {
 	size_type length( const typename Term::Cell & c) const {
 	  return _complex.cell_boundary().length( c->first);
 	}
-		
+	decltype(auto) complex() const { return _complex; }		
 	private:		
 	Complex & _complex;
 }; // class Complex_boundary
