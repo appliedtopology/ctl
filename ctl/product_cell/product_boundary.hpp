@@ -16,7 +16,8 @@
 #include <ctl/product_cell/product_cell.hpp>
 
 //non-exported functionality
-namespace {
+namespace ctl {
+namespace detail {
 //TODO: Concept_check Boundary1_ and Boundary2_ should have the same coefficient 
 template< typename Term_, typename Boundary1_, typename Boundary2_, 
 	   typename Coefficient_>
@@ -128,7 +129,6 @@ class const_product_boundary_iterator :
 }; // END const_product_boundary_iterator
 } //END private namespace
 
-namespace ctl { 
 template< typename Boundary1_, typename Boundary2_, 
 	  typename Coefficient = typename Boundary1_::Coefficient>
 class Product_boundary {

@@ -30,7 +30,4 @@ struct Cell_less{
 
 } //namespace ctl
 
-//non-exported functionality
-namespace {} //anonymous namespace
-
 #endif //CTLIB_FILTRATION_LESS_H

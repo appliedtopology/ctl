@@ -12,8 +12,9 @@
 #include <ctl/term/term.hpp>
 #include <ctl/finite_field/finite_field.hpp>
 
+namespace ctl {
 //non-exported functionality
-namespace {
+namespace detail {
 //TODO: Concept_check Boundary1_ and Boundary2_ should have the same coefficient 
 template< typename Term_, typename Boundary1_, typename Boundary2_, 
 	   typename Coefficient_>
@@ -150,7 +151,6 @@ class const_it_product_boundary_iterator :
 }; // END const_it_product_boundary_iterator
 } //END private namespace
 
-namespace ctl { 
 template< typename Product_, typename Boundary1_, typename Boundary2_, 
 	  typename Coefficient = typename Boundary1_::Coefficient>
 class Iterator_product_boundary {

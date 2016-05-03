@@ -32,7 +32,4 @@ double hamming( const Point & a, const Point & b) {
 
 } //namespace ctl
 
-//non-exported functionality
-namespace {} //anonymous namespace
-
 #endif //CTLIB_LP_H
