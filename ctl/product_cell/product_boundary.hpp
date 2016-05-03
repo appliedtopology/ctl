@@ -142,7 +142,7 @@ public:
 	typedef Product Cell;
 	typedef typename Boundary1::Term::template 
 			rebind< Product, Coefficient>::T Term;
-	typedef const_product_boundary_iterator< Term, Boundary1, Boundary2, Coefficient> const_iterator;
+	typedef detail::const_product_boundary_iterator< Term, Boundary1, Boundary2, Coefficient> const_iterator;
 	Product_boundary() : bd1(), bd2() {}
 	//initialization constructor
 	Product_boundary( const Boundary1 & b1, const Boundary2 & b2): 

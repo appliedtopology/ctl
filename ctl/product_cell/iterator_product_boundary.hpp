@@ -161,7 +161,7 @@ public:
 	typedef Boundary2_ Boundary2;
 	typedef typename Boundary1::Term::template 
 			rebind< Product, Coefficient>::T Term;
-	typedef const_it_product_boundary_iterator< Term, Boundary1, 
+	typedef detail::const_it_product_boundary_iterator< Term, Boundary1, 
 					 Boundary2, Coefficient> const_iterator;
 	//default constructor
 	//none since we store references.
