@@ -33,6 +33,7 @@ stream_to_string(){
 #include "wrap_vr.hpp"
 #include "wrap_product.hpp"
 #include "wrap_prod_complex.hpp"
+#include "wrap_rel_complex.hpp"
 
 decltype(auto)
 sc_open_star_cover( ctl::Simplicial_complex<>& sc, 
@@ -79,6 +80,7 @@ PYBIND11_PLUGIN(ctl) {
   wrap_product(m);
   wrap_complex(m);
   wrap_prod_complex(m);
+  wrap_rel_complex(m);
   wrap_persistence(m);
   wrap_vr(m);
   m.def("open_star_vtx_cover", &sc_open_star_cover, "produce a cover and nerve where the open star of vertex `i` in the complex is put into set f[i]");

@@ -19,7 +19,9 @@ template< typename Complex_>
 class Relative_cell_complex {
  public:
 	typedef  Complex_ Complex;
+	typedef  typename Complex::Cell Cell;
  private:
+	typedef Relative_cell_complex< Complex> Self;
 	typedef typename std::iterator_traits<typename Complex::const_iterator>::value_type vt;
  public:
 	typedef std::function< bool(vt)> Predicate;
@@ -50,6 +52,8 @@ class Relative_cell_complex {
 	
 	bool contains(const vt& x) const { return pred( x); }
 
+	bool operator==( const Self & c) const { return (X == c.X) && (A == c.A); }
+	bool operator!=( const Self&  c) const { return !(*this == c); }
  private:
   	Complex& X;
   	Complex& A;
