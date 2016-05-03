@@ -1,7 +1,6 @@
 # README #
 This C++11 library provides a set of generic tools for:
 
- * Generating point sets (coming soon)
  * Building Neighborhood Graphs 
  * Building Cellular Complexes
  * Computing [persistent] homology over finite fields
@@ -13,39 +12,21 @@ This C++11 library provides a set of generic tools for:
 
 ## DEPENDENCIES ##
 
-CTL has a number of dependencies. We have listed them below.
+CTL has dependencies.
+   - boost
+   - tbb
+   - metis
+   - ann (for \epsilon nearest neighbors, we plan to move to a more up to date neighborhood computer)
 
-We have made an effort to make getting an using these dependencies simple.
-
-In particular, we strongly recommend installing them on your system either
+We strongly recommend installing them on your system either
 as root or with the help of your system administrator via your operating systems
 package manager e.g. apt on debian based systems, yum on RHEL systems, or 
-brew/port/fink on OSX.
+brew/port/fink on OSX. 
 
-If you do not tell us specifically where these dependencies are, we will try to
-find them for you via the CMake `find_package` system. 
+please see .travis.yml for an example of how to to this, and our CI results to clarify is a given commit will build.
 
-If this fails or if you wish to use a local/system wide install of the library, 
-simply update the corresponding entries in:
+If you wish to install your own dependencies in another way, you can manually edit:
 	build_dependencies.txt
-
-If you do not have the software installed anywhere, then for most of our 
-dependencies we provide make targets to download, and install them on your 
-system.
-
-For example:
-	`make boost`
-
-Will download and install boost into the dependencies/ directory.
-
-You may also type:
-	`make dependencies`
-
-Which will download and install all of the dependencies into the dependencies/
-directory.
-
-For your convienence `build_dependencies.txt` already lists the directories
-where this software should be installed to. So just uncomment!
 
 If you encounter any issues, make sure to file it:
   https://github.com/appliedtopology/ctl/issues
@@ -53,8 +34,7 @@ If you encounter any issues, make sure to file it:
 This list of the dependencies is below and we have annoted 
 which packages we can auto-help you install locally.
 
-C++11 compiler (clang or gcc)
-GTest (cmake .; make will download and compile automagically)
+C++14 compiler (clang or gcc)
 Boost 
 Intel TBB 
 METIS (make metis) (used for graph partitioning)
@@ -86,22 +66,9 @@ if boost is compiled with gcc, you cannot use clang to compile CTL and vice vers
 ## INSTALL ##
 OS/X:
  `brew tap appliedtopology/software`
- `brew install ctl`
-
-Fedora/CentOS/RHEL:(coming soon)
-`yum install ctl` 
-
-Ubuntu:  (coming soon)
- `apt-get install ctl`
-
-## INSTALL (from source) ##
- `make install`
+ `brew install --HEAD ctl`
 
 This sticks the headers into the default location on your system and all the tools into the appropriate path/bin directory
-
-## USING (coming soon) ##
-See tools/ or tests/ for a number of examples of using the library. 
-We hope to write a tutorial soon.
 
 ## SUBMITTING PATCHES ##
 Please Do! Accepting Pull Requests via github.
