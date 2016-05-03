@@ -101,7 +101,8 @@ class const_product_boundary_iterator :
 		} else if ( face2 != end2){
 			face.cell().first = cellptr->first;
 			face.cell().second = face2->cell();
-			face.coefficient( sign*face2->coefficient()); 
+			face.coefficient( face2->coefficient()); 
+			face *= sign;
 			++face2;
 		} else {
 			end_term();
