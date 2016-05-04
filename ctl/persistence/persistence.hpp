@@ -1,5 +1,6 @@
 #ifndef CTLIB_PERSISTENCE_H
 #define CTLIB_PERSISTENCE_H
+//#define DEBUG_PERSISTENCE
 /*******************************************************************************
 * Copyright (C) Ryan H. Lewis 2014 <me@ryanlewis.net>
 *******************************************************************************
@@ -62,7 +63,14 @@ void update_cascade( Persistence_data& data, const Term & tau,
 		     Scalar & scalar, detail::partner_and_cascade){
    typedef typename Persistence_data::Chain Chain;
    Chain& tau_cascade = data.cascade_map[ tau];
+#ifdef DEBUG_PERSISTENCE
+   std::cout << "\t tau_cascade: " << tau_cascade << std::endl;
+   std::cout << "\t data.cascade: " << data.cascade << std::endl;
+#endif
    data.cascade.scaled_add( scalar,  tau_cascade, data.temporary_chain);
+#ifdef DEBUG_PERSISTENCE
+   std::cout << "\t sum: " << data.cascade << std::endl;
+#endif
 }
 
 /**
@@ -83,7 +91,7 @@ void eliminate_boundaries( Persistence_data & data){
 	const Term& tau_term = data.cascade_boundary.youngest();
 	const Chain& bd_cascade_tau = data.cascade_boundary_map[ tau_term];
 	#ifdef DEBUG_PERSISTENCE
-	std::cerr << tau_term.cell() << " is youngest" << std::endl;
+	std::cerr << "\t" << tau_term.cell() << " is youngest" << std::endl;
 	#endif
 	//tau is the partner
 	if( bd_cascade_tau.empty()){ return; }
@@ -93,12 +101,12 @@ void eliminate_boundaries( Persistence_data & data){
 	const Chain& bd_cascade_tau_partner = 
 				data.cascade_boundary_map[ tau_partner_term];
 	#ifdef DEBUG_PERSISTENCE
-	std::cerr << "adding: " << bd_cascade_tau_partner << std::endl;
+	std::cerr << "\t adding: " << bd_cascade_tau_partner << std::endl;
 	#endif 
   	data.cascade_boundary.scaled_add( scalar, bd_cascade_tau_partner,
 				          data, data.temporary_chain);
 	#ifdef DEBUG_PERSISTENCE
- 	std::cerr << ctl::delta << "(cascade["<< ctl::sigma << "]) = " 
+ 	std::cerr << "\t " << ctl::delta << "(cascade["<< ctl::sigma << "]) = " 
 		  << data.cascade_boundary << std::endl;  
 	#endif
 	update_cascade( data, tau_partner_term, scalar, data.policy); 
@@ -374,7 +382,7 @@ pair_cells( Filtration_iterator begin, Filtration_iterator end,
 			       output_policy);
 	for(Filtration_iterator sigma = begin; sigma != end; ++sigma){
 	   #ifdef DEBUG_PERSISTENCE
-	   std::cerr << "Processing: " << (*sigma)->first << std::endl;
+	   std::cerr << "Processing: " << fm[sigma] << std::endl << std::flush;
 	   #endif 
 	   timer.start();
 	   //hand the column we want to operate on to our temporary.
@@ -382,8 +390,9 @@ pair_cells( Filtration_iterator begin, Filtration_iterator end,
 	   initialize_cascade_data< Remove_destroyers >( fm[sigma], data, 
 						   input_policy, output_policy);
 	   #ifdef DEBUG_PERSISTENCE
-	   std::cerr << ctl::delta << "(cascade(" << cascade_map[sigma] << ")"
+	   std::cerr << ctl::delta << "(" << data.cascade << ")"
 	   	  << " = " << data.cascade_boundary << std::endl;
+	
 	   #endif
 	   timer.stop();
 	   init_cascade_time += timer.elapsed();
