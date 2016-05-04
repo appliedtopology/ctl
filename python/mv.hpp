@@ -93,6 +93,7 @@ compute_homology_at_term_ijr( Iterator F_begin, Bd& unused,
 
 template< typename Page, typename Map, typename Cell_map>
 void print_page_with_map( Page& page, std::size_t r , Map& D_map, Map& R_map, std::size_t nerve_dimension, std::size_t complex_dimension, Cell_map M){
+	std::cout << std::endl << "------------ " << std::endl ;
 for( std::size_t j = 0; j < nerve_dimension+1; ++j){
 		for( std::size_t i = 0; i < complex_dimension+1; ++i){
 	auto& indices = page[ std::make_pair(i,j)];
