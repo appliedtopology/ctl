@@ -21,7 +21,7 @@
 //exported functionality
 namespace ctl{
 using Barcodes = std::vector< 
-std::multiset< std::pair< double, double> >> ;
+std::vector< std::pair< double, double> >> ;
 } //namespace ctl
 
 #endif //CTLIB_BARCODES_H

@@ -57,11 +57,11 @@ void construct_graph( const Points& points,
     double epsilon_squared = epsilon*epsilon;
     for ( std::tie( vi, vlast) = boost::vertices( graph); vi != vlast; ++vi) {
       for ( std::tie( vj, vlast) = boost::vertices (graph); vj != vi; ++vj) {
-       
-	if( lp(points.begin(name_map[*vi]), 
+        double d = lp(points.begin(name_map[*vi]), 
 	       points.end(name_map[*vi]), 
-	       points.begin(name_map[*vj])) < epsilon_squared){
-             boost::add_edge(*vi, *vj, graph);
+	       points.begin(name_map[*vj])); 
+	if( d < epsilon_squared){
+             boost::add_edge(*vi, *vj, std::sqrt(d), graph);
        }
       } 
     }

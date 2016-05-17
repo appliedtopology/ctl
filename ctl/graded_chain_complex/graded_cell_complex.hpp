@@ -72,9 +72,21 @@ public:
 		std::sort( filtration_.begin(), filtration_.end(), Less());
 	}
 
-	//default constructor
-	template< typename Function>
-	Graded_cell_complex( Complex & c, Function& f): filtration_( c.size()), complex_( c){
+	Graded_cell_complex( Complex & c, std::vector< double>& f):
+		filtration_( c.size()), complex_( c){
+		std::size_t pos = 0;
+		for( auto i= c.begin(); i != c.end(); ++i, ++pos){ 
+			 filtration_[ pos] = i;
+		}
+		std::sort( filtration_.begin(), filtration_.end(), 
+			   [&](const auto& i,const auto& j){ 
+			return (i->first.dimension() < j->first.dimension()) || 
+			       ((i->first.dimension() == j->first.dimension()) && f[i->second.id()] < f[j->second.id()]); 
+			  });
+	}
+
+	Graded_cell_complex( Complex & c, std::function<bool(const typename Complex::Cell&, const typename Complex::Cell&)>& f): 
+		filtration_( c.size()), complex_( c){
 		std::size_t pos = 0;
 		for( auto i= c.begin(); i != c.end(); ++i, ++pos){ 
 			 filtration_[ pos] = i;

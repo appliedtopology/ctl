@@ -21,10 +21,10 @@ compute_barcodes( ctl::Graded_cell_complex< Complex>& F,
                const auto& bd = R_map[ sigma];
 	       auto& barcode = barcodes[ (*sigma)->first.dimension()];
 	       if( bd.empty()){
-	       	  barcode.emplace( pos, std::numeric_limits< double>::infinity());
+	       	  barcode.emplace_back( pos, std::numeric_limits< double>::infinity());
 	       }else if( offset_map[sigma] < bd.youngest().cell()){
 	 	  auto destroyer = offset_map[bd.youngest().cell()];
-		  barcode.emplace( pos, destroyer);
+		  barcode.emplace_back( pos, destroyer);
 	       }
        }
        if( !include_last_dim){ barcodes.pop_back(); }

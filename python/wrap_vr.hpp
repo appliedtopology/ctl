@@ -50,7 +50,7 @@ class Matrix_view {
     pointer data_;
 }; //end Matrix_view class
 
-ctl::Simplicial_complex<>
+decltype(auto)
 vr_wrapper(py::array_t<double> array, double epsilon, std::size_t dimension) { 
    auto info = array.request();
    if( info.ndim != 2){
@@ -60,7 +60,12 @@ vr_wrapper(py::array_t<double> array, double epsilon, std::size_t dimension) {
    return ctl::vr( view, epsilon, dimension);
 }
 
+decltype(auto)
+vr_wrapper_2( Graph_wrapper& g, std::size_t dimension){
+	return ctl::vr( g.graph, dimension);
+}
 // Creates a Python class for an `Abstract_simplex`. 
 void wrap_vr(py::module &mod){
-  mod.def("vr", &vr_wrapper, "compute the vr complex of a set of points. returns list of simplices",  py::keep_alive<0,1>());
+  mod.def("vr", &vr_wrapper, "compute the vr complex of a set of points. returns list of simplices");
+  mod.def("vr", &vr_wrapper_2, "compute the vr complex of a metric neighbhorhood graph. returns list of simplices");
 }

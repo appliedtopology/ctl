@@ -59,7 +59,7 @@ run_homology( Complex & complex, Cell_less & less, bool compute_cascade = false)
    }
 }
 template< typename Complex, bool Remove_destroyers>
-std::vector< std::pair< std::size_t, std::size_t> >
+decltype(auto)
 run_persistence( ctl::Graded_cell_complex< Complex>& graded_complex, bool compute_cascade = false){
    typedef ctl::Graded_cell_complex< Complex> Filtration;
    //Boundary Operator
@@ -102,19 +102,21 @@ run_persistence( ctl::Graded_cell_complex< Complex>& graded_complex, bool comput
 	}
    }
    std::vector< std::size_t> bti;
+   auto barcode = compute_barcodes( graded_complex, R_map, true);
    return std::make_pair(barcode, generators);
    } else {
 	ctl::persistence<Remove_destroyers>( graded_complex.begin(), graded_complex.end(),
                             		     filtration_boundary,
    					     R_map,  false, offset_map);
-   	auto barcode = compute_barcodes( graded_complex, R_map, barcode, true);
+   	auto barcode = compute_barcodes( graded_complex, R_map, true);
    	return std::make_pair(barcode, Chains());
    }
 }
 
 
 template< typename Complex>
-decltype(auto) homology_two_impl( Complex& complex, bool compute_cascade=false, bool remove_destroyers=true){
+decltype(auto) 
+homology_two_impl( Complex& complex, bool compute_cascade=false, bool remove_destroyers=true){
   typedef ctl::Cell_less Complex_cell_less;
   Complex_cell_less less;
   if( remove_destroyers){
@@ -124,14 +126,13 @@ decltype(auto) homology_two_impl( Complex& complex, bool compute_cascade=false, 
 }
 
 template< typename Complex>
-decltype(auto) homology_two_impl( ctl::Graded_cell_complex<Complex>& complex, 
+decltype(auto) 
+homology_two_impl( ctl::Graded_cell_complex<Complex>& complex, 
 				  bool compute_cascade=false, bool remove_destroyers=true){
-  typedef ctl::Cell_less Complex_cell_less;
-  Complex_cell_less less;
   if( remove_destroyers){
-      return run_persistence<Complex, Complex_cell_less, true>( complex, less, compute_cascade);
+      return run_persistence<Complex, true>( complex, compute_cascade);
   }
-  return run_persistence<Complex, Complex_cell_less, false>( complex, less, compute_cascade);
+  return run_persistence<Complex,false>( complex, compute_cascade);
 }
 
 template< typename Complex>
@@ -225,6 +226,4 @@ void wrap_persistence(py::module &mod){
   mod.def("homology", &homology_two_gpd, "compute the persistent homology of the graded prod simplicial chain complex");
   mod.def("homology", &homology_one_gpd, "compute the persistent homology of the graded  prod simplicial chain complex");
   mod.def("homology", &homology_gpd, "compute the persistent homology of the graded prod simplicial chain complex");
-}
-
 }

@@ -30,31 +30,40 @@
 #include <ctl/vr/incremental_complex.hpp> 
 
 namespace ctl {
-
-template< typename It1, typename It2>
-double lp( It1 begin1, It1 end1, It2 begin2, It2 end2){
-	double r = 0.0;
-	for( ; begin1 != end1; ++begin2, ++begin2){
-		double v = (*begin1 - *begin2);
-		r += v*v;
+std::pair< ctl::Simplicial_complex<>, std::vector< double>>
+vr(const ctl::Nbhd_graph<>& graph, std::size_t dimension){
+	//TODO: glue in other algorithms
+	ctl::Simplicial_complex<> complex;
+	ctl::incremental_vr( graph, complex, dimension);
+	std::vector< double> weights;
+	weights.resize( complex.size());
+	ctl::Complex_boundary< decltype(complex)> bd( complex);
+	for(auto sigma = complex.begin(); sigma != complex.end(); ++sigma){
+	 auto& wgt = weights[ sigma->second.id()];
+	 if( sigma->first.dimension() == 1){
+		const auto& ed = boost::edge(sigma->first.front(),sigma->first.back(),graph);
+		wgt = boost::get(boost::edge_weight_t(), graph, ed.first);
+	 	continue;
+	 }
+	 for( auto tau = bd.begin( sigma); tau != bd.end( sigma); ++tau){
+	 	auto& cw = weights[ tau->cell()->second.id()];
+	 	if (wgt < cw){ wgt = cw; } 
+	 }
 	}
-	return r;
+	return std::make_pair(complex, weights);
 }
 
 template< typename Points>
-ctl::Cell_complex< ctl::Simplex_boundary> 
+decltype(auto)
 vr(const Points& points, double epsilon, std::size_t dimension){
 	//Simplex
 	typedef typename ctl::Nbhd_graph<> Graph;
-	
 	//Chain Complex
 	typedef ctl::Cell_complex< ctl::Simplex_boundary> Complex;
 	Graph graph;
 	Complex complex; 
 	ctl::all_pairs::construct_graph(points, epsilon, graph);
-	//TODO: glue in other algorithms
-	ctl::incremental_vr( graph, complex, dimension);
-	return complex;
+	return ctl::vr( graph, dimension);
 }
 
 } //end namespace ctl

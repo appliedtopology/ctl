@@ -16,6 +16,11 @@ void wrap_filtration(py::module &mod, std::string complex_name){
 						     const typename Complex::Cell&)>& f) {
           new (&instance) s(c, f);
      })
+    .def("__init__",
+      [](s &instance, Complex& c, std::vector<double>&wgts){ 
+	new (&instance) s(c, wgts);
+     })
+
     .def("__iter__", [](const s &c) { 
         return py::make_iterator(boost::make_indirect_iterator(c.begin()), boost::make_indirect_iterator(c.end()));
     }, py::keep_alive<0, 1>())
