@@ -30,16 +30,6 @@ class Graded_cell_complex {
 	typedef typename Cell_boundary::Term Cell_term;
 	typedef typename Cell_term::Coefficient Coefficient;
  public:
-	/*
-	typedef typename ctl::detail::_filtration_iterator< _viterator, 1> 
-								   iterator;
-	typedef typename ctl::detail::_filtration_iterator< _vciterator, 1> 
-								const_iterator;
-	typedef typename ctl::detail::_filtration_iterator< _viterator, -1> 
-							       reverse_iterator;
-	typedef typename ctl::detail::_filtration_iterator<  _vciterator, -1>
-							 const_reverse_iterator;
-	*/
 	typedef _viterator iterator;
 	typedef _vciterator const_iterator;
 	typedef _vriterator reverse_iterator;
@@ -72,6 +62,7 @@ public:
 	//maybe we have an empty complex, but we know its size in advance	
 	Graded_cell_complex( Complex & c, std::size_t s, bool flag): filtration_( s), 
 							    complex_( c) {}
+	
 	//default constructor	
 	Graded_cell_complex( Complex & c): filtration_( c.size()), complex_( c){
 		std::size_t pos = 0;
@@ -79,6 +70,17 @@ public:
 			 filtration_[ pos] = i;
 		}
 		std::sort( filtration_.begin(), filtration_.end(), Less());
+	}
+
+	//default constructor
+	template< typename Function>
+	Graded_cell_complex( Complex & c, Function& f): filtration_( c.size()), complex_( c){
+		std::size_t pos = 0;
+		for( auto i= c.begin(); i != c.end(); ++i, ++pos){ 
+			 filtration_[ pos] = i;
+		}
+		std::sort( filtration_.begin(), filtration_.end(), 
+			   [&](const auto i,const auto j){ return f(i->first, j->first); });
 	}
 
 	//used typedefs above since the names were getting to long

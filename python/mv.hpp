@@ -6,8 +6,8 @@
 
 template< typename Iterator, typename Bd, typename SS_Term, typename M>
 decltype(auto)
-compute_homology_at_term_ijr( Iterator F_begin, Bd& unused, 
-			     SS_Term& er_term, SS_Term& er_target, M& R_map, M& D_map){ 
+compute_homology_at_term_ijr( Iterator F_begin, std::size_t size, Bd& unused, 
+			      SS_Term& er_term, SS_Term& er_target, M& S_map, M& R_map, M& D_map){ 
    typedef ctl::Finite_field< 2> Coeff;
    typedef std::vector< std::size_t> WTF;
    typedef typename ctl::Offset_map< typename WTF::iterator> Offset_map;
@@ -19,9 +19,11 @@ compute_homology_at_term_ijr( Iterator F_begin, Bd& unused,
  
    WTF v( er_target.size()+er_term.size());
    std::iota(v.begin(), v.end(), 0); 
+   Matrix quotient_S( v.size());
    Matrix quotient_R( v.size());
    Matrix quotient_D( v.size());
    Offset_map offset_map( v.begin());
+   Chain_map QS_map( quotient_S.begin(), offset_map);
    Chain_map QR_map( quotient_R.begin(), offset_map);
    Chain_map QD_map( quotient_D.begin(), offset_map);
    
@@ -29,6 +31,9 @@ compute_homology_at_term_ijr( Iterator F_begin, Bd& unused,
    for( auto i = 0; i != v.size(); ++i){
    	 Chain& d = QD_map[ i];
 	 d += Term( i, 1);
+	 
+	 Chain& s = QS_map[ i];
+	 s += Term( i, 1);
    }
  
    for( auto i = er_target.size(); i != v.size(); ++i){
@@ -40,7 +45,7 @@ compute_homology_at_term_ijr( Iterator F_begin, Bd& unused,
 	 for(auto& nz : R_map[ original_idx]){
 		//std::cout << nz << " <--> "; 
 	 	auto row_pos = std::find( std::begin(er_target), std::end(er_target), nz.cell());
-		if( row_pos != std::end(er_target) ){
+		if( row_pos != std::end(er_target)  ){
 			Term t( std::distance( std::begin(er_target), row_pos), nz.coefficient());
 			//std::cout << "Created a Term with value: " << t << std::endl;
 			c += t;
@@ -49,89 +54,113 @@ compute_homology_at_term_ijr( Iterator F_begin, Bd& unused,
 		}
 	 }
    }
-   //std::cout << "Just before persistence: " << er_term.size() <<  std::endl;
+   std::cout << "Just before persistence: " << er_term.size() <<  std::endl;
    
    ctl::persistence<false>( v.begin(), v.end(),
                             unused, QR_map, QD_map, true, offset_map);
-   //std::cout << "Just after persistence." << std::endl;
+   std::cout << "Just after persistence." << std::endl;
    typename std::remove_const< SS_Term>::type ker, im;
    for( auto i = 0; i != er_target.size(); ++i){
 	   auto act_idx = er_target[ i];
 	   //std::cout << "idx " << v[ i] << " --> " << act_idx << std::endl;;
 	   if( !QR_map[ i].empty()){
 		im.push_back( act_idx);
-	   }
+	   } //else {
+		//std::cout << "Not empty: " << F_begin[ i]->first << std::endl;
+		//for(auto& elt : QR_map[ i]){
+		//	std::cout << elt.cell() << " ";	
+		//}
+		//std::cout << std::endl;
+	   //}
    }
+   std::cout << "Image vector created." << std::endl;
    for( auto i = er_target.size(); i !=v.size(); ++i){
 	   std::size_t idx = v[ i];
 	   std::size_t er_term_index = i-er_target.size();
 	   auto act_idx = er_term[ er_term_index];
-	   //std::cout << "Working on local col idx " << idx << " --> Global column index" << act_idx << std::endl;;
-	   //std::cout << "Cell: " << F_begin[ act_idx]->first << std::endl;
-	   //std::cout << "Offset Map: " << offset_map[ idx] << std::endl;
-	   //std::cout << "We added these columns together: " << QD_map[ idx] << std::endl;
+	   std::cout << "act_idx: " << act_idx << std::endl;
 	   if (QR_map[ idx].empty()){ ker.push_back( act_idx); }
+	   std::cout << "ker pushback" << std::endl;
 	   for(auto& local_combinator: QD_map[ idx]){
 		//When you multiply guass transforms you need to end up with an identity element.
 		auto act_col_idx = er_term[local_combinator.cell()-er_target.size()];
 		if( act_col_idx == act_idx) { continue ; }
-		//std::cout << local_combinator.cell() << " --> " << act_col_idx << std::endl;
 	   	D_map[ act_idx] += Term( act_col_idx, local_combinator.coefficient());
 	   	R_map[ act_idx].scaled_add( local_combinator.coefficient(), R_map[ act_col_idx]);
 	   }
-
-	   //if (R_map[ act_idx].empty()) { 
-	   //std::cout << ctl::delta << "(";
-	   //for( auto & elt: D_map[ act_idx]){ std::cout << F_begin[ elt.cell()]->first  << " "; }
-	   //std::cout << ") = 0";
-	   //std::cout << std::endl;
-	   //}
-	   //for( auto & elt: R_map[ act_idx]){ std::cout << F_begin[ elt.cell()]->first  << " "; }
+	   std::cout << "col updates" << std::endl;
+	   if( !QR_map[ idx].empty()){
+		std::size_t offset = QR_map[ idx].youngest().cell();
+		if (offset < er_term.size()) {
+		auto youngest_index = er_term[ offset];
+	   	//World's least efficient row operation.
+		for( auto col_index = 0; col_index != size; ++col_index){
+			auto& col = R_map[ col_index];
+			if( col.empty()) { continue; }
+			//at the row at youngest_index to all rows which have a nonzero entry  in col QR_map[ idx]
+			if( col.youngest().cell() == youngest_index){
+				for( auto& elt: QR_map[ idx]){
+					if (elt.cell() != offset && elt.cell() < er_term.size()){
+						col += Term( er_term[ elt.cell()], 1);
+					}
+				}
+			} 
+		}
+		}
+	   }
+	   std::cout << "Success col updates." << std::endl;
    }
    return std::make_pair( ker, im);
 }
 
 template< typename Page, typename Map, typename Cell_map>
-void print_page_with_map( Page& page, std::size_t r , Map& D_map, Map& R_map, std::size_t nerve_dimension, std::size_t complex_dimension, Cell_map M){
-	std::cout << std::endl << "------------ " << std::endl ;
+std::string 
+print_page_with_map( Page& page, std::size_t r , 
+		     Map& D_map, Map& R_map, std::size_t nerve_dimension, std::size_t complex_dimension, Cell_map M){
+std::stringstream ss;
+ss << std::endl << "------------ " << std::endl ;
 for( std::size_t j = 0; j < nerve_dimension+1; ++j){
 		for( std::size_t i = 0; i < complex_dimension+1; ++i){
 	auto& indices = page[ std::make_pair(i,j)];
-	std::cout << "dim E^"<< r << "_{" << i << "," << j << "} = " << indices.size() << std::endl;
+	ss << "dim E^"<< r << "_{" << i << "," << j << "} = " << indices.size() << std::endl;
 	if( indices.size() == 0){ 
 		continue; 
 	} //If the source is empty, bail now.
 	auto im_tgt = std::make_pair(i+r-1, j-r);
+	if( r  == 0) { continue ; }
 	if( i+r >= 1 and j >= r and page.count(im_tgt) > 0 and page[im_tgt].size() > 0){ //If there is an image, then there should is a nonzero map to print
-		std::cout << ctl::delta << "^" << r << " :  E^"<< r << "_{" << i << "," << j << "} --> E^"<< r << "_{" << im_tgt.first << "," << im_tgt.second << "} "<< std::endl;
-		auto& Im = page[im_tgt];
+		ss << ctl::delta << "^" << r << " :  E^"<< r << "_{" << i << "," << j << "} --> E^"<< r << "_{" << im_tgt.first << "," << im_tgt.second << "} "<< std::endl;
+		//auto& Im = page[im_tgt];
 		for(auto & index: indices){
-			std::cout << "\t " << ctl::delta << "(";
+			ss << "\t " << ctl::delta << "(";
 			for(auto& elt: D_map[ index]){
-				std::cout << M[ elt.cell()]->first << " ";				
+				ss << M[ elt.cell()]->first << " ";				
 			}
-			std::cout << ") = ";
+			ss << ") = ";
 			for(auto & elt: R_map[ index]){
-				if( std::find( std::begin(Im), std::end(Im), elt.cell()) != std::end(Im)){
-					std::cout << M[ elt.cell()]->first << " ";
-				}
+				auto& img_elt =  M[ elt.cell()]->first;	
+				if( img_elt.first_cell().dimension() == im_tgt.first && 
+							img_elt.second_cell().dimension() == im_tgt.second){
+					ss << M[ elt.cell()]->first << " ";
+				} 
 			}
-			if( R_map[ index].empty()){ std::cout << "0"; }
-			std::cout << std::endl;
+			if( R_map[ index].empty()){ ss << "0"; }
+			ss << std::endl;
 		}
 	} else { //Otherwise print page
-		std::cout << "E^" << r << "_{" << i << "," << j << "} : ";
+		ss << "E^" << r << "_{" << i << "," << j << "} : ";
 		for(auto & index: indices){
-			std::cout << "\t";
+			ss << "\t";
 			for(auto& elt: D_map[ index]){
-				std::cout << M[ elt.cell()]->first << " ";				
+				ss << M[ elt.cell()]->first << " ";				
 			}
-			std::cout << std::endl;
+			ss<< std::endl;
 		}
-		std::cout << "But Differential is zero! " << std::endl;
+		ss << "But Differential is zero! " << std::endl;
 	}
   }
 }
+return ss.str();
 }
 
 
@@ -159,7 +188,12 @@ mv_demo( ctl::Prod_simplicial_complex& K){
  
         //we hand persistence a property map for genericity!                        
         Offset_map offset_map( F.begin());
-        Matrix R( K.size());
+       
+	Matrix S( K.size());
+        Chain_map S_map( S.begin(), offset_map);
+    	
+ 
+	Matrix R( K.size());
         Chain_map R_map( R.begin(), offset_map);
     	
 	Matrix D( K.size());
@@ -179,8 +213,10 @@ mv_demo( ctl::Prod_simplicial_complex& K){
 			R_map[ itr] += *f;
 		}
 		D_map[itr] += typename Chain::Term( std::distance(F.begin(), itr), 1);
+		S_map[itr] += typename Chain::Term( std::distance(F.begin(), itr), 1);
 	}
-	print_page_with_map( E0, 0, D_map, R_map, nerve_dimension, complex_dimension, F.begin());
+	std::string res = print_page_with_map( E0, 0, D_map, R_map, nerve_dimension, complex_dimension, F.begin());
+	out << res;
 	E.emplace_back( E0);
 	for(std::size_t r = 0; r < 3; ++r){
 	 std::cout << "Computing differential r = " << r << std::endl;
@@ -188,7 +224,7 @@ mv_demo( ctl::Prod_simplicial_complex& K){
 	 Page E_next;
 	  for( std::size_t j = 0; j < nerve_dimension+1; ++j){
 		for( std::size_t i = 0; i < complex_dimension+1; ++i){
-				//std::cout << "At Term: " << i << " " << j << " on page: " << r << std::endl;
+				std::cout << "At Term: " << i << " " << j << " on page: " << r << std::endl;
 				auto src = std::make_pair(i,j);
 				if( E_r.count( src)==0 or i+r < 1 or j < r) {
 					//Our map is the zero map, because either the source vector space is zero, or the target space is defined to be zero vector space.
@@ -201,33 +237,35 @@ mv_demo( ctl::Prod_simplicial_complex& K){
 				//auto im_tgt = std::make_pair(j-r, i+r-1);
 				//construct the target of the map indices, which is in a place where data was assigned nonzero at some point by assumption
 				auto im_tgt = std::make_pair(i+r-1, j-r);
-				//std::cout << "Computing map to E_" << im_tgt.first << "," << im_tgt.second << " on page " <<  r << std::endl;
+				std::cout << "Computing map to E_" << im_tgt.first << "," << im_tgt.second << " on page " <<  r << std::endl;
 				//if we have the image, and if its nonzero we compute homology, otherwise we know we have a zero map
 				if( E_r.count( im_tgt) != 0 && E_r[ im_tgt].size() > 0){ 
 					const SS_Term& er_im_target = E_r[ im_tgt]; 
 					auto& ker = E_next[ im_tgt];
 					std::pair< SS_Term, SS_Term> ker_and_im_indices=
 						compute_homology_at_term_ijr( F.begin(),
+									      F.size(),
 									      G_bd,
 									      er_term,
 									      er_im_target, 
-									      R_map, D_map);
+									      S_map, R_map, D_map);
 					E_next.emplace( src, ker_and_im_indices.first);
 					for( auto& im_index : ker_and_im_indices.second){
 						std::remove( std::begin(ker), std::end(ker), im_index);
 					}
 					ker.resize( ker.size() - ker_and_im_indices.second.size());
-					//std::cout << "Computed term: E_" << i << "," << j << " @ " <<  r << std::endl;
+					std::cout << "Computed term: E_" << i << "," << j << " @ " <<  r << std::endl;
 				} else { //Another example of a zero map!
 					E_next.emplace( src, E_r[src]);
 				}
 			}
 		}
-	    print_page_with_map( E_next, r+1, D_map, R_map, nerve_dimension, complex_dimension, F.begin());
+	    std::string res = print_page_with_map( E_next, r+1, D_map, R_map, 
+						nerve_dimension, complex_dimension, F.begin());
+		out << res;
 	    E.emplace_back(E_next);
 	}
-	std::cout << "Returning.." << std::endl;
-	//TODO: compute persistence here.
+	//std::cout << "Returning.." << std::endl;
 	return out.str();
 }
 

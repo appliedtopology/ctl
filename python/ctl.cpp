@@ -34,6 +34,7 @@ stream_to_string(){
 #include "wrap_product.hpp"
 #include "wrap_prod_complex.hpp"
 #include "wrap_rel_complex.hpp"
+#include "wrap_filtration.hpp"
 #include "mv.hpp"
 
 //## Define the module
@@ -52,6 +53,7 @@ PYBIND11_PLUGIN(ctl) {
   wrap_product(m);
   wrap_complex(m);
   wrap_prod_complex(m);
+  wrap_filtration( m);
   wrap_rel_complex(m);
   wrap_persistence(m);
   wrap_vr(m);
